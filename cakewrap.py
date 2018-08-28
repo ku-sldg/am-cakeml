@@ -4,9 +4,8 @@ Wrapper for the CakeML compiler
 """
 
 # CHANGE THESE
-CAKE_LOCATION = "/home/barclata/Projects/stairCASE/examples/CakeML/cake-x64/cake"
-BASIS_LOCATION = "/home/barclata/Projects/stairCASE/examples/CakeML/cake-x64/basis_ffi.c"
-
+CAKE_LOCATION = "/home/barclata/cake-x64-64/cake"
+BASIS_LOCATION = "/home/barclata/cake-x64-64/basis_ffi.c"
 
 __author__ = "TJ Barclay"
 __version__ = "0.1.0"
