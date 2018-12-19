@@ -1,128 +1,65 @@
 (* Eval.v *)
-type 'a fmap = (nat * 'a) list
+type pubKey = nat
+type privKey = nat
 
-val fmap_empty = []
+type platform = pubKey * privKey
+type system = platform list
 
-fun find m (x : nat) =
-    case m of
-        [] => None
-      | ((i, a) :: ms) => if i = x then Some a else find ms x
+fun public p = case p of (x,y) => x
+fun private p = case p of (x,y) => y
 
-fun fmap_set m i v = (i,v) :: m
+fun platforms s = List.map public s
 
-fun fmap_dom m = case m of [] => []
-                        | ((i,a)::ms) => i :: fmap_dom ms
+val emptyUSM : (id, string list -> nat) map = map_empty
+fun dummyUSM args = natFromInt (List.length args + 1)
+fun dummyUSM' args = natFromInt (List.length args + 2)
 
-type platform = nat * nat
-fun goldenUsm p = case p of (x,y) => x
-fun goldenKim p = case p of (x,y) => y
+val emptyKIM : (id, nat -> string list -> nat) map = map_empty
+fun dummyKIM p args = natFromInt (List.length args + 1)
+fun dummyKIM' p args = natFromInt (List.length args + 2)
 
-type system = platform fmap
-fun platforms (s : system) = s
+val dummyAmUSM =  let val y = map_set emptyUSM (Id (natFromInt 0)) dummyUSM
+                  in map_set y (Id (natFromInt 1)) dummyUSM'
+                  end
 
-val emptySystem = fmap_empty
+val dummyAmKIM =  let val y = map_set emptyKIM (Id (natFromInt 0)) dummyKIM
+                  in map_set y (Id (natFromInt 1)) dummyKIM'
+                  end
 
-fun measureUsm (s : system) (p : pl) =
-    let val ps = platforms s in
-        let val optionP = find ps p in
-            case optionP of
-                None => O
-              | Some plat => goldenUsm plat
-        end
-    end
+fun splitEv s e = case s
+                   of ALL => e
+                    | NONE => Mt
 
-fun measureKim (s : system) (p : pl) =
-    let val ps = platforms s in
-        let val optionP = find ps p in
-            case optionP of
-                None => O
-              | Some plat => goldenKim plat
-        end
-    end
+fun measureUsm am id args =
+    case map_get am id
+     of None => O
+      | Some f => f args
 
-fun signEv (p : pl) (v : value) = p
+
+fun measureKim am id p args =
+    case map_get am id
+     of None => O
+      | Some f => f p args
+
+fun signEv (p : pl) (e : ev) = p
+fun genHash (p : pl) (e : ev) = p
 fun genNonce (p : pl) = p
 
-datatype pm = Plus of nat
-            | Minus
+exception USMexpn
+exception KIMexpn
 
-(* Debruijn substitution: Chapter 7 of TAPL *)
-fun walk (d : pm) (c : nat) (t : apdt) =
-    case t of
-        VAR (Id n) => if (nat_leb c n)
-                      then (case d of
-                                Plus v => VAR (Id (nat_plus n v))
-                              | Minus  => VAR (Id (nat_minus n one)))
-                      else VAR (Id n)
-
-      | ABS ty t' => ABS ty (walk d (nat_plus c one) t')
-      | APP t1 t2 => APP (walk d c t1) (walk d c t2)
-      | AT p t'   => AT p (walk d c t')
-      | LN t1 t2  => LN (walk d c t1) (walk d c t2)
-      | BR t1 t2  => BR (walk d c t1) (walk d c t2)
-      | _ => t
-
-fun termShift (d : pm) (t : apdt) = walk d O t
-
-fun walkS (j : nat) (s : apdt) (c : nat) (t : apdt) =
-    case t of
-        VAR (Id n) => if (nat_eq n (nat_plus j c))
-                      then termShift (Plus c) s
-                      else VAR (Id n)
-
-      | ABS ty t' => ABS ty (walkS j s (nat_plus c one) t')
-      | APP t1 t2 => APP (walkS j s c t1) (walkS j s c t2)
-      | AT p t'   => AT p (walkS j s c t')
-      | LN t1 t2  => LN (walkS j s c t1) (walkS j s c t2)
-      | BR t1 t2  => BR (walkS j s c t1) (walkS j s c t2)
-      | _ => t
-
-fun termSubst (j : nat) (s : apdt) (t : apdt) = walkS j s O t
-
-fun termSubstTop (s : apdt) (t : apdt) =
-    termShift Minus (termSubst O (termShift (Plus one) s) t)
-
-fun eval (p : pl) (s : system) (t : apdt) =
-    case t of
-        V v => Some (V v)
-      | VAR i => None
-      | MEA USM => Some (V (Vu p (measureUsm s p)))
-      | MEA (KIM q) => Some (V (Vk q p (measureKim s q)))
-      | NONCE => Some (V (Vnv p (genNonce p)))
-      | COM SIG => None
-      | AT (V (Vpla q)) t' => eval q s t'
-      | AT _ _ => None
-      | LN t1 t2 => (case t2 of
-                         COM SIG => (case (eval p s t1) of
-                                         Some (V v1) => Some (V (Vg p (signEv p v1) v1))
-                                       | _ => None)
-
-                       | _ => (case (eval p s t1) of
-                                   Some (V v1) => (case (eval p s t2) of
-                                                       Some (V v2) => Some (V (Vss v1 v2))
-                                                     | _ => None)
-                                 | _ => None))
-
-(* Another way to do the LN case *)
-(* | LN t1 t2 => (case (eval p s t1) of *)
-(*                    Some (V v1) => (case t2 of *)
-(*                                        COM SIG => Some (V (Vg p (signEv p v1) v1)) *)
-(*                                      | _ => (case (eval p s t2) of *)
-(*                                                  Some (V v2) => Some (Vss v1 v2) *)
-(*                                                | _ => None)) *)
-(*                  | _ => None) *)
-
-      | BR t1 t2 => (case (eval p s t1) of
-                         Some (V v1) => (case (eval p s t2) of
-                                             Some (V v2) => Some (V (Vpp v1 v2))
-                                           | _ => None)
-                       | _ => None)
-
-      | ABS ty t' => Some (ABS ty t')
-      | APP t1 t2 => (case (eval p s t1) of
-                          Some (ABS ty t1') => (case (eval p s t2) of
-                                                    Some (V v) => Some (termSubstTop (V v) t1')
-                                                  | _ => None)
-                        | _ => None)
-
-fun eapdt t = eval O emptySystem t
+fun eval (p : pl)  (e : ev) (term : t) =
+    case term
+     of USM id args => (case measureUsm dummyAmUSM id args
+                        of O => (print (String.concat ["USM ", idToString id, " fails\n"]); raise USMexpn)
+                         | n => U id args p n e)
+      | KIM id p' args=> (case measureKim dummyAmKIM id p args
+                          of O => (print (String.concat ["KIM ", idToString id, " fails\n"]); raise KIMexpn)
+                           | n => K id args p p' n e)
+      | SIG => G p e (signEv p e)
+      | HSH => H p (genHash p e)
+      | NONCE => N p (genNonce p) e
+      | AT p' t' => eval p' e t'
+      | LN t1 t2 => let val e1 = eval p e t1 in eval p e1 t2 end
+      | BRS s1 s2 t1 t2 => SS (eval p (splitEv s1 e) t1) (eval p (splitEv s2 e) t2)
+      | BRP s1 s2 t1 t2 => PP (eval p (splitEv s1 e) t1) (eval p (splitEv s2 e) t2)
