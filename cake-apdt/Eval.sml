@@ -10,13 +10,13 @@ fun private p = case p of (x,y) => y
 
 fun platforms s = List.map public s
 
-val emptyUSM : (id, string list -> bs) map = map_empty
-fun dummyUSM args = Vector.tabulate (List.length args + 1) (Word8.fromInt)
-fun dummyUSM' args = Vector.tabulate (List.length args + 2) (Word8.fromInt)
+val emptyUSM : (id, string list -> ByteString.bs) map = map_empty
+fun dummyUSM args = Word8Array.array 1 (Word8.fromInt (List.length args + 1))
+fun dummyUSM' args = Word8Array.array 1 (Word8.fromInt (List.length args + 1))
 
-val emptyKIM : (id, nat -> string list -> bs) map = map_empty
-fun dummyKIM p args = Vector.tabulate (List.length args + 1) (Word8.fromInt)
-fun dummyKIM' p args = Vector.tabulate (List.length args + 2) (Word8.fromInt)
+val emptyKIM : (id, nat -> string list -> ByteString.bs) map = map_empty
+fun dummyKIM p args = Word8Array.array 1 (Word8.fromInt (List.length args + 1))
+fun dummyKIM' p args = Word8Array.array 1 (Word8.fromInt (List.length args + 1))
 
 val dummyAmUSM =  let val y = map_set emptyUSM (Id (natFromInt 0)) dummyUSM
                   in map_set y (Id (natFromInt 1)) dummyUSM'
@@ -32,14 +32,14 @@ fun splitEv s e = case s
 
 fun encodeEv (e : ev) =
     case e
-     of Mt => bsEmpty
+     of Mt => ByteString.empty
       | U _ _ _ bs _ => bs
       | K _ _ _ _ bs _ => bs
       | G _ _ bs => bs
       | H _ bs => bs
       | N _ bs _ => bs
-      | SS e1 e2 => bsAppend (encodeEv e1) (encodeEv e2)
-      | PP e1 e2 => bsAppend (encodeEv e1) (encodeEv e2)
+      | SS e1 e2 => ByteString.append (encodeEv e1) (encodeEv e2)
+      | PP e1 e2 => ByteString.append (encodeEv e1) (encodeEv e2)
 
 
 exception USMexpn
@@ -56,9 +56,9 @@ fun measureKim am id p args =
       | Some f => f p args
 
 (* These are just placeholders at the moment. *)
-fun signEv (p : pl) (e : ev) = bsEmpty
-fun genHash (p : pl) (e : ev) = bsEmpty
-fun genNonce (p : pl) = bsEmpty
+fun signEv (p : pl) (e : ev) = ByteString.empty
+fun genHash (p : pl) (e : ev) = ByteString.empty
+fun genNonce (p : pl) = ByteString.empty
 
 fun eval (p : pl) (e : ev) (term : t) =
     case term
