@@ -10,13 +10,13 @@ fun private p = case p of (x,y) => y
 
 fun platforms s = List.map public s
 
-val emptyUSM : (id, string list -> nat) map = map_empty
-fun dummyUSM args = natFromInt (List.length args + 1)
-fun dummyUSM' args = natFromInt (List.length args + 2)
+val emptyUSM : (id, string list -> bs) map = map_empty
+fun dummyUSM args = Vector.tabulate (List.length args + 1) (Word8.fromInt)
+fun dummyUSM' args = Vector.tabulate (List.length args + 2) (Word8.fromInt)
 
-val emptyKIM : (id, nat -> string list -> nat) map = map_empty
-fun dummyKIM p args = natFromInt (List.length args + 1)
-fun dummyKIM' p args = natFromInt (List.length args + 2)
+val emptyKIM : (id, nat -> string list -> bs) map = map_empty
+fun dummyKIM p args = Vector.tabulate (List.length args + 1) (Word8.fromInt)
+fun dummyKIM' p args = Vector.tabulate (List.length args + 2) (Word8.fromInt)
 
 val dummyAmUSM =  let val y = map_set emptyUSM (Id (natFromInt 0)) dummyUSM
                   in map_set y (Id (natFromInt 1)) dummyUSM'
@@ -30,32 +30,40 @@ fun splitEv s e = case s
                    of ALL => e
                     | NONE => Mt
 
-fun measureUsm am id args =
-    case map_get am id
-     of None => O
-      | Some f => f args
+fun encodeEv (e : ev) =
+    case e
+     of Mt => bsEmpty
+      | U _ _ _ bs _ => bs
+      | K _ _ _ _ bs _ => bs
+      | G _ _ bs => bs
+      | H _ bs => bs
+      | N _ bs _ => bs
+      | SS e1 e2 => bsAppend (encodeEv e1) (encodeEv e2)
+      | PP e1 e2 => bsAppend (encodeEv e1) (encodeEv e2)
 
-
-fun measureKim am id p args =
-    case map_get am id
-     of None => O
-      | Some f => f p args
-
-fun signEv (p : pl) (e : ev) = p
-fun genHash (p : pl) (e : ev) = p
-fun genNonce (p : pl) = p
 
 exception USMexpn
 exception KIMexpn
 
-fun eval (p : pl)  (e : ev) (term : t) =
+fun measureUsm am id args =
+    case map_get am id
+     of None => raise USMexpn
+      | Some f => f args
+
+fun measureKim am id p args =
+    case map_get am id
+     of None => raise KIMexpn
+      | Some f => f p args
+
+(* These are just placeholders at the moment. *)
+fun signEv (p : pl) (e : ev) = bsEmpty
+fun genHash (p : pl) (e : ev) = bsEmpty
+fun genNonce (p : pl) = bsEmpty
+
+fun eval (p : pl) (e : ev) (term : t) =
     case term
-     of USM id args => (case measureUsm dummyAmUSM id args
-                        of O => (print (String.concat ["USM ", idToString id, " fails\n"]); raise USMexpn)
-                         | n => U id args p n e)
-      | KIM id p' args=> (case measureKim dummyAmKIM id p args
-                          of O => (print (String.concat ["KIM ", idToString id, " fails\n"]); raise KIMexpn)
-                           | n => K id args p p' n e)
+     of USM id args => U id args p (measureUsm dummyAmUSM id args) e
+      | KIM id p' args => K id args p p' (measureKim dummyAmKIM id p args) e
       | SIG => G p e (signEv p e)
       | HSH => H p (genHash p e)
       | NONCE => N p (genNonce p) e
