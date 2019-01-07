@@ -1,4 +1,7 @@
+(* No external dependencies *)
+
 (* Default Coq *)
+
 datatype nat = O
              | S of nat
 

@@ -1,4 +1,7 @@
-(* CoplandLang.v - Copland Language Definition *)
+(* Depends on: CoqDefaults.sml, ByteString.sml*)
+
+(* Copland Language Definition *)
+
 datatype id = Id of nat
 
 fun id_compare i j = let val (Id i) = i in
@@ -75,17 +78,17 @@ fun evToString e =
           | U i al p bs e'   => concat ["U", aspIdToString i,
                                         listToString al (fn x => x),
                                         plToString p,
-                                        ByteString.toString bs,
+                                        ByteString.toHexString bs,
                                         evToString' e']
           | K i al p1 p2 bs e' => concat ["K", aspIdToString i,
                                           listToString al (fn x => x),
                                           plToString p1,
                                           plToString p2,
-                                          ByteString.toString bs,
+                                          ByteString.toHexString bs,
                                           evToString' e']
-          | G p e' bs => concat ["G", plToString p, evToString' e', ByteString.toString bs]
-          | H p bs    => concat ["H", plToString p, ByteString.toString bs]
-          | N p bs e' => concat ["N", plToString p, ByteString.toString bs, evToString' e']
+          | G p e' bs => concat ["G", plToString p, evToString' e', ByteString.toHexString bs]
+          | H p bs    => concat ["H", plToString p, ByteString.toHexString bs]
+          | N p bs e' => concat ["N", plToString p, ByteString.toHexString bs, evToString' e']
           | SS e1 e2  => concat ["SS", evToString' e1, evToString' e2]
           | PP e1 e2   => concat ["PP", evToString' e1, evToString' e2]
     end

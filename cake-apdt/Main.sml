@@ -1,3 +1,3 @@
 (* Examples *)
-fun main () = (print "Nothing Yet\n")
+fun main () = print ("Hash test: " ^ (evToString (eval O Mt HSH)) ^ "\n")
 val _ = main ()

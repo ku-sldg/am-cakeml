@@ -1,3 +1,5 @@
+(* No external dependencies *)
+
 (*
 This is an implementation for ByteStrings which somewhat resembles the Haskell
 ByteString library.
@@ -56,7 +58,12 @@ structure ByteString = struct
 
 
         (* Returns a string of the hexadecimal representation *)
-        val toString = foldl (fn w => fn s => s ^ (byteToHex w)) "0x"
+        val toHexString = foldl (fn w => fn s => s ^ (byteToHex w)) "0x"
+
+        (* This returns a string by interpreting each byte as a char. *)
+        (* toHexString is meant to create a readable string for printing.
+           toCharString is meant to be used for sending through FFI *)
+        fun toCharString bs = Word8Array.substring bs 0 (Word8Array.length bs)
 
         (* An empty byteString *)
         val empty = Word8Array.array 0 zeroByte

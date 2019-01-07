@@ -1,4 +1,7 @@
+(* Depends on: Copland.sml, ByteString.sml *)
+
 (* Eval.v *)
+
 type pubKey = nat
 type privKey = nat
 
@@ -57,7 +60,7 @@ fun measureKim am id p args =
 
 (* These are just placeholders at the moment. *)
 fun signEv (p : pl) (e : ev) = ByteString.empty
-fun genHash (p : pl) (e : ev) = ByteString.empty
+fun genHash (p : pl) (e : ev) = hash (encodeEv e)
 fun genNonce (p : pl) = ByteString.empty
 
 fun eval (p : pl) (e : ev) (term : t) =
