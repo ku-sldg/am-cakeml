@@ -45,20 +45,34 @@ structure ByteString = struct
             end
 
         (* foldl over bytes in a ByteString *)
+        (* (a -> word8 -> a) -> a -> byte_array -> a *)
         fun foldl f init bs =
             let
                 fun foldl_withIndex f init bs i =
                     if (i < (Word8Array.length bs)) then
-                        foldl_withIndex f (f (Word8Array.sub bs i) init) bs (i+1)
+                        foldl_withIndex f (f init (Word8Array.sub bs i)) bs (i+1)
                     else
                         init
             in
                 foldl_withIndex f init bs 0
             end
 
+        (* foldr over bytes in a ByteString *)
+        (* (word8 -> a -> a) -> a -> byte_array -> a *)
+        fun foldr f init bs =
+            let
+                fun foldr_withIndex f init bs i =
+                    if (i < (Word8Array.length bs)) then
+                        f (Word8Array.sub bs i) (foldr_withIndex f init bs (i+1))
+                    else
+                        init
+            in
+                foldr_withIndex f init bs 0
+            end
+
 
         (* Returns a string of the hexadecimal representation *)
-        val toHexString = foldl (fn w => fn s => s ^ (byteToHex w)) "0x"
+        val toHexString = foldl (fn s => fn w => s ^ (byteToHex w)) "0x"
 
         (* This returns a string by interpreting each byte as a char. *)
         (* toHexString is meant to create a readable string for printing.
