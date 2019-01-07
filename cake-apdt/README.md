@@ -5,7 +5,7 @@
 
 To build this project, just type `make`.
 
-## Why are you using the sml file extension for CakeML files
+## Why are you using the sml file extension for CakeML files?
 
 To make use of sml syntax highlighting.
 
