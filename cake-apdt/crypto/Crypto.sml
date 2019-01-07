@@ -1,3 +1,4 @@
+(* No external dependencies *)
 (* Safe wrappers to FFI crypto functions *)
 
 fun hash bs =
