@@ -71,14 +71,6 @@ structure ByteString = struct
             end
 
 
-        (* Returns a string of the hexadecimal representation *)
-        val toHexString = foldl (fn s => fn w => s ^ (byteToHex w)) "0x"
-
-        (* This returns a string by interpreting each byte as a char. *)
-        (* toHexString is meant to create a readable string for printing.
-           toCharString is meant to be used for sending through FFI *)
-        fun toCharString bs = Word8Array.substring bs 0 (Word8Array.length bs)
-
         (* An empty byteString *)
         val empty = Word8Array.array 0 zeroByte
 
@@ -88,13 +80,25 @@ structure ByteString = struct
         (* Length of a byteString *)
         val len = Word8Array.length
 
+        (* Returns a string of the hexadecimal representation *)
+        fun toString bs =
+            if isEmpty bs then "<Empty ByteString>"
+            else foldl (fn s => fn w => s ^ (byteToHex w)) "0x" bs
+        (* val toHexString = ((op ^) "0x") o (foldr ((op ^) o byteToHex) "") *)
+
+        (* This returns a string by interpreting each byte as a char. *)
+        (* toHexString is meant to create a readable string for printing.
+           toRawString is meant to be used for sending through FFI *)
+        fun toRawString bs = Word8Array.substring bs 0 (Word8Array.length bs)
+
+
         (* Appends 2 byteStrings *)
         (* Since arrays are fixed size, we create a new array large enough to
            accommodate both byteStrings, and then copy them in sequentially*)
         fun append bs1 bs2 =
             let
-                val bs1Len = Word8Array.length bs1
-                val bs2Len = Word8Array.length bs2
+                val bs1Len = len bs1
+                val bs2Len = len bs2
                 val newArray = Word8Array.array (bs1Len + bs2Len) zeroByte
             in
                 Word8Array.copy bs1 0 bs1Len newArray 0;
