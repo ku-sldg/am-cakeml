@@ -1,4 +1,4 @@
-(* Depends on: Copland.sml, ByteString.sml *)
+(* Depends on: CoplandLang.sml, CoqDefaults.sml, ByteString.sml, and Measurements.sml*)
 
 (* Eval.v *)
 
@@ -33,18 +33,6 @@ fun splitEv s e = case s
                    of ALL => e
                     | NONE => Mt
 
-fun encodeEv (e : ev) =
-    case e
-     of Mt => ByteString.empty
-      | U _ _ _ bs _ => bs
-      | K _ _ _ _ bs _ => bs
-      | G _ _ bs => bs
-      | H _ bs => bs
-      | N _ bs _ => bs
-      | SS e1 e2 => ByteString.append (encodeEv e1) (encodeEv e2)
-      | PP e1 e2 => ByteString.append (encodeEv e1) (encodeEv e2)
-
-
 exception USMexpn
 exception KIMexpn
 
@@ -58,18 +46,14 @@ fun measureKim am id p args =
      of None => raise KIMexpn
       | Some f => f p args
 
-(* These are just placeholders at the moment. *)
-fun signEv (p : pl) (e : ev) = ByteString.empty
-fun genHash (p : pl) (e : ev) = hash (encodeEv e)
-fun genNonce (p : pl) = ByteString.empty
 
 fun eval (p : pl) (e : ev) (term : t) =
     case term
      of USM id args => U id args p (measureUsm dummyAmUSM id args) e
       | KIM id p' args => K id args p p' (measureKim dummyAmKIM id p args) e
-      | SIG => G p e (signEv p e)
-      | HSH => H p (genHash p e)
-      | NONCE => N p (genNonce p) e
+      | SIG => G p e (signEv e)
+      | HSH => H p (genHash e)
+      | NONCE => N p (genNonce ()) e
       | AT p' t' => eval p' e t'
       | LN t1 t2 => let val e1 = eval p e t1 in eval p e1 t2 end
       | BRS s1 s2 t1 t2 => SS (eval p (splitEv s1 e) t1) (eval p (splitEv s2 e) t2)

@@ -1,6 +1,6 @@
 # NOTE: the order of this list must reflect code dependencies
-APPEND_LIST = CoqDefaults.sml ByteString.sml CoplandLang.sml \
-              crypto/Crypto.sml Eval.sml Main.sml
+APPEND_LIST = ByteString.sml CoqDefaults.sml CoplandLang.sml crypto/Crypto.sml \
+              Measurements.sml Eval.sml Main.sml
 
 # Change this directory if necessary
 CAKE_DIR = ~/cake-x64-64
