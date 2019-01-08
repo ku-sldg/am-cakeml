@@ -14,14 +14,16 @@ fun encodeEv (e : ev) =
 
 fun genHash (e : ev) = hash (encodeEv e)
 
-fun genFileHash filename =
+fun readFile filename =
     let
         val fd = TextIO.openIn filename
         val text = TextIO.inputAll fd
-        val _ = TextIO.close fd
     in
-        hashStr text
+        TextIO.close fd;
+        text
     end
+
+val genFileHash = hashStr o readFile
 
 (* These are just placeholders at the moment. *)
 fun signEv (e : ev) = ByteString.empty
