@@ -1,6 +1,6 @@
-// This is not a replacement for basis_ffi.c, rather than extension. When
-// building, simply compile this file like normal, and then link the object file
-// with basis_ffi.o and your CakeML object file.
+// FFI interface to our verified crypto algorithms. Note, this file does not
+// replace basis_ffi.c. Both files need to be linked against the compiled
+// CakeML code.
 
 #include <assert.h>     // asserts
 #include <stdint.h>     // uint8_t and uint32_t types
