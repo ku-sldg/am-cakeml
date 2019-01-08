@@ -10,14 +10,7 @@ via the wayback machine:
     https://web.archive.org/web/20130526224224/http://csrc.nist.gov/groups/STM/cavp/documents/shs/sha256-384-512.pdf
 *)
 
-val message =
-    let
-        val arr = Word8Array.array 3 (Word8.fromInt 0)
-    in
-        Word8Array.copyVec "abc" 0 3 arr 0;
-        arr
-    end
-val evidence = H O message
+val evidence = H O (ByteString.fromRawString "abc")
 
 fun main () = print ("Hash test: " ^ (evToString (eval O evidence HSH)) ^ "\n")
 val _ = main ()

@@ -91,6 +91,15 @@ structure ByteString = struct
            toRawString is meant to be used for sending through FFI *)
         fun toRawString bs = Word8Array.substring bs 0 (Word8Array.length bs)
 
+        (* Inverse of toRawString *)
+        fun fromRawString s =
+            let
+                val size = String.size s
+                val arr = Word8Array.array size (Word8.fromInt 0)
+            in
+                Word8Array.copyVec s 0 size arr 0;
+                arr
+            end
 
         (* Appends 2 byteStrings *)
         (* Since arrays are fixed size, we create a new array large enough to
