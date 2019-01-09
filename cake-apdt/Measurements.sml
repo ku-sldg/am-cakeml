@@ -25,8 +25,8 @@ fun readFile filename =
 
 val genFileHash = hashStr o readFile
 
-(* Gets a 32 bit nonce *)
-fun genNonce () = nonce 4
+(* Gets a 128 bit (16 byte) nonce *)
+fun genNonce () = nonce 16
 
 (* This is just a placeholder at the moment. *)
 fun signEv (e : ev) = ByteString.empty
