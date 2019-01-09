@@ -4,6 +4,7 @@
 
 #include <assert.h>
 #include <sys/random.h>
+// #include <bsd/stdlib.h>
 #include "sha512.h"
 
 void ffisha512(unsigned char * c, long clen, unsigned char * a, long alen) {
@@ -12,8 +13,19 @@ void ffisha512(unsigned char * c, long clen, unsigned char * a, long alen) {
     sha512(c, clen, a);
 }
 
+
 void ffinonce(unsigned char * c, long clen, unsigned char * a, long alen) {
-    // This performs a syscall, drawing entropy from "urandom" (aka /dev/urandom) 
+    // This performs a syscall, drawing entropy from "urandom" (aka /dev/urandom)
     // http://man7.org/linux/man-pages/man2/getrandom.2.html
-    getrandom(a, alen, 0);
+    ssize_t len = getrandom(a, alen, 0);
+
+    // Rather than making a syscall each time, we could use something like
+    // arc4random, which is a userspace prng that periodically reseeds from
+    // urandom. However, this is not in libc (we would need to link against
+    // libbsd), and some old versions are based on a now insecure algorithm.
+
+    // For now, we will assert that we must get as many bytes as we asked for.
+    // In the future, we may wish to recover from such an error rather than
+    // purposefully crashing.
+    assert(len == alen);
 }
