@@ -40,6 +40,6 @@ fun aes256 pt xkey =
     let
         val result = Word8Array.array 16 (Word8.fromInt 0)
     in
-        #(aes256) (pt ^ (ByteString.toString xkey)) result;
+        #(aes256) (pt ^ xkey) result;
         result
     end

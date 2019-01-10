@@ -26,12 +26,13 @@ structure Aes256CtrDrbg = struct
                     let val _ = reseed drbg (* semicolon/sequencing, due to   *)
                     in genBits drbg end     (* right-to-left evaluation order *)
                 else
-                    Aes256Ctr.halfEncr ctr
+                    Aes256Ctr.encrCtr ctr
         end
 end
 
 
 local
+    (* Does everything need to be a ref, or just count? *)
     val dbgr = ref (Aes256CtrDrbg.init ())
 in
     (* Returns 16 random bytes *)
