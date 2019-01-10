@@ -44,6 +44,37 @@ structure ByteString = struct
                 ((getHexit top) ^ (getHexit bot))
             end
 
+        (* Raised by hexToByte if there exists a char != 0..9, a..f, or A..F *)
+        exception InvalidHexString
+
+        (* Inverse of byteToHex *)
+        fun hexToByte s =
+            let
+                val top = String.sub s 0
+                val bot = String.sub s 1
+                fun getHalfByte c =
+                    case c of
+                      #"0" => Word8.fromInt 0
+                    | #"1" => Word8.fromInt 1
+                    | #"2" => Word8.fromInt 2
+                    | #"3" => Word8.fromInt 3
+                    | #"4" => Word8.fromInt 4
+                    | #"5" => Word8.fromInt 5
+                    | #"6" => Word8.fromInt 6
+                    | #"7" => Word8.fromInt 7
+                    | #"8" => Word8.fromInt 8
+                    | #"9" => Word8.fromInt 9
+                    | #"a" => Word8.fromInt 10 | #"A" => Word8.fromInt 10
+                    | #"b" => Word8.fromInt 11 | #"B" => Word8.fromInt 11
+                    | #"c" => Word8.fromInt 12 | #"C" => Word8.fromInt 12
+                    | #"d" => Word8.fromInt 13 | #"D" => Word8.fromInt 13
+                    | #"e" => Word8.fromInt 14 | #"E" => Word8.fromInt 14
+                    | #"f" => Word8.fromInt 15 | #"F" => Word8.fromInt 15
+                    |   _  => raise InvalidHexString
+            in
+                Word8.orb (Word8.<< (getHalfByte top) 4) (getHalfByte bot)
+            end
+
         (* foldl over bytes in a ByteString *)
         (* (a -> word8 -> a) -> a -> byte_array -> a *)
         fun foldl f init bs =
@@ -57,6 +88,19 @@ structure ByteString = struct
                 foldl_withIndex f init bs 0
             end
 
+        (* foldli over bytes in a ByteString *)
+        (* (int -> a -> word8 -> a) -> a -> byte_array -> a *)
+        fun foldli f init bs =
+            let
+                fun foldli_withIndex f init bs i =
+                    if (i < (Word8Array.length bs)) then
+                        foldli_withIndex f (f i init (Word8Array.sub bs i)) bs (i+1)
+                    else
+                        init
+            in
+                foldli_withIndex f init bs 0
+            end
+
         (* foldr over bytes in a ByteString *)
         (* (word8 -> a -> a) -> a -> byte_array -> a *)
         fun foldr f init bs =
@@ -68,6 +112,19 @@ structure ByteString = struct
                         init
             in
                 foldr_withIndex f init bs 0
+            end
+
+        (* foldri over bytes in a ByteString *)
+        (* (int -> word8 -> a -> a) -> a -> byte_array -> a *)
+        fun foldri f init bs =
+            let
+                fun foldri_withIndex f init bs i =
+                    if (i < (Word8Array.length bs)) then
+                        f i (Word8Array.sub bs i) (foldri_withIndex f init bs (i+1))
+                    else
+                        init
+            in
+                foldri_withIndex f init bs 0
             end
 
 
@@ -84,7 +141,21 @@ structure ByteString = struct
         fun toString bs =
             if isEmpty bs then "<Empty ByteString>"
             else foldl (fn s => fn w => s ^ (byteToHex w)) "0x" bs
-        (* val toHexString = ((op ^) "0x") o (foldr ((op ^) o byteToHex) "") *)
+        (* val toHexString = foldr ((op ^) o byteToHex) "" *)
+
+        (* Almost inverse of toString (this function disallows the "0x" prefix)
+           Only really useful for testing purposes, I imagine. *)
+        fun fromHexString s =
+            let
+                val result = Word8Array.array (String.size s div 2) zeroByte
+                fun f i _ _ = (
+                    Word8Array.update result i (hexToByte (String.substring s (2*i) 2));
+                    ()
+                )
+            in (* I'm basically just using foldli as a means of iteration *)
+                foldli f () result;
+                result
+            end
 
         (* This returns a string by interpreting each byte as a char. *)
         (* toHexString is meant to create a readable string for printing.

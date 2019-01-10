@@ -1,3 +1,6 @@
+(* Depends on: Eval.sml, ByteString.sml, CoplandLang.sml, Measurements.sml,
+   and crypto/Aes256.sml*)
+
 (* Examples *)
 
 (*
@@ -24,8 +27,48 @@ fun hashTests () =
                "Hash file test: " ^ hashFile  ^ "\n\n" )
     end
 
+(* Just prints a nonce. It's difficult to really measure randomness *)
 fun nonceTest () =
     print ("Nonce test: " ^ (ByteString.toString (genNonce ())) ^ "\n\n" )
+
+(*
+Using example vector with known answer. See section F.5.5,
+"CTR-AES256.Encrypt" from the following NIST publication:
+    https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38a.pdf
+*)
+
+(* Not currently giving expected values.
+   Potential causes: unnacounted endianness, byte_array addition *)
+fun aes256CtrTest () =
+    let
+        val key   = ByteString.fromHexString "603deb1015ca71be2b73aef0857d77811f352c073b6108d72d9810a30914dff4"
+        val nonce = ByteString.fromHexString "f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff"
+        val ctr = Aes256Ctr.init key nonce
+
+        val pt1 = ByteString.fromHexString "6bc1bee22e409f96e93d7e117393172a"
+        val pt2 = ByteString.fromHexString "ae2d8a571e03ac9c9eb76fac45af8e51"
+
+        val _ = print ("AES-256 CTR test: " ^ "\n")
+        val _ = print ((let val (_, _, v) = ctr in (ByteString.toString v) end) ^ "\n")
+        val _ = print ("Encrypted text 1: " ^ (ByteString.toString (Aes256Ctr.encrCtr ctr)) ^ "\n")
+        val _ = print ((let val (_, _, v) = ctr in (ByteString.toString v) end) ^ "\n\n")
+    in () end
+
+(* fun aes256CtrTest () =
+    let
+        val key   = ByteString.fromHexString "603deb1015ca71be2b73aef0857d77811f352c073b6108d72d9810a30914dff4"
+        val nonce = ByteString.fromHexString "f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff"
+        val ctr = Aes256Ctr.init key nonce
+
+        val pt1 = ByteString.fromHexString "6bc1bee22e409f96e93d7e117393172a"
+        val pt2 = ByteString.fromHexString "ae2d8a571e03ac9c9eb76fac45af8e51"
+    in
+        print ("AES-256 CTR test: " ^ "\n" ^
+               "Encrypted text 1: " ^ (ByteString.toString (Aes256Ctr.encrBlock ctr pt1)) ^ "\n" ^
+               (let val (_, _, v) = ctr in (ByteString.toString v) end) ^ "\n" ^
+               "Encrypted text 2: " ^ (ByteString.toString (Aes256Ctr.encrBlock ctr pt2)) ^ "\n" ^
+               (let val (_, _, v) = ctr in (ByteString.toString v) end) ^ "\n\n")
+    end *)
 
 (* Run all tests *)
 (* This function could have been written with sequencing/semicolons. However,
@@ -35,5 +78,6 @@ fun main () =
     let
         val _ = hashTests ()
         val _ = nonceTest ()
+        val _ = aes256CtrTest ()
     in () end
 val _ = main ()

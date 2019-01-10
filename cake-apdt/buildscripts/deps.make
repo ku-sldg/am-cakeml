@@ -23,4 +23,5 @@ crypto/Random.sml: crypto/Aes256.sml crypto/CryptoFFI.sml
 
 Eval.sml: CoplandLang.sml CoqDefaults.sml ByteString.sml Measurements.sml
 
-Main.sml: Eval.sml CoplandLang.sml
+Main.sml: Eval.sml ByteString.sml CoplandLang.sml Measurements.sml \
+	      crypto/Aes256.sml
