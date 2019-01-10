@@ -1,4 +1,4 @@
-(* Depends on: crypto/Aes256Ctr.sml, crypto/CryptoFFI.sml *)
+(* Depends on: crypto/Aes256.sml, crypto/CryptoFFI.sml *)
 
 (*
 A Deterministic Random Bit Generator (DRBG) based on the AES-256 block cipher

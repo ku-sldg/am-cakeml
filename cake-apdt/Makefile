@@ -1,6 +1,6 @@
 # NOTE: the order of this list must reflect code dependencies
 APPEND_LIST = ByteString.sml CoqDefaults.sml CoplandLang.sml \
-		      crypto/CryptoFFI.sml crypto/Aes256Ctr.sml crypto/Random.sml \
+		      crypto/CryptoFFI.sml crypto/Aes256.sml crypto/Random.sml \
 			  Measurements.sml Eval.sml Main.sml
 
 # Change this directory if necessary
