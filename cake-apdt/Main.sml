@@ -13,19 +13,27 @@ via the wayback machine:
 The second hashes a file called "hashTest.txt". This contains the exact same
 string (without a final newline char, despite editors really wanting to insert
 one) so we can again compare against the desired result.
-
-Finally, we test nonce generation.
 *)
-
-fun main () =
+fun hashTests () =
     let
         val evidence  = H O (ByteString.fromRawString "abc")
         val hashTest  = evToString (eval O evidence HSH)
         val hashFile  = ByteString.toString (genFileHash "hashTest.txt")
-        val nonceTest = ByteString.toString (genNonce ())
     in
         print ("Hash test: "      ^ hashTest  ^ "\n\n" ^
-               "Hash file test: " ^ hashFile  ^ "\n\n" ^
-               "Nonce test: "     ^ nonceTest ^ "\n\n" )
+               "Hash file test: " ^ hashFile  ^ "\n\n" )
     end
+
+fun nonceTest () =
+    print ("Nonce test: " ^ (ByteString.toString (genNonce ())) ^ "\n\n" )
+
+(* Run all tests *)
+(* This function could have been written with sequencing/semicolons. However,
+   due to right-to-left evaluation, we would see the print statements in the
+   opposite order than is intuitive. *)
+fun main () =
+    let
+        val _ = hashTests ()
+        val _ = nonceTest ()
+    in () end
 val _ = main ()
