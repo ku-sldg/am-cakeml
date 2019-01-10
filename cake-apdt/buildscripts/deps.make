@@ -14,7 +14,12 @@
 
 CoplandLang.sml: ByteString.sml CoqDefaults.sml
 
-Measurements.sml: CoplandLang.sml crypto/Crypto.sml
+Measurements.sml: CoplandLang.sml ByteString.sml crypto/Random.sml \
+                  crypto/CryptoFFI.sml
+
+crypto/Aes256Ctr.sml: ByteString.sml crypto/CryptoFFI.sml
+
+crypto/Random.sml: crypto/Aes256Ctr.sml crypto/CryptoFFI.sml
 
 Eval.sml: CoplandLang.sml CoqDefaults.sml ByteString.sml Measurements.sml
 

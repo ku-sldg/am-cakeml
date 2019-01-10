@@ -1,4 +1,5 @@
-(* Depends on: CoplandLang.sml, ByteString.sml, and Crypto.sml*)
+(* Depends on: CoplandLang.sml, ByteString.sml, crypto/Random.sml, and
+   crypto/CryptoFFI.sml*)
 
 fun encodeEv (e : ev) =
     case e
@@ -26,7 +27,8 @@ fun readFile filename =
 val genFileHash = hashStr o readFile
 
 (* Gets a 128 bit (16 byte) nonce *)
-fun genNonce () = nonce 16
+val genNonce = rand
+(* fun genNonce = urand 16 *)
 
 (* This is just a placeholder at the moment. *)
 fun signEv (e : ev) = ByteString.empty

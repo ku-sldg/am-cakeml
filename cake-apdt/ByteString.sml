@@ -101,6 +101,16 @@ structure ByteString = struct
                 arr
             end
 
+        (* Returns a copy of a ByteString *)
+        fun copy bs =
+            let
+                val bsLen = len bs
+                val result = Word8Array.array bsLen zeroByte
+            in
+                Word8Array.copy bs 0 bsLen result 0;
+                result
+            end
+
         (* Appends 2 byteStrings *)
         (* Since arrays are fixed size, we create a new array large enough to
            accommodate both byteStrings, and then copy them in sequentially*)
@@ -113,6 +123,42 @@ structure ByteString = struct
                 Word8Array.copy bs1 0 bs1Len newArray 0;
                 Word8Array.copy bs2 0 bs2Len newArray bs1Len;
                 newArray
+            end
+
+        fun xor bs1 bs2 =
+            let
+                val len = min (len bs1) (len bs2)
+                val out = Word8Array.array len zeroByte
+                fun xor_withIndex bs1 bs2 out i =
+                    if (i < len) then (
+                        Word8Array.update out i (Word8.xorb (Word8Array.sub bs1 i) (Word8Array.sub bs2 i));
+                        xor_withIndex bs1 bs2 out (i+1)
+                    ) else out
+            in
+                xor_withIndex bs1 bs2 out 0
+            end
+
+        (* exception raised by addInt the byte_array does not have enough precision *)
+        exception OutOfBounds
+
+        (* Treats the byte_string as an abitrary length integer *)
+        fun addInt bs n =
+            let
+                val base = 256
+                fun addInt_withIndex bs n i =
+                    if n <= 0
+                        then bs
+                    else if i < 0
+                        then raise OutOfBounds
+                    else
+                        let
+                            val sum = (Word8.toInt (Word8Array.sub bs i)) + (n mod base)
+                        in
+                            Word8Array.update bs i (Word8.fromInt (sum mod base));
+                            addInt_withIndex bs ((n div base) + (sum div base)) (i - 1)
+                        end
+            in
+                addInt_withIndex bs n (Word8Array.length bs - 1)
             end
 
     end

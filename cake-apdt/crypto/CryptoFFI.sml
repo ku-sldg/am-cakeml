@@ -18,11 +18,28 @@ fun hashStr s =
         result
     end
 
+
 (* len is length of nonce in bytes *)
-fun nonce len =
+fun urand len =
     let
         val result = Word8Array.array len (Word8.fromInt 0)
     in
-        #(nonce) "" result;
+        #(urand) "" result;
+        result
+    end
+
+fun aes256_xkey key =
+    let
+        val result = Word8Array.array 240 (Word8.fromInt 0)
+    in
+        #(aes256_expand_key) key result;
+        result
+    end
+
+fun aes256 pt xkey =
+    let
+        val result = Word8Array.array 16 (Word8.fromInt 0)
+    in
+        #(aes256) (pt ^ (ByteString.toString xkey)) result;
         result
     end
