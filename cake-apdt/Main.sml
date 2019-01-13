@@ -16,6 +16,8 @@ via the wayback machine:
 The second hashes a file called "hashTest.txt". This contains the exact same
 string (without a final newline char, despite editors really wanting to insert
 one) so we can again compare against the desired result.
+
+Expected result: 0xDDAF35A193617ABACC417349AE20413112E6FA4E89A97EA20A9EEEE64B55D39A2192992A274FC1A836BA3C23A3FEEBBD454D4423643CE80E2A9AC94FA54CA49F
 *)
 fun hashTests () =
     let
@@ -31,7 +33,8 @@ fun hashTests () =
 fun nonceTest () =
     print ("Nonce test: " ^ (ByteString.toString (genNonce ())) ^ "\n\n" )
 
-(* Testing addition over arbitrary length ByteStrings. Needed for CTR mode *)
+(* Testing addition over arbitrary length ByteStrings. Needed for CTR mode.
+   Expected result: increment by 1 each time *)
 fun bsAddTest () =
     let
         val _ = print "Bytesring addition test: \n"
@@ -41,6 +44,22 @@ fun bsAddTest () =
                 ) 5 (ByteString.fromHexString "A0FFFE")
         val _ = print "\n"
     in () end
+
+(*
+Based on test case from Appendix C.3 from the following NIST publication:
+   https://csrc.nist.gov/csrc/media/publications/fips/197/final/documents/fips-197.pdf
+Expected result: 0x8ea2b7ca516745bfeafc49904b496089
+*)
+fun aes256Test () =
+    let
+        val hexToRaw = ByteString.toRawString o ByteString.fromHexString
+        val key   = hexToRaw "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f"
+        val xkey  = ByteString.toRawString (aes256_xkey key)
+        val pt    = hexToRaw "00112233445566778899aabbccddeeff"
+        val ct    = ByteString.toString (aes256 pt xkey)
+    in
+        print ("AES-256 test: " ^ ct ^ "\n\n")
+    end
 
 (*
 Using example vector with known answer. See section F.5.5,
@@ -90,6 +109,7 @@ fun main () =
         val _ = hashTests ()
         val _ = nonceTest ()
         val _ = bsAddTest ()
+        val _ = aes256Test ()
         val _ = aes256CtrTest ()
     in () end
 val _ = main ()
