@@ -2,12 +2,15 @@
 // building, simply compile this file like normal, and then link the object file
 // with basis_ffi.o and your CakeML object file.
 
-#include <assert.h>
-#include <sys/random.h>
+#include <assert.h>     // asserts
+#include <stdint.h>     // uint8_t and uint32_t types
+#include <sys/random.h> // getRandom()
+
 #include "sha512.h"
 #include "aes256.h"
 
-void ffisha512(unsigned char * c, long clen, unsigned char * a, long alen) {
+// c <- message, returns hash in a
+void ffisha512(uint8_t * c, long clen, uint8_t * a, long alen) {
     // sha512 hash length = 512 bits = 64 bytes
     assert(alen >= 64);
     sha512(c, clen, a);
@@ -15,7 +18,7 @@ void ffisha512(unsigned char * c, long clen, unsigned char * a, long alen) {
 
 // This may block right after a fresh boot until the entropy pool is
 // sufficiently large
-void ffiurand(unsigned char * c, long clen, unsigned char * a, long alen) {
+void ffiurand(uint8_t * c, long clen, uint8_t * a, long alen) {
     // This performs a syscall, drawing entropy from "urandom" (aka /dev/urandom)
     // http://man7.org/linux/man-pages/man2/getrandom.2.html
     ssize_t len = getrandom(a, alen, 0);
@@ -26,16 +29,51 @@ void ffiurand(unsigned char * c, long clen, unsigned char * a, long alen) {
     assert(len == alen);
 }
 
+// Helper functions for copying between byte and 32-bit word arrays, and vice versa.
+// (casting and memcpy both result in unexpected ordering due to endianness)
+void cpyBytesToWords(uint8_t * bytes, uint32_t * words, int numWords){
+  for (int i = 0; i < numWords; i++){
+    words[i]  = ((uint32_t)bytes[4*i])   << 24;
+    words[i] |= ((uint32_t)bytes[4*i+1]) << 16;
+    words[i] |= ((uint32_t)bytes[4*i+2]) << 8;
+    words[i] |=  (uint32_t)bytes[4*i+3];
+  }
+}
+void cpyWordsToBytes(uint32_t * words, uint8_t * bytes, int numWords){
+  for (int i = 0; i < numWords; i++){
+    bytes[4*i]   = (uint8_t)( words[i] >> 24);
+    bytes[4*i+1] = (uint8_t)((words[i] >> 16) & 0xFF);
+    bytes[4*i+2] = (uint8_t)((words[i] >>  8) & 0xFF);
+    bytes[4*i+3] = (uint8_t)((words[i]) & 0xFF);
+  }
+}
+
 // c <- key, returns xkey in a
-void ffiaes256_expand_key(unsigned char * c, long clen, unsigned char * a, long alen) {
+void ffiaes256_expand_key(uint8_t * c, long clen, uint8_t * a, long alen) {
     assert(clen >= 32);
     assert(alen >= 240);
-    aes256_expand_key(c, a);
+
+    uint32_t key[8];
+    cpyBytesToWords(c, key, 8);
+
+    uint32_t xkey[60];
+    aes256_expand_key(key, xkey);
+    cpyWordsToBytes(xkey, a, 60);
 }
 
 // c[0..15] <- message block, c[16..254] <- xkey
-void ffiaes256(unsigned char * c, long clen, unsigned char * a, long alen) {
+void ffiaes256(uint8_t * c, long clen, uint8_t * a, long alen) {
     assert(clen >= 255);
     assert(alen >= 16);
-    aes256_block_enc(c, (c+16), a);
+
+    uint32_t pt[4];
+    cpyBytesToWords(c, pt, 4);
+
+    uint32_t xkey[60];
+    // FYI, (c+16) == &c[16]    (or if you like esoteric code, &16[c])
+    cpyBytesToWords(c+16, xkey, 60);
+
+    uint32_t ct[4];
+    aes256_block_enc(pt, xkey, ct);
+    cpyWordsToBytes(ct, a, 4);
 }

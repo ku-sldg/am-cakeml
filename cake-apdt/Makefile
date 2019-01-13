@@ -9,7 +9,7 @@ CAKEC = $(CAKE_DIR)/cake
 BASIS = $(CAKE_DIR)/basis_ffi.c
 
 CC = gcc
-CFLAGS = -Wno-incompatible-pointer-types
+CFLAGS = #-Wno-incompatible-pointer-types
 # BUILD_DIR = build
 
 apdt: apdt.S basis_ffi.o sha512.o aes256.o crypto_ffi.o
