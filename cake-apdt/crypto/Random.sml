@@ -4,8 +4,14 @@
 A Deterministic Random Bit Generator (DRBG) based on the AES-256 block cipher
 in the counter (CTR) mode of operation. Specified by NIST (see section 10.2):
     https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-90Ar1.pdf
-*)
 
+This implementation is slightly simplified compared to the above specification.
+E.G. it will always generate 16 random bytes, rather than letting you specify
+how many you want. The underlying mechanics are the same, though. We make
+syscalls to get random values for our key and counter (together acting as our
+seed), and then simply operate the AES-256 in CTR mode (conceptually encrypting
+zero blocks).
+*)
 structure Aes256CtrDrbg = struct
     type drbg = (Aes256Ctr.ctr * int) ref
 
@@ -32,7 +38,6 @@ end
 
 
 local
-    (* Does everything need to be a ref, or just count? *)
     val dbgr = ref (Aes256CtrDrbg.init ())
 in
     (* Returns 16 random bytes *)
