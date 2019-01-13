@@ -31,6 +31,17 @@ fun hashTests () =
 fun nonceTest () =
     print ("Nonce test: " ^ (ByteString.toString (genNonce ())) ^ "\n\n" )
 
+(* Testing addition over arbitrary length ByteStrings. Needed for CTR mode *)
+fun bsAddTest () =
+    let
+        val _ = print "Bytesring addition test: \n"
+        val _ = funpow (fn bs =>
+                    let val _ = print (ByteString.toString bs ^ "\n")
+                    in ByteString.addInt bs 1 end
+                ) 5 (ByteString.fromHexString "A0FFFE")
+        val _ = print "\n"
+    in () end
+
 (*
 Using example vector with known answer. See section F.5.5,
 "CTR-AES256.Encrypt" from the following NIST publication:
@@ -38,7 +49,7 @@ Using example vector with known answer. See section F.5.5,
 *)
 
 (* Not currently giving expected values.
-   Potential causes: unnacounted endianness, byte_array addition *)
+   Potential causes: unnacounted endianness *)
 fun aes256CtrTest () =
     let
         val key   = ByteString.fromHexString "603deb1015ca71be2b73aef0857d77811f352c073b6108d72d9810a30914dff4"
@@ -78,6 +89,7 @@ fun main () =
     let
         val _ = hashTests ()
         val _ = nonceTest ()
+        val _ = bsAddTest ()
         val _ = aes256CtrTest ()
     in () end
 val _ = main ()
