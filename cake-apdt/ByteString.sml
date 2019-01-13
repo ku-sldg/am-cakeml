@@ -212,15 +212,15 @@ structure ByteString = struct
         (* exception raised by addInt the byte_array does not have enough precision *)
         exception OutOfBounds
 
-        (* Treats the byte_string as an abitrary length integer *)
+        (* Treats the ByteString as an abitrary length integer and adds n,
+           Returns the same byte_array, whose value has been _mutated_.
+           Overflow results in wrap around, e.g. `addInt 0xFF 1` ~> `0x00` *)
         fun addInt bs n =
             let
                 val base = 256
                 fun addInt_withIndex bs n i =
-                    if n <= 0
+                    if n <= 0 orelse i < 0
                         then bs
-                    else if i < 0
-                        then raise OutOfBounds
                     else
                         let
                             val sum = (Word8.toInt (Word8Array.sub bs i)) + (n mod base)
@@ -234,11 +234,3 @@ structure ByteString = struct
 
     end
 end
-(*
-(* Test stuff *)
-fun main () = print (ByteString.toString (
-    ByteString.append (Word8Array.array 8 (Word8.fromInt 42))
-                      (ByteString.append ByteString.empty (Word8Array.array 2 (Word8.fromInt 94))))
-    ^ "\n")
-val _ = main ()
-*)
