@@ -18,7 +18,12 @@ structure Aes256Ctr = struct
            function for the benefit of the CTR DRBG, which does not make use of
            the XORing. *)
         fun encrCtr (xkey, _, ctr) =
-            aes256 (ByteString.toRawString (ByteString.addInt ctr 1)) xkey
+            let
+                val out = aes256 (ByteString.toRawString ctr) xkey
+                val _ = ByteString.addInt ctr 1
+            in
+                out
+            end
 
         (* Full block encryption *)
         fun encrBlock aes block = ByteString.xor (encrCtr aes) block
