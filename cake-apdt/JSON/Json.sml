@@ -91,7 +91,7 @@ fun getc strm =
 
 fun takeWhile prop ss =
     let
-        val (ls, ss') = String.splitl prop ss
+        val (ls, ss') = String.split prop ss
     in
         if isEmpty ls
         then None
@@ -211,7 +211,7 @@ fun toAList p acc = case p
 (*---------------------------------------------------------------------------*)
 fun dropl f s =
     let
-        val (_, s') = String.splitl f s
+        val (_, s') = String.split f s
     in
         s'
     end
