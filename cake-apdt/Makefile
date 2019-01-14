@@ -19,7 +19,11 @@ apdt.S: apdt.sml
 	$(CAKEC) < apdt.sml > apdt.S
 
 apdt.sml: $(APPEND_LIST)
-	buildscripts/cakeappender.py -o apdt.sml $(APPEND_LIST)
+	> apdt.sml; \
+	for cml in $(APPEND_LIST); do \
+		echo "\n(* $$cml *)" >> apdt.sml; \
+		cat $$cml >> apdt.sml; \
+	done
 
 sha512.o: crypto/sha512.c crypto/sha512.h
 	$(CC) $(CFLAGS) -c crypto/sha512.c
