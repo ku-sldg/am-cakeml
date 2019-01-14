@@ -29,9 +29,28 @@ fun hashTests () =
                "Hash file test: " ^ hashFile  ^ "\n\n" )
     end
 
-(* Just prints a nonce. It's difficult to really measure randomness *)
+(* Just prints a nonce. It's difficult to determine the quality of a single
+   random number though. At the very least, we can verify a new number is
+   printed at each invocation. *)
 fun nonceTest () =
     print ("Nonce test: " ^ (ByteString.toString (genNonce ())) ^ "\n\n" )
+
+(*
+The purpose of this function is to create a large file of random bytes, to
+be analyzed by NIST's statistical test suite for CSPRNGs:
+    https://www.nist.gov/publications/statistical-test-suite-random-and-pseudorandom-number-generators-cryptographic
+*)
+fun genRandFile filename len =
+    let
+        val fd = TextIO.openOut filename
+        val _ = funpow (fn _ => (
+                    TextIO.output fd (ByteString.toRawString (rand ())); ()
+                )) len ()
+    in
+        TextIO.close fd
+    end
+(* val _ = genRandFile "rand" 5000000 *)
+
 
 (* Testing addition over arbitrary length ByteStrings. Needed for CTR mode.
    Expected result: increment by 1 each time *)
