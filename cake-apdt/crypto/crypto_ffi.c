@@ -11,7 +11,7 @@
 #elif __APPLE__
     // open, read, close:
     #include <sys/types.h>
-    #include <sys/stat.h>
+    #include <sys/uio.h>
     #include <fcntl.h>
     #include <unistd.h>
 #endif
@@ -45,6 +45,7 @@ void ffiurand(uint8_t * c, long clen, uint8_t * a, long alen) {
     // On macOS, /dev/random and /dev/urandom are synonymous, with urandom only
     // existing for linux compatibility
     int fd = open("/dev/random", O_RDONLY);
+    assert(fd != -1);
     size_t len = read(fd, a, alen);
     assert(len == alen);
     close(fd);
