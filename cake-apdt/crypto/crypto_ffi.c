@@ -2,9 +2,19 @@
 // replace basis_ffi.c. Both files need to be linked against the compiled
 // CakeML code.
 
-#include <assert.h>     // asserts
-#include <stdint.h>     // uint8_t and uint32_t types
-#include <sys/random.h> // getRandom()
+#include <assert.h>   // asserts
+#include <stdint.h>   // uint8_t and uint32_t types
+
+#ifdef __linux__
+    // getRandom()
+    #include <sys/random.h>
+#elif __APPLE__
+    // open, read, close:
+    #include <sys/types.h>
+    #include <sys/stat.h>
+    #include <fcntl.h>
+    #include <unistd.h>
+#endif
 
 #include "sha512.h"
 #include "aes256.h"
@@ -16,6 +26,7 @@ void ffisha512(uint8_t * c, long clen, uint8_t * a, long alen) {
     sha512(c, clen, a);
 }
 
+#ifdef __linux__
 // This may block right after a fresh boot until the entropy pool is
 // sufficiently large
 void ffiurand(uint8_t * c, long clen, uint8_t * a, long alen) {
@@ -28,6 +39,22 @@ void ffiurand(uint8_t * c, long clen, uint8_t * a, long alen) {
     // purposefully crashing.
     assert(len == alen);
 }
+
+#elif __APPLE__
+void ffiurand(uint8_t * c, long clen, uint8_t * a, long alen) {
+    // On macOS, /dev/random and /dev/urandom are synonymous, with urandom only
+    // existing for linux compatibility
+    int fd = open("/dev/random", O_RDONLY);
+    size_t len = read(fd, a, alen);
+    assert(len == alen);
+    close(fd);
+}
+
+#else
+void ffiurand(uint8_t * c, long clen, uint8_t * a, long alen) {
+    assert(!"No support at the moment for this OS");
+}
+#endif
 
 // Helper functions for copying between byte and 32-bit word arrays, and vice versa.
 // (casting and memcpy both result in unexpected ordering due to endianness)
