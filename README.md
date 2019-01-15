@@ -14,7 +14,7 @@ Currently, this project should run under Linux and macOS*. Eventually, we will s
 To make use of sml syntax highlighting.
 
 ## Why does the makefile append CakeML files together?
-CakeML does not support any mechanism of combining source files. For the purpose of organization and modularity, we separate the source code regardless. In order to build our scattered CakeML, we therefore employ a python script which will append them all together in order to feed a single file to the CakeML compiler. This, however, necessitates that we append in an order which respects the dependencies of each file.
+CakeML does not support any mechanism of combining source files. For the purpose of organization and modularity, we separate the source code regardless. In order to build our scattered CakeML, we combine them with `cat` in order to feed a single file to the CakeML compiler. This, however, necessitates that we append in an order which respects the dependencies of each file.
 
 I have adopted the convention of listing the dependencies at the top of each file within a comment, from which you may manually derive an appension order. Alternatively, I wrote a quick python script that can derive such an ordering automatically. File dependencies are described in an external file, using syntax inspired by makefiles (checkout `buildscripts/deps.make`). You can print the ordering to the terminal by running `./topOrd.py deps.make` from the `buildscripts` directory.
 
