@@ -22,7 +22,7 @@ CFLAGS = #-Wno-incompatible-pointer-types
 # BUILD_DIR = build
 
 apdt: apdt.S basis_ffi.o sha512.o aes256.o crypto_ffi.o
-	$(CC) $(CFLAGS) $(LDFLAGS) -o apdt apdt.S basis_ffi.o sha512.o aes256.o crypto_ffi.o
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
 apdt.S: apdt.sml
 	$(CAKEC) < apdt.sml > apdt.S
