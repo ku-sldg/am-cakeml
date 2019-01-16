@@ -1,4 +1,4 @@
-(* No external dependencies *)
+(* Depends on: ByteString.sml *)
 
 (* Safe wrappers to FFI crypto functions *)
 
