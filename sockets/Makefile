@@ -1,5 +1,5 @@
-CLIENT_LIST = ByteString.sml sockets/SocketFFI.sml sockets/ClientTest.sml
-SERVER_LIST = ByteString.sml sockets/SocketFFI.sml sockets/ServerTest.sml
+CLIENT_LIST = ../ByteString.sml SocketFFI.sml ClientTest.sml
+SERVER_LIST = ../ByteString.sml SocketFFI.sml ServerTest.sml
 
 # Change this directory if necessary  -- or
 # provide the directory for your machine on the make command-line, e.g.
@@ -39,8 +39,8 @@ ClientTestFull.S: ClientTestFull.sml
 ClientTestFull.sml: $(CLIENT_LIST)
 	cat $^ > $@
 
-socket_ffi.o: sockets/socket_ffi.c
-	$(CC) $(CFLAGS) -c sockets/socket_ffi.c
+socket_ffi.o: socket_ffi.c
+	$(CC) $(CFLAGS) -c socket_ffi.c
 
 basis_ffi.o: $(BASIS)
 	$(CC) $(CFLAGS) -c $(BASIS)
