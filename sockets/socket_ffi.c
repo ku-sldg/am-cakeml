@@ -1,5 +1,8 @@
 // FFI interface to POSIX-style network sockets.
 
+// This socket interface is largely based on the example provided in the
+// getaddrinfo man page http://man7.org/linux/man-pages/man3/getaddrinfo.3.html
+
 #include <assert.h>     // asserts
 #include <stdint.h>     // uint8_t, uint16_6, etc.
 #include <sys/types.h>  // socket, bind, listen, getaddrinfo
@@ -13,7 +16,7 @@
 // I figured it would be good to use the same marshalling paradigm as the
 // provided FFI functions when possible.
 // However, I'm not sure why ints (usually 4 bytes) are converted back and forth
-// to 8 byte arrays.
+// to 8-byte arrays.
 int byte2_to_int(uint8_t *b);
 void int_to_byte2(int i, uint8_t *b);
 int byte8_to_int(uint8_t *b);
@@ -22,30 +25,45 @@ void int_to_byte8(int i, uint8_t *b);
 
 // Server functions:
 
-// Arguments: portnum (first 2 bytes of c), qlen (second 2 bytes of c)
+// Arguments: qlen (first 2 bytes of c), and port, a string representation of a
+//     number, following qlen
 // Returns: sockfd as 64-bit int in a
 void ffilisten(uint8_t * c, long clen, uint8_t * a, long alen) {
-    assert(clen >= 4);
+    assert(clen >= 2);
     assert(alen >= 8);
 
     // Parse arguments
-    uint16_t portnum = byte2_to_int(c);
-    int qlen = byte2_to_int(c+2);
+    int qlen = byte2_to_int(c);
+    char * port = c+2;
 
+    struct addrinfo hints;
+    memset(&hints, 0, sizeof(struct addrinfo));
     // AF_INET specifies the IPv4 Internet protocols
     // SOCK_STREAM specifies "sequenced, reliable, two-way, connection-based
     // byte streams."
-    int sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    assert(sockfd != -1);
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_STREAM;
+    // Passive flag + null node in getaddrinfo invocation indicates suitability
+    // for accepting connections
+    hints.ai_flags = AI_PASSIVE;
+    struct addrinfo * result;
+    int errorFlag = getaddrinfo(0, port, &hints, &result);
+    assert(!errorFlag);
 
-    struct sockaddr_in addr;
-    memset(&addr, 0, sizeof(struct sockaddr_in));
-    addr.sin_family = AF_INET;
-    addr.sin_port = htons(portnum); // htons converts a short to network byte order
-    addr.sin_addr.s_addr = INADDR_ANY;
-    // Bind the socket fd to an address
-    int errorFlag = bind(sockfd, (struct sockaddr *)(&addr), sizeof(struct sockaddr_in));
-    assert(errorFlag != -1);
+    int sockfd;
+    struct addrinfo * r;
+    for (r = result; r; r = r->ai_next) {
+        sockfd = socket(r->ai_family, r->ai_socktype, r->ai_protocol);
+        if (sockfd == -1)
+            continue;
+
+        if(bind(sockfd, r->ai_addr, r->ai_addrlen) == 0)
+            break;
+
+        close(sockfd);
+    }
+    assert(r && (sockfd != -1));
+    freeaddrinfo(result);
 
     // Listen for incoming connections, with a maximum queue length of qlen
     listen(sockfd, qlen);
@@ -98,7 +116,8 @@ void fficonnect(uint8_t * c, long clen, uint8_t * a, long alen) {
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
     struct addrinfo * result;
-    getaddrinfo(host, port, &hints, &result);
+    int errorFlag = getaddrinfo(host, port, &hints, &result);
+    assert(!errorFlag);
 
     int sockfd;
     struct addrinfo * r;

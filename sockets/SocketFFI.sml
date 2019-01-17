@@ -9,13 +9,13 @@
 
 (* Takes a port number and maximum queue length, and returns the fd of a new
    actively listening socket *)
-fun listen portNum qLen =
+fun listen port qLen =
     let
         val fdbuf = Word8Array.array 8 (Word8.fromInt 0)
-        val args = Word8Array.array 4 (Word8.fromInt 0)
-        val _ = Marshalling.n2w2 portNum args 0
-        val _ = Marshalling.n2w2 qLen args 2
-        val _ = #(listen) (ByteString.toRawString args) fdbuf
+        val cbuf = Word8Array.array 2 (Word8.fromInt 0)
+        val _ = Marshalling.n2w2 qLen cbuf 0
+        val c = (ByteString.toRawString cbuf) ^ (Int.toString port)
+        val _ = #(listen) c fdbuf
     in
         ByteString.toRawString fdbuf
     end
@@ -36,8 +36,8 @@ fun connect host port =
     let
         val fdbuf = Word8Array.array 8 (Word8.fromInt 0)
         val null = String.str (Char.chr 0)
-        val a = host ^ null ^ (Int.toString port) ^ null
-        val _ = #(connect) a fdbuf
+        val c = host ^ null ^ (Int.toString port) ^ null
+        val _ = #(connect) c fdbuf
     in
         ByteString.toRawString fdbuf
     end
