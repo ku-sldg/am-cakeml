@@ -8,7 +8,6 @@
 #include <sys/types.h>  // socket, bind, listen, getaddrinfo
 #include <sys/socket.h> // socket, bind, listen, getaddrinfo
 #include <netdb.h>      // getaddrinfo
-#include <netinet/in.h> // struct sockaddr_in
 #include <string.h>     // memset
 #include <unistd.h>     // close
 
