@@ -1,7 +1,7 @@
 val fdToString = ByteString.toString o ByteString.fromRawString
 
 val _ = print "Connecting to server...\n"
-val serverfd = connect "127.0.0.1" 50000
+val serverfd = connect "127.0.0.1" 5000
 val _ = print ("Connection established with file descriptor: " ^
                (fdToString serverfd) ^ "\n")
 
