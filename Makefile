@@ -1,7 +1,7 @@
 # NOTE: the order of this list must reflect code dependencies
-APPEND_LIST = ByteString.sml CoqDefaults.sml CoplandLang.sml \
-		      crypto/CryptoFFI.sml crypto/Aes256.sml crypto/Random.sml \
-			  Measurements.sml Eval.sml Main.sml
+APPEND_LIST = ByteString.sml crypto/CryptoFFI.sml crypto/Aes256.sml \
+              crypto/Random.sml sockets/SocketFFI.sml CoqDefaults.sml \
+              CoplandLang.sml Measurements.sml Eval.sml Main.sml
 
 # Change this directory if necessary  -- or
 # provide the directory for your machine on the make command-line, e.g.
@@ -13,15 +13,15 @@ BASIS = $(CAKE_DIR)/basis_ffi.c
 OS ?= $(shell uname)
 
 ifeq ($(OS),Darwin)
-	# These options avoid linker warnings on macOS
-	LDFLAGS += -Wl,-no_pie
+    # These options avoid linker warnings on macOS
+    LDFLAGS += -Wl,-no_pie
 endif
 
 CC = gcc
 CFLAGS = #-Wno-incompatible-pointer-types
 # BUILD_DIR = build
 
-apdt: apdt.S basis_ffi.o sha512.o aes256.o crypto_ffi.o
+apdt: apdt.S sha512.o aes256.o crypto_ffi.o socket_ffi.o basis_ffi.o
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
 apdt.S: apdt.sml
@@ -39,9 +39,12 @@ aes256.o: crypto/aes256.c crypto/aes256.h
 crypto_ffi.o: crypto/crypto_ffi.c crypto/sha512.h crypto/aes256.h
 	$(CC) $(CFLAGS) -c crypto/crypto_ffi.c
 
+socket_ffi.o: sockets/socket_ffi.c
+	$(CC) $(CFLAGS) -c sockets/socket_ffi.c
+
 basis_ffi.o: $(BASIS)
 	$(CC) $(CFLAGS) -c $(BASIS)
 
 .PHONY: clean
 clean:
-	rm -f apdt apdt.S apdt.sml sha512.o aes256.o crypto_ffi.o basis_ffi.o
+	rm -f apdt apdt.S apdt.sml sha512.o aes256.o crypto_ffi.o socket_ffi.o basis_ffi.o
