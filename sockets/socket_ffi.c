@@ -56,6 +56,9 @@ void ffilisten(uint8_t * c, long clen, uint8_t * a, long alen) {
         if (sockfd == -1)
             continue;
 
+        int enable = 1;
+        setsockopt(sockfd, SOL_SOCKET, SO_REUSEPORT, &enable, sizeof(enable));
+
         if(bind(sockfd, r->ai_addr, r->ai_addrlen) == 0)
             break;
 
