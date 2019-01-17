@@ -62,7 +62,8 @@ void ffilisten(uint8_t * c, long clen, uint8_t * a, long alen) {
 
         close(sockfd);
     }
-    assert(r && (sockfd != -1));
+    assert(r);
+    assert(sockfd != -1);
     freeaddrinfo(result);
 
     // Listen for incoming connections, with a maximum queue length of qlen
@@ -131,7 +132,8 @@ void fficonnect(uint8_t * c, long clen, uint8_t * a, long alen) {
 
         close(sockfd);
     }
-    assert(r && (sockfd != -1));
+    assert(r);
+    assert(sockfd != -1);
     freeaddrinfo(result);
 
     // return sockfd
