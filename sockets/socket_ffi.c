@@ -123,7 +123,7 @@ void fficonnect(uint8_t * c, long clen, uint8_t * a, long alen) {
     int sockfd;
     struct addrinfo * r;
     for (r = result; r; r = r->ai_next) {
-        int sockfd = socket(r->ai_family, r->ai_socktype, r->ai_protocol);
+        sockfd = socket(r->ai_family, r->ai_socktype, r->ai_protocol);
         if (sockfd == -1)
             continue;
 
