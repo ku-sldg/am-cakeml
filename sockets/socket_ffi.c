@@ -1,4 +1,4 @@
-// FFI interface to POSIX-style network sockets.
+// FFI interface to UNIX-style network sockets.
 
 // This socket interface is largely based on the example provided in the
 // getaddrinfo man page http://man7.org/linux/man-pages/man3/getaddrinfo.3.html
@@ -8,8 +8,11 @@
 #include <sys/types.h>  // socket, bind, listen, getaddrinfo
 #include <sys/socket.h> // socket, bind, listen, getaddrinfo
 #include <netdb.h>      // getaddrinfo
-#include <string.h>     // memset
+#include <string.h>     // memset, strerror
 #include <unistd.h>     // close
+#include <stdio.h>      // fprintf
+#include <stdlib.h>     // exit
+#include <errno.h>      // errno
 
 // These helper functions are defined in basis_ffi.c
 // I figured it would be good to use the same marshalling paradigm as the
@@ -21,8 +24,18 @@ void int_to_byte2(int i, uint8_t *b);
 int byte8_to_int(uint8_t *b);
 void int_to_byte8(int i, uint8_t *b);
 
+// Error helper functions. More helpful debugging than assert statements
+void fatalError(const char * msg) {
+    fprintf(stderr, "Fatal error: %s\n", msg);
+    exit(1);
+}
+void nonfatalError(const char * msg) {
+    fprintf(stderr, "Nonfatal error: %s\n", msg);
+}
 
-// Server functions:
+////////////////////////////////////////////////////////////////////////////////
+// Server functions:                                                          //
+////////////////////////////////////////////////////////////////////////////////
 
 // Arguments: qlen (first 2 bytes of c), and port, a string representation of a
 //     number, following qlen
@@ -38,16 +51,16 @@ void ffilisten(uint8_t * c, long clen, uint8_t * a, long alen) {
     struct addrinfo hints;
     memset(&hints, 0, sizeof(struct addrinfo));
     // AF_INET specifies the IPv4 Internet protocols
+    hints.ai_family = AF_INET;
     // SOCK_STREAM specifies "sequenced, reliable, two-way, connection-based
     // byte streams."
-    hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
     // Passive flag + null node in getaddrinfo invocation indicates suitability
     // for accepting connections
     hints.ai_flags = AI_PASSIVE;
     struct addrinfo * result;
-    int errorFlag = getaddrinfo(0, port, &hints, &result);
-    assert(!errorFlag);
+    int gai_ret = getaddrinfo(0, port, &hints, &result);
+    if (gai_ret) fatalError(gai_strerror(gai_ret));
 
     int sockfd;
     struct addrinfo * r;
@@ -59,10 +72,12 @@ void ffilisten(uint8_t * c, long clen, uint8_t * a, long alen) {
         int enable = 1;
         setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(enable));
 
-        if(bind(sockfd, r->ai_addr, r->ai_addrlen) == 0)
+        if (bind(sockfd, r->ai_addr, r->ai_addrlen)) {
+            nonfatalError(strerror(errno));
+            close(sockfd);
+        }
+        else
             break;
-
-        close(sockfd);
     }
     assert(r);
     assert(sockfd != -1);
@@ -119,8 +134,8 @@ void fficonnect(uint8_t * c, long clen, uint8_t * a, long alen) {
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
     struct addrinfo * result;
-    int errorFlag = getaddrinfo(host, port, &hints, &result);
-    assert(!errorFlag);
+    int gai_ret = getaddrinfo(host, port, &hints, &result);
+    if (gai_ret) fatalError(gai_strerror(gai_ret));
 
     int sockfd;
     struct addrinfo * r;
@@ -129,10 +144,12 @@ void fficonnect(uint8_t * c, long clen, uint8_t * a, long alen) {
         if (sockfd == -1)
             continue;
 
-        if (connect(sockfd, r->ai_addr, r->ai_addrlen) != -1)
+        if (connect(sockfd, r->ai_addr, r->ai_addrlen)) {
+            nonfatalError(strerror(errno));
+            close(sockfd);
+        }
+        else
             break;
-
-        close(sockfd);
     }
     assert(r);
     assert(sockfd != -1);

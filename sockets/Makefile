@@ -9,14 +9,19 @@ CAKEC = $(CAKE_DIR)/cake
 BASIS = $(CAKE_DIR)/basis_ffi.c
 
 OS ?= $(shell uname)
-
 ifeq ($(OS),Darwin)
-    # These options avoid linker warnings on macOS
-    LDFLAGS += -Wl,-no_pie
+	# These options avoid linker warnings on macOS
+	LDFLAGS += -Wl,-no_pie
 endif
 
+# DEBUG = false
+# ifneq ($(DEBUG),false)
+# 	CFLAGS += -ggdb3
+# endif
+
 CC = gcc
-CFLAGS = #-Wno-incompatible-pointer-types
+CFLAGS = -ggdb3
+
 
 .PHONY: all
 all: serverTest clientTest
