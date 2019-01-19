@@ -111,8 +111,9 @@ void ffiaccept(uint8_t * c, long clen, uint8_t * a, long alen) {
     int_to_byte8(conn_sockfd, a);
 }
 
-
-// Client functions:
+////////////////////////////////////////////////////////////////////////////////
+// Client functions:                                                          //
+////////////////////////////////////////////////////////////////////////////////
 
 // Arguments: host and port, both stored in that order in c, delimited by a null
 //     byte. host is a domain name or ip address, as a string. port is a number,
