@@ -14,13 +14,15 @@ ifeq ($(OS),Darwin)
 	LDFLAGS += -Wl,-no_pie
 endif
 
-# DEBUG = false
-# ifneq ($(DEBUG),false)
-# 	CFLAGS += -ggdb3
-# endif
+DEBUG = true
+ifeq ($(DEBUG), true)
+	CFLAGS += -ggdb3
+else
+	CFLAGS = -DNDEBUG
+endif
 
 CC = gcc
-CFLAGS = -ggdb3
+# CFLAGS =
 
 
 .PHONY: all
