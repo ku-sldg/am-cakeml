@@ -11,7 +11,7 @@ Currently, this project should run under Linux and macOS*. Eventually, we will s
 \*This project _should_ run on macOS, but is more frequently tested on Linux. Let me know if you have any problems running under macOS.
 
 ## Compiling with CompCert
-You can replace gcc with CompCert by overriding the `CC` makefile variable from the command-line, i.e. `make CC=ccomp`. However, you will need to make a slight modification to `basis_ffi.c` for it to compile. Just add `#include <sys/stat.h>` to the top of the file with the other includes (I put in a [pull request](https://github.com/CakeML/cakeml/pull/604). Hopefully its merged, but I'm not sure how long it will take to make it into an official release).
+You can replace gcc with CompCert by overriding the `CC` makefile variable from the command-line, i.e. `make CC=ccomp`. You may need to re-download CakeML, since older versions were missing a necessary header include in `basis_ffi.c` (although for some reason the header wasn't required by gcc?).
 
 ## Why are you using the sml file extension for CakeML files?
 To make use of sml syntax highlighting.
