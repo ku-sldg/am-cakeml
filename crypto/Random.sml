@@ -38,7 +38,7 @@ end
 
 
 local
-    val dbgr = ref (Aes256CtrDrbg.init ())
+    val dbgr = Ref (Aes256CtrDrbg.init ())
 in
     (* Returns 16 random bytes *)
     fun rand () = Aes256CtrDrbg.genBits dbgr

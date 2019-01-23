@@ -29,12 +29,12 @@ fun nat_minus n m =
                               | S m' => (nat_minus n' m')
 
 fun nat_eq n m =
-    case n of O => (case m of O => true | _ => false)
-            | S n' => (case m of S m' => nat_eq n' m' | _ => false)
+    case n of O => (case m of O => True | _ => False)
+            | S n' => (case m of S m' => nat_eq n' m' | _ => False)
 
 fun nat_leb n m =
-    case n of O => true
-            | S n' => (case m of S m' => nat_leb n' m' | O => false)
+    case n of O => True
+            | S n' => (case m of S m' => nat_leb n' m' | O => False)
 
 fun nat_compare n m =
     if nat_eq n m
