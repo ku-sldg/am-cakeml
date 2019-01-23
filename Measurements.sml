@@ -20,7 +20,7 @@ fun readFile filename =
         val fd = TextIO.openIn filename
         val text = TextIO.inputAll fd
     in
-        TextIO.close fd;
+        TextIO.closeIn fd;
         text
     end
 

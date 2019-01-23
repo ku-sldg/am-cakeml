@@ -47,7 +47,7 @@ fun genRandFile filename len =
                     TextIO.output fd (ByteString.toRawString (rand ())); ()
                 )) len ()
     in
-        TextIO.close fd
+        TextIO.closeOut fd
     end
 (* val _ = genRandFile "rand" 5000000 *)
 
