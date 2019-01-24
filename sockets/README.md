@@ -1,4 +1,5 @@
 # Status
-The CakeML basis library has recently been changed such that the Client and Server tests will not compile. They should still work properly on older versions of the compiler (I believe [this](https://cakeml.org/regression.cgi/job/690) is the most recent compatible version).
+Sockets should be working with the newest version of the compiler (`cake --version` = Tue Jan 22 00:49:08 2019 UTC).
 
-Aside from the tests, the socket code still compiles and works, but there is currently no way to read/write/close them. This is because I was using the file operations in TextIO, which have since been changed to work exclusively on files opened through the basis library.
+# Misc
+- If you need to terminate your program early, use Ctl+c. Using Ctl+z will result in the sockets not closing properly, and the program will likely fail to reacquire the socket port on the next execution (restarting fixes the issue).
