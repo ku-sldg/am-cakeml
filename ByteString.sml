@@ -209,9 +209,6 @@ structure ByteString = struct
                 xor_withIndex bs1 bs2 out 0
             end
 
-        (* exception raised by addInt the byte_array does not have enough precision *)
-        exception OutOfBounds
-
         (* Treats the ByteString as an abitrary length integer and adds n,
            Returns the same byte_array, whose value has been _mutated_.
            Overflow results in wrap around, e.g. `addInt 0xFF 1` ~> `0x00` *)
