@@ -33,7 +33,7 @@ fun print_json js t =
     case js
      of LBRACK => "LBRACK"
       | LBRACE => "LBRACE"
-      | Boolean b => String.concat ["\"", if b then "true" else "false", "\""]
+      | Boolean b => String.concat ["\"", if b then "True" else "False", "\""]
 	    | Number (Int n) => Int.toString n
 	    | String s => String.concat ["\"",s,"\""]
 	    | List js' => String.concat ["[\n", print_json_list js' (t + 1), "]"]
@@ -125,8 +125,8 @@ fun getKeyword ss =
  compose (fn s => fn ss' =>
    case s
     of "null"  => Some (NullLit,ss')
-     | "true"  => Some (BoolLit true, ss')
-     | "false" => Some (BoolLit false, ss')
+     | "True"  => Some (BoolLit True, ss')
+     | "False" => Some (BoolLit False, ss')
      |  other  => None)
   (takeWhile isAlpha ss);
 
@@ -151,8 +151,8 @@ fun lex strm =
       | Some (#",",strm') => Some (Comma,strm')
       | Some (#":",strm') => Some (Colon,strm')
       | Some (#"n",strm') => getKeyword strm  (* null *)
-      | Some (#"t",strm') => getKeyword strm  (* true *)
-      | Some (#"f",strm') => getKeyword strm  (* false *)
+      | Some (#"t",strm') => getKeyword strm  (* True *)
+      | Some (#"f",strm') => getKeyword strm  (* False *)
       | Some (#"\"",strm') => getString strm' []
       | Some (ch,strm') =>
         if Char.isSpace ch
@@ -173,7 +173,7 @@ fun lexemes ss =
 
 (* let _ = lexemes "null [ \"foo\" : \"bar\" ]" *)
 (* lexemes "{ \"foo\" : 12, \"bar\" : 13  }"; *)
-(* lexemes "[true,false, null, 123, -23, \"foo\"] "; *)
+(* lexemes "[True,False, null, 123, -23, \"foo\"] "; *)
 
 
 (* --------------------------------------------------------------------------- *)
@@ -309,7 +309,7 @@ fun fromFile filename =
  let
      val istrm = TextIO.openIn filename
      val ss = TextIO.inputAll istrm
-     val _ = TextIO.close istrm
+     val _ = TextIO.closeIn istrm
  in
      parse ([], ss)
  end
@@ -318,7 +318,7 @@ fun fromFileMany filename =
     let
         val istrm = TextIO.openIn filename
         val ss = TextIO.inputAll istrm
-        val _ = TextIO.close istrm
+        val _ = TextIO.closeIn istrm
     in
         ((parseMany ([], ss)), "")
     end
