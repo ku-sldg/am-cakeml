@@ -59,7 +59,7 @@ structure Socket = struct
        stripped of the instream/outstream constructors. Specifically, taken
        from the following commit:
 https://github.com/CakeML/cakeml/commit/b2076e74977d96b0734bd1ab2ae59ef1f91c3004
-       The following lisencing information applies to the rest of the code in
+       The following licensing information applies to the rest of the code in
        this file: *)
 (*
 CakeML Copyright Notice, License, and Disclaimer.

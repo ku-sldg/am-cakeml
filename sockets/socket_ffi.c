@@ -108,7 +108,7 @@ void ffilisten(uint8_t * c, long clen, uint8_t * a, long alen) {
     int_to_byte8(sockfd, a+1);
 }
 
-// Argument: sockfd as 64-bit int in a
+// Argument: sockfd as 64-bit int in c
 // Returns: failure flag in a[0], conn_sockfd as 64-bit int in a[1..8]
 // Blocks until there is an incoming connection
 void ffiaccept(uint8_t * c, long clen, uint8_t * a, long alen) {
