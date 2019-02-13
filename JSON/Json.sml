@@ -8,7 +8,7 @@ struct
 
 (* type substring = String.substring *)
 
-exception ERR of string * string
+exception ERR string string
 
 fun fst p = case p of (x,y) =>  x
 fun snd p = case p of (x,y) =>  y
@@ -16,18 +16,18 @@ fun snd p = case p of (x,y) =>  y
 fun eRR_MESG pair = print (fst pair^": "^snd pair)
 
 datatype number
-   = Int of int
+   = Int int
    (* | Float of real (* Not totally sure about exact representation desired *) *) (* There are no floating points in CakeML *)
 
 datatype json
     = Null
     | LBRACK  (* stack symbol only *)
     | LBRACE  (* stack symbol only *)
-    | Boolean of bool
-    | Number of number     (* ints and floats *)
-    | String of string     (* should be unicode strings, per JSON spec *)
-    | List of json list
-    | AList of (string * json) list;
+    | Boolean bool
+    | Number number     (* ints and floats *)
+    | String string     (* should be unicode strings, per JSON spec *)
+    | List (json list)
+    | AList ((string * json) list)
 
 fun print_json js t =
     case js
@@ -70,9 +70,9 @@ datatype lexeme
   | Colon
   | Comma
   | NullLit
-  | BoolLit of bool
-  | NumLit of number
-  | StringLit of string
+  | BoolLit bool
+  | NumLit number
+  | StringLit string
 
 fun isEmpty s = s = ""
 
