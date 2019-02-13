@@ -11,7 +11,7 @@
 #include <string.h>     // memset, strerror
 #include <unistd.h>     // close
 #include <stdio.h>      // fprintf
-#include <stdlib.h>     // exit
+#include <stdlib.h>     // abort
 #include <errno.h>      // errno
 // #include <fcntl.h>      // fcntl
 
@@ -25,7 +25,8 @@ void int_to_byte2(int i, uint8_t *b);
 int byte8_to_int(uint8_t *b);
 void int_to_byte8(int i, uint8_t *b);
 
-// Error helper functions. Similar to asserts, but unconditional and with a msg
+// Error helper functions. Similar to asserts, but unconditional and with a msg.
+// Like asserts, they are disabled by the NDEBUG flag.
 #ifndef NDEBUG
 #define fatalErr(msg) __fatalErr(msg, __FILE__, __LINE__)
 #define nonfatalErr(msg) __nonfatalErr(msg, __FILE__, __LINE__)
@@ -47,14 +48,14 @@ void __nonfatalErr(const char * msg, const char * file, int line) {
 
 // Arguments: qlen (first 2 bytes of c), and port, a string representation of a
 //     number, following qlen
-// Returns: sockfd as 64-bit int in a
+// Returns: failure flag in a[0], sockfd as 64-bit int in a[1..8]
 void ffilisten(uint8_t * c, long clen, uint8_t * a, long alen) {
     assert(clen >= 2);
-    assert(alen >= 8);
+    assert(alen >= 9);
 
     // Parse arguments
     int qlen = byte2_to_int(c);
-    char * port = c+2;
+    char * port = (char *)c + 2;
 
     struct addrinfo hints;
     memset(&hints, 0, sizeof(struct addrinfo));
@@ -68,7 +69,12 @@ void ffilisten(uint8_t * c, long clen, uint8_t * a, long alen) {
     hints.ai_flags = AI_PASSIVE;
     struct addrinfo * result;
     int gai_ret = getaddrinfo(0, port, &hints, &result);
-    if (gai_ret) fatalErr(gai_strerror(gai_ret));
+    if (gai_ret) {
+        nonfatalErr(gai_strerror(gai_ret));
+        freeaddrinfo(result);
+        a[0] = 1;
+        return;
+    }
 
     int sockfd;
     struct addrinfo * r;
@@ -88,40 +94,47 @@ void ffilisten(uint8_t * c, long clen, uint8_t * a, long alen) {
         else
             break;
     }
-    assert(r);
-    assert(sockfd != -1);
     freeaddrinfo(result);
+    if (!r || sockfd == -1) {
+        a[0] = 1;
+        return;
+    }
 
     // Listen for incoming connections, with a maximum queue length of qlen
     listen(sockfd, qlen);
 
     // return sockfd
-    int_to_byte8(sockfd, a);
+    a[0] = 0;
+    int_to_byte8(sockfd, a+1);
 }
 
 // Argument: sockfd as 64-bit int in a
-// Returns: conn_sockfd as 64-bit int in a
+// Returns: failure flag in a[0], conn_sockfd as 64-bit int in a[1..8]
 // Blocks until there is an incoming connection
 void ffiaccept(uint8_t * c, long clen, uint8_t * a, long alen) {
     assert(clen >= 8);
-    assert(alen >= 8);
+    assert(alen >= 9);
 
     // Parse argument
     int sockfd = byte8_to_int(c);
 
     struct sockaddr_in conn_addr;
-    int conn_addr_len = sizeof(struct sockaddr_in);
+    unsigned int conn_addr_len = (unsigned int)(sizeof(struct sockaddr_in));
     // accept returns the sockfd corresponding to the first connection in the
     // incoming queue. If there is none, blocks until there is.
     int conn_sockfd = accept(sockfd, (struct sockaddr *)(&conn_addr), &conn_addr_len);
-    assert(conn_sockfd != -1);
+    if(conn_sockfd == -1) {
+        a[0] = 1;
+        return;
+    }
 
     // Set nonblocking
     // int flags = fcntl(conn_sockfd, F_GETFL, 0);
     // fcntl(conn_sockfd, F_SETFL, flags | O_NONBLOCK);
 
     // return conn_sockfd
-    int_to_byte8(conn_sockfd, a);
+    a[0] = 0;
+    int_to_byte8(conn_sockfd, a+1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -131,14 +144,14 @@ void ffiaccept(uint8_t * c, long clen, uint8_t * a, long alen) {
 // Arguments: host and port, both stored in that order in c, delimited by a null
 //     byte. host is a domain name or ip address, as a string. port is a number,
 //     again as a string. port should be followed by a final null byte.
-// Returns: sockfd as 64-bit int in a
+// Returns: failure flag in a[0], sockfd as 64-bit int in a[1..8]
 void fficonnect(uint8_t * c, long clen, uint8_t * a, long alen) {
     assert(clen >= 2); // Assumes there are at least the null byte delimiter and terminator
-    assert(alen >= 8);
+    assert(alen >= 9);
 
     // Parse arguments
-    char * host = c;
-    char * port = c + strlen(c) + 1;
+    char * host = (char *)c;
+    char * port = host + strlen(host) + 1;
 
     struct addrinfo hints;
     memset(&hints, 0, sizeof(struct addrinfo));
@@ -149,7 +162,12 @@ void fficonnect(uint8_t * c, long clen, uint8_t * a, long alen) {
     hints.ai_socktype = SOCK_STREAM;
     struct addrinfo * result;
     int gai_ret = getaddrinfo(host, port, &hints, &result);
-    if (gai_ret) fatalErr(gai_strerror(gai_ret));
+    if (gai_ret) {
+        nonfatalErr(gai_strerror(gai_ret));
+        freeaddrinfo(result);
+        a[0] = 1;
+        return;
+    }
 
     int sockfd;
     struct addrinfo * r;
@@ -165,14 +183,17 @@ void fficonnect(uint8_t * c, long clen, uint8_t * a, long alen) {
         else
             break;
     }
-    assert(r);
-    assert(sockfd != -1);
     freeaddrinfo(result);
+    if (!r || sockfd == -1) {
+        a[0] = 1;
+        return;
+    }
 
     // Set nonblocking
     // int flags = fcntl(sockfd, F_GETFL, 0);
     // fcntl(sockfd, F_SETFL, flags | O_NONBLOCK);
 
     // return sockfd
-    int_to_byte8(sockfd, a);
+    a[0] = 0;
+    int_to_byte8(sockfd, a+1);
 }

@@ -8,39 +8,48 @@
    constructors are defined locally. So, we will have to redefine file
    operations here. *)
 structure Socket = struct
+    (* Generic socket exception *)
+    exception SocketFail
+
     (* Takes a port number and maximum queue length, and returns the fd of a new
        actively listening socket *)
     fun listen port qLen =
         let
-            val fdbuf = Word8Array.array 8 (Word8.fromInt 0)
+            val fdbuf = Word8Array.array 9 (Word8.fromInt 0)
             val cbuf = Word8Array.array 2 (Word8.fromInt 0)
             val _ = Marshalling.n2w2 qLen cbuf 0
             val c = (ByteString.toRawString cbuf) ^ (Int.toString port)
             val _ = #(listen) c fdbuf
         in
-            ByteString.toRawString fdbuf
+            if Word8Array.sub fdbuf 0 = Word8.fromInt 1
+                then raise SocketFail
+                else Word8Array.substring fdbuf 1 8
         end
 
     (* Takes the fd of an actively listening socket, returns the fd of a connection *)
     (* Blocks until there is an incoming connection *)
     fun accept sockfd =
         let
-            val fdbuf = Word8Array.array 8 (Word8.fromInt 0)
+            val fdbuf = Word8Array.array 9 (Word8.fromInt 0)
             val _ = #(accept) sockfd fdbuf
         in
-            ByteString.toRawString fdbuf
+            if Word8Array.sub fdbuf 0 = Word8.fromInt 1
+                then raise SocketFail
+                else Word8Array.substring fdbuf 1 8
         end
 
     (* Takes the host as a string, in the format of a domain name or IPv4 address,
        and port, and integer corresponding to a port number. Returns a fd. *)
     fun connect host port =
         let
-            val fdbuf = Word8Array.array 8 (Word8.fromInt 0)
+            val fdbuf = Word8Array.array 9 (Word8.fromInt 0)
             val null = String.str (Char.chr 0)
             val c = host ^ null ^ (Int.toString port) ^ null
             val _ = #(connect) c fdbuf
         in
-            ByteString.toRawString fdbuf
+            if Word8Array.sub fdbuf 0 = Word8.fromInt 1
+                then raise SocketFail
+                else Word8Array.substring fdbuf 1 8
         end
 
     (* Returns a pretty string for debug printing file descriptors *)
