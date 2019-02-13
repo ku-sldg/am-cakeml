@@ -2,7 +2,7 @@
 
 (* Copland Language Definition *)
 
-datatype id = Id of nat
+datatype id = Id nat
 
 fun id_compare i j = let val (Id i) = i in
                          let val (Id j) = j in
@@ -29,15 +29,15 @@ fun spToString s = case s
                     of ALL => "ALL"
                      | NONE => "NONE"
 
-datatype t = USM of asp_id * arg list
-           | KIM of asp_id * pl * arg list
+datatype t = USM asp_id (arg list)
+           | KIM asp_id pl (arg list)
            | SIG
            | HSH
            | NONCE
-           | AT of pl * t
-           | LN of t * t
-           | BRS of sp * sp * t * t
-           | BRP of sp * sp * t * t
+           | AT pl t
+           | LN t t
+           | BRS sp sp t t
+           | BRP sp sp t t
 
 fun tToString a =
     let
@@ -58,14 +58,14 @@ fun tToString a =
 
 (* Evidence Values *)
 local type bs = ByteString.bs in
-datatype ev = Mt                                         (* Empty evidence *)
-            | U of asp_id * arg list * pl * bs * ev      (* User space measurement *)
-            | K of asp_id * arg list * pl * pl * bs * ev (* Kernel measurement *)
-            | G of pl * ev * bs                          (* Signature *)
-            | H of pl * bs                               (* Hash *)
-            | N of pl * bs * ev                          (* Nonce *)
-            | SS of ev * ev                              (* Sequence *)
-            | PP of ev * ev                              (* Parallel *)
+datatype ev = Mt                            (* Empty evidence *)
+            | U asp_id (arg list) pl bs ev    (* User space measurement *)
+            | K asp_id (arg list) pl pl bs ev (* Kernel measurement *)
+            | G pl ev bs                    (* Signature *)
+            | H pl bs                       (* Hash *)
+            | N pl bs ev                    (* Nonce *)
+            | SS ev ev                      (* Sequence *)
+            | PP ev ev                      (* Parallel *)
 end
 
 fun evToString e =

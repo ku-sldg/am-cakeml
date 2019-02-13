@@ -3,7 +3,7 @@
 (* Default Coq *)
 
 datatype nat = O
-             | S of nat
+             | S nat
 
 fun natToInt n =
     case n
