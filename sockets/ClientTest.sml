@@ -1,12 +1,11 @@
 val _ = print "Connecting to server...\n"
-val serverfd = Socket.connect "127.0.0.1" 5000
-val _ = print ("Connection established with file descriptor: " ^
-               (Socket.fdToString serverfd) ^ "\n")
+val serverfd = Socket.connect "127.0.0.1" 50000
+val _ = print "Connection established.\n"
 
-val _ = print "Sending message...\n"
-val _ = Socket.output serverfd "Hello Socket World"
+val _ = Socket.output serverfd "Hello!"
 
-val _ = print "Closing socket...\n"
+val msg = Socket.inputAll serverfd
+val _ = print ("Server message: " ^ msg ^ "\n")
+
 val _ = Socket.close serverfd
-
-val _ = print "Done\n"
+val _ = print "Socket closed.\n"

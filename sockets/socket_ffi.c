@@ -3,17 +3,13 @@
 // This socket interface is largely based on the example provided in the
 // getaddrinfo man page http://man7.org/linux/man-pages/man3/getaddrinfo.3.html
 
-#include <assert.h>     // asserts
+#include <assert.h>     // assert
 #include <stdint.h>     // uint8_t, uint16_6, etc.
 #include <sys/types.h>  // socket, bind, listen, getaddrinfo
 #include <sys/socket.h> // socket, bind, listen, getaddrinfo
 #include <netdb.h>      // getaddrinfo
 #include <string.h>     // memset, strerror
 #include <unistd.h>     // close
-#include <stdio.h>      // fprintf
-#include <stdlib.h>     // abort
-#include <errno.h>      // errno
-// #include <fcntl.h>      // fcntl
 
 // These helper functions are defined in basis_ffi.c
 // I figured it would be good to use the same marshalling paradigm as the
@@ -24,23 +20,6 @@ int byte2_to_int(uint8_t *b);
 void int_to_byte2(int i, uint8_t *b);
 int byte8_to_int(uint8_t *b);
 void int_to_byte8(int i, uint8_t *b);
-
-// Error helper functions. Similar to asserts, but unconditional and with a msg.
-// Like asserts, they are disabled by the NDEBUG flag.
-#ifndef NDEBUG
-#define fatalErr(msg) __fatalErr(msg, __FILE__, __LINE__)
-#define nonfatalErr(msg) __nonfatalErr(msg, __FILE__, __LINE__)
-void __fatalErr(const char * msg, const char * file, int line) {
-    fprintf(stderr, "%s:%d: Fatal error: %s\n", file, line, msg);
-    abort();
-}
-void __nonfatalErr(const char * msg, const char * file, int line) {
-    fprintf(stderr, "%s:%d: Nonfatal error: %s\n", file, line, msg);
-}
-#else
-#define fatalErr(msg)
-#define nonfatalErr(msg)
-#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // Server functions:                                                          //
@@ -59,18 +38,13 @@ void ffilisten(uint8_t * c, long clen, uint8_t * a, long alen) {
 
     struct addrinfo hints;
     memset(&hints, 0, sizeof(struct addrinfo));
-    // AF_INET specifies the IPv4 Internet protocols
+
     hints.ai_family = AF_INET;
-    // SOCK_STREAM specifies "sequenced, reliable, two-way, connection-based
-    // byte streams."
     hints.ai_socktype = SOCK_STREAM;
-    // Passive flag + null node in getaddrinfo invocation indicates suitability
-    // for accepting connections
     hints.ai_flags = AI_PASSIVE;
+
     struct addrinfo * result;
-    int gai_ret = getaddrinfo(0, port, &hints, &result);
-    if (gai_ret) {
-        nonfatalErr(gai_strerror(gai_ret));
+    if (getaddrinfo(0, port, &hints, &result)) {
         freeaddrinfo(result);
         a[0] = 1;
         return;
@@ -78,21 +52,19 @@ void ffilisten(uint8_t * c, long clen, uint8_t * a, long alen) {
 
     int sockfd;
     struct addrinfo * r;
+    // Loop through addrinfo list from getadrrinfo until one works (or failure)
     for (r = result; r; r = r->ai_next) {
         sockfd = socket(r->ai_family, r->ai_socktype, r->ai_protocol);
         if (sockfd == -1)
             continue;
 
         int enable = 1;
-        if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(enable)))
-            nonfatalErr(strerror(errno));
+        setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(enable));
 
-        if (bind(sockfd, r->ai_addr, r->ai_addrlen)) {
-            nonfatalErr(strerror(errno));
-            close(sockfd);
-        }
-        else
+        if (!bind(sockfd, r->ai_addr, r->ai_addrlen))
             break;
+
+        close(sockfd);
     }
     freeaddrinfo(result);
     if (!r || sockfd == -1) {
@@ -101,7 +73,10 @@ void ffilisten(uint8_t * c, long clen, uint8_t * a, long alen) {
     }
 
     // Listen for incoming connections, with a maximum queue length of qlen
-    listen(sockfd, qlen);
+    if (listen(sockfd, qlen)) {
+        a[0] = 1;
+        return;
+    }
 
     // return sockfd
     a[0] = 0;
@@ -128,10 +103,6 @@ void ffiaccept(uint8_t * c, long clen, uint8_t * a, long alen) {
         return;
     }
 
-    // Set nonblocking
-    // int flags = fcntl(conn_sockfd, F_GETFL, 0);
-    // fcntl(conn_sockfd, F_SETFL, flags | O_NONBLOCK);
-
     // return conn_sockfd
     a[0] = 0;
     int_to_byte8(conn_sockfd, a+1);
@@ -155,15 +126,12 @@ void fficonnect(uint8_t * c, long clen, uint8_t * a, long alen) {
 
     struct addrinfo hints;
     memset(&hints, 0, sizeof(struct addrinfo));
-    // AF_INET specifies the IPv4 Internet protocols
+
     hints.ai_family = AF_INET;
-    // SOCK_STREAM specifies "sequenced, reliable, two-way, connection-based
-    // byte streams."
     hints.ai_socktype = SOCK_STREAM;
+
     struct addrinfo * result;
-    int gai_ret = getaddrinfo(host, port, &hints, &result);
-    if (gai_ret) {
-        nonfatalErr(gai_strerror(gai_ret));
+    if (getaddrinfo(host, port, &hints, &result)) {
         freeaddrinfo(result);
         a[0] = 1;
         return;
@@ -176,22 +144,16 @@ void fficonnect(uint8_t * c, long clen, uint8_t * a, long alen) {
         if (sockfd == -1)
             continue;
 
-        if (connect(sockfd, r->ai_addr, r->ai_addrlen)) {
-            nonfatalErr(strerror(errno));
-            close(sockfd);
-        }
-        else
+        if (!connect(sockfd, r->ai_addr, r->ai_addrlen))
             break;
+
+        close(sockfd);
     }
     freeaddrinfo(result);
     if (!r || sockfd == -1) {
         a[0] = 1;
         return;
     }
-
-    // Set nonblocking
-    // int flags = fcntl(sockfd, F_GETFL, 0);
-    // fcntl(sockfd, F_SETFL, flags | O_NONBLOCK);
 
     // return sockfd
     a[0] = 0;

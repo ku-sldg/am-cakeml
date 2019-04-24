@@ -1,63 +1,64 @@
 (* Depends on: ByteString.sml *)
 
-(* Safe(ish) wrappers to FFI socket functions *)
-
-(* File descriptors (fd) are in the same format as used by the basis library,
-   i.e. strings derived from 8 byte encodings of integers. Unfortunately, it is
-   not possible to use TextIO's functions, since they use types whose
-   constructors are defined locally. So, we will have to redefine file
-   operations here. *)
+(* Safe(ish) wrapper to FFI socket functions *)
 structure Socket = struct
     (* Generic socket exception *)
     exception SocketFail
 
-    (* Takes a port number and maximum queue length, and returns the fd of a new
-       actively listening socket *)
-    fun listen port qLen =
-        let
-            val fdbuf = Word8Array.array 9 (Word8.fromInt 0)
-            val cbuf = Word8Array.array 2 (Word8.fromInt 0)
-            val _ = Marshalling.n2w2 qLen cbuf 0
-            val c = (ByteString.toRawString cbuf) ^ (Int.toString port)
-            val _ = #(listen) c fdbuf
-        in
-            if Word8Array.sub fdbuf 0 = Word8.fromInt 1
-                then raise SocketFail
-                else Word8Array.substring fdbuf 1 8
-        end
+    local
+        (* Shared/reused buffers *)
+        val fdbuf = Word8Array.array 9 (Word8.fromInt 0)
+        val cbuf = Word8Array.array 2 (Word8.fromInt 0)
+        (* The null char (used here to delimit args) *)
+        val null = String.str (Char.chr 0)
+    in
+        (* Takes a port number and maximum queue length, and returns the fd of a new
+           actively listening socket *)
+        fun listen port qLen =
+            let
+                val _ = Marshalling.n2w2 qLen cbuf 0
+                val c = (ByteString.toRawString cbuf) ^ (Int.toString port)
+                val _ = #(listen) c fdbuf
+            in
+                if Word8Array.sub fdbuf 0 = Word8.fromInt 1
+                    then raise SocketFail
+                    else Word8Array.substring fdbuf 1 8
+            end
 
-    (* Takes the fd of an actively listening socket, returns the fd of a connection *)
-    (* Blocks until there is an incoming connection *)
-    fun accept sockfd =
-        let
-            val fdbuf = Word8Array.array 9 (Word8.fromInt 0)
-            val _ = #(accept) sockfd fdbuf
-        in
-            if Word8Array.sub fdbuf 0 = Word8.fromInt 1
-                then raise SocketFail
-                else Word8Array.substring fdbuf 1 8
-        end
+        (* Takes the fd of an actively listening socket, returns the fd of a connection *)
+        (* Blocks until there is an incoming connection *)
+        fun accept sockfd =
+            let
+                val _ = #(accept) sockfd fdbuf
+            in
+                if Word8Array.sub fdbuf 0 = Word8.fromInt 1
+                    then raise SocketFail
+                    else Word8Array.substring fdbuf 1 8
+            end
 
-    (* Takes the host as a string, in the format of a domain name or IPv4 address,
-       and port, and integer corresponding to a port number. Returns a fd. *)
-    fun connect host port =
-        let
-            val fdbuf = Word8Array.array 9 (Word8.fromInt 0)
-            val null = String.str (Char.chr 0)
-            val c = host ^ null ^ (Int.toString port) ^ null
-            val _ = #(connect) c fdbuf
-        in
-            if Word8Array.sub fdbuf 0 = Word8.fromInt 1
-                then raise SocketFail
-                else Word8Array.substring fdbuf 1 8
-        end
+        (* Takes the host as a string, in the format of a domain name or IPv4 address,
+           and port, and integer corresponding to a port number. Returns a fd. *)
+        fun connect host port =
+            let
+                val c = host ^ null ^ (Int.toString port) ^ null
+                val _ = #(connect) c fdbuf
+            in
+                if Word8Array.sub fdbuf 0 = Word8.fromInt 1
+                    then raise SocketFail
+                    else Word8Array.substring fdbuf 1 8
+            end
+    end
 
     (* Returns a pretty string for debug printing file descriptors *)
     val fdToString = ByteString.toString o ByteString.fromRawString
 
-    (* The following code is taken almost verbatim from the basis library, but
-       stripped of the instream/outstream constructors. Specifically, taken
-       from the following commit:
+
+    (* The following code is adaptped from the TextIO implementation in the
+       basis library. It is stripped of the instream/outstream constructors.
+       The input functions are changed to not make redundant read calls that
+       end up blocking when used on sockets.
+
+       Specifically, the code is adapted from the following commit:
 https://github.com/CakeML/cakeml/commit/b2076e74977d96b0734bd1ab2ae59ef1f91c3004
        The following licensing information applies to the rest of the code in
        this file: *)
@@ -136,18 +137,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         local
             fun read fd n =
                 let val a = Marshalling.n2w2 n iobuff 0 in
-                      (#(read) fd iobuff;
-                      if Word8.toInt (Word8Array.sub iobuff 0) <> 1
-                      then Marshalling.w22n iobuff 1
-                      else raise InvalidFD)
+                    (#(read) fd iobuff;
+                    if Word8.toInt (Word8Array.sub iobuff 0) <> 1
+                        then Marshalling.w22n iobuff 1
+                        else raise InvalidFD)
                 end
 
             fun input fd buff off len =
                 let fun input0 off len count =
-                    let val nread = read fd (min len 2048) in
+                    let val nwant = min len 2048
+                        val nread = read fd nwant
+                    in
                         if nread = 0 then count else
-                          (Word8Array.copy iobuff 4 nread buff off;
-                           input0 (off + nread) (len - nread) (count + nread))
+                        (Word8Array.copy iobuff 4 nread buff off;
+                            if nread < nwant then count+nread else
+                            input0 (off + nread) (len - nread) (count + nread))
                     end
                 in input0 off len 0 end
 
@@ -163,10 +167,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                         let val len = Word8Array.length arr in
                             if i < len then
                                 let
-                                    val n = input fd arr i (len - i)
+                                    val nwant = len - i
+                                    val nread = input fd arr i nwant
                                 in
-                                    if n = 0 then Word8Array.substring arr 0 i
-                                    else inputAll_aux arr (i + n)
+                                    if nread < nwant then Word8Array.substring arr 0 (i+nread)
+                                    else inputAll_aux arr (i + nread)
                                 end
                             else inputAll_aux (extend_array arr) i
                         end
