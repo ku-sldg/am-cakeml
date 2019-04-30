@@ -7,6 +7,10 @@ CAKE_DIR = ~/cake-x64-64
 CAKEC = $(CAKE_DIR)/cake
 BASIS = $(CAKE_DIR)/basis_ffi.c
 
+ifeq (,$(wildcard $(CAKEC)))
+$(error Cake compiler not found at:  $(CAKEC), perhaps CAKE_DIR is not set correctly.)
+endif
+
 OS ?= $(shell uname)
 
 ifeq ($(OS),Darwin)
@@ -16,6 +20,8 @@ endif
 
 CC = gcc
 # BUILD_DIR = build
+
+ .DELETE_ON_ERROR :
 
 j2apdt : j2apdt.cake.S basis_ffi.o
 	$(CC) $(LDFLAGS) $< basis_ffi.o $(LOADLIBES) $(LDLIBS) -o $@
