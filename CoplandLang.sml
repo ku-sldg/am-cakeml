@@ -63,7 +63,7 @@ datatype ev = Mt                            (* Empty evidence *)
             | K asp_id (arg list) pl pl bs ev (* Kernel measurement *)
             | G pl ev bs                    (* Signature *)
             | H pl bs                       (* Hash *)
-            | N pl bs ev                    (* Nonce *)
+            | N pl int bs ev                (* Nonce *)
             | SS ev ev                      (* Sequence *)
             | PP ev ev                      (* Parallel *)
 end
@@ -88,7 +88,7 @@ fun evToString e =
                                           evToString' e']
           | G p e' bs => concat ["G", plToString p, evToString' e', ByteString.toString bs]
           | H p bs    => concat ["H", plToString p, ByteString.toString bs]
-          | N p bs e' => concat ["N", plToString p, ByteString.toString bs, evToString' e']
+          | N p index bs e' => concat ["N", plToString p, Int.toString index,  ByteString.toString bs, evToString' e']
           | SS e1 e2  => concat ["SS", evToString' e1, evToString' e2]
           | PP e1 e2   => concat ["PP", evToString' e1, evToString' e2]
     end
