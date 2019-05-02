@@ -1,6 +1,6 @@
 # NOTE: the order of this list must reflect code dependencies
-APPEND_LIST = ../ByteString.sml ../CoqDefaults.sml ../CoplandLang.sml \
-		      Json.sml JsonToApdt.sml testJ2A.sml
+APPEND_LIST = ../ByteString.sml ../CoqDefaults.sml ../CoplandLang.sml ../CommTypes.sml \
+		      Json.sml JsonToApdt.sml  CoplandToJson.sml testJ2A.sml
 
 # Change this directory if necessary
 CAKE_DIR = ~/cake-x64-64

@@ -39,11 +39,19 @@ val _ = print ("number of json objects: " ^ (Int.toString len) ^ "\n\n")
 (* val _ = List.map print (List.map (fn x => Json.print_json x 0) parsed) *)
 
 fun displayTermFromJson js =
-    tToString (JsonToApdt.jsonToApdt js) ^ "\n\n"
+    let val term = JsonToCopland.jsonToApdt js
+        val jterm = CoplandToJson.apdtToJson term
+    in
+        (tToString term) ^ "\nBack to JSON\n" ^ (Json.print_json jterm 0) ^ "\n\n"
+    end
     handle Json.ERR fcnName msg => "Json.ERR in: " ^ fcnName ^ " " ^ msg ^ "\n\n"
 
 fun displayEvidenceFromJson js =
-    evToString (JsonToEvidence.jsonToEvidence js) ^ "\n\n"
+    let val ev = JsonToCopland.jsonToEvidence js
+        val jev = CoplandToJson.evidenceToJson ev
+    in
+      (evToString ev)  ^ "\nBack to JSON\n" ^ (Json.print_json jev 0) ^ "\n\n"
+    end
     handle Json.ERR fcnName msg => "Json.ERR in: " ^ fcnName ^ " " ^ msg ^ "\n\n"
 
 val _ = if isEvidence
