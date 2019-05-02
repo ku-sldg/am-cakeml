@@ -12,7 +12,7 @@ fun jsonStringListToList (Json.List args)  = List.map jsonStringToString args
 fun jsonStringToBS (Json.String s) = ByteString.fromHexString s
 
 
-structure JsonToApdt =
+structure JsonToCopland =
 struct
 
 (* json object to apt object *)
@@ -85,10 +85,6 @@ fun jsonToApdt js =
      of [ Json.List [ (Json.String sp1), (Json.String sp2)], term1, term2] =>
      BRP (stringToSp sp1) (stringToSp sp2) (jsonToApdt term1) (jsonToApdt term2)
       | _ => raise  Json.ERR "getBRP" "unexpected argument list"
-end
-
-structure JsonToEvidence =
-struct
 
 (* json object to apt object *)
 fun jsonToEvidence js =
