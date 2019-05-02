@@ -34,10 +34,10 @@ fun print_json js t =
      of LBRACK => "LBRACK"
       | LBRACE => "LBRACE"
       | Boolean b => String.concat ["\"", if b then "True" else "False", "\""]
-	    | Number (Int n) => Int.toString n
-	    | String s => String.concat ["\"",s,"\""]
-	    | List js' => String.concat ["[\n", print_json_list js' (t + 1), "]"]
-	    | AList js' => String.concat ["{\n", print_json_alist js' (t + 1), "\n}"]
+      | Number (Int n) => Int.toString n
+      | String s => String.concat ["\"",s,"\""]
+      | List js' => String.concat ["[\n", print_json_list js' (t + 1), "]"]
+      | AList js' => String.concat ["{\n", print_json_alist js' (t + 1), "\n}"]
 
 and print_json_list js t =
 	case js
@@ -322,31 +322,4 @@ fun fromFileMany filename =
     in
         ((parseMany ([], ss)), "")
     end
-
-(*---------------------------------------------------------------------------*)
-(* Called from an executable which wants to get <name>.json from the         *)
-(* command line.                                                             *)
-(*---------------------------------------------------------------------------*)
-
-fun jsonFileName execName =
- let fun printHelp() = print ("Usage: "^execName^" <name>.json\n")
-     (* fun fail() = (printHelp(); MiscLib.fail()) *)
-     fun fail() = (printHelp(); raise ERR "jsonFileName" "")
-     fun isDot ch = (ch = #".")
- in case CommandLine.arguments()
-     of [s] => (case String.tokens isDot s
-                 of [file,"json"] => s
-                  | otherwise => fail())
-      | otherwise => fail()
- end
-
 end
-
-
-(* val filename = Json.jsonFileName "hope" *)
-(* val parse_output = (Json.fromFileMany filename) *)
-(* val parsed = fst parse_output *)
-(* val len = List.length parsed *)
-(* val _ = print (snd parse_output) *)
-(* val _ = print (String.concat ["number of json objects: ", Int.toString len, "\n\n"]) *)
-(* val _ = List.map print (List.map (fn x => Json.print_json x 0) parsed) *)
