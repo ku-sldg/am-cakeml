@@ -1,7 +1,5 @@
 (* Depends on: CoplandLang.sml, CoqDefaults.sml, ByteString.sml, and Measurements.sml*)
 
-(* Eval.v *)
-
 type pubKey = nat
 type privKey = nat
 
@@ -53,7 +51,7 @@ fun eval (p : pl) (e : ev) (term : t) =
       | KIM id p' args => K id args p p' (measureKim dummyAmKIM id p args) e
       | SIG => G p e (signEv e)
       | HSH => H p (genHash e)
-      | NONCE => N p (genNonce ()) e
+      | NONCE => N p 0 (genNonce ()) e (* TODO: replace '0' with a real ID *)
       | AT p' t' => eval p' e t'
       | LN t1 t2 => let val e1 = eval p e t1 in eval p e1 t2 end
       | BRS s1 s2 t1 t2 => SS (eval p (splitEv s1 e) t1) (eval p (splitEv s2 e) t2)

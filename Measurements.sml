@@ -8,7 +8,7 @@ fun encodeEv (e : ev) =
       | K _ _ _ _ bs _ => bs
       | G _ _ bs => bs
       | H _ bs => bs
-      | N _ bs _ => bs
+      | N _ _ bs _ => bs
       | SS e1 e2 => ByteString.append (encodeEv e1) (encodeEv e2)
       | PP e1 e2 => ByteString.append (encodeEv e1) (encodeEv e2)
 
