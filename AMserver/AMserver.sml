@@ -12,19 +12,26 @@ val evalJson =
       o strToJson
     end
 
-fun respondToMsg client = Socket.output client (evalJson (Socket.inputAll client))
+fun respondToMsg client = Socket.output client (
+    (evalJson (Socket.inputAll client))
+    handle Json.ERR s1 s2 => (TextIO.print_err (s1^": "^s2^"\n");
+                              "Invalid JSON/Copland term")
+    )
 
 fun handleIncoming listener =
     let val client = Socket.accept listener
      in respondToMsg client;
         Socket.close client
     end
-    (* TODO: catch each possible exception separately, print informative error
-             messages *)
-    handle _ => (print "Something went wrong!\n"; ())
-
-fun loop f x = (f x; loop f x; ())
+    handle Socket.Err       => TextIO.print_err "Socket failure\n"
+    handle Socket.InvalidFD => TextIO.print_err "Invalid file descriptor\n"
 
 (* TODO: get port num and queue length from command line *)
-fun main () = loop handleIncoming (Socket.listen 50000 5)
+fun main () =
+    let fun loop f x = (f x; loop f x; ())
+     in loop handleIncoming (Socket.listen 50000 5)
+    end
+    handle Socket.Err => TextIO.print_err "Socket failure on listener instantiation\n"
+    handle _          => TextIO.print_err "Fatal: unknown error\n"
+
 val _ = main ()
