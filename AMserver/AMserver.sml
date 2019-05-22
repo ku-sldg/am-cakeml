@@ -28,7 +28,7 @@ fun handleIncoming listener =
 
 (* TODO: get port num and queue length from command line *)
 fun main () =
-    let fun loop f x = (f x; loop f x; ())
+    let fun loop f x = (f x; loop f x)
      in loop handleIncoming (Socket.listen 50000 5)
     end
     handle Socket.Err => TextIO.print_err "Socket failure on listener instantiation\n"
