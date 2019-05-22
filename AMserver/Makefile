@@ -2,9 +2,11 @@ SERVER_LIST = ../ByteString.sml ../crypto/CryptoFFI.sml ../crypto/Aes256.sml \
               ../crypto/Random.sml ../sockets/SocketFFI.sml ../CoqDefaults.sml \
               ../CoplandLang.sml ../Measurements.sml ../Eval.sml \
               ../JSON/Json.sml ../JSON/JsonToCopland.sml \
-			  ../JSON/CoplandToJson.sml AMserver.sml
+              ../JSON/CoplandToJson.sml AMserver.sml
 
-CLIENT_LIST = ../ByteString.sml ../sockets/SocketFFI.sml clientTest.sml
+CLIENT_LIST = ../ByteString.sml ../sockets/SocketFFI.sml ../JSON/Json.sml \
+              ../CoqDefaults.sml ../CoplandLang.sml ../JSON/JsonToCopland.sml \
+              ../JSON/CoplandToJson.sml clientTest.sml
 
 # Change this directory if necessary  -- or
 # provide the directory for your machine on the make command-line, e.g.
