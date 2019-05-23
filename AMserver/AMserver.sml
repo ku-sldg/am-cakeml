@@ -7,7 +7,7 @@ val evalJson =
         fun jsonToStr j   = Json.print_json j 0
      in jsonToStr
       o CoplandToJson.evidenceToJson
-      o (eval O Mt)
+      o eval O Mt
       o JsonToCopland.jsonToApdt
       o strToJson
     end

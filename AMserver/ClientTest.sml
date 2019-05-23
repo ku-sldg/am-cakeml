@@ -3,7 +3,7 @@
 
 fun serverSend fd =
     let fun jsonToStr j = Json.print_json j 0
-     in (Socket.output fd)
+     in Socket.output fd
       o jsonToStr
       o CoplandToJson.apdtToJson
     end
@@ -23,7 +23,10 @@ fun serverEval fd copTerm = Some (serverSend fd copTerm; serverRcv fd)
 val copTerm = NONCE
 
 (* This version, which uses serverRcv, gives the JSON error:
-   "JsonToEvidence: APDT Evidence does not begin as an AList" *)
+   "JsonToEvidence: APDT Evidence does not begin as an AList"
+   It seems this is because of the last string in the "data" list,
+   which is the string "Mt" when it should be an evidence Json thing.
+   This means the problem is actually in the server-side json conversion. *)
 (* fun main () =
     let val fd = Socket.connect "127.0.0.1" 50000
         fun printEv ev = print ((evToString ev)^"\n")
@@ -36,7 +39,6 @@ val copTerm = NONCE
 
 fun main () =
     let val fd = Socket.connect "127.0.0.1" 50000
-        fun printEv ev = print ((evToString ev)^"\n")
      in serverSend fd copTerm;
         print ((Socket.inputAll fd)^"\n");
         Socket.close fd
