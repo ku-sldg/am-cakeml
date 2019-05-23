@@ -143,18 +143,23 @@ structure ByteString = struct
             else foldl (fn s => fn w => s ^ (byteToHex w)) "0x" bs
         (* val toHexString = foldr ((op ^) o byteToHex) "" *)
 
-        (* Almost inverse of toString (this function disallows the "0x" prefix)
-           Only really useful for testing purposes, I imagine. *)
+        (* This function desparately needs refactoring.
+           It was originally meant just for testing but ended up being
+           important for Json parsing.  *)
         fun fromHexString s =
-            let
-                val result = Word8Array.array (String.size s div 2) zeroByte
-                fun f i _ _ = (
-                    Word8Array.update result i (hexToByte (String.substring s (2*i) 2));
-                    ()
-                )
-            in (* I'm basically just using foldli as a means of iteration *)
-                foldli f () result;
-                result
+            let fun fromHexString_aux s =
+                    let val result = Word8Array.array (String.size s div 2) zeroByte
+                        fun f i _ _ = (
+                            Word8Array.update result i (hexToByte (String.substring s (2*i) 2));
+                            ()
+                        )
+                    in (* I'm basically just using foldli as a means of iteration *)
+                        foldli f () result;
+                        result
+                    end
+             in if (String.isPrefix "0x" s) orelse (String.isPrefix "0X" s)
+                then fromHexString_aux (String.substring s 2 ((String.size s) - 2))
+                else fromHexString_aux s
             end
 
         (* This returns a string by interpreting each byte as a char. *)
