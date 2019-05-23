@@ -24,29 +24,29 @@ fun jsonToApdt js =
       and
     fromAList pairs =
     case pairs
-     of [("name", nameVal)] => handleNullConstructor nameVal
-      |  [("name", nameVal), ("data", args)] => handleConstructorWithArgs nameVal args
-      |  [("data", args),  ("name", nameVal)]  => handleConstructorWithArgs nameVal args
-      | _ =>  raise  Json.ERR "fromAList" "does not contain just name and data pairs"
+     of [("constructor", constructorVal)] => handleNullConstructor constructorVal
+      |  [("constructor", constructorVal), ("data", args)] => handleConstructorWithArgs constructorVal args
+      |  [("data", args),  ("constructor", constructorVal)]  => handleConstructorWithArgs constructorVal args
+      | _ =>  raise  Json.ERR "fromAList" "does not contain just constructor and data pairs"
 
       and
-    handleNullConstructor (Json.String name) =
-    case name
+    handleNullConstructor (Json.String constructor) =
+    case constructor
      of "SIG" => SIG
      |  "HSH" =>  HSH
      |  "NONCE" => NONCE
-     | _ => raise Json.ERR "handleNullConstructor"  (String.concat ["Unexpected Null constructor for APDT term: ", name])
+     | _ => raise Json.ERR "handleNullConstructor"  (String.concat ["Unexpected Null constructor for APDT term: ", constructor])
 
     and
-    handleConstructorWithArgs (Json.String name) (Json.List args) =
-        case name
+    handleConstructorWithArgs (Json.String constructor) (Json.List args) =
+        case constructor
          of "KIM" => getKIM args
          | "USM" =>  getUSM args
          | "AT"  =>  getAT args
          | "LN"  =>  getLN args
          | "BRS" =>  getBRS args
          | "BRP" =>  getBRP args
-         |  _ =>  raise  Json.ERR "handleConstructorWithArgs" (String.concat ["Unexpected constructor for APDT term: ", name])
+         |  _ =>  raise  Json.ERR "handleConstructorWithArgs" (String.concat ["Unexpected constructor for APDT term: ", constructor])
 
       and
     getKIM data =
@@ -88,27 +88,28 @@ fun jsonToApdt js =
 
 (* json object to apt object *)
 fun jsonToEvidence js =
-    case js
+    (case js
      of Json.AList js' => fromAList js'
-      | _ =>  raise  Json.ERR "JsonToEvidence" "APDT Evidence does not begin as an AList"
+      | _ =>  raise  Json.ERR "JsonToEvidence" "APDT Evidence does not begin as an AList")
+    handle _ => (print "1\n"; Mt)
 
       and
     fromAList pairs =
     case pairs
-     of [("name", nameVal)] => handleNullConstructor nameVal
-     |  [("name", nameVal), ("data", args)] => handleConstructorWithArgs nameVal args
-     |  [("data", args),  ("name", nameVal)]  => handleConstructorWithArgs nameVal args
-     | _ =>  raise  Json.ERR "fromAList" "does not contain just name and data pairs"
+     of [("constructor", constructorVal)] => handleNullConstructor constructorVal
+     |  [("constructor", constructorVal), ("data", args)] => handleConstructorWithArgs constructorVal args
+     |  [("data", args),  ("constructor", constructorVal)]  => handleConstructorWithArgs constructorVal args
+     | _ =>  raise  Json.ERR "fromAList" "does not contain just constructor and data pairs"
 
     and
-    handleNullConstructor (Json.String name) =
-    case name
+    handleNullConstructor (Json.String constructor) =
+    case constructor
      of "Mt" => Mt
-     | _ => raise Json.ERR "handleNullConstructor"  (String.concat ["Unexpected Null constructor for APDT Evidence: ", name])
+     | _ => raise Json.ERR "handleNullConstructor"  (String.concat ["Unexpected Null constructor for APDT Evidence: ", constructor])
 
     and
-    handleConstructorWithArgs (Json.String name) (Json.List args) =
-    case name
+    handleConstructorWithArgs (Json.String constructor) (Json.List args) =
+    case constructor
      of "K" => getK args
      | "U" =>  getU args
      | "G" =>  getG args
@@ -116,7 +117,7 @@ fun jsonToEvidence js =
      | "N" =>  getN args
      | "SS"  =>  getSS args
      | "PP" =>  getPP args
-     |  _ =>  raise  Json.ERR "handleConstructorWithArgs" (String.concat ["Unexpected constructor for APDT Evidence: ", name])
+     |  _ =>  raise  Json.ERR "handleConstructorWithArgs" (String.concat ["Unexpected constructor for APDT Evidence: ", constructor])
 
     and
     getK data =

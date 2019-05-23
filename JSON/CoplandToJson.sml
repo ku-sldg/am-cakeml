@@ -18,9 +18,15 @@ fun placeToJson pl = Json.Number (Json.Int (natToInt pl))
 
 fun spPairToJson (sp1, sp2) = Json.List [ Json.String  (spToString sp1), Json.String (spToString sp2)]
 
-fun noArgConstructor cName = Json.AList [("name", stringToJson cName )]
+fun plAddressMapToJson map =
+    let val placeToStr = Int.toString o natToInt
+        fun pairToJson (pl, addr) = (placeToStr pl, Json.String addr)
+     in Json.AList (List.map pairToJson (Map.toAscList map))
+    end
 
-fun constructorWithArgs cName arglist = Json.AList [("name", stringToJson cName ),
+fun noArgConstructor cName = Json.AList [("constructor", stringToJson cName )]
+
+fun constructorWithArgs cName arglist = Json.AList [("constructor", stringToJson cName),
                                                     ("data", Json.List arglist)]
 
 fun apdtToJson term =
@@ -38,7 +44,7 @@ fun apdtToJson term =
 
 fun evidenceToJson evidence =
     case evidence
-     of Mt => Json.String "Mt"
+     of Mt => noArgConstructor "Mt"
      | U aspid args pl bs ev =>  constructorWithArgs "U" [ aspidToJson aspid, stringListToJsonList args, placeToJson pl, byteStringToJson bs, evidenceToJson ev]
      | K aspid args pl1 pl2 bs ev =>  constructorWithArgs "K" [ aspidToJson aspid, stringListToJsonList args, placeToJson pl1, placeToJson pl2,  byteStringToJson bs, evidenceToJson ev]
      | G pl ev bs => constructorWithArgs "G" [placeToJson pl, evidenceToJson ev, byteStringToJson bs]
@@ -47,4 +53,9 @@ fun evidenceToJson evidence =
      | SS ev1 ev2 => constructorWithArgs "SS" [evidenceToJson ev1, evidenceToJson ev2]
      | PP ev1 ev2 => constructorWithArgs "PP" [evidenceToJson ev1, evidenceToJson ev2]
      |  _ =>  raise  Json.ERR "evidenceToJson" "Unexpected constructor for Evidence term: "
+
+fun requestToJson (REQ pl1 pl2 map t ev) = constructorWithArgs "REQ" [placeToJson pl1, placeToJson pl2, plAddressMapToJson map, apdtToJson t, evidenceToJson ev]
+
+fun responseToJson (RES pl1 pl2 ev) = constructorWithArgs "RES" [placeToJson pl1, placeToJson pl2, evidenceToJson ev]
+
 end
