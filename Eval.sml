@@ -11,11 +11,11 @@ fun private p = case p of (x,y) => y
 
 fun platforms s = List.map public s
 
-val emptyUSM : (id, string list -> ByteString.bs) map = map_empty
+val emptyUSM : (id, string list -> ByteString.bs) mymap = map_empty
 fun dummyUSM args = Word8Array.array 1 (Word8.fromInt (List.length args + 1))
 fun dummyUSM' args = Word8Array.array 1 (Word8.fromInt (List.length args + 1))
 
-val emptyKIM : (id, nat -> string list -> ByteString.bs) map = map_empty
+val emptyKIM : (id, nat -> string list -> ByteString.bs) mymap = map_empty
 fun dummyKIM p args = Word8Array.array 1 (Word8.fromInt (List.length args + 1))
 fun dummyKIM' p args = Word8Array.array 1 (Word8.fromInt (List.length args + 1))
 

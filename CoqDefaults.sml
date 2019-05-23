@@ -71,7 +71,7 @@ fun concatWith s l =
 
 (* Map functions *)
 
-type ('a, 'b) map = ('a * 'b) list
+type ('a, 'b) mymap = ('a * 'b) list
 
 val map_empty = []
 
