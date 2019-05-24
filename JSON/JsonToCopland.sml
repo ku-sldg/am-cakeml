@@ -162,31 +162,31 @@ fun jsonToEvidence js =
     getPP data =
     case data
      of [ev1, ev2] => PP  (jsonToEvidence ev1)  (jsonToEvidence ev2)
-     | _ => raise  Json.ERR "getPP" "unexpected argument list"
+     | _ => raise Json.ERR "getPP" "unexpected argument list"
 
 fun jsonToRequest js =
     case js
-     of Json.AList js' => fromAList js'
-      | _ =>  raise Json.ERR "JsonToRequest" "Request message does not begin as an AList"
+      of Json.AList js' => fromAList js'
+       | _ => raise Json.ERR "JsonToRequest" "Request message does not begin as an AList"
 
     and
     fromAList pairs =
         case pairs
           of [("constructor", constructorVal), ("data", args)] => handleConstructorWithArgs constructorVal args
-          | [("data", args), ("constructor", constructorVal)] => handleConstructorWithArgs constructorVal args
-          | _ =>  raise Json.ERR "fromAList" "does not contain just constructor and data pairs"
+           | [("data", args), ("constructor", constructorVal)] => handleConstructorWithArgs constructorVal args
+           | _ => raise Json.ERR "fromAList" "does not contain just constructor and data pairs"
 
     and
     handleConstructorWithArgs (Json.String constructor) (Json.List args) =
         case constructor
           of "REQ" => getREQ args
-           |  _    =>  raise Json.ERR "handleConstructorWithArgs" (String.concat ["Unexpected constructor for APDT term: ", constructor])
+           |  _    => raise Json.ERR "handleConstructorWithArgs" (String.concat ["Unexpected constructor for REQ term: ", constructor])
 
     and
     getREQ data =
         case data
-          of [Json.Number (Json.Int pl1), Json.Number (Json.Int pl2), Json.AList alist, Json.AList t, Json.AList ev] =>
-                 REQ (natFromInt pl1) (natFromInt pl2) (toPlAddrMap alist) (jsonToApdt (Json.AList t)) (jsonToEvidence (Json.AList ev))
+          of [Json.Number (Json.Int pl1), Json.Number (Json.Int pl2), Json.AList alist, t, ev] =>
+                 REQ (natFromInt pl1) (natFromInt pl2) (toPlAddrMap alist) (jsonToApdt t) (jsonToEvidence ev)
            | _ => raise Json.ERR "getREQ" "unexpected argument list"
 
     and
@@ -195,8 +195,32 @@ fun jsonToRequest js =
                 case Int.fromString s
                   of Some i => (natFromInt i, s')
                    | _ => raise Json.ERR "toPlAddrMap" "unexpected non-integer"
-            fun compare nat1 nat2 = Int.compare (natToInt nat1) (natToInt nat2)
-         in Map.fromList compare (List.map unjasonify alist)
+         in Map.fromList natCompare (List.map unjasonify alist)
         end
+
+fun jsonToResponse js =
+    case js
+      of Json.AList js' => fromAList js'
+       | _ => raise Json.ERR "JsonToResponse" "Response message does not begin as an AList"
+
+    and
+    fromAList pairs =
+        case pairs
+          of [("constructor", constructorVal), ("data", args)] => handleConstructorWithArgs constructorVal args
+           | [("data", args), ("constructor", constructorVal)] => handleConstructorWithArgs constructorVal args
+           | _ =>  raise Json.ERR "fromAList" "does not contain just constructor and data pairs"
+
+    and
+    handleConstructorWithArgs (Json.String constructor) (Json.List args) =
+        case constructor
+          of "RES" => getRES args
+           |  _    => raise Json.ERR "handleConstructorWithArgs" (String.concat ["Unexpected constructor for RES term: ", constructor])
+
+    and
+    getRES data =
+        case data
+          of [Json.Number (Json.Int pl1), Json.Number (Json.Int pl2), ev] =>
+                 RES (natFromInt pl1) (natFromInt pl2) (jsonToEvidence ev)
+           | _ => raise Json.ERR "getRES" "unexpected argument list"
 
 end

@@ -1,21 +1,22 @@
 (* Depends on: SocketFFI.sml, Json.sml, JsonToCopland.sml, CoplandToJson.sml,
                Comm.sml, and CoplandLang.sml *)
 
-fun serverSend fd = Socket.output fd o jsonToStr o CoplandToJson.apdtToJson
+fun serverSend fd = Socket.output fd o jsonToStr o CoplandToJson.requestToJson
 
-val serverRcv = JsonToCopland.jsonToEvidence o strToJson o Socket.inputAll
+val serverRcv = JsonToCopland.jsonToResponse o strToJson o Socket.inputAll
 
-fun serverEval fd copTerm = Some (serverSend fd copTerm; serverRcv fd)
+fun serverEval fd req = Some (serverSend fd req; serverRcv fd)
     handle Socket.Err     => (TextIO.print_err "Socket error\n"; None)
          | Json.ERR s1 s2 => (TextIO.print_err ("JSON error: "^s1^": "^s2^"\n"); None)
 
 
 val copTerm = NONCE
+val req = REQ O O emptyNsMap copTerm Mt
 
 fun main () =
     let val fd = Socket.connect "127.0.0.1" 50000
-        fun printEv ev = print ((evToString ev)^"\n")
-     in Option.map printEv (serverEval fd copTerm);
+        fun printEv (RES _ _ ev) = print ((evToString ev)^"\n")
+     in Option.map printEv (serverEval fd req);
         Socket.close fd
     end
     handle Socket.Err       => TextIO.print_err "Socket failure on connection\n"
