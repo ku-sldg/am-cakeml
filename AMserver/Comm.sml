@@ -7,12 +7,16 @@ fun jsonToStr js  = Json.print_json js 0
 (* Message formatting *)
 type address = string
 
+(* Nameserver mapping *)
+type nsMap = ((pl, address) map)
+val emptyNsMap : nsMap = Map.empty natCompare
+
 (* To place,
    From place,
    Nameserver mapping,
    Term to execute,
    Initial evidence *)
-datatype requestMessage = REQ pl pl ((pl, address) map) t ev
+datatype requestMessage = REQ pl pl nsMap t ev
 
 (* To place,
    From place,
