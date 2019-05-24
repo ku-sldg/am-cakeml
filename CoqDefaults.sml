@@ -16,6 +16,8 @@ fun natFromInt i = if i < 0
                         then O
                         else S (natFromInt (i - 1))
 
+(* nat -> nat -> ordering *)
+fun natCompare nat1 nat2 = Int.compare (natToInt nat1) (natToInt nat2)
 
 fun natToString n = Int.toString (natToInt n)
 
