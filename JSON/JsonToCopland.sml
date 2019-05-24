@@ -15,7 +15,7 @@ fun jsonStringToBS (Json.String s) = ByteString.fromHexString s
 structure JsonToCopland =
 struct
 
-(* json object to apt object *)
+(* json object to apdt object *)
 fun jsonToApdt js =
     case js
      of Json.AList js' => fromAList js'
@@ -86,12 +86,11 @@ fun jsonToApdt js =
      BRP (stringToSp sp1) (stringToSp sp2) (jsonToApdt term1) (jsonToApdt term2)
       | _ => raise  Json.ERR "getBRP" "unexpected argument list"
 
-(* json object to apt object *)
+(* json object to ev object *)
 fun jsonToEvidence js =
-    (case js
+    case js
      of Json.AList js' => fromAList js'
-      | _ =>  raise  Json.ERR "JsonToEvidence" "APDT Evidence does not begin as an AList")
-    handle _ => (print "1\n"; Mt)
+      | _ =>  raise  Json.ERR "JsonToEvidence" "APDT Evidence does not begin as an AList"
 
       and
     fromAList pairs =
@@ -164,4 +163,40 @@ fun jsonToEvidence js =
     case data
      of [ev1, ev2] => PP  (jsonToEvidence ev1)  (jsonToEvidence ev2)
      | _ => raise  Json.ERR "getPP" "unexpected argument list"
+
+fun jsonToRequest js =
+    case js
+     of Json.AList js' => fromAList js'
+      | _ =>  raise Json.ERR "JsonToRequest" "Request message does not begin as an AList"
+
+    and
+    fromAList pairs =
+        case pairs
+          of [("constructor", constructorVal), ("data", args)] => handleConstructorWithArgs constructorVal args
+          | [("data", args), ("constructor", constructorVal)] => handleConstructorWithArgs constructorVal args
+          | _ =>  raise Json.ERR "fromAList" "does not contain just constructor and data pairs"
+
+    and
+    handleConstructorWithArgs (Json.String constructor) (Json.List args) =
+        case constructor
+          of "REQ" => getREQ args
+           |  _    =>  raise Json.ERR "handleConstructorWithArgs" (String.concat ["Unexpected constructor for APDT term: ", constructor])
+
+    and
+    getREQ data =
+        case data
+          of [Json.Number (Json.Int pl1), Json.Number (Json.Int pl2), Json.AList alist, Json.AList t, Json.AList ev] =>
+                 REQ (natFromInt pl1) (natFromInt pl2) (toPlAddrMap alist) (jsonToApdt (Json.AList t)) (jsonToEvidence (Json.AList ev))
+           | _ => raise Json.ERR "getREQ" "unexpected argument list"
+
+    and
+    toPlAddrMap alist =
+        let fun unjasonify (s, Json.String s') =
+                case Int.fromString s
+                  of Some i => (natFromInt i, s')
+                   | _ => raise Json.ERR "toPlAddrMap" "unexpected non-integer"
+            fun compare nat1 nat2 = Int.compare (natToInt nat1) (natToInt nat2)
+         in Map.fromList compare (List.map unjasonify alist)
+        end
+
 end

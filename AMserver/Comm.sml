@@ -2,7 +2,7 @@
 
 (* Utility functions *)
 fun strToJson str = List.hd (fst (Json.parse ([], str)))
-fun jsonToStr j   = Json.print_json j 0
+fun jsonToStr js  = Json.print_json js 0
 
 (* Message formatting *)
 type address = string

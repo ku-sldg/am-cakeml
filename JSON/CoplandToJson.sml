@@ -18,10 +18,10 @@ fun placeToJson pl = Json.Number (Json.Int (natToInt pl))
 
 fun spPairToJson (sp1, sp2) = Json.List [ Json.String  (spToString sp1), Json.String (spToString sp2)]
 
-fun plAddressMapToJson map =
+fun plAddrMapToJson map =
     let val placeToStr = Int.toString o natToInt
-        fun pairToJson (pl, addr) = (placeToStr pl, Json.String addr)
-     in Json.AList (List.map pairToJson (Map.toAscList map))
+        fun jsonify (pl, addr) = (placeToStr pl, Json.String addr)
+     in Json.AList (List.map jsonify (Map.toAscList map))
     end
 
 fun noArgConstructor cName = Json.AList [("constructor", stringToJson cName )]
@@ -54,7 +54,7 @@ fun evidenceToJson evidence =
      | PP ev1 ev2 => constructorWithArgs "PP" [evidenceToJson ev1, evidenceToJson ev2]
      |  _ =>  raise  Json.ERR "evidenceToJson" "Unexpected constructor for Evidence term: "
 
-fun requestToJson (REQ pl1 pl2 map t ev) = constructorWithArgs "REQ" [placeToJson pl1, placeToJson pl2, plAddressMapToJson map, apdtToJson t, evidenceToJson ev]
+fun requestToJson (REQ pl1 pl2 map t ev) = constructorWithArgs "REQ" [placeToJson pl1, placeToJson pl2, plAddrMapToJson map, apdtToJson t, evidenceToJson ev]
 
 fun responseToJson (RES pl1 pl2 ev) = constructorWithArgs "RES" [placeToJson pl1, placeToJson pl2, evidenceToJson ev]
 
