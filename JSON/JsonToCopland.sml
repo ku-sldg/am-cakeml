@@ -195,7 +195,7 @@ fun jsonToRequest js =
                 case Int.fromString s
                   of Some i => (natFromInt i, s')
                    | _ => raise Json.ERR "toPlAddrMap" "unexpected non-integer"
-         in Map.fromList natCompare (List.map unjasonify alist)
+         in Map.fromList nat_compare (List.map unjasonify alist)
         end
 
 fun jsonToResponse js =

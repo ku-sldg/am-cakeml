@@ -16,10 +16,7 @@ fun natFromInt i = if i < 0
                         then O
                         else S (natFromInt (i - 1))
 
-(* nat -> nat -> ordering *)
-fun natCompare nat1 nat2 = Int.compare (natToInt nat1) (natToInt nat2)
-
-fun natToString n = Int.toString (natToInt n)
+val natToString = Int.toString o natToInt
 
 fun nat_plus n m =
     case n of O => m
@@ -38,12 +35,11 @@ fun nat_leb n m =
     case n of O => True
             | S n' => (case m of S m' => nat_leb n' m' | O => False)
 
-fun nat_compare n m =
-    if nat_eq n m
-    then Equal
-    else if nat_leb n m
-         then Less
-         else Greater
+fun nat_compare n m = case (n, m)
+    of (S n', S m') => nat_compare n' m'
+     | (S n', O) => Greater
+     | (O, S m') => Less
+     | (O, O) => Equal
 
 fun nat_length l =
     case l of

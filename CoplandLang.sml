@@ -4,11 +4,7 @@
 
 datatype id = Id nat
 
-fun id_compare i j = let val (Id i) = i in
-                         let val (Id j) = j in
-                             nat_compare i j
-                         end
-                     end
+fun id_compare (Id i) (Id j) = nat_compare i j
 
 fun idToString i = case i of Id i' => "Id " ^ natToString i'
 

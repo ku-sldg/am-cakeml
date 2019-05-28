@@ -19,8 +19,7 @@ fun placeToJson pl = Json.Number (Json.Int (natToInt pl))
 fun spPairToJson (sp1, sp2) = Json.List [ Json.String  (spToString sp1), Json.String (spToString sp2)]
 
 fun plAddrMapToJson map =
-    let val placeToStr = Int.toString o natToInt
-        fun jsonify (pl, addr) = (placeToStr pl, Json.String addr)
+    let fun jsonify (pl, addr) = (plToString pl, Json.String addr)
      in Json.AList (List.map jsonify (Map.toAscList map))
     end
 

@@ -9,7 +9,7 @@ type address = string
 
 (* Nameserver mapping *)
 type nsMap = ((pl, address) map)
-val emptyNsMap : nsMap = Map.empty natCompare
+val emptyNsMap : nsMap = Map.empty nat_compare
 
 (* To place,
    From place,
