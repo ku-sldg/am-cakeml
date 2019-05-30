@@ -6,7 +6,7 @@ datatype id = Id nat
 
 fun id_compare (Id i) (Id j) = nat_compare i j
 
-fun idToString i = case i of Id i' => "Id " ^ natToString i'
+fun idToString (Id i) = "Id " ^ natToString i 
 
 type pl = nat
 val plToString = natToString
@@ -25,15 +25,17 @@ fun spToString s = case s
                     of ALL => "ALL"
                      | NONE => "NONE"
 
+
 datatype t = USM asp_id (arg list)
            | KIM asp_id pl (arg list)
            | SIG
            | HSH
+           | CPY
            | NONCE
            | AT pl t
            | LN t t
-           | BRS sp sp t t
-           | BRP sp sp t t
+           | BRS (sp * sp) t t
+           | BRP (sp * sp) t t
 
 fun tToString a =
     let
@@ -45,11 +47,12 @@ fun tToString a =
           | KIM a p al => concat ["KIM", aspIdToString a, plToString p, listToString al argToString]
           | SIG => "SIG"
           | HSH => "HSH"
+          | CPY => "CPY"
           | NONCE => "NONCE"
           | AT p a' => concat ["AT", plToString p, wrapped a']
           | LN a1 a2 => concat ["LN", wrapped a1, wrapped a2]
-          | BRS s1 s2 a1 a2 => concat ["BRS (", (spToString s1 ^ ", " ^ spToString s2), ") ", wrapped a1, wrapped a2]
-          | BRP s1 s2 a1 a2 => concat ["BRP (", (spToString s1 ^ ", " ^ spToString s2), ") " , wrapped a1, wrapped a2]
+          | BRS (s1, s2) a1 a2 => concat ["BRS (", (spToString s1 ^ ", " ^ spToString s2), ") ", wrapped a1, wrapped a2]
+          | BRP (s1, s2) a1 a2 => concat ["BRP (", (spToString s1 ^ ", " ^ spToString s2), ") " , wrapped a1, wrapped a2]
     end
 
 (* Evidence Values *)

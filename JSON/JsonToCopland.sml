@@ -77,13 +77,13 @@ fun jsonToApdt js =
     getBRS data =
     case data
      of [ Json.List [ (Json.String sp1), (Json.String sp2)], term1, term2] =>
-     BRS (stringToSp sp1) (stringToSp sp2) (jsonToApdt term1) (jsonToApdt term2)
+     BRS (stringToSp sp1, stringToSp sp2) (jsonToApdt term1) (jsonToApdt term2)
       | _ => raise  Json.ERR "getBRS" "unexpected argument list"
     and
     getBRP data =
     case data
      of [ Json.List [ (Json.String sp1), (Json.String sp2)], term1, term2] =>
-     BRP (stringToSp sp1) (stringToSp sp2) (jsonToApdt term1) (jsonToApdt term2)
+     BRP (stringToSp sp1, stringToSp sp2) (jsonToApdt term1) (jsonToApdt term2)
       | _ => raise  Json.ERR "getBRP" "unexpected argument list"
 
 (* json object to ev object *)

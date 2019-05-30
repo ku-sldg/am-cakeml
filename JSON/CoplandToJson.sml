@@ -37,8 +37,8 @@ fun apdtToJson term =
       | NONCE => noArgConstructor "NONCE"
       | AT pl t1 => constructorWithArgs "AT" [ placeToJson pl, apdtToJson t1]
       | LN t1 t2 =>  constructorWithArgs "LN" [ apdtToJson t1, apdtToJson t2]
-      | BRS sp1 sp2 t1 t2 => constructorWithArgs "BRS" [spPairToJson (sp1, sp2), apdtToJson t1, apdtToJson t2]
-      | BRP sp1 sp2 t1 t2=>  constructorWithArgs "BRP" [spPairToJson (sp1, sp2), apdtToJson t1, apdtToJson t2]
+      | BRS p t1 t2 => constructorWithArgs "BRS" [spPairToJson p, apdtToJson t1, apdtToJson t2]
+      | BRP p t1 t2=>  constructorWithArgs "BRP" [spPairToJson p, apdtToJson t1, apdtToJson t2]
       |  _ =>  raise  Json.ERR "apdtToJson" "Unexpected constructor for APDT term: "
 
 fun evidenceToJson evidence =
