@@ -10,7 +10,7 @@ fun stringToJson s = Json.String s
 
 fun stringListToJsonList args  =  Json.List (List.map stringToJson args)
 
-fun byteStringToJson bs = Json.String (ByteString.toString  bs)
+fun byteStringToJson bs = Json.String (ByteString.toHexString bs)
 
 fun aspidToJson (Id a) = Json.Number (Json.Int (natToInt a))
 

@@ -52,7 +52,7 @@ structure Socket = struct
             end
 
         (* Returns a pretty string for debug printing file descriptors *)
-        val fdToString = ByteString.toString o ByteString.fromRawString o getFd
+        val showFD = ByteString.show o ByteString.fromRawString o getFd
 
 
     (* The following code is adaptped from the TextIO implementation in the

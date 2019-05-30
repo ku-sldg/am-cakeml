@@ -6,7 +6,7 @@ datatype id = Id nat
 
 fun id_compare (Id i) (Id j) = nat_compare i j
 
-fun idToString (Id i) = "Id " ^ natToString i 
+fun idToString (Id i) = "Id " ^ natToString i
 
 type pl = nat
 val plToString = natToString
@@ -77,17 +77,17 @@ fun evToString e =
           | U i al p bs e' => concat ["U", aspIdToString i,
                                       listToString al id,
                                       plToString p,
-                                      ByteString.toString bs,
+                                      ByteString.show bs,
                                       evToString' e']
           | K i al p1 p2 bs e' => concat ["K", aspIdToString i,
                                           listToString al id,
                                           plToString p1,
                                           plToString p2,
-                                          ByteString.toString bs,
+                                          ByteString.show bs,
                                           evToString' e']
-          | G p e' bs => concat ["G", plToString p, evToString' e', ByteString.toString bs]
-          | H p bs => concat ["H", plToString p, ByteString.toString bs]
-          | N p index bs e' => concat ["N", plToString p, Int.toString index,  ByteString.toString bs, evToString' e']
+          | G p e' bs => concat ["G", plToString p, evToString' e', ByteString.show bs]
+          | H p bs => concat ["H", plToString p, ByteString.show bs]
+          | N p index bs e' => concat ["N", plToString p, Int.toString index,  ByteString.show bs, evToString' e']
           | SS e1 e2 => concat ["SS", evToString' e1, evToString' e2]
           | PP e1 e2 => concat ["PP", evToString' e1, evToString' e2]
     end
