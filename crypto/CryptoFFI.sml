@@ -18,6 +18,13 @@ fun hashStr s =
         result
     end
 
+fun signFile files =
+    let
+        val result = Word8Array.array 64 (Word8.fromInt 0)
+    in
+        #(signFile) files result;
+        result
+    end
 
 (* len is length of nonce in bytes *)
 fun urand len =

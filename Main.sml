@@ -94,6 +94,14 @@ fun aes256CtrTest () =
                "Encrypted text 3: " ^ ct3 ^ "\n\n")
     end
 
+(* can i sign a file? *)
+(* this is rough because it expects certain files in certain places *)
+fun sigTest () =
+    let val fileStr = "./crypto/sig/Makefile;./crypto/sig/mySig.txt;./crypto/sig/rsa/working/myPrivateKey.txt"
+    in 
+        signFile fileStr;
+        TextIO.print "See crypto/sig/mySig.txt!"
+    end
 
 (* Run all tests *)
 fun main () = (
@@ -101,5 +109,6 @@ fun main () = (
     nonceTest ();
     bsAddTest ();
     aes256Test ();
-    aes256CtrTest ())
+    aes256CtrTest ();
+    sigTest ())
 val _ = main ()
