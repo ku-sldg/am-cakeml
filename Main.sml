@@ -98,7 +98,8 @@ fun aes256CtrTest () =
 fun sigTest () =
     let val msg = "The private key is stored at ./crypto/sig/rsa/working/myPrivateKey.txt"
     in 
-        print( "Signature Test: \n" ^ ByteString.show( signMsg msg ) )
+
+        print( "Signature Test: \n" ^ ByteString.show( signMsg (ByteString.fromRawString msg ) ) )
     end
 
 (* Run all tests *)
@@ -108,5 +109,5 @@ fun main () = (
     bsAddTest ();
     aes256Test ();
     aes256CtrTest ();
-    sigTest ())
+    sigTest())
 val _ = main ()

@@ -22,7 +22,7 @@ fun signMsg msg =
     let
         val result = Word8Array.array 512 (Word8.fromInt 0)
     in
-        #(signMsg) msg result;
+        #(signMsg) (ByteString.toRawString msg) result;
         result
     end
 
