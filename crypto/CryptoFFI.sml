@@ -18,11 +18,11 @@ fun hashStr s =
         result
     end
 
-fun signFile files =
+fun signMsg msg =
     let
-        val result = Word8Array.array 64 (Word8.fromInt 0)
+        val result = Word8Array.array 512 (Word8.fromInt 0)
     in
-        #(signFile) files result;
+        #(signMsg) msg result;
         result
     end
 

@@ -16,18 +16,13 @@ void ffisha512(uint8_t * c, long clen, uint8_t * a, long alen) {
     sha512(c, clen, a);
 }
 
-// "msgFileName;sigFileName;privKeyFileName"
-void ffisignFile( uint8_t* filesList, long filesListLen, uint8_t* signature, long sigLen )
+void ffisignMsg( uint8_t* msg, long msgLen, uint8_t* signature, long sigLen )
 {
-    struct file_list_class files[1];
-    readFileList( filesList, files );
-    char* msg = files->msgFile;
-    char* sig = files->sigFile;
-    char* privKey = files->privKeyFile;
-    signFile( msg, sig, privKey );
-    free( files->msgFile );
-    free( files->sigFile );
-    free( files->privKeyFile );
+    unsigned long long* mySig = malloc( sizeof(long long)*64 );
+    signMsg( msg, mySig );
+    sigToByteString( mySig, signature );
+    free( mySig );
+    return;
 }
 
 // Although the `getrandom` function is the preferred way to request random bits

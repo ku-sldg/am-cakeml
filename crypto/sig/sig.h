@@ -11,6 +11,8 @@
 #include "sha512/hasher.h"
 #include <string.h>
 
+#define PRIVATE_KEY_FILE "./crypto/sig/rsa/working/myPrivateKey.txt"
+
 struct file_list_class
 {
     char* msgFile;
@@ -19,7 +21,10 @@ struct file_list_class
 };
 
 // writes the signature to the input "sig"
-void signMsg( char* msg, unsigned long long* sig, struct private_key_class* priv );
+void signMsgWithKey( char* msg, unsigned long long* sig, struct private_key_class* priv );
+
+// writes the signature to the input "sig"
+void signMsg( char* msg, unsigned long long* sig );
 
 // writes the signature to the file given by sigFile
 void signFile( char* msgFile, char* sigFile, char* privKeyFile );
@@ -38,6 +43,12 @@ char* dupstr( char* src );
 // parse a special input string for a file_list_class
 // input "msgFileName;sigFileName;privKeyFileName"
 void readFileList( uint8_t* fileString, struct file_list_class* files );
+
+// parse a signature into a bytestring
+void sigToByteString( unsigned long long* sig, uint8_t* byteSig );
+
+// invert the above function
+void byteStringToSig( uint8_t* byteSig, unsigned long long* sig );
 
 #endif
 
