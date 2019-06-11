@@ -35,8 +35,8 @@ be analyzed by NIST's statistical test suite for CSPRNGs:
 *)
 fun genRandFile filename len =
     let val fd = TextIO.openOut filename
-        val writeRand = TextIO.output fd (ByteString.toRawString (rand ()))
-     in funpow (const writeRand) len ();
+        val writeRand = TextIO.output fd o ByteString.toRawString o rand
+     in funpow writeRand len ();
         TextIO.closeOut fd
     end
 (* val _ = genRandFile "rand" 5000000 *)
@@ -97,9 +97,8 @@ fun aes256CtrTest () =
 (* can I sign a file? *)
 fun sigTest () =
     let val msg = "The private key is stored at ./crypto/sig/rsa/working/myPrivateKey.txt"
-    in 
-
-        print( "Signature Test: \n" ^ ByteString.show( signMsg (ByteString.fromRawString msg ) ) )
+        val signAndShow = ByteString.show o signMsg o ByteString.fromRawString
+     in print ("Signature Test: \n" ^ signAndShow msg ^ "\n")
     end
 
 (* Run all tests *)

@@ -13,14 +13,12 @@ fun encodeEv (e : ev) =
       | PP e1 e2 => ByteString.append (encodeEv e1) (encodeEv e2)
 
 
-fun genHash (e : ev) = hash (encodeEv e)
+val genHash = hash o encodeEv
 
 fun readFile filename =
-    let
-        val fd = TextIO.openIn filename
+    let val fd = TextIO.openIn filename
         val text = TextIO.inputAll fd
-    in
-        TextIO.closeIn fd;
+     in TextIO.closeIn fd;
         text
     end
 
@@ -30,4 +28,4 @@ val genFileHash = hashStr o readFile
 val genNonce = rand
 (* fun genNonce = urand 16 *)
 
-fun signEv (e : ev) = signMsg (encodeEv e)
+val signEv = signMsg o encodeEv
