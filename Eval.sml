@@ -31,7 +31,7 @@ fun splitEv s e = case s
                    of ALL => e
                     | NONE => Mt
 
-exception USMexpn id 
+exception USMexpn id
 exception KIMexpn id
 
 fun measureUsm am id args =
@@ -45,16 +45,20 @@ fun measureKim am id p args =
       | Some f => f p args
 
 
-(* Raises USMexpn and KIMexpn when bad ids are given! *)
-fun eval (p : pl) (e : ev) (term : t) =
-    case term
-     of USM id args => U id args p (measureUsm dummyAmUSM id args) e
-      | KIM id p' args => K id args p p' (measureKim dummyAmKIM id p args) e
-      | SIG => G p e (signEv e)
-      | HSH => H p (genHash e)
-      | CPY => e 
-      | NONCE => N p 0 (genNonce ()) e (* TODO: replace '0' with a real ID *)
-      | AT p' t' => eval p' e t'
-      | LN t1 t2 => let val e1 = eval p e t1 in eval p e1 t2 end
-      | BRS (s1, s2) t1 t2 => SS (eval p (splitEv s1 e) t1) (eval p (splitEv s2 e) t2)
-      | BRP (s1, s2) t1 t2 => PP (eval p (splitEv s1 e) t1) (eval p (splitEv s2 e) t2)
+(* eval probably doesn't need a place argument, when it just represents "me"
+  (invariant). Could pass me+map together in a copEnv-like thing. *)
+val me = O
+
+(* May raise USMexpn, KIMexpn, DispatchErr, Json.ERR, or Socket.Err *)
+fun eval map ev t =
+    case t
+     of USM id args => U id args me (measureUsm dummyAmUSM id args) ev
+      | KIM id pl args => K id args me pl (measureKim dummyAmKIM id me args) ev
+      | SIG => G me ev (signEv ev)
+      | HSH => H me (genHash ev)
+      | CPY => ev
+      | NONCE => N me 0 (genNonce ()) ev (* TODO: replace '0' with a real ID *)
+      | AT pl t' => dispatchAt (REQ me pl map t' ev)
+      | LN t1 t2 => eval map (eval map ev t1) t2
+      | BRS (s1, s2) t1 t2 => SS (eval map (splitEv s1 ev) t1) (eval map (splitEv s2 ev) t2)
+      | BRP (s1, s2) t1 t2 => PP (eval map (splitEv s1 ev) t1) (eval map (splitEv s2 ev) t2)

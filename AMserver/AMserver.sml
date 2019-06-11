@@ -1,21 +1,21 @@
 (* Depends on: SocketFFI.sml, Json.sml, JsonToCopland.sml, CoplandToJson.sml,
-               Comm.sml, and Eval.sml *)
+               CommTypes.sml, CommUtil.sml and Eval.sml *)
 
 (* TODO: Do something with pl1 rather than assuming it is here.
    Also do something with the nameserver mapping *)
-(* When things go well, this returns a JSON evidence string. When they go wrong, 
-   it returns a raw error message string. In the future, we may want to wrap  
+(* When things go well, this returns a JSON evidence string. When they go wrong,
+   it returns a raw error message string. In the future, we may want to wrap
    said error messages in JSON as well to make it easier on the client. *)
 fun evalJson s =
     let val (REQ pl1 pl2 map t ev) = JsonToCopland.jsonToRequest (strToJson s)
-        val ev' = eval pl2 ev t
+        val ev' = eval map ev t
         val response = RES pl2 pl1 ev'
      in jsonToStr (CoplandToJson.responseToJson response)
     end
     handle Json.ERR s1 s2 => (TextIO.print_err ("JSON error"^s1^": "^s2^"\n");
                               "Invalid JSON/Copland term")
          | USMexpn (Id n) => "Invalid USM id: "^(natToString n)^"\n"
-         | KIMexpn (Id n) => "Invalid KIM id: "^(natToString n)^"\n" 
+         | KIMexpn (Id n) => "Invalid KIM id: "^(natToString n)^"\n"
 
 
 fun respondToMsg client = Socket.output client (evalJson (Socket.inputAll client))

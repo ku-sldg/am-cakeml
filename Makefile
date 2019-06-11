@@ -1,7 +1,9 @@
 # NOTE: the order of this list must reflect code dependencies
 APPEND_LIST = ByteString.sml crypto/CryptoFFI.sml crypto/Aes256.sml \
-              crypto/Random.sml sockets/SocketFFI.sml CoqDefaults.sml \
-              CoplandLang.sml Measurements.sml Eval.sml Main.sml
+    crypto/Random.sml sockets/SocketFFI.sml CoqDefaults.sml CoplandLang.sml \
+    Measurements.sml AMserver/CommTypes.sml JSON/Json.sml \
+	JSON/CoplandToJson.sml JSON/JsonToCopland.sml AMserver/CommUtil.sml \
+    Eval.sml Main.sml
 
 # Change this directory if necessary  -- or
 # provide the directory for your machine on the make command-line, e.g.

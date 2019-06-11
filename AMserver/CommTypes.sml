@@ -1,10 +1,5 @@
-(* Depends on: CoplandLang.sml, Json.sml *)
+(* Depends on: CoplandLang.sml *)
 
-(* Utility functions *)
-fun strToJson str = List.hd (fst (Json.parse ([], str)))
-fun jsonToStr js  = Json.print_json js 0
-
-(* Message formatting *)
 type address = string
 
 (* Nameserver mapping *)
