@@ -18,6 +18,13 @@ fun hashStr s =
         result
     end
 
+fun signMsg msg =
+    let
+        val result = Word8Array.array 512 (Word8.fromInt 0)
+    in
+        #(signMsg) (ByteString.toRawString msg) result;
+        result
+    end
 
 (* len is length of nonce in bytes *)
 fun urand len =

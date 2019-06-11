@@ -7,12 +7,22 @@
 
 #include "sha512.h"
 #include "aes256.h"
+#include "sig/sig.h"
 
 // c <- message, returns hash in a
 void ffisha512(uint8_t * c, long clen, uint8_t * a, long alen) {
     // sha512 hash length = 512 bits = 64 bytes
     assert(alen >= 64);
     sha512(c, clen, a);
+}
+
+void ffisignMsg( uint8_t* msg, long msgLen, uint8_t* signature, long sigLen )
+{
+    unsigned long long* mySig = malloc( sizeof(long long)*64 );
+    signMsg( msg, mySig );
+    sigToByteString( mySig, signature );
+    free( mySig );
+    return;
 }
 
 // Although the `getrandom` function is the preferred way to request random bits

@@ -30,5 +30,4 @@ val genFileHash = hashStr o readFile
 val genNonce = rand
 (* fun genNonce = urand 16 *)
 
-(* This is just a placeholder at the moment. *)
-fun signEv (e : ev) = ByteString.empty
+fun signEv (e : ev) = signMsg (encodeEv e)

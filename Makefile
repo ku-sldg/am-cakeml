@@ -5,6 +5,8 @@ APPEND_LIST = ByteString.sml crypto/CryptoFFI.sml crypto/Aes256.sml \
 	JSON/CoplandToJson.sml JSON/JsonToCopland.sml AMserver/CommUtil.sml \
     Eval.sml Main.sml
 
+SIG_OBJS = crypto/sig/rsa/rsa.o crypto/sig/rsa/rsaInterface.o crypto/sig/rsa/utils.o crypto/sig/sha512/hasher.o crypto/sig/sha512/toBinary.o
+
 # Change this directory if necessary  -- or
 # provide the directory for your machine on the make command-line, e.g.
 # make -n   CAKE_DIR="/someOtherLocation/cake-x64-64"
@@ -23,7 +25,7 @@ CC = gcc
 CFLAGS = #-Wno-incompatible-pointer-types
 # BUILD_DIR = build
 
-apdt: apdt.S sha512.o aes256.o crypto_ffi.o socket_ffi.o basis_ffi.o
+apdt: apdt.S sha512.o aes256.o sig.o $(SIG_OBJS) crypto_ffi.o socket_ffi.o basis_ffi.o
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
 apdt.S: apdt.sml
@@ -44,9 +46,13 @@ crypto_ffi.o: crypto/crypto_ffi.c crypto/sha512.h crypto/aes256.h
 socket_ffi.o: sockets/socket_ffi.c
 	$(CC) $(CFLAGS) -c sockets/socket_ffi.c
 
+sig.o: crypto/sig/sig.h
+	cd crypto/sig && make && cp sig.o ../../ && cd rsa && ./genKeys && cd ../..
+
 basis_ffi.o: $(BASIS)
 	$(CC) $(CFLAGS) -c $(BASIS)
 
 .PHONY: clean
 clean:
-	rm -f apdt apdt.S apdt.sml sha512.o aes256.o crypto_ffi.o socket_ffi.o basis_ffi.o
+	rm -f apdt apdt.S apdt.sml sha512.o aes256.o sig.o crypto_ffi.o socket_ffi.o basis_ffi.o
+	cd crypto/sig && make clean
