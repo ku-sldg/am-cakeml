@@ -7,7 +7,11 @@ SERVER_LIST = ../ByteString.sml ../crypto/CryptoFFI.sml ../crypto/Aes256.sml \
 CLIENT_LIST = ../ByteString.sml ../sockets/SocketFFI.sml ../JSON/Json.sml \
     ../CoqDefaults.sml ../CoplandLang.sml CommTypes.sml \
     ../JSON/JsonToCopland.sml ../JSON/CoplandToJson.sml CommUtil.sml \
-	ClientTest.sml
+    ClientTest.sml
+
+SIG_OBJS = ../crypto/sig/rsa/rsa.o ../crypto/sig/rsa/rsaInterface.o \
+    ../crypto/sig/rsa/utils.o ../crypto/sig/sha512/hasher.o \
+    ../crypto/sig/sha512/toBinary.o
 
 # Change this directory if necessary  -- or
 # provide the directory for your machine on the make command-line, e.g.
@@ -36,7 +40,7 @@ CC = gcc
 .PHONY: all
 all: server client
 
-server: Server.S sha512.o aes256.o crypto_ffi.o socket_ffi.o basis_ffi.o
+server: Server.S sha512.o aes256.o sig.o $(SIG_OBJS) crypto_ffi.o socket_ffi.o basis_ffi.o
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
 Server.S: Server.sml
@@ -66,10 +70,14 @@ crypto_ffi.o: ../crypto/crypto_ffi.c ../crypto/sha512.h ../crypto/aes256.h
 socket_ffi.o: ../sockets/socket_ffi.c
 	$(CC) $(CFLAGS) -c ../sockets/socket_ffi.c
 
+sig.o: ../crypto/sig/sig.h
+	cd ../crypto/sig && make && cp sig.o ../../AMserver && cd rsa && ./genKeys
+
 basis_ffi.o: $(BASIS)
 	$(CC) $(CFLAGS) -c $(BASIS)
 
 .PHONY: clean
 clean:
-	rm -f server Server.S Server.sml client Client.S Client.sml \
-	      sha512.o aes256.o crypto_ffi.o socket_ffi.o basis_ffi.o
+	rm -f server Server.S Server.sml client Client.S Client.sml sha512.o \
+	      aes256.o sig.o crypto_ffi.o socket_ffi.o basis_ffi.o
+	cd ../crypto/sig && make clean
