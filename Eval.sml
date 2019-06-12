@@ -50,6 +50,9 @@ fun measureKim am id p args =
 val me = O
 
 (* May raise USMexpn, KIMexpn, DispatchErr, Json.ERR, or Socket.Err *)
+(* I'd love to refactor the various exceptions into a Result/Either type,
+   but without do notation, infix ops, or typeclasses, monads become
+   pretty unwieldy :( *)
 fun eval map ev t =
     case t
      of USM id args => U id args me (measureUsm dummyAmUSM id args) ev
