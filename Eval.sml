@@ -46,7 +46,8 @@ fun measureKim am id p args =
 
 
 (* eval probably doesn't need a place argument, when it just represents "me"
-  (invariant). Could pass me+map together in a copEnv-like thing. *)
+   (invariant). Could pass me+map together in a copEnv-like thing. Throw in
+   USM and KIM maps to? *)
 val me = O
 
 (* May raise USMexpn, KIMexpn, DispatchErr, Json.ERR, or Socket.Err *)

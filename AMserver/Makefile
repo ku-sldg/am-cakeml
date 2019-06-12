@@ -4,10 +4,11 @@ SERVER_LIST = ../ByteString.sml ../crypto/CryptoFFI.sml ../crypto/Aes256.sml \
     ../JSON/JsonToCopland.sml ../JSON/CoplandToJson.sml CommUtil.sml \
     ../Eval.sml AMserver.sml
 
-CLIENT_LIST = ../ByteString.sml ../sockets/SocketFFI.sml ../JSON/Json.sml \
-    ../CoqDefaults.sml ../CoplandLang.sml CommTypes.sml \
+CLIENT_LIST = ../ByteString.sml ../crypto/CryptoFFI.sml ../crypto/Aes256.sml \
+    ../crypto/Random.sml ../sockets/SocketFFI.sml ../CoqDefaults.sml \
+    ../CoplandLang.sml ../Measurements.sml CommTypes.sml ../JSON/Json.sml \
     ../JSON/JsonToCopland.sml ../JSON/CoplandToJson.sml CommUtil.sml \
-    ClientTest.sml
+    ../Eval.sml ClientTest.sml
 
 SIG_OBJS = ../crypto/sig/rsa/rsa.o ../crypto/sig/rsa/rsaInterface.o \
     ../crypto/sig/rsa/utils.o ../crypto/sig/sha512/hasher.o \
@@ -49,7 +50,7 @@ Server.S: Server.sml
 Server.sml: $(SERVER_LIST)
 	cat $^ > $@
 
-client: Client.S socket_ffi.o basis_ffi.o
+client: Client.S sha512.o aes256.o sig.o $(SIG_OBJS) crypto_ffi.o socket_ffi.o basis_ffi.o
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
 Client.S: Client.sml

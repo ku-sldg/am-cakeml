@@ -1,15 +1,9 @@
-(* Depends on: SocketFFI.sml, CoplandLang.sml, CommTypes.sml,
-               and CommUtil.sml *)
+(* Depends on: CoplandLang.sml, Eval.sml, and SocketFFI.sml *)
 
-val copTerm = NONCE
-val req = REQ O O emptyNsMap copTerm Mt
+val map  = Map.insert emptyNsMap O "127.0.0.1"
+val term = AT O NONCE
 
-fun main () =
-    let val fd = Socket.connect "127.0.0.1" 50000
-        fun printEv (RES _ _ ev) = print ((evToString ev)^"\n")
-     in Option.map printEv (serverEval fd req);
-        Socket.close fd
-    end
+fun main () = print (evToString (eval map Mt term) ^ "\n")
     handle Socket.Err       => TextIO.print_err "Socket failure on connection\n"
          | Socket.InvalidFD => TextIO.print_err "Invalid file descriptor\n"
          | _                => TextIO.print_err "Fatal: unknown error\n"
