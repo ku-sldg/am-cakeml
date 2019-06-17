@@ -171,16 +171,11 @@ fun jsonToRequest js =
 
     and
     fromAList pairs =
-        case pairs
-          of [("constructor", constructorVal), ("data", args)] => handleConstructorWithArgs constructorVal args
-           | [("data", args), ("constructor", constructorVal)] => handleConstructorWithArgs constructorVal args
-           | _ => raise Json.ERR "fromAList" "does not contain just constructor and data pairs"
-
-    and
-    handleConstructorWithArgs (Json.String constructor) (Json.List args) =
-        case constructor
-          of "REQ" => getREQ args
-           |  _    => raise Json.ERR "handleConstructorWithArgs" (String.concat ["Unexpected constructor for REQ term: ", constructor])
+        let fun get str = case Alist.lookup pairs str
+                            of Some x => x
+                             | None => raise Json.ERR "fromAList" "missing request field"
+         in getREQ (List.map get ["toPlace", "fromPlace", "reqNameMap", "reqTerm", "reqEv"])
+        end
 
     and
     getREQ data =
@@ -205,16 +200,11 @@ fun jsonToResponse js =
 
     and
     fromAList pairs =
-        case pairs
-          of [("constructor", constructorVal), ("data", args)] => handleConstructorWithArgs constructorVal args
-           | [("data", args), ("constructor", constructorVal)] => handleConstructorWithArgs constructorVal args
-           | _ =>  raise Json.ERR "fromAList" "does not contain just constructor and data pairs"
-
-    and
-    handleConstructorWithArgs (Json.String constructor) (Json.List args) =
-        case constructor
-          of "RES" => getRES args
-           |  _    => raise Json.ERR "handleConstructorWithArgs" (String.concat ["Unexpected constructor for RES term: ", constructor])
+        let fun get str = case Alist.lookup pairs str
+                            of Some x => x
+                             | None => raise Json.ERR "fromAList" "missing request field"
+         in getRES (List.map get ["respToPlace", "respFromPlace", "respEv"])
+        end
 
     and
     getRES data =
