@@ -3,6 +3,12 @@
 // This socket interface is largely based on the example provided in the
 // getaddrinfo man page http://man7.org/linux/man-pages/man3/getaddrinfo.3.html
 
+// Gcc defines this macro by default, enabling certain definitions in the 
+// standard header files. It is defined here because CompCert does _not_ define
+// the macro. See here for more information:
+//   https://gnu.org/software/libc/manual/html_node/Feature-Test-Macros
+#define _GNU_SOURCE 1
+
 #include <assert.h>     // assert
 #include <stdint.h>     // uint8_t, uint16_6, etc.
 #include <sys/types.h>  // socket, bind, listen, getaddrinfo
