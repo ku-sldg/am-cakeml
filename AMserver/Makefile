@@ -17,7 +17,7 @@ SIG_OBJS = ../crypto/sig/rsa/rsa.o ../crypto/sig/rsa/rsaInterface.o \
 # Change this directory if necessary  -- or
 # provide the directory for your machine on the make command-line, e.g.
 # make -n   CAKE_DIR="/someOtherLocation/cake-x64-64"
-CAKE_DIR = ~/cake-x64-64
+CAKE_DIR = ~/cake-x64-32
 CAKEC = $(CAKE_DIR)/cake
 BASIS = $(CAKE_DIR)/basis_ffi.c
 
@@ -34,8 +34,8 @@ else
 	CFLAGS = -DNDEBUG
 endif
 
-CC = gcc
-# CFLAGS =
+CC = ccomp
+CFLAGS = -static -Wall
 
 
 .PHONY: all

@@ -7,8 +7,13 @@
 // standard header files. It is defined here because CompCert does _not_ define
 // the macro. See here for more information:
 //   https://gnu.org/software/libc/manual/html_node/Feature-Test-Macros
-#define _GNU_SOURCE 1
-#define _XOPEN_SOURCE 700
+// define _GNU_SOURCE 1
+//
+// defining _GNU_SOURCE 1 defines many standards to be included, not all of
+// which are necessary. For now we include just this posix_c_source, as per the
+// `getaddrinfo` man page
+
+#define _POSIX_C_SOURCE 201112L
 
 #include <assert.h>     // assert
 #include <stdint.h>     // uint8_t, uint16_6, etc.
