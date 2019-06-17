@@ -17,6 +17,8 @@ void ffisha512(uint8_t * c, long clen, uint8_t * a, long alen) {
 }
 
 void ffisignMsg(uint8_t * msg, long msgLen, uint8_t * signature, long sigLen) {
+    (void)msgLen;
+    (void)sigLen;
     unsigned long long mySig[64];
     signMsg((char *)msg, mySig);
     sigToByteString(mySig, signature);
@@ -48,6 +50,8 @@ void ffiurand(uint8_t * c, long clen, uint8_t * a, long alen) {
 #include <fcntl.h>
 #include <unistd.h>
 void ffiurand(uint8_t * c, long clen, uint8_t * a, long alen) {
+    (void)c;
+    (void)clen;
     // On macOS, /dev/random and /dev/urandom are synonymous, with urandom only
     // existing for linux compatibility
     int fd = open("/dev/urandom", O_RDONLY);

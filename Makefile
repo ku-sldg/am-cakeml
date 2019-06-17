@@ -12,7 +12,7 @@ SIG_OBJS = crypto/sig/rsa/rsa.o crypto/sig/rsa/rsaInterface.o \
 # Change this directory if necessary  -- or
 # provide the directory for your machine on the make command-line, e.g.
 # make -n   CAKE_DIR="/someOtherLocation/cake-x64-64"
-CAKE_DIR = ~/cake-x64-64
+CAKE_DIR = ~/cake-x64-32
 CAKEC = $(CAKE_DIR)/cake
 BASIS = $(CAKE_DIR)/basis_ffi.c
 
@@ -23,12 +23,12 @@ ifeq ($(OS),Darwin)
     LDFLAGS += -Wl,-no_pie
 endif
 
-CC = gcc
-CFLAGS = -Wall #-Wno-incompatible-pointer-types
+CC = ccomp
+CFLAGS = -static -Wall # -Werror -Wno-incompatible-pointer-types
 # BUILD_DIR = build
 
 apdt: apdt.S sha512.o aes256.o sig.o $(SIG_OBJS) crypto_ffi.o socket_ffi.o basis_ffi.o
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ -lm
 
 apdt.S: apdt.sml
 	$(CAKEC) < apdt.sml > apdt.S

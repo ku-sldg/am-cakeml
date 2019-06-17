@@ -1,4 +1,4 @@
-CC = gcc
+CC = ccomp
 CFLAGS = -Wall -Werror -Wmissing-prototypes
 OBJS = sha512/hasher.o sha512/sha512.o sha512/toBinary.o rsa/utils.o rsa/rsa.o rsa/rsaInterface.o sig.o
 

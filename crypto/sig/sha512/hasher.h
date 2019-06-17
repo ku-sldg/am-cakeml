@@ -2,7 +2,7 @@
 #ifndef HASHER_H
 #define HASHER_H
 
-#include "sha512.h"
+#include "../../sha512.h"
 #include "toBinary.h"
 #include <stdio.h>
 #include <stdlib.h>

@@ -8,6 +8,7 @@
 // the macro. See here for more information:
 //   https://gnu.org/software/libc/manual/html_node/Feature-Test-Macros
 #define _GNU_SOURCE 1
+#define _XOPEN_SOURCE 700
 
 #include <assert.h>     // assert
 #include <stdint.h>     // uint8_t, uint16_6, etc.
