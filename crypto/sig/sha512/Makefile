@@ -1,4 +1,4 @@
-CC = gcc
+CC = ccomp
 OBJS = hasher.o sha512.o toBinary.o
 
 ifeq ($(CC),ccomp)

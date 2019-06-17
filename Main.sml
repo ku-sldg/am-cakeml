@@ -107,6 +107,6 @@ fun main () = (
     nonceTest ();
     bsAddTest ();
     aes256Test ();
-    aes256CtrTest ();
-    sigTest())
+    aes256CtrTest ()) 
+    (* sigTest()) *)
 val _ = main ()

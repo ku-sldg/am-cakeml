@@ -3,6 +3,11 @@
 // This socket interface is largely based on the example provided in the
 // getaddrinfo man page http://man7.org/linux/man-pages/man3/getaddrinfo.3.html
 
+#define __USE_GNU 1
+#define __USE_MISC 1
+#define __USE_XOPEN2K 1
+#define _XOPEN_SOURCE 700
+
 #include <assert.h>     // assert
 #include <stdint.h>     // uint8_t, uint16_6, etc.
 #include <sys/types.h>  // socket, bind, listen, getaddrinfo
@@ -10,6 +15,10 @@
 #include <netdb.h>      // getaddrinfo
 #include <string.h>     // memset, strerror
 #include <unistd.h>     // close
+
+
+
+
 
 // These helper functions are defined in basis_ffi.c
 // I figured it would be good to use the same marshalling paradigm as the

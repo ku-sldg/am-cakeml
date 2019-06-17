@@ -1,4 +1,4 @@
-CC = gcc
+CC = ccomp
 OBJS = utils.o rsa.o rsaInterface.o
 
 ifeq ($(CC),ccomp)
