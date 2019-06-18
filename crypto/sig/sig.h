@@ -11,8 +11,6 @@
 #include "sha512/hasher.h"
 #include <string.h>
 
-#define PRIVATE_KEY_FILE "./crypto/sig/rsa/working/myPrivateKey.txt"
-
 struct file_list_class
 {
     char* msgFile;

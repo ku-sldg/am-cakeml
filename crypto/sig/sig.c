@@ -37,7 +37,10 @@ void signMsgWithKey( char* msg, unsigned long long* sig, struct private_key_clas
 void signMsg( char* msg, unsigned long long* sig )
 {
     // grab the private key
-    struct private_key_class* priv = readPriv( PRIVATE_KEY_FILE );
+    char priKey[255];
+    strcpy( priKey, KEY_STORAGE );
+    strcat( priKey, "myPrivateKey.txt" );
+    struct private_key_class* priv = readPriv( priKey );
 
     // get the signature
     signMsgWithKey( msg, sig, priv );
@@ -159,28 +162,6 @@ void readFileList( uint8_t* fileString, struct file_list_class* files )
 
     return;
 }
-
-// TODO
-// this is incorrect right now
-// it looks at string representation of nums...
-/*
-void sigToByteString( unsigned long long* sig, uint8_t* byteSig )
-{
-    char* temp = malloc( sizeof(char) * 100 );
-    printf( "the sprintf sig is: \n" );
-    for( int i=0; i<64; i++ )
-    {
-        sprintf( temp, "%llu", sig[i] );
-        printf( "%s ", temp );
-        for( int j=0; j<8; j++ )
-        {
-            byteSig[i*8+j] = (uint8_t)temp[j];
-        }
-    }
-    free( temp );
-    return;
-}
-*/
 
 // sig is 64 long longs
 // byteSig is 512 chars

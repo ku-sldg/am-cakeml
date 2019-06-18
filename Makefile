@@ -49,7 +49,7 @@ socket_ffi.o: sockets/socket_ffi.c
 	$(CC) $(CFLAGS) -c sockets/socket_ffi.c
 
 sig.o: crypto/sig/sig.h
-	cd crypto/sig && make && cp sig.o ../../ && cd rsa && ./genKeys
+	cd crypto/sig && make && cp sig.o ../../
 
 basis_ffi.o: $(BASIS)
 	$(CC) $(CFLAGS) -c $(BASIS)

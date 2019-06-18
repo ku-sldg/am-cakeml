@@ -23,18 +23,24 @@ int genKeys( char* primesFile )
     }
 
     struct stat st = {0};
-    if ( stat("./working", &st) == -1 ) 
+    if ( stat( KEY_STORAGE, &st) == -1 ) 
     {
-        mkdir("./working", 0700);
+        mkdir( KEY_STORAGE, 0700);
     }
 
     FILE* fp;
 
-    fp = fopen( "./working/myPublicKey.txt", "w+" );
+    char pubKey[255];
+    strcpy( pubKey, KEY_STORAGE );
+    strcat( pubKey, "myPublicKey.txt" );
+    fp = fopen( pubKey, "w+" );
     fprintf( fp, "Public Key:\n Modulus: %lld\n Exponent: %lld\n", (long long)pub->modulus, (long long) pub->exponent );
     fclose( fp );    
 
-    fp = fopen( "./working/myPrivateKey.txt", "w+" );
+    char priKey[255];
+    strcpy( priKey, KEY_STORAGE );
+    strcat( priKey, "myPrivateKey.txt" );
+    fp = fopen( priKey, "w+" );
     fprintf( fp, "Private Key:\n Modulus: %lld\n Exponent: %lld\n", (long long)priv->modulus, (long long) priv->exponent );
     fclose( fp );
 
@@ -43,7 +49,10 @@ int genKeys( char* primesFile )
 
 int decryptFile( char* inputFile, char* outputFile )
 {
-    struct private_key_class* priv = readPriv( "./working/myPrivateKey.txt" );
+    char priKey[255];
+    strcpy( priKey, KEY_STORAGE );
+    strcat( priKey, "myPrivateKey.txt" );
+    struct private_key_class* priv = readPriv( priKey );
     char* msgFile = inputFile;
     int i;
     FILE* fp = fopen( msgFile, "r" );
@@ -96,7 +105,10 @@ int decryptFile( char* inputFile, char* outputFile )
 
 int encryptFile( char* inputFile, char* outputFile )
 {
-    struct public_key_class* pub = readPub( "./working/myPublicKey.txt" );
+    char pubKey[255];
+    strcpy( pubKey, KEY_STORAGE );
+    strcat( pubKey, "myPublicKey.txt" );
+    struct public_key_class* pub = readPub( pubKey );
     char* msgFile = inputFile;
     int i;
     FILE* fp = fopen( msgFile, "r" );
