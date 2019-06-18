@@ -42,7 +42,7 @@ CFLAGS = -static -Wall
 all: server client
 
 server: Server.S sha512.o aes256.o sig.o $(SIG_OBJS) crypto_ffi.o socket_ffi.o basis_ffi.o
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ -lm
 
 Server.S: Server.sml
 	$(CAKEC) < $^ > $@
@@ -51,7 +51,7 @@ Server.sml: $(SERVER_LIST)
 	cat $^ > $@
 
 client: Client.S sha512.o aes256.o sig.o $(SIG_OBJS) crypto_ffi.o socket_ffi.o basis_ffi.o
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ -lm
 
 Client.S: Client.sml
 	$(CAKEC) < $^ > $@
@@ -72,7 +72,7 @@ socket_ffi.o: ../sockets/socket_ffi.c
 	$(CC) $(CFLAGS) -c ../sockets/socket_ffi.c
 
 sig.o: ../crypto/sig/sig.h
-	cd ../crypto/sig && make && cp sig.o ../../AMserver && cd rsa && ./genKeys
+	cd ../crypto/sig && make && cp sig.o ../../AMserver
 
 basis_ffi.o: $(BASIS)
 	$(CC) $(CFLAGS) -c $(BASIS)
