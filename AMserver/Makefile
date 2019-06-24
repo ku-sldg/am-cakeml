@@ -10,6 +10,7 @@ CLIENT_LIST = ../ByteString.sml ../crypto/CryptoFFI.sml ../crypto/Aes256.sml \
     ../JSON/JsonToCopland.sml ../JSON/CoplandToJson.sml CommUtil.sml \
     ../Eval.sml ClientTest.sml
 
+# object files for the sig library
 SIG_OBJS = ../crypto/sig/rsa/rsa.o ../crypto/sig/rsa/rsaInterface.o \
     ../crypto/sig/rsa/utils.o ../crypto/sig/sha512/hasher.o \
     ../crypto/sig/sha512/toBinary.o
@@ -17,7 +18,7 @@ SIG_OBJS = ../crypto/sig/rsa/rsa.o ../crypto/sig/rsa/rsaInterface.o \
 # Change this directory if necessary  -- or
 # provide the directory for your machine on the make command-line, e.g.
 # make -n   CAKE_DIR="/someOtherLocation/cake-x64-64"
-CAKE_DIR = ~/cake-x64-32
+CAKE_DIR = ~/cake-x64-64
 CAKEC = $(CAKE_DIR)/cake
 BASIS = $(CAKE_DIR)/basis_ffi.c
 
@@ -27,16 +28,8 @@ ifeq ($(OS),Darwin)
 	LDFLAGS += -Wl,-no_pie
 endif
 
-DEBUG = true
-ifeq ($(DEBUG), true)
-	CFLAGS += -ggdb3
-else
-	CFLAGS = -DNDEBUG
-endif
-
-CC = ccomp
-CFLAGS = -static -Wall
-
+CC = gcc
+CFLAGS = -Wall
 
 .PHONY: all
 all: server client
@@ -72,7 +65,7 @@ socket_ffi.o: ../sockets/socket_ffi.c
 	$(CC) $(CFLAGS) -c ../sockets/socket_ffi.c
 
 sig.o: ../crypto/sig/sig.h
-	cd ../crypto/sig && make && cp sig.o ../../AMserver && cd rsa && ./genKeys
+	cd ../crypto/sig && make CC=$(CC) CFLAGS='$(CFLAGS)' && cp sig.o ../../AMserver && cd rsa && ./genKeys
 
 basis_ffi.o: $(BASIS)
 	$(CC) $(CFLAGS) -c $(BASIS)
