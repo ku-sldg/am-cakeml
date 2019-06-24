@@ -108,5 +108,6 @@ fun main () = (
     bsAddTest ();
     aes256Test ();
     aes256CtrTest ();
-    sigTest()) 
+    sigTest()
+    ) handle _ => TextIO.print_err "Fatal: unknown error\n"
 val _ = main ()
