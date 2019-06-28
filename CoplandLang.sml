@@ -31,7 +31,6 @@ datatype t = USM asp_id (arg list)
            | SIG
            | HSH
            | CPY
-           | NONCE
            | AT pl t
            | LN t t
            | BRS (sp * sp) t t
@@ -48,7 +47,6 @@ fun tToString a =
           | SIG => "SIG"
           | HSH => "HSH"
           | CPY => "CPY"
-          | NONCE => "NONCE"
           | AT p a' => concat ["AT", plToString p, wrapped a']
           | LN a1 a2 => concat ["LN", wrapped a1, wrapped a2]
           | BRS (s1, s2) a1 a2 => concat ["BRS (", (spToString s1 ^ ", " ^ spToString s2), ") ", wrapped a1, wrapped a2]

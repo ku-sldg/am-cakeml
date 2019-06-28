@@ -26,6 +26,8 @@ endif
 CC = gcc
 CFLAGS = -Wall
 
+.PHONY: sig.o clean
+
 test: test.S sha512.o aes256.o sig.o $(SIG_OBJS) crypto_ffi.o socket_ffi.o basis_ffi.o
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ -lm
 
@@ -53,7 +55,6 @@ sig.o: crypto/sig/sig.h
 basis_ffi.o: $(BASIS)
 	$(CC) $(CFLAGS) -c $(BASIS)
 
-.PHONY: clean
 clean:
 	rm -f test test.S test.sml sha512.o aes256.o sig.o crypto_ffi.o socket_ffi.o basis_ffi.o
 	cd crypto/sig && make clean

@@ -61,7 +61,6 @@ fun eval map ev t =
       | SIG => G me ev (signEv ev)
       | HSH => H me (genHash ev)
       | CPY => ev
-      | NONCE => N me 0 (genNonce ()) ev (* TODO: replace '0' with a real ID *)
       | AT pl t' => dispatchAt (REQ me pl map t' ev)
       | LN t1 t2 => eval map (eval map ev t1) t2
       | BRS (s1, s2) t1 t2 => SS (eval map (splitEv s1 ev) t1) (eval map (splitEv s2 ev) t2)
