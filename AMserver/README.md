@@ -1,4 +1,4 @@
-Type `make` to build an attestation manager server and a simple test client. This Makefile uses the same variables described in the top-level directory (i.e. `CC`, `CFLAGS`, and `CAKE_DIR`).
+Build with `make am` (or `make server` and `make client` to build the two separately).
 
 To run the server, you must give it a port number and a queue length as arguments,
 e.g. `./server 50000 5`. The queue length sets the maximum backlog for incoming

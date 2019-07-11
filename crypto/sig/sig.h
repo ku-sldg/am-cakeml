@@ -11,7 +11,9 @@
 #include "sha512/hasher.h"
 #include <string.h>
 
+#ifndef PRIVATE_KEY_FILE
 #define PRIVATE_KEY_FILE "./crypto/sig/rsa/working/myPrivateKey.txt"
+#endif
 
 struct file_list_class
 {
@@ -51,4 +53,3 @@ void sigToByteString( unsigned long long* sig, uint8_t* byteSig );
 void byteStringToSig( uint8_t* byteSig, unsigned long long* sig );
 
 #endif
-
