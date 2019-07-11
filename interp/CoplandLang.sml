@@ -89,3 +89,14 @@ fun evToString e =
           | SS e1 e2 => concat ["SS", evToString' e1, evToString' e2]
           | PP e1 e2 => concat ["PP", evToString' e1, evToString' e2]
     end
+
+fun encodeEv (e : ev) =
+    case e
+     of Mt => ByteString.empty
+      | U _ _ _ bs _ => bs
+      | K _ _ _ _ bs _ => bs
+      | G _ _ bs => bs
+      | H _ bs => bs
+      | N _ _ bs _ => bs
+      | SS e1 e2 => ByteString.append (encodeEv e1) (encodeEv e2)
+      | PP e1 e2 => ByteString.append (encodeEv e1) (encodeEv e2)

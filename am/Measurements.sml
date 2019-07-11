@@ -1,18 +1,6 @@
 (* Depends on: CoplandLang.sml, ByteString.sml, crypto/Random.sml, and
    crypto/CryptoFFI.sml*)
 
-fun encodeEv (e : ev) =
-    case e
-     of Mt => ByteString.empty
-      | U _ _ _ bs _ => bs
-      | K _ _ _ _ bs _ => bs
-      | G _ _ bs => bs
-      | H _ bs => bs
-      | N _ _ bs _ => bs
-      | SS e1 e2 => ByteString.append (encodeEv e1) (encodeEv e2)
-      | PP e1 e2 => ByteString.append (encodeEv e1) (encodeEv e2)
-
-
 val genHash = hash o encodeEv
 
 fun readFile filename =
