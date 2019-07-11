@@ -8,7 +8,7 @@ server
 client
 
 # Directories
-./build
+/build
 
 # CMake stuff
 CMakeFiles
