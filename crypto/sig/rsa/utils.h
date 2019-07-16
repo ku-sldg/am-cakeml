@@ -5,14 +5,9 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 
-struct public_key_class
-{
-    unsigned long long modulus;
-    unsigned long long exponent;
-};
-
-struct private_key_class
+struct key_class
 {
     unsigned long long modulus;
     unsigned long long exponent;
@@ -20,11 +15,17 @@ struct private_key_class
 
 unsigned long long keyExtract( char* phrase );
 
-struct public_key_class* readPub( char* filename );
-
-struct private_key_class* readPriv( char* filename );
+struct key_class* readKey( char* filename );
 
 unsigned long long* longChunk( char* sentence );
+
+void longToBytes( unsigned long long input, uint8_t* output );
+
+void bytesToLong( uint8_t* input, unsigned long long* output );
+
+void keyToString( struct key_class* inKey, uint8_t* outKey );
+
+void stringToKey( uint8_t* outKey, struct key_class* inKey );
 
 #endif
 

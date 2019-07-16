@@ -9,8 +9,8 @@
 
 int genKeys( char* primesFile )
 {
-    struct public_key_class pub[1];
-    struct private_key_class priv[1];
+    struct key_class pub[1];
+    struct key_class priv[1];
     rsa_gen_keys( pub, priv, primesFile );
 
     unsigned long long n = pub->modulus;
@@ -52,7 +52,7 @@ int decryptFile( char* inputFile, char* outputFile )
     char priKey[255];
     strcpy( priKey, KEY_STORAGE );
     strcat( priKey, "myPrivateKey.txt" );
-    struct private_key_class* priv = readPriv( priKey );
+    struct key_class* priv = readKey( priKey );
     char* msgFile = inputFile;
     int i;
     FILE* fp = fopen( msgFile, "r" );
@@ -108,7 +108,7 @@ int encryptFile( char* inputFile, char* outputFile )
     char pubKey[255];
     strcpy( pubKey, KEY_STORAGE );
     strcat( pubKey, "myPublicKey.txt" );
-    struct public_key_class* pub = readPub( pubKey );
+    struct key_class* pub = readKey( pubKey );
     char* msgFile = inputFile;
     int i;
     FILE* fp = fopen( msgFile, "r" );
@@ -148,4 +148,17 @@ int encryptFile( char* inputFile, char* outputFile )
     }
     return( 0 );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 

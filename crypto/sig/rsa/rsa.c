@@ -124,7 +124,7 @@ unsigned long long rsa_modExp(unsigned long long msg, unsigned long long e, unsi
 
 // Calling this function will generate a public and private key and store them in the pointers
 // it is given. 
-void rsa_gen_keys(struct public_key_class *pub, struct private_key_class *priv, char *PRIME_SOURCE_FILE)
+void rsa_gen_keys(struct key_class *pub, struct key_class *priv, char *PRIME_SOURCE_FILE)
 {
     // variables over which to iterate
     int i = 0;
@@ -220,7 +220,7 @@ void rsa_gen_keys(struct public_key_class *pub, struct private_key_class *priv, 
 
 unsigned long long* rsa_long_encrypt(unsigned long long* message,
         const unsigned long message_length,
-        const struct public_key_class *pub )
+        const struct key_class *pub )
 {
     unsigned long long *encrypted = malloc(sizeof(unsigned long long)*message_length);
     if(encrypted == NULL){
@@ -237,7 +237,7 @@ unsigned long long* rsa_long_encrypt(unsigned long long* message,
 unsigned long long* rsa_char_encrypt(
         const char *message,
         const unsigned long message_length,
-        const struct public_key_class *pub )
+        const struct key_class *pub )
 {
 
     unsigned long long* longMsg = malloc( sizeof(long long) * message_length );
@@ -265,7 +265,7 @@ unsigned long long* rsa_char_encrypt(
 unsigned long long* rsa_long_decrypt(
         const unsigned long long *message, 
         const unsigned long message_length, 
-        const struct private_key_class *priv )
+        const struct key_class *priv )
 {
     // We allocate space to do the decryption (temp) and space for the output as a char array (decrypted)
     unsigned long long* decrypted = malloc(message_length * sizeof(unsigned long long));
@@ -284,7 +284,7 @@ unsigned long long* rsa_long_decrypt(
 char* rsa_char_decrypt(
         const unsigned long long *message, 
         const unsigned long message_length, 
-        const struct private_key_class *priv )
+        const struct key_class *priv )
 {
 
     char* decrypted = malloc(message_length * sizeof(unsigned long long));

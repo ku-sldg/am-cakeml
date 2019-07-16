@@ -21,9 +21,12 @@ rsa.o: rsa.h rsa.c utils.o
 utils.o: utils.c utils.h
 	$(CC) $(CFLAGS) -g -c utils.c
 
+test: rsaInterface.o test.c
+	$(CC) $(CFLAGS) $(OBJS) test.c -o test -lm
+
 .PHONY: all
 
 clean:
-	rm -f *.o genKeys working/*
+	rm -f *.o genKeys working/* test
 	rmdir working
 
