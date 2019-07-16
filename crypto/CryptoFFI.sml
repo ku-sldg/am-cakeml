@@ -25,7 +25,15 @@ fun signMsg msg =
         #(signMsg) (ByteString.toRawString msg) result;
         result
     end
-
+(*
+fun sigCheck files =
+    let
+        val result = Word8Array.array 512 (Word8.fromInt 0)
+    in
+        #(sigCheck) (ByteString.toRawString files) result;
+        result
+    end
+*)
 (* len is length of nonce in bytes *)
 fun urand len =
     let
