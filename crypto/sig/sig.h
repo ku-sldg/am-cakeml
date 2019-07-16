@@ -18,6 +18,10 @@ void signFile( char* msgFile, char* sigFile, char* privKeyFile );
 // returns 1 if they agree, 0 otherwise
 int sigVerify( unsigned long long* sig, uint8_t* hash, struct key_class* pub );
 
+// payload is a null byte delimited list in the order:
+// signature, hash, public key
+int sigCheck( uint8_t* payload );
+
 // duplicate a string, with memory allocation
 // don't forget to free it
 char* dupstr( char* src );

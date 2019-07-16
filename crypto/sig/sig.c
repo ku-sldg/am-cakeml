@@ -40,7 +40,7 @@ void signMsg( char* msg, unsigned long long* sig )
     char priKey[255];
     strcpy( priKey, KEY_STORAGE );
     strcat( priKey, "myPrivateKey.txt" );
-    struct key_class* priv = readPriv( priKey );
+    struct key_class* priv = readKey( priKey );
 
     // get the signature
     signMsgWithKey( msg, sig, priv );
@@ -51,7 +51,7 @@ void signMsg( char* msg, unsigned long long* sig )
 void signFile( char* msgFile, char* sigFile, char* privKeyFile )
 {
     // grab the private key
-    struct key_class* priv = readPriv( privKeyFile );
+    struct key_class* priv = readKey( privKeyFile );
 
     // read in the message
     FILE* fp = fopen( msgFile, "r" );
@@ -117,6 +117,12 @@ int sigVerify( unsigned long long* sig, uint8_t* hash, struct key_class* pub )
     free( properHash );
 
     return( 1 );
+}
+
+int sigCheck( uint8_t* payload )
+{
+    (void) payload;
+    return 0;
 }
 
 char* dupstr( char* src )
