@@ -14,6 +14,5 @@ val genFileHash = hashStr o readFile
 
 (* Gets a 128 bit (16 byte) nonce *)
 val genNonce = rand
-(* fun genNonce = urand 16 *)
 
 val signEv = signMsg o encodeEv
