@@ -1,12 +1,12 @@
 /*
 ** Michael Neises
-** 10 june 2019
+** 16 July 2019
 ** signature over RSA with SHA512 thumbprint
 */
 
 #include "sig.h"
 
-void signMsgWithKey( char* msg, unsigned long long* sig, struct private_key_class* priv )
+void signMsgWithKey( char* msg, unsigned long long* sig, struct key_class* priv )
 {
     // hash the message
     uint8_t* hash = mySha512( msg );
@@ -40,7 +40,7 @@ void signMsg( char* msg, unsigned long long* sig )
     char priKey[255];
     strcpy( priKey, KEY_STORAGE );
     strcat( priKey, "myPrivateKey.txt" );
-    struct private_key_class* priv = readPriv( priKey );
+    struct key_class* priv = readPriv( priKey );
 
     // get the signature
     signMsgWithKey( msg, sig, priv );
@@ -51,7 +51,7 @@ void signMsg( char* msg, unsigned long long* sig )
 void signFile( char* msgFile, char* sigFile, char* privKeyFile )
 {
     // grab the private key
-    struct private_key_class* priv = readPriv( privKeyFile );
+    struct key_class* priv = readPriv( privKeyFile );
 
     // read in the message
     FILE* fp = fopen( msgFile, "r" );
@@ -88,23 +88,7 @@ void signFile( char* msgFile, char* sigFile, char* privKeyFile )
     return;
 }
 
-void readSigFile( unsigned long long* sig, char* sigFile )
-{
-    // read in the message
-    FILE* fp = fopen( sigFile, "r" );
-
-    // read the sig line by line
-    unsigned long long buff[1];
-    for( int i=0; i<64; i++ )
-    {
-        fscanf( fp, "%llu", buff );
-        sig[i] = buff[0];
-    }
-
-    return;
-}
-
-int sigVerify( unsigned long long* sig, uint8_t* hash, struct public_key_class* pub )
+int sigVerify( unsigned long long* sig, uint8_t* hash, struct key_class* pub )
 {
     // transform the signature into what should be the hash
     unsigned long long* longHash = rsa_long_encrypt( sig, 64, pub );
@@ -144,23 +128,6 @@ char* dupstr( char* src )
     }
     strcpy( dst, src );
     return( dst );
-}
-
-void readFileList( uint8_t* fileString, struct file_list_class* files )
-{
-    char* fileList = (char*)fileString;
-    char fileArray[255];
-    strcpy( fileArray, fileList );
-
-    const char s[2] = ";";
-
-    files->msgFile = (char*)dupstr( strtok( fileArray, s ) );
-    files->sigFile = (char*)dupstr( strtok( NULL, s ) );
-    files->privKeyFile = (char*)dupstr( strtok( NULL, s ) );
-
-    strtok( NULL, s );
-
-    return;
 }
 
 // sig is 64 long longs
