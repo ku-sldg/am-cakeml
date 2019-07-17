@@ -37,10 +37,16 @@ void signMsgWithKey( char* msg, unsigned long long* sig, struct private_key_clas
 void signMsg( char* msg, unsigned long long* sig )
 {
     // grab the private key
-    struct private_key_class* priv = readPriv( PRIVATE_KEY_FILE );
+    // struct private_key_class* priv = readPriv( PRIVATE_KEY_FILE );
+
+    struct private_key_class priv;
+    // priv.modulus = 4096090459;
+    // priv.exponent = 1522040473;
+    priv.modulus = PRIVATE_KEY_MODULUS;
+    priv.exponent = PRIVATE_KEY_EXPONENT;
 
     // get the signature
-    signMsgWithKey( msg, sig, priv );
+    signMsgWithKey( msg, sig, &priv );
 
     return;
 }
@@ -215,5 +221,3 @@ void byteStringToSig( uint8_t* byteSig, unsigned long long* sig )
     }
     return;
 }
-
-

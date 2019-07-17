@@ -21,7 +21,7 @@ Finally, type `make <target>`, where `<target>` is one of the following:
 ## Configuration
 From the build directory, type `ccmake ..` to bring up the configuration GUI. Hovering over a variable displays some documentation at the bottom of the screen. After you make changes, press `c` then `g` to save your changes.
 
-Some common use cases include changing the `CAKE_DIR` location (e.g. to `~/cake-x64-32` for the 32-bit CakeML compiler) or `CMAKE_C_COMPILER` (e.g. to compcert, a cross-compiler, etc.).
+Some common use cases include changing the `CAKE_DIR` location (e.g. to `~/cake-x64-32` for the 32-bit CakeML compiler), `CMAKE_C_COMPILER` (e.g. to compcert, a cross-compiler, etc.), or the `PRIV_KEY` values.
 
 ## Platforms
 Currently, this project should run under Linux and macOS. We plan to eventually support a version which runs under a seL4 CAmkES component.
