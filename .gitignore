@@ -2,6 +2,9 @@
 *.o
 *.S
 
+# Temporary files
+*.swp
+
 # Executables
 test
 server

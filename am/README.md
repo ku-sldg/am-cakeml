@@ -2,7 +2,7 @@ Build with `make am` (or `make server` and `make client` to build the two separa
 
 To run the server, you must give it a port number and a queue length as arguments,
 e.g. `./server 50000 5`. The queue length sets the maximum backlog for incoming
-connections.
+connections. Run under the same directory as `tests/hashTest.txt`.
 
 The client takes no arguments, just run it with `./client` after the corresponding server has started.
 
