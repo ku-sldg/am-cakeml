@@ -85,7 +85,7 @@ fun evToString e =
                                           evToString' e']
           | G p e' bs => concat ["G", plToString p, evToString' e', ByteString.show bs]
           | H p bs => concat ["H", plToString p, ByteString.show bs]
-          | N p index bs e' => concat ["N", plToString p, Int.toString index,  ByteString.show bs, evToString' e']
+          | N p index bs e' => concat ["N", plToString p, Int.toString index, ByteString.show bs, evToString' e']
           | SS e1 e2 => concat ["SS", evToString' e1, evToString' e2]
           | PP e1 e2 => concat ["PP", evToString' e1, evToString' e2]
     end
@@ -93,10 +93,10 @@ fun evToString e =
 fun encodeEv (e : ev) =
     case e
      of Mt => ByteString.empty
-      | U _ _ _ bs _ => bs
-      | K _ _ _ _ bs _ => bs
-      | G _ _ bs => bs
+      | U _ _ _ bs ev => ByteString.append bs (encodeEv ev)
+      | K _ _ _ _ bs ev => ByteString.append bs (encodeEv ev)
+      | G _ ev bs => ByteString.append bs (encodeEv ev)
       | H _ bs => bs
-      | N _ _ bs _ => bs
-      | SS e1 e2 => ByteString.append (encodeEv e1) (encodeEv e2)
-      | PP e1 e2 => ByteString.append (encodeEv e1) (encodeEv e2)
+      | N _ _ bs ev => ByteString.append bs (encodeEv ev)
+      | SS ev1 ev2 => ByteString.append (encodeEv ev1) (encodeEv ev2)
+      | PP ev1 ev2 => ByteString.append (encodeEv ev1) (encodeEv ev2)
