@@ -95,10 +95,18 @@ fun aes256CtrTest () =
     end
 
 (* can I sign a file? *)
+(* and check the sig in place? *)
 fun sigTest () =
     let val msg = "The private key is stored at ./crypto/sig/rsa/working/myPrivateKey.txt"
-        val signAndShow = ByteString.show o signMsg o ByteString.fromRawString
-     in print ("Signature Test: \n" ^ signAndShow msg ^ "\n")
+        val sign = (signMsg (ByteString.fromRawString msg))
+        val pubMod = readFile "/usr/share/thisPubMod"
+        val pubExp = readFile "/usr/share/thisPubExp"
+        val null = String.str (Char.chr 0)
+        val myHash = hashStr msg
+        val payload = (ByteString.toRawString sign) ^ null ^ (ByteString.toRawString myHash) ^ null ^ pubMod ^ null ^ pubExp
+        val sigResult = (sigCheck payload)
+     in 
+        print ("Signature Test: \n" ^ (ByteString.show sign) ^ "\n\n" ^ "Signature Check: \n" ^ (ByteString.show sigResult) ^ "\n" )
     end
 
 (* Run all tests *)

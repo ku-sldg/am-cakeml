@@ -5,7 +5,7 @@
 #include <sys/stat.h>
 #include "rsa.h"
 
-#define KEY_STORAGE "./working/"
+#define KEY_STORAGE "/usr/share/myKeys/"
 
 int genKeys( char* primesFile );
 

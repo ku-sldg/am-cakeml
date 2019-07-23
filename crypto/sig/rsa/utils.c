@@ -15,21 +15,26 @@ unsigned long long keyExtract( char* phrase )
     return( (unsigned long long)(strtoll( pch, (char**) NULL, 10 ) ) );
 }
 
-struct key_class* readKey( char* filename )
+void composeKey( uint8_t* mod, uint8_t* exp, struct key_class* myKey )
 {
-    struct key_class* priv = malloc( sizeof(struct key_class) );;
+    myKey->modulus = (unsigned long long)(strtoll( (char*)mod, (char**)NULL, 10 ) );
+    myKey->exponent = (unsigned long long)(strtoll( (char*)exp, (char**)NULL, 10 ) );
+    return;
+}
 
+void readKey( char* filename, struct key_class* myKey )
+{
     FILE* fp;
     char buf[255];
     fp = fopen( filename, "r" );
 
     fgets( buf, 255, fp );
     fgets( buf, 255, fp );
-    priv->modulus = keyExtract( buf );
+    myKey->modulus = keyExtract( buf );
     fgets( buf, 255, fp );
-    priv->exponent = keyExtract( buf );
+    myKey->exponent = keyExtract( buf );
 
-    return( priv );
+    return;
 }
 
 unsigned long long* longChunk( char* sentence )

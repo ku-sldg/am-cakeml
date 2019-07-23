@@ -19,7 +19,7 @@ void signFile( char* msgFile, char* sigFile, char* privKeyFile );
 int sigVerify( unsigned long long* sig, uint8_t* hash, struct key_class* pub );
 
 // payload is a null byte delimited list in the order:
-// signature, hash, public key
+// signature, hash, pubkey mod, pubkey exp
 int sigCheck( uint8_t* payload );
 
 // duplicate a string, with memory allocation

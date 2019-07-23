@@ -52,7 +52,8 @@ int decryptFile( char* inputFile, char* outputFile )
     char priKey[255];
     strcpy( priKey, KEY_STORAGE );
     strcat( priKey, "myPrivateKey.txt" );
-    struct key_class* priv = readKey( priKey );
+    struct key_class* priv = malloc( sizeof( struct key_class ) );
+    readKey( priKey, priv );
     char* msgFile = inputFile;
     int i;
     FILE* fp = fopen( msgFile, "r" );
@@ -95,11 +96,12 @@ int decryptFile( char* inputFile, char* outputFile )
                 break;
             }
         }  
-
-        free( priv );
         free( decrypted );
 
     }
+    free( priv );
+    free( message );
+
     return( 0 );
 }
 
@@ -108,7 +110,8 @@ int encryptFile( char* inputFile, char* outputFile )
     char pubKey[255];
     strcpy( pubKey, KEY_STORAGE );
     strcat( pubKey, "myPublicKey.txt" );
-    struct key_class* pub = readKey( pubKey );
+    struct key_class* pub = malloc( sizeof( struct key_class ) );
+    readKey( pubKey, pub );
     char* msgFile = inputFile;
     int i;
     FILE* fp = fopen( msgFile, "r" );
@@ -141,11 +144,12 @@ int encryptFile( char* inputFile, char* outputFile )
         for(i=0; i < strlen(message); i++){
             fprintf( fp, "%llu\n", (unsigned long long)encrypted[i] );
         }  
-
-        free( pub );
         free( encrypted );
 
     }
+    free( pub );
+    free( message );
+
     return( 0 );
 }
 

@@ -24,29 +24,30 @@ void ffisignMsg(uint8_t * msg, long msgLen, uint8_t * signature, long sigLen) {
     sigToByteString(mySig, signature);
 }
 
-/*
 // Give payload in form:
 // first 64 bytes: sig
 // null byte
 // 64 bytes: file hash
 // null byte
-// Public Keyjk
-void ffisigCheck( uint8_t * payload, long payloadLen, uint8_t * status, long statusLen ) {
-    (void)filesLen;
-    (void)statusLen;
-    // grab each file name from files
-    struct file_list_class* myFiles[1];
-    readFileList( files, myFiles );
+// Public Key
+void ffisigCheck( uint8_t * payload, long payloadLen, uint8_t * a, long aLen ) {
+    // not going to use these
+    (void)payloadLen;
+    (void)aLen;
 
-    // convert sig
-    unsigned long long * longSig = malloc( sizeof(long long) * 64 );
-    byteStringToSig( sig, longSig );
-    
-    int isGood = sigVerify( longSig, hash, pubKey );
+    // check the signature
+    int isGood = sigCheck( payload );
 
-    free( longSig );
+    // is this right?
+    if( isGood )
+    {
+        a[0] = 0xFF;
+    }
+    else
+    {
+        a[0] = 0x00;
+    }
 }
-*/
 
 // Although the `getrandom` function is the preferred way to request random bits
 // from the kernel on linux, it may not be available on older systems. The

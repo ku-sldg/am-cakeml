@@ -15,7 +15,9 @@ struct key_class
 
 unsigned long long keyExtract( char* phrase );
 
-struct key_class* readKey( char* filename );
+void composeKey( uint8_t* mod, uint8_t* exp, struct key_class* myKey );
+
+void readKey( char* filename, struct key_class* myKey);
 
 unsigned long long* longChunk( char* sentence );
 
