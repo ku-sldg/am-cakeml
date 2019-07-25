@@ -34,7 +34,6 @@ fun apdtToJson term =
       | USM aspid args => constructorWithArgs "USM"  [ aspidToJson aspid, stringListToJsonList args]
       | SIG => noArgConstructor "SIG"
       | HSH => noArgConstructor "HSH"
-      | NONCE => noArgConstructor "NONCE"
       | AT pl t1 => constructorWithArgs "AT" [ placeToJson pl, apdtToJson t1]
       | LN t1 t2 =>  constructorWithArgs "LN" [ apdtToJson t1, apdtToJson t2]
       | BRS p t1 t2 => constructorWithArgs "BRS" [spPairToJson p, apdtToJson t1, apdtToJson t2]

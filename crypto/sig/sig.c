@@ -40,11 +40,13 @@ void signMsg( char* msg, unsigned long long* sig )
     char priKey[255];
     strcpy( priKey, KEY_STORAGE );
     strcat( priKey, "myPrivateKey.txt" );
-    struct key_class* priv = malloc( sizeof( struct key_class ) );
-    readKey( priKey, priv );
+    struct key_class priv;
+    readKey( priKey, &priv );
+    // priv.modulus = PRIVATE_KEY_MODULUS;
+    // priv.exponent = PRIVATE_KEY_EXPONENT;
 
     // get the signature
-    signMsgWithKey( msg, sig, priv );
+    signMsgWithKey( msg, sig, &priv );
     free( priv );
 
     return;
@@ -200,5 +202,3 @@ void byteStringToSig( uint8_t* byteSig, unsigned long long* sig )
     }
     return;
 }
-
-

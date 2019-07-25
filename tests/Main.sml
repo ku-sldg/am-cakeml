@@ -18,7 +18,8 @@ Expected result: 0xDDAF35A193617ABACC417349AE20413112E6FA4E89A97EA20A9EEEE64B55D
 fun hashTests () =
     let val evidence  = H O (ByteString.fromRawString "abc")
         val hashTest  = evToString (eval emptyNsMap evidence HSH)
-        val hashFile  = ByteString.show (genFileHash "hashTest.txt")
+        val hashFile  = (ByteString.show (genFileHash "hashTest.txt"))
+            handle _ => "ERROR: could not find 'hashTest.txt' in the present working directory"
      in print ("Hash test: "      ^ hashTest  ^ "\n\n" ^
                "Hash file test: " ^ hashFile  ^ "\n\n" )
     end
@@ -116,5 +117,6 @@ fun main () = (
     bsAddTest ();
     aes256Test ();
     aes256CtrTest ();
-    sigTest()) 
+    sigTest()
+    ) handle _ => TextIO.print_err "Fatal: unknown error\n"
 val _ = main ()

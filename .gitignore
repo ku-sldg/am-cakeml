@@ -1,0 +1,19 @@
+# Compilation artifacts
+*.o
+*.S
+
+# Temporary files
+*.swp
+
+# Executables
+test
+server
+client
+
+# Directories
+/build
+
+# CMake stuff
+CMakeFiles
+cmake_install.cmake
+CMakeCache.txt

@@ -31,7 +31,6 @@ datatype t = USM asp_id (arg list)
            | SIG
            | HSH
            | CPY
-           | NONCE
            | AT pl t
            | LN t t
            | BRS (sp * sp) t t
@@ -48,7 +47,6 @@ fun tToString a =
           | SIG => "SIG"
           | HSH => "HSH"
           | CPY => "CPY"
-          | NONCE => "NONCE"
           | AT p a' => concat ["AT", plToString p, wrapped a']
           | LN a1 a2 => concat ["LN", wrapped a1, wrapped a2]
           | BRS (s1, s2) a1 a2 => concat ["BRS (", (spToString s1 ^ ", " ^ spToString s2), ") ", wrapped a1, wrapped a2]
@@ -87,7 +85,18 @@ fun evToString e =
                                           evToString' e']
           | G p e' bs => concat ["G", plToString p, evToString' e', ByteString.show bs]
           | H p bs => concat ["H", plToString p, ByteString.show bs]
-          | N p index bs e' => concat ["N", plToString p, Int.toString index,  ByteString.show bs, evToString' e']
+          | N p index bs e' => concat ["N", plToString p, Int.toString index, ByteString.show bs, evToString' e']
           | SS e1 e2 => concat ["SS", evToString' e1, evToString' e2]
           | PP e1 e2 => concat ["PP", evToString' e1, evToString' e2]
     end
+
+fun encodeEv (e : ev) =
+    case e
+     of Mt => ByteString.empty
+      | U _ _ _ bs ev => ByteString.append bs (encodeEv ev)
+      | K _ _ _ _ bs ev => ByteString.append bs (encodeEv ev)
+      | G _ ev bs => ByteString.append bs (encodeEv ev)
+      | H _ bs => bs
+      | N _ _ bs ev => ByteString.append bs (encodeEv ev)
+      | SS ev1 ev2 => ByteString.append (encodeEv ev1) (encodeEv ev2)
+      | PP ev1 ev2 => ByteString.append (encodeEv ev1) (encodeEv ev2)

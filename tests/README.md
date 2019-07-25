@@ -1,0 +1,1 @@
+A series of tests for the interpreter, largely revolving around the crypto functionality. Build with `make test`. Make sure to run in the same directory as `hashTest.txt` for the file hash test to work.

@@ -34,7 +34,6 @@ fun jsonToApdt js =
     case constructor
      of "SIG" => SIG
      |  "HSH" =>  HSH
-     |  "NONCE" => NONCE
      | _ => raise Json.ERR "handleNullConstructor"  (String.concat ["Unexpected Null constructor for APDT term: ", constructor])
 
     and
