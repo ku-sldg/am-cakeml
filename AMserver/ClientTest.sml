@@ -1,6 +1,6 @@
 (* Depends on: CoplandLang.sml, Eval.sml, and SocketFFI.sml *)
 
-val map  = Map.insert emptyNsMap O "127.0.0.1"
+val map  = Map.insert emptyNsMap O "129.237.122.162"
 val term = AT O NONCE
 
 fun main () = print (evToString (eval map Mt term) ^ "\n")
