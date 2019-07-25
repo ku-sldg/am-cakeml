@@ -47,7 +47,6 @@ void signMsg( char* msg, unsigned long long* sig )
 
     // get the signature
     signMsgWithKey( msg, sig, &priv );
-    free( priv );
 
     return;
 }
