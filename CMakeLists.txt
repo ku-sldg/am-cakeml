@@ -16,15 +16,15 @@ mark_as_advanced(CLEAR
 )
 
 # CakeML source/dependency lists
-file(GLOB core_src
+set(core_src
     util/ByteString.sml crypto/CryptoFFI.sml crypto/Aes256.sml crypto/Random.sml
     sockets/SocketFFI.sml util/CoqDefaults.sml interp/CoplandLang.sml
     am/Measurements.sml am/CommTypes.sml JSON/Json.sml JSON/CoplandToJson.sml
     JSON/JsonToCopland.sml am/CommUtil.sml interp/Eval.sml
 )
-file(GLOB test_src ${core_src} tests/Main.sml)
-file(GLOB server_src ${core_src} am/Server.sml)
-file(GLOB client_src ${core_src} am/ClientTest.sml)
+set(test_src   ${core_src} tests/Main.sml)
+set(server_src ${core_src} am/Server.sml)
+set(client_src ${core_src} am/ClientTest.sml)
 
 # Targets
 gen_cakeml(test ${test_src})

@@ -4,7 +4,12 @@ string(REGEX REPLACE "[ \t\r\n]+" ";" cakeflag_list "${CAKE_FLAGS}")
 # Takes a name and a list of cml source files. Generates an executable target.
 # Add additional sources/libs with target_sources/target_link_libraries
 function(gen_cakeml name cml_source)
-    cat(${name}.cml ${cml_source} ${ARGN})
+    set(catlist "")
+    foreach(source ${cml_source} ${ARGN})
+        list(APPEND catlist "${CMAKE_SOURCE_DIR}/${source}")
+    endforeach(source)
+    cat(${name}.cml ${catlist})
+
     add_custom_command(
         OUTPUT ${name}.cake.S
         COMMAND ${cakec} ${cakeflag_list} < ${name}.cml > ${name}.cake.S
