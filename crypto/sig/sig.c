@@ -124,20 +124,48 @@ int sigVerify( unsigned long long* sig, uint8_t* hash, struct key_class* pub )
     return( 1 );
 }
 
+// parses a signature payload and passes the results to sigVerify
 int sigCheck( uint8_t* payload )
 {
     // parse the payload for parts
-    char* aSig = (char*)payload;
-    char* aHash = (char*)payload + strlen( aSig ) + 1;
-    char* aPubMod = (char*)payload + strlen( aSig ) + 1 + strlen( aHash ) + 1;
-    char* aPubExp = (char*)payload + strlen( aSig ) + 1 + strlen( aHash ) + 1 + strlen( aPubMod ) + 1;
+    uint8_t* sig = malloc( 512*sizeof(long long) );
+    uint8_t* hash = malloc( 512*sizeof(uint8_t) );
+    uint8_t* pubKeyParts = malloc( 2*sizeof(long long) );
+    
+    
+    printf( "sig\n" );
+    for( int i=0; i<512; i++ )
+    {
+        sig[i] = payload[i];
+        printf( "%x", sig[i] );
+    }
 
-    // make the proper casts
-    uint8_t* sig = (uint8_t*)aSig;
-    uint8_t* hash = (uint8_t*)aHash;
-    uint8_t* pubMod = (uint8_t*)aPubMod;
-    uint8_t* pubExp = (uint8_t*)aPubExp;
+    printf( "\n\n" );
 
+    printf( "hash\n" );
+    for( int i=512; i < 576; i++ )
+    {
+        hash[i] = payload[i];
+        printf( "%x", hash[i] );
+    }
+    printf( "\n\n" );
+
+    printf( "pubKeyParts\n" );
+    for( int i=576; i < 594; i++ )
+    {
+        pubKeyParts[i] = payload[i];
+        printf( "%02x!", pubKeyParts[i] );
+    }
+    printf( "\n\n" );
+
+
+
+
+    /*
+    printf( "mod : exp is %s : %s\n", aPubMod, aPubExp );
+    */
+
+    /*
     // convert sig
     unsigned long long * mySig = malloc( sizeof(long long) * 64 );
     byteStringToSig( sig, mySig );
@@ -154,6 +182,8 @@ int sigCheck( uint8_t* payload )
     free( myPub );
 
     return( isGood );
+    */
+    return(0);
 }
 
 // if use this, must free the return pointer
@@ -201,3 +231,4 @@ void byteStringToSig( uint8_t* byteSig, unsigned long long* sig )
     }
     return;
 }
+
