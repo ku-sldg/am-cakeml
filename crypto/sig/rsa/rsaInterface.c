@@ -14,12 +14,14 @@ int genKeys( char* primesFile )
     rsa_gen_keys( pub, priv, primesFile );
 
     unsigned long long n = pub->modulus;
+    unsigned long long m = priv->modulus;
 
-    while( (n-1)*(n-1) / (n-1) != (n-1) )
+    while( (n-1)*(n-1)/(n-1)!=(n-1) || (m-1)*(m-1)/(m-1)!=(m-1) )
     {
         sleep(1);
         rsa_gen_keys( pub, priv, primesFile );
         n = pub->modulus;
+        m = priv->modulus;
     }
 
     struct stat st = {0};
