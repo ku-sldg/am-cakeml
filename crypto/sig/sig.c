@@ -130,60 +130,89 @@ int sigCheck( uint8_t* payload )
     // parse the payload for parts
     uint8_t* sig = malloc( 512*sizeof(long long) );
     uint8_t* hash = malloc( 512*sizeof(uint8_t) );
-    uint8_t* pubKeyParts = malloc( 2*sizeof(long long) );
+    uint8_t* pubKeyParts = malloc( 3*sizeof(long long) );
+    uint8_t* pubMod = malloc( sizeof(long long) );
+    uint8_t* pubExp = malloc( sizeof(long long) );
     
     
-    printf( "sig\n" );
+    printf( "c sig\n" );
     for( int i=0; i<512; i++ )
     {
         sig[i] = payload[i];
-        printf( "%x", sig[i] );
+        printf( "%X", sig[i] );
     }
-
     printf( "\n\n" );
 
-    printf( "hash\n" );
+    printf( "c hash\n" );
     for( int i=512; i < 576; i++ )
     {
-        hash[i] = payload[i];
-        printf( "%x", hash[i] );
+        hash[i-512] = payload[i];
+        printf( "%X", hash[i-512] );
     }
     printf( "\n\n" );
 
-    printf( "pubKeyParts\n" );
     for( int i=576; i < 594; i++ )
     {
-        pubKeyParts[i] = payload[i];
-        printf( "%02x!", pubKeyParts[i] );
+        pubKeyParts[i-576] = payload[i];
     }
-    printf( "\n\n" );
 
+    // parse keyparts for parts lul
+    // grab positions of the semi-colons
+    int expNow = 0;
+    int count = 0;
+    for( int i=0; i<18; i++ )
+    {
+        if( (char)pubKeyParts[i] == ':' )
+        {
+            if( expNow )
+            {
+                count = 0;
+                break;
+            }
+            count = 0;
+            expNow = 1;
+        }
+        else if( expNow )
+        {
+            pubExp[count] = pubKeyParts[i];
+            count++;
+        }
+        else
+        {
+            pubMod[count] = pubKeyParts[i];
+            count++;
+        }
+    }
+      
+    // parse the hex-strings for hex-nums
+    unsigned long long longPubMod = strtoll( &pubMod[0], (char**)NULL, 16 );
+    printf( "c pub mod is: %llX\n", longPubMod );
+    unsigned long long longPubExp = strtoll( &pubExp[0], (char**)NULL, 16 );
+    printf( "c pub exp is: %llX\n", longPubExp );
+    printf("\n");
 
-
-
-    /*
-    printf( "mod : exp is %s : %s\n", aPubMod, aPubExp );
-    */
-
-    /*
     // convert sig
     unsigned long long * mySig = malloc( sizeof(long long) * 64 );
     byteStringToSig( sig, mySig );
     
     // convert pubKey
     struct key_class myPub[1];
-    composeKey( pubMod, pubExp, myPub );
+    myPub->modulus = longPubMod;
+    myPub->exponent = longPubExp;
 
     // check the signature
     int isGood = sigVerify( mySig, hash, myPub );
 
     // don't leak memory
+    free( sig );
     free( mySig );
-    free( myPub );
+    free( hash );
+    free( pubKeyParts );
+    free( pubMod ); 
+    free( pubExp );
 
+    // see how we did
     return( isGood );
-    */
-    return(0);
 }
 
 // if use this, must free the return pointer

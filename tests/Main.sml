@@ -103,10 +103,10 @@ fun sigTest () =
         val pubMod = (readFile "/usr/share/myKeys/thisPubMod")
         val pubExp = (readFile "/usr/share/myKeys/thisPubExp")
         val myHash = hashStr msg
-        val payload = (ByteString.toRawString sign) ^ (ByteString.toRawString myHash) ^  ":" ^pubMod ^ ":" ^ pubExp ^ ":"
-        val _ = print ("hash:\n" ^ (ByteString.show myHash) ^ "\n")
-        val _ = print ("pubmod:\n" ^ pubMod ^ "\n")
-        val _ = print ("pubexp:\n" ^ pubExp ^ "\n")
+        val payload = (ByteString.toRawString sign) ^ (ByteString.toRawString myHash) ^ pubMod ^ ":" ^ pubExp ^ ":"
+        val _ = print ("cake hash:\n" ^ (ByteString.show myHash) ^ "\n\n")
+        val _ = print ("cake pub mod:" ^ pubMod)
+        val _ = print ("cake pub exp:" ^ pubExp ^ "\n")
         val sigResult = (sigCheck payload) 
      in 
         print ("Signature Test: \n" ^ (ByteString.show sign) ^ "\n\n" ^ "Signature Check: \n" ^ (ByteString.show sigResult) ^ "\n" ) 
