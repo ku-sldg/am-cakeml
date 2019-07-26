@@ -33,14 +33,14 @@ int genKeys( char* primesFile )
     strcpy( pubKey, KEY_STORAGE );
     strcat( pubKey, "myPublicKey.txt" );
     fp = fopen( pubKey, "w+" );
-    fprintf( fp, "Public Key:\n Modulus: %lld\n Exponent: %lld\n", (long long)pub->modulus, (long long) pub->exponent );
+    fprintf( fp, "Public Key:\nModulus: %llX\nExponent: %llX\n", pub->modulus, pub->exponent );
     fclose( fp );    
 
     char priKey[255];
     strcpy( priKey, KEY_STORAGE );
     strcat( priKey, "myPrivateKey.txt" );
     fp = fopen( priKey, "w+" );
-    fprintf( fp, "Private Key:\n Modulus: %lld\n Exponent: %lld\n", (long long)priv->modulus, (long long) priv->exponent );
+    fprintf( fp, "Private Key:\nModulus: %llX\nExponent: %llX\n", priv->modulus, priv->exponent );
     fclose( fp );
 
     return( 0 );

@@ -3,9 +3,11 @@
 
 int main( )
 {
+    printf( "Generating Keys and Writing to File...\n" );
     genKeys( "primes.txt" );
-    struct key_class* pub = malloc( sizeof( struct key_class ) );
-    readKey( "./working/myPublicKey.txt", pub );
+    struct key_class pub[1];
+    printf( "Reading Keys from File...\n" );
+    readKey( "/usr/share/myKeys/myPublicKey.txt", pub );
 
     uint8_t* pubBytes = malloc( 3*sizeof( long long ) );
     keyToString( pub, pubBytes );
@@ -15,26 +17,24 @@ int main( )
 
     
     printf( (char*)pubBytes );
-    printf( "\n" );
 
     // compare the keys
+    printf( "Comparing Keys...\n" );
 
     if( pub->modulus != pub2->modulus )
     {
-        printf( "wrong mod\n" );
+        printf( "Modulus Doesn't Match!\n" );
     }
     else if( pub->exponent != pub2->exponent )
     {
-        printf( "wrong exp\n" );
+        printf( "Exponent Doesn't Match!\n" );
     }
     else
     {
-        printf( "keys match!\n" );
+        printf( "Keys Match!\n" );
     }
 
-    free( pub );
     free( pubBytes );
-    free( pub2 );
 
     return(0);
 }

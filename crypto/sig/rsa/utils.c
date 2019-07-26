@@ -12,7 +12,7 @@ unsigned long long keyExtract( char* phrase )
     char * pch;
     pch = strtok ( phrase, " " );
     pch = strtok (NULL, " ");
-    return( (unsigned long long)(strtoll( pch, (char**) NULL, 10 ) ) );
+    return( (unsigned long long)(strtoll( pch, (char**) NULL, 16 ) ) );
 }
 
 void composeKey( uint8_t* mod, uint8_t* exp, struct key_class* myKey )
