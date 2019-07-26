@@ -103,8 +103,9 @@ unsigned long long rsa_modExp(unsigned long long msg, unsigned long long e, unsi
         return(0);
     }
 
-    if( (n-1)*(n-1) / (n-1) != (n-1) )
+    if( (n-1)*(n-1)/(n-1)!=(n-1) )
     {
+        printf( "we got: %llu\n", n );
         printf( "Whoa! The product of those primes is too big!\n" );
         exit(1);
     }

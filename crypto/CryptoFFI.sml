@@ -28,7 +28,7 @@ fun signMsg msg =
 
 fun sigCheck payload =
     let
-        val result = Word8Array.array 512 (Word8.fromInt 0)
+        val result = Word8Array.array 1 (Word8.fromInt 0)
     in
         #(sigCheck) payload result;
         result
