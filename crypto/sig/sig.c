@@ -37,13 +37,13 @@ void signMsgWithKey( char* msg, unsigned long long* sig, struct key_class* priv 
 void signMsg( char* msg, unsigned long long* sig )
 {
     // grab the private key
-    char priKey[255];
-    strcpy( priKey, KEY_STORAGE );
-    strcat( priKey, "myPrivateKey.txt" );
+    //char priKey[255];
+    //strcpy( priKey, KEY_STORAGE );
+    //strcat( priKey, "myPrivateKey.txt" );
     struct key_class priv;
-    readKey( priKey, &priv );
-    // priv.modulus = PRIVATE_KEY_MODULUS;
-    // priv.exponent = PRIVATE_KEY_EXPONENT;
+    //readKey( priKey, &priv );
+    priv.modulus = PRIVATE_KEY_MODULUS;
+    priv.exponent = PRIVATE_KEY_EXPONENT;
 
     // get the signature
     signMsgWithKey( msg, sig, &priv );
@@ -135,21 +135,21 @@ int sigCheck( uint8_t* payload )
     uint8_t* pubExp = malloc( sizeof(long long) );
     
     
-    printf( "c sig\n" );
+    //printf( "c sig:\n" );
     for( int i=0; i<512; i++ )
     {
         sig[i] = payload[i];
-        printf( "%X", sig[i] );
+        //printf( "%X", sig[i] );
     }
-    printf( "\n\n" );
+    //printf( "\n\n" );
 
-    printf( "c hash\n" );
+    //printf( "c hash:\n" );
     for( int i=512; i < 576; i++ )
     {
         hash[i-512] = payload[i];
-        printf( "%X", hash[i-512] );
+        //printf( "%X", hash[i-512] );
     }
-    printf( "\n\n" );
+    //printf( "\n\n" );
 
     for( int i=576; i < 594; i++ )
     {
@@ -186,10 +186,10 @@ int sigCheck( uint8_t* payload )
       
     // parse the hex-strings for hex-nums
     unsigned long long longPubMod = strtoll( &pubMod[0], (char**)NULL, 16 );
-    printf( "c pub mod is: %llX\n", longPubMod );
+    //printf( "c pub mod: %llX\n", longPubMod );
     unsigned long long longPubExp = strtoll( &pubExp[0], (char**)NULL, 16 );
-    printf( "c pub exp is: %llX\n", longPubExp );
-    printf("\n");
+    //printf( "c pub exp: %llX\n", longPubExp );
+    //printf("\n");
 
     // convert sig
     unsigned long long * mySig = malloc( sizeof(long long) * 64 );
