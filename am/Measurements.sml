@@ -16,3 +16,11 @@ val genFileHash = hashStr o readFile
 val genNonce = rand
 
 val signEv = signMsg o encodeEv
+
+(* Placeholder *)
+fun verifySigFFI msg sign pubKey = True
+
+fun verifySig g pubKey =
+    case g
+      of G _ ev bs => Some (verifySigFFI (encodeEv ev) bs pubKey)
+       | _ => None

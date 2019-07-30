@@ -140,6 +140,16 @@ structure ByteString = struct
             arr
         end
 
+    fun deepEq bs1 bs2 =
+        let val len = length bs1
+            fun deepEq_aux i =
+                i >= len orelse (
+                    Word8Array.sub bs1 i = Word8Array.sub bs2 i
+                    andalso deepEq_aux (i+1)
+                )
+         in len = length bs2 andalso deepEq_aux 0
+        end
+
     fun append bs1 bs2 =
         let val bs1Len = length bs1
             val bs2Len = length bs2
@@ -148,6 +158,8 @@ structure ByteString = struct
             Word8Array.copy bs2 0 bs2Len arr bs1Len;
             arr
         end
+
+    (* Warning: the next two functions are very ad hoc *)
 
     (* bs1 and bs2 should be the same size. If they aren't, the returned
        ByteString will be the size of the smaller input, and the xor will

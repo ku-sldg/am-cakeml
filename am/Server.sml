@@ -8,7 +8,7 @@
    said error messages in JSON as well to make it easier on the client. *)
 fun evalJson s =
     let val (REQ pl1 pl2 map t ev) = JsonToCopland.jsonToRequest (strToJson s)
-        val ev' = eval map ev t
+        val ev' = eval pl2 map ev t
         val response = RES pl2 pl1 ev'
      in jsonToStr (CoplandToJson.responseToJson response)
     end

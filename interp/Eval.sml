@@ -43,23 +43,20 @@ fun measureKim map id p args =
       | Some f => f p args
 
 
-(* eval probably doesn't need a place argument, when it just represents "me"
-   (invariant). Could pass me+map together in a copEnv-like thing. Throw in
-   USM and KIM maps to? *)
-val me = O
-
 (* May raise USMexpn, KIMexpn, DispatchErr, Json.ERR, or Socket.Err *)
 (* I'd love to refactor the various exceptions into a Result/Either type,
    but without do notation, infix ops, or typeclasses, monads become
    pretty unwieldy :( *)
-fun eval map ev t =
-    case t
-     of USM id args => U id args me (measureUsm mapUSM id args) ev
-      | KIM id pl args => K id args me pl (measureKim mapKIM id me args) ev
-      | SIG => G me ev (signEv ev)
-      | HSH => H me (genHash ev)
-      | CPY => ev
-      | AT pl t' => dispatchAt (REQ me pl map t' ev)
-      | LN t1 t2 => eval map (eval map ev t1) t2
-      | BRS (s1, s2) t1 t2 => SS (eval map (splitEv s1 ev) t1) (eval map (splitEv s2 ev) t2)
-      | BRP (s1, s2) t1 t2 => PP (eval map (splitEv s1 ev) t1) (eval map (splitEv s2 ev) t2)
+fun eval pl map ev t =
+    let val evalRec = eval pl map
+     in case t
+          of USM id args => U id args pl (measureUsm mapUSM id args) ev
+           | KIM id pl' args => K id args pl pl' (measureKim mapKIM id pl args) ev
+           | SIG => G pl ev (signEv ev)
+           | HSH => H pl (genHash ev)
+           | CPY => ev
+           | AT pl' t' => dispatchAt (REQ pl pl' map t' ev)
+           | LN t1 t2 => evalRec (evalRec ev t1) t2
+           | BRS (s1, s2) t1 t2 => SS (evalRec (splitEv s1 ev) t1) (evalRec (splitEv s2 ev) t2)
+           | BRP (s1, s2) t1 t2 => PP (evalRec (splitEv s1 ev) t1) (evalRec (splitEv s2 ev) t2)
+    end
