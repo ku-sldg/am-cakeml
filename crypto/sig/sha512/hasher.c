@@ -10,7 +10,7 @@ void printHash( uint8_t* myHash )
     printf("\n");
 }
 
-uint8_t* mySha512(char* inputString)
+void mySha512(char* inputString, uint8_t* output)
 {
     // grab the input string
     char* myString = inputString;
@@ -37,10 +37,13 @@ uint8_t* mySha512(char* inputString)
         charPtr[1] = '\0';
 
         // convert the char into a binary string
-        char* tempString = stringToBinary(charPtr);
+        char* tempString = malloc( strlen(charPtr) * CHAR_BIT + 1 );
+        stringToBinary(charPtr, tempString );
+        free( charPtr );
 
         // interpret the binary string as an integer value
         int tempInt = strtol(tempString, NULL, 2);
+        free( tempString );
     
         // add that int to intList
         intList[i] = tempInt; 
@@ -54,21 +57,21 @@ uint8_t* mySha512(char* inputString)
     {
         eightBitList[i] = intList[i];
     }
+    free( intList );
 
     //declare some arguments for sha512()
     const uint64_t mySize = inputLen;
-    uint8_t* myReturn = malloc( 64 );
     
     // execute the sha512()
-    sha512( eightBitList, mySize, myReturn );
+    sha512( eightBitList, mySize, output );
+    free( eightBitList );
+    return;
    
     // print the results
     //printHash( myReturn );
-
-    return myReturn;
 }
 
-uint8_t* hashFile( char* filepath )
+void hashFile( char* filepath, uint8_t* output )
 {
     // declare a file pointer
     FILE* f;
@@ -87,7 +90,7 @@ uint8_t* hashFile( char* filepath )
     fclose(f);
     
     // hash the string buffer and return
-    return( mySha512( myString ) );
+    mySha512( myString, output );
 }
 
 unsigned long long hashToNum( uint8_t* myHash )

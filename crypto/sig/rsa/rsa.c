@@ -217,6 +217,8 @@ void rsa_gen_keys(struct key_class *pub, struct key_class *priv, char *PRIME_SOU
 
     priv->modulus = n;
     priv->exponent = d;
+
+    fclose( primes_list );
 }
 
 unsigned long long* rsa_long_encrypt(unsigned long long* message,

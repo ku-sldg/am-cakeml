@@ -9,7 +9,8 @@
 void signMsgWithKey( char* msg, unsigned long long* sig, struct key_class* priv )
 {
     // hash the message
-    uint8_t* hash = mySha512( msg );
+    uint8_t* hash = malloc( 512*8 );
+    mySha512( msg, hash );
 
     // put each char of hash into a long long, into a list
     // 512 bits = 64 bytes = 64 uint8_t's = 64 chars
@@ -30,6 +31,7 @@ void signMsgWithKey( char* msg, unsigned long long* sig, struct key_class* priv 
 
     free( longMsg );
     free( temp );
+    free( hash );
 
     return;
 }
@@ -37,13 +39,13 @@ void signMsgWithKey( char* msg, unsigned long long* sig, struct key_class* priv 
 void signMsg( char* msg, unsigned long long* sig )
 {
     // grab the private key
-    //char priKey[255];
-    //strcpy( priKey, KEY_STORAGE );
-    //strcat( priKey, "myPrivateKey.txt" );
+    char priKey[255];
+    strcpy( priKey, KEY_STORAGE );
+    strcat( priKey, "myPrivateKey.txt" );
     struct key_class priv;
-    //readKey( priKey, &priv );
-    priv.modulus = PRIVATE_KEY_MODULUS;
-    priv.exponent = PRIVATE_KEY_EXPONENT;
+    readKey( priKey, &priv );
+    //priv.modulus = PRIVATE_KEY_MODULUS;
+    //priv.exponent = PRIVATE_KEY_EXPONENT;
 
     // get the signature
     signMsgWithKey( msg, sig, &priv );

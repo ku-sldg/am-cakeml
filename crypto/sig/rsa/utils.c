@@ -34,6 +34,7 @@ void readKey( char* filename, struct key_class* myKey )
     fgets( buf, 255, fp );
     myKey->exponent = keyExtract( buf );
 
+    fclose( fp );
     return;
 }
 
@@ -98,6 +99,9 @@ void keyToString( struct key_class* inKey, uint8_t* outKey )
         outKey[10+i] = expPart[i];
     }
     outKey[18] = '\0';
+
+    free( modPart );
+    free( expPart );
 
     return;
 }
