@@ -36,8 +36,8 @@ fun main () =
         val dSig = demoGrabSig ev
         val dHash = demoGrabHash ev
         val sHash = ByteString.toRawString (hashStr dHash)
-        val pubMod = readFile "/usr/share/myKeys/thisPubMod"
-        val pubExp = readFile "/usr/share/myKeys/thisPubExp"
+        val pubMod = readFile "../crypto/thisPubMod"
+        val pubExp = readFile "../crypto/thisPubExp"
         val payload = dSig ^ sHash ^ pubMod ^ ":" ^ pubExp ^ ":" 
         val sigResult = sigCheck payload 
      in
