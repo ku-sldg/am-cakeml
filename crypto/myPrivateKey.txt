@@ -1,0 +1,3 @@
+Private Key:
+Modulus: 6C57079D
+Exponent: 12C2249F
