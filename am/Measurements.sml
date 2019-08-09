@@ -19,5 +19,5 @@ val signEv = signMsg o encodeEv
 
 fun verifySig g pubMod pubExp =
     case g
-      of G _ ev bs => Some (sigCheck bs (encodeEv ev) pubKey)
+      of G _ ev bs => Some (sigCheck bs (encodeEv ev) pubMod pubExp)
        | _ => None
