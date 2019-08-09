@@ -30,7 +30,7 @@ fun sigCheck sign msg pubMod pubExp =
     let
         val result  = Word8Array.array 1 (Word8.fromInt 0)
         val payload = (ByteString.toRawString sign) ^
-                      (ByteString.toRawString msg) ^
+                      (ByteString.toRawString (hash msg)) ^
                       pubMod ^ ":" ^ pubExp ^ ":"
     in
         #(sigCheck) payload result;

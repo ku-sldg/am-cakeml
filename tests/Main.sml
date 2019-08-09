@@ -102,11 +102,7 @@ fun sigTest () =
         val sign = (signMsg o ByteString.fromRawString) msg
         val pubMod = "F5AB9DD3"
         val pubExp = "101"
-        val myHash = hashStr msg
-        val _ = print ("cake hash:\n" ^ (ByteString.show myHash) ^ "\n\n")
-        val _ = print ("cake pub mod: " ^ pubMod ^ "\n")
-        val _ = print ("cake pub exp: " ^ pubExp ^ "\n")
-        val sigResult = sigCheck sign myHash pubMod pubExp
+        val sigResult = sigCheck sign (ByteString.fromRawString msg) pubMod pubExp
      in
         print ("Signature Test: \n" ^ (ByteString.show sign) ^ "\n\n" ^ "Signature Check: "
               ^ (if sigResult then "Passed\n" else "Failed\n"))
