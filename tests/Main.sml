@@ -111,9 +111,9 @@ fun sigTest () =
         val _ = print ("cake hash:\n" ^ (ByteString.show myHash) ^ "\n\n")
         val _ = print ("cake pub mod:" ^ pubMod)
         val _ = print ("cake pub exp:" ^ pubExp ^ "\n")
-        val sigResult = (sigCheck payload) 
-     in 
-        print ("Signature Test: \n" ^ (ByteString.show sign) ^ "\n\n" ^ "Signature Check: \n" ^ (ByteString.show sigResult) ^ "\n" ) 
+        val sigResult = (sigCheck payload)
+     in
+        print ("Signature Test: \n" ^ (ByteString.show sign) ^ "\n\n" ^ "Signature Check: \n" ^ (ByteString.show sigResult) ^ "\n" )
     end
 
 (* Run all tests *)
