@@ -104,12 +104,12 @@ fun sigTest () =
         val pubExp = "101"
         val myHash = hashStr msg
         val _ = print ("cake hash:\n" ^ (ByteString.show myHash) ^ "\n\n")
-        val _ = print ("cake pub mod:" ^ pubMod)
-        val _ = print ("cake pub exp:" ^ pubExp ^ "\n")
+        val _ = print ("cake pub mod: " ^ pubMod ^ "\n")
+        val _ = print ("cake pub exp: " ^ pubExp ^ "\n")
         val sigResult = sigCheck sign myHash pubMod pubExp
      in
-        print ("Signature Test: \n" ^ (ByteString.show sign) ^ "\n\n" ^ "Signature Check: \n"
-              ^ (if sigResult then "passed\n" else "failed\n"))
+        print ("Signature Test: \n" ^ (ByteString.show sign) ^ "\n\n" ^ "Signature Check: "
+              ^ (if sigResult then "Passed\n" else "Failed\n"))
     end
 
 (* Run all tests *)
