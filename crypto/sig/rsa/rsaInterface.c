@@ -9,13 +9,12 @@
 
 int genKeys( char* primesFile )
 {
-    struct public_key_class pub[1];
-    struct private_key_class priv[1];
+    struct key_class pub[1];
+    struct key_class priv[1];
     rsa_gen_keys( pub, priv, primesFile );
 
     unsigned long long n = pub->modulus;
-
-    while( (n-1)*(n-1) / (n-1) != (n-1) )
+    while( ( (n-1)*(n-1)/(n-1)!=(n-1) ) )
     {
         sleep(1);
         rsa_gen_keys( pub, priv, primesFile );
@@ -23,19 +22,25 @@ int genKeys( char* primesFile )
     }
 
     struct stat st = {0};
-    if ( stat("./working", &st) == -1 ) 
+    if ( stat( KEY_STORAGE, &st) == -1 ) 
     {
-        mkdir("./working", 0700);
+        mkdir( KEY_STORAGE, 0700);
     }
 
     FILE* fp;
 
-    fp = fopen( "./working/myPublicKey.txt", "w+" );
-    fprintf( fp, "Public Key:\n Modulus: %lld\n Exponent: %lld\n", (long long)pub->modulus, (long long) pub->exponent );
+    char pubKey[255];
+    strcpy( pubKey, KEY_STORAGE );
+    strcat( pubKey, "myPublicKey.txt" );
+    fp = fopen( pubKey, "w+" );
+    fprintf( fp, "Public Key:\nModulus: %llX\nExponent: %llX\n", pub->modulus, pub->exponent );
     fclose( fp );    
 
-    fp = fopen( "./working/myPrivateKey.txt", "w+" );
-    fprintf( fp, "Private Key:\n Modulus: %lld\n Exponent: %lld\n", (long long)priv->modulus, (long long) priv->exponent );
+    char priKey[255];
+    strcpy( priKey, KEY_STORAGE );
+    strcat( priKey, "myPrivateKey.txt" );
+    fp = fopen( priKey, "w+" );
+    fprintf( fp, "Private Key:\nModulus: %llX\nExponent: %llX\n", priv->modulus, priv->exponent );
     fclose( fp );
 
     return( 0 );
@@ -43,7 +48,11 @@ int genKeys( char* primesFile )
 
 int decryptFile( char* inputFile, char* outputFile )
 {
-    struct private_key_class* priv = readPriv( "./working/myPrivateKey.txt" );
+    char priKey[255];
+    strcpy( priKey, KEY_STORAGE );
+    strcat( priKey, "myPrivateKey.txt" );
+    struct key_class* priv = malloc( sizeof( struct key_class ) );
+    readKey( priKey, priv );
     char* msgFile = inputFile;
     int i;
     FILE* fp = fopen( msgFile, "r" );
@@ -86,17 +95,22 @@ int decryptFile( char* inputFile, char* outputFile )
                 break;
             }
         }  
-
-        free( priv );
         free( decrypted );
 
     }
+    free( priv );
+    free( message );
+
     return( 0 );
 }
 
 int encryptFile( char* inputFile, char* outputFile )
 {
-    struct public_key_class* pub = readPub( "./working/myPublicKey.txt" );
+    char pubKey[255];
+    strcpy( pubKey, KEY_STORAGE );
+    strcat( pubKey, "myPublicKey.txt" );
+    struct key_class* pub = malloc( sizeof( struct key_class ) );
+    readKey( pubKey, pub );
     char* msgFile = inputFile;
     int i;
     FILE* fp = fopen( msgFile, "r" );
@@ -129,11 +143,25 @@ int encryptFile( char* inputFile, char* outputFile )
         for(i=0; i < strlen(message); i++){
             fprintf( fp, "%llu\n", (unsigned long long)encrypted[i] );
         }  
-
-        free( pub );
         free( encrypted );
 
     }
+    free( pub );
+    free( message );
+
     return( 0 );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 

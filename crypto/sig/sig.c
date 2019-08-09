@@ -1,15 +1,16 @@
 /*
 ** Michael Neises
-** 10 june 2019
+** 16 July 2019
 ** signature over RSA with SHA512 thumbprint
 */
 
 #include "sig.h"
 
-void signMsgWithKey( char* msg, unsigned long long* sig, struct private_key_class* priv )
+void signMsgWithKey( char* msg, unsigned long long* sig, struct key_class* priv )
 {
     // hash the message
-    uint8_t* hash = mySha512( msg );
+    uint8_t* hash = malloc( 512*8 );
+    mySha512( msg, hash );
 
     // put each char of hash into a long long, into a list
     // 512 bits = 64 bytes = 64 uint8_t's = 64 chars
@@ -30,6 +31,7 @@ void signMsgWithKey( char* msg, unsigned long long* sig, struct private_key_clas
 
     free( longMsg );
     free( temp );
+    free( hash );
 
     return;
 }
@@ -37,11 +39,11 @@ void signMsgWithKey( char* msg, unsigned long long* sig, struct private_key_clas
 void signMsg( char* msg, unsigned long long* sig )
 {
     // grab the private key
-    // struct private_key_class* priv = readPriv( PRIVATE_KEY_FILE );
-
-    struct private_key_class priv;
-    // priv.modulus = 4096090459;
-    // priv.exponent = 1522040473;
+    //char priKey[255];
+    //strcpy( priKey, KEY_STORAGE );
+    //strcat( priKey, "myPrivateKey.txt" );
+    struct key_class priv;
+    //readKey( priKey, &priv );
     priv.modulus = PRIVATE_KEY_MODULUS;
     priv.exponent = PRIVATE_KEY_EXPONENT;
 
@@ -54,7 +56,8 @@ void signMsg( char* msg, unsigned long long* sig )
 void signFile( char* msgFile, char* sigFile, char* privKeyFile )
 {
     // grab the private key
-    struct private_key_class* priv = readPriv( privKeyFile );
+    struct key_class* priv = malloc( sizeof( struct key_class ) );
+    readKey( privKeyFile, priv );
 
     // read in the message
     FILE* fp = fopen( msgFile, "r" );
@@ -87,27 +90,12 @@ void signFile( char* msgFile, char* sigFile, char* privKeyFile )
     fclose( fp );
     free( message );
     free( mySig );
+    free( priv );
 
     return;
 }
 
-void readSigFile( unsigned long long* sig, char* sigFile )
-{
-    // read in the message
-    FILE* fp = fopen( sigFile, "r" );
-
-    // read the sig line by line
-    unsigned long long buff[1];
-    for( int i=0; i<64; i++ )
-    {
-        fscanf( fp, "%llu", buff );
-        sig[i] = buff[0];
-    }
-
-    return;
-}
-
-int sigVerify( unsigned long long* sig, uint8_t* hash, struct public_key_class* pub )
+int sigVerify( unsigned long long* sig, uint8_t* hash, struct key_class* pub )
 {
     // transform the signature into what should be the hash
     unsigned long long* longHash = rsa_long_encrypt( sig, 64, pub );
@@ -138,6 +126,98 @@ int sigVerify( unsigned long long* sig, uint8_t* hash, struct public_key_class* 
     return( 1 );
 }
 
+// parses a signature payload and passes the results to sigVerify
+int sigCheck( uint8_t* payload )
+{
+    // parse the payload for parts
+    uint8_t* sig = malloc( 512*sizeof(long long) );
+    uint8_t* hash = malloc( 512*sizeof(uint8_t) );
+    uint8_t* pubKeyParts = malloc( 3*sizeof(long long) );
+    uint8_t* pubMod = malloc( sizeof(long long) );
+    uint8_t* pubExp = malloc( sizeof(long long) );
+    
+    
+    //printf( "c sig:\n" );
+    for( int i=0; i<512; i++ )
+    {
+        sig[i] = payload[i];
+        //printf( "%X", sig[i] );
+    }
+    //printf( "\n\n" );
+
+    //printf( "c hash:\n" );
+    for( int i=512; i < 576; i++ )
+    {
+        hash[i-512] = payload[i];
+        //printf( "%X", hash[i-512] );
+    }
+    //printf( "\n\n" );
+
+    for( int i=576; i < 594; i++ )
+    {
+        pubKeyParts[i-576] = payload[i];
+    }
+
+    // parse keyparts for parts lul
+    // grab positions of the semi-colons
+    int expNow = 0;
+    int count = 0;
+    for( int i=0; i<18; i++ )
+    {
+        if( (char)pubKeyParts[i] == ':' )
+        {
+            if( expNow )
+            {
+                count = 0;
+                break;
+            }
+            count = 0;
+            expNow = 1;
+        }
+        else if( expNow )
+        {
+            pubExp[count] = pubKeyParts[i];
+            count++;
+        }
+        else
+        {
+            pubMod[count] = pubKeyParts[i];
+            count++;
+        }
+    }
+      
+    // parse the hex-strings for hex-nums
+    unsigned long long longPubMod = strtoll( &pubMod[0], (char**)NULL, 16 );
+    //printf( "c pub mod: %llX\n", longPubMod );
+    unsigned long long longPubExp = strtoll( &pubExp[0], (char**)NULL, 16 );
+    //printf( "c pub exp: %llX\n", longPubExp );
+    //printf("\n");
+
+    // convert sig
+    unsigned long long * mySig = malloc( sizeof(long long) * 64 );
+    byteStringToSig( sig, mySig );
+    
+    // convert pubKey
+    struct key_class myPub[1];
+    myPub->modulus = longPubMod;
+    myPub->exponent = longPubExp;
+
+    // check the signature
+    int isGood = sigVerify( mySig, hash, myPub );
+
+    // don't leak memory
+    free( sig );
+    free( mySig );
+    free( hash );
+    free( pubKeyParts );
+    free( pubMod ); 
+    free( pubExp );
+
+    // see how we did
+    return( isGood );
+}
+
+// if use this, must free the return pointer
 char* dupstr( char* src )
 {
     char* dst = malloc( strlen(src)+1 );
@@ -148,45 +228,6 @@ char* dupstr( char* src )
     strcpy( dst, src );
     return( dst );
 }
-
-void readFileList( uint8_t* fileString, struct file_list_class* files )
-{
-    char* fileList = (char*)fileString;
-    char fileArray[255];
-    strcpy( fileArray, fileList );
-
-    const char s[2] = ";";
-
-    files->msgFile = (char*)dupstr( strtok( fileArray, s ) );
-    files->sigFile = (char*)dupstr( strtok( NULL, s ) );
-    files->privKeyFile = (char*)dupstr( strtok( NULL, s ) );
-
-    strtok( NULL, s );
-
-    return;
-}
-
-// TODO
-// this is incorrect right now
-// it looks at string representation of nums...
-/*
-void sigToByteString( unsigned long long* sig, uint8_t* byteSig )
-{
-    char* temp = malloc( sizeof(char) * 100 );
-    printf( "the sprintf sig is: \n" );
-    for( int i=0; i<64; i++ )
-    {
-        sprintf( temp, "%llu", sig[i] );
-        printf( "%s ", temp );
-        for( int j=0; j<8; j++ )
-        {
-            byteSig[i*8+j] = (uint8_t)temp[j];
-        }
-    }
-    free( temp );
-    return;
-}
-*/
 
 // sig is 64 long longs
 // byteSig is 512 chars
@@ -221,3 +262,4 @@ void byteStringToSig( uint8_t* byteSig, unsigned long long* sig )
     }
     return;
 }
+

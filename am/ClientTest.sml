@@ -5,6 +5,8 @@ val term  = AT (S O) (LN (USM (Id O) ["hashTest.txt"]) SIG)
 val nonce = genNonce ()
 
 val goldenHash = "DDAF35A193617ABACC417349AE20413112E6FA4E89A97EA20A9EEEE64B55D39A2192992A274FC1A836BA3C23A3FEEBBD454D4423643CE80E2A9AC94FA54CA49F"
+val pubMod = "F5AB9DD3"
+val pubExp = "101"
 
 (* Like an option, but the error case is also parameterized, typically to carry
    error messages *)
@@ -18,7 +20,7 @@ fun appraise ev =
          then Err "Bad nonce value"
          else if ByteString.toHexString evHash <> goldenHash
               then Err "Bad hash value"
-              else if Option.valOf (verifySig ev ())
+              else if Option.valOf (verifySig ev pubMod pubExp)
                    then Ok ()
                    else Err "Bad signature"
        | _ => Err "Unexpected shape of evidence"

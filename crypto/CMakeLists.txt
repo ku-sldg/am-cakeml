@@ -1,5 +1,5 @@
-set(PRIVATE_KEY_MODULUS 4096090459 CACHE STRING "Private key modulus")
-set(PRIVATE_KEY_EXPONENT 1522040473 CACHE STRING "Private key exponent")
+set(PRIVATE_KEY_MODULUS 0xF5AB9DD3 CACHE STRING "Private key modulus")
+set(PRIVATE_KEY_EXPONENT 0x21EF175D CACHE STRING "Private key exponent")
 
 add_executable(genKeys EXCLUDE_FROM_ALL
     sig/rsa/genKeys.c sig/rsa/rsa.c sig/rsa/rsaInterface.c sig/rsa/utils.c)

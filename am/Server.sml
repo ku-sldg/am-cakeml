@@ -28,6 +28,7 @@ fun handleIncoming listener =
     handle Socket.Err       => TextIO.print_err "Socket failure\n"
          | Socket.InvalidFD => TextIO.print_err "Invalid file descriptor\n"
 
+(* I'm almost certain this leaks memory. *)
 fun startServer port qLen =
     let fun loop f x = (f x; loop f x)
      in loop handleIncoming (Socket.listen port qLen)

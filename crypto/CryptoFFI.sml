@@ -26,6 +26,17 @@ fun signMsg msg =
         result
     end
 
+fun sigCheck sign msg pubMod pubExp =
+    let
+        val result  = Word8Array.array 1 (Word8.fromInt 0)
+        val payload = (ByteString.toRawString sign) ^
+                      (ByteString.toRawString msg) ^
+                      pubMod ^ ":" ^ pubExp ^ ":"
+    in
+        #(sigCheck) payload result;
+        result
+    end
+
 (* len is length of nonce in bytes *)
 fun urand len =
     let

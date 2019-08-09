@@ -8,7 +8,7 @@
 #include <errno.h>
 #include <math.h>
 
-char* stringToBinary( char* s );
+void stringToBinary( char* s, char* binary );
 
 int hexStringToInt( char* hexString );
 

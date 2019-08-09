@@ -3,11 +3,12 @@
 
 #include "toBinary.h"
 
-char *stringToBinary(char *s)
+//binary should be malloc( slen * CHAR_BIT + 1 )
+void stringToBinary(char *s, char* binary)
 {
   if (s == NULL) {
     // NULL might be 0 but you cannot be sure about it
-    return NULL;
+    return;
   }
   // get length of string without NUL
   size_t slen = strlen(s);
@@ -16,15 +17,14 @@ char *stringToBinary(char *s)
   // allocate "slen" (number of characters in string without NUL)
   // times the number of bits in a "char" plus one byte for the NUL
   // at the end of the return value
-  char *binary = malloc(slen * CHAR_BIT + 1);
   if(binary == NULL){
      fprintf(stderr,"malloc has failed in stringToBinary(%s): %s\n",s, strerror(errno));
-     return NULL;
+     return;
   }
   // finally we can put our shortcut from above here
   if (slen == 0) {
     *binary = '\0';
-    return binary;
+    return;
   }
   char *ptr;
   // keep an eye on the beginning
@@ -43,7 +43,7 @@ char *stringToBinary(char *s)
   *binary = '\0';
   // reset pointer to beginning
   binary = start;
-  return binary;
+  return;
 }
 
 // changes the return into an int

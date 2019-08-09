@@ -24,6 +24,31 @@ void ffisignMsg(uint8_t * msg, long msgLen, uint8_t * signature, long sigLen) {
     sigToByteString(mySig, signature);
 }
 
+// Give payload in form:
+// first 64 bytes: sig
+// null byte
+// 64 bytes: file hash
+// null byte
+// Public Key
+void ffisigCheck( uint8_t * payload, long payloadLen, uint8_t * a, long aLen ) {
+    // not going to use these
+    (void)payloadLen;
+    (void)aLen;
+
+    // check the signature
+    int isGood = sigCheck( payload );
+
+    // is this right?
+    if( isGood )
+    {
+        a[0] = 0xFF;
+    }
+    else
+    {
+        a[0] = 0x00;
+    }
+}
+
 // Although the `getrandom` function is the preferred way to request random bits
 // from the kernel on linux, it may not be available on older systems. The
 // latter definition should work on most other unix like systems, including
