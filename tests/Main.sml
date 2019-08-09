@@ -99,19 +99,14 @@ fun aes256CtrTest () =
 (* and check the sig in place? *)
 fun sigTest () =
     let val msg = "The private key was stored at ./crypto/sig/rsa/working/myPrivateKey.txt, but now it's in memory as a macro."
-        val sign = (signMsg (ByteString.fromRawString msg))
-        (*
-        val pubMod = (readFile "/usr/share/myKeys/thisPubMod")
-        val pubExp = (readFile "/usr/share/myKeys/thisPubExp")
-        *)
-        val pubMod = (readFile "../crypto/thisPubMod")
-        val pubExp = (readFile "../crypto/thisPubExp")
+        val sign = (signMsg o ByteString.fromRawString) msg
+        val pubMod = "F5AB9DD3"
+        val pubExp = "101"
         val myHash = hashStr msg
-        val payload = (ByteString.toRawString sign) ^ (ByteString.toRawString myHash) ^ pubMod ^ ":" ^ pubExp ^ ":"
         val _ = print ("cake hash:\n" ^ (ByteString.show myHash) ^ "\n\n")
         val _ = print ("cake pub mod:" ^ pubMod)
         val _ = print ("cake pub exp:" ^ pubExp ^ "\n")
-        val sigResult = (sigCheck payload)
+        val sigResult = sigCheck sign myHash pubMod pubExp
      in
         print ("Signature Test: \n" ^ (ByteString.show sign) ^ "\n\n" ^ "Signature Check: \n" ^ (ByteString.show sigResult) ^ "\n" )
     end
