@@ -34,7 +34,7 @@ fun sigCheck sign msg pubMod pubExp =
                       pubMod ^ ":" ^ pubExp ^ ":"
     in
         #(sigCheck) payload result;
-        result
+        Word8Array.sub result 0 <> ByteString.zeroByte
     end
 
 (* len is length of nonce in bytes *)
