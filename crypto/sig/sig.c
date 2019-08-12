@@ -130,15 +130,15 @@ int sigVerify( unsigned long long* sig, uint8_t* hash, struct key_class* pub )
 int sigCheck( uint8_t* payload )
 {
     // parse the payload for parts
-    uint8_t* sig = malloc( 512*sizeof(long long) );
+    uint8_t* sig = malloc( 256*sizeof(long long) );
     uint8_t* hash = malloc( 512*sizeof(uint8_t) );
     uint8_t* pubKeyParts = malloc( 3*sizeof(long long) );
     uint8_t* pubMod = malloc( sizeof(long long) );
     uint8_t* pubExp = malloc( sizeof(long long) );
-    
-    
+
+
     //printf( "c sig:\n" );
-    for( int i=0; i<512; i++ )
+    for( int i=0; i<256; i++ )
     {
         sig[i] = payload[i];
         //printf( "%X", sig[i] );
@@ -146,16 +146,16 @@ int sigCheck( uint8_t* payload )
     //printf( "\n\n" );
 
     //printf( "c hash:\n" );
-    for( int i=512; i < 576; i++ )
+    for( int i=256; i < 320; i++ )
     {
-        hash[i-512] = payload[i];
+        hash[i-256] = payload[i];
         //printf( "%X", hash[i-512] );
     }
     //printf( "\n\n" );
 
-    for( int i=576; i < 594; i++ )
+    for( int i=320; i < 338; i++ )
     {
-        pubKeyParts[i-576] = payload[i];
+        pubKeyParts[i-320] = payload[i];
     }
 
     // parse keyparts for parts lul
@@ -185,7 +185,7 @@ int sigCheck( uint8_t* payload )
             count++;
         }
     }
-      
+
     // parse the hex-strings for hex-nums
     unsigned long long longPubMod = strtoll( &pubMod[0], (char**)NULL, 16 );
     //printf( "c pub mod: %llX\n", longPubMod );
@@ -196,7 +196,7 @@ int sigCheck( uint8_t* payload )
     // convert sig
     unsigned long long * mySig = malloc( sizeof(long long) * 64 );
     byteStringToSig( sig, mySig );
-    
+
     // convert pubKey
     struct key_class myPub[1];
     myPub->modulus = longPubMod;
@@ -210,7 +210,7 @@ int sigCheck( uint8_t* payload )
     free( mySig );
     free( hash );
     free( pubKeyParts );
-    free( pubMod ); 
+    free( pubMod );
     free( pubExp );
 
     // see how we did
@@ -235,31 +235,20 @@ void sigToByteString( unsigned long long* sig, uint8_t* byteSig )
 {
     for( int i=0; i<64; i++ )
     {
-        byteSig[8*i] = (uint8_t)( sig[i] >> 56 );
-        byteSig[8*i+1] = (uint8_t)(( sig[i] >> 48 ) & 0xFF );
-        byteSig[8*i+2] = (uint8_t)(( sig[i] >> 40 ) & 0xFF );
-        byteSig[8*i+3] = (uint8_t)(( sig[i] >> 32 ) & 0xFF );
-        byteSig[8*i+4] = (uint8_t)(( sig[i] >> 24 ) & 0xFF );
-        byteSig[8*i+5] = (uint8_t)(( sig[i] >> 16 ) & 0xFF );
-        byteSig[8*i+6] = (uint8_t)(( sig[i] >> 8 ) & 0xFF );
-        byteSig[8*i+7] = (uint8_t)( sig[i] & 0xFF );
+        byteSig[4*i]   = (uint8_t)(( sig[i] >> 24 ));
+        byteSig[4*i+1] = (uint8_t)(( sig[i] >> 16 ) & 0xFF );
+        byteSig[4*i+2] = (uint8_t)(( sig[i] >>  8 ) & 0xFF );
+        byteSig[4*i+3] = (uint8_t)(  sig[i] & 0xFF );
     }
-    return;
 }
 
 void byteStringToSig( uint8_t* byteSig, unsigned long long* sig )
 {
     for( int i=0; i<64; i++ )
     {
-        sig[i]  = ((unsigned long long)byteSig[8*i+0]) << 56;
-        sig[i] |= ((unsigned long long)byteSig[8*i+1]) << 48;
-        sig[i] |= ((unsigned long long)byteSig[8*i+2]) << 40;
-        sig[i] |= ((unsigned long long)byteSig[8*i+3]) << 32;
-        sig[i] |= ((unsigned long long)byteSig[8*i+4]) << 24;
-        sig[i] |= ((unsigned long long)byteSig[8*i+5]) << 16;
-        sig[i] |= ((unsigned long long)byteSig[8*i+6]) << 8;
-        sig[i] |= (unsigned long long)byteSig[8*i+7];
+        sig[i]  = ((unsigned long long)byteSig[4*i])   << 24;
+        sig[i] |= ((unsigned long long)byteSig[4*i+1]) << 16;
+        sig[i] |= ((unsigned long long)byteSig[4*i+2]) << 8;
+        sig[i] |=  (unsigned long long)byteSig[4*i+3];
     }
-    return;
 }
-

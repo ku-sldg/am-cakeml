@@ -20,7 +20,7 @@ fun hashStr s =
 
 fun signMsg msg =
     let
-        val result = Word8Array.array 512 (Word8.fromInt 0)
+        val result = Word8Array.array 256 (Word8.fromInt 0)
     in
         #(signMsg) (ByteString.toRawString msg) result;
         result
