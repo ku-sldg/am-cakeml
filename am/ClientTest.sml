@@ -27,9 +27,11 @@ fun appraise ev =
 
 fun main () =
     let val ev = eval O map (N O 0 nonce Mt) term
-     in print (evToString ev ^ "\n\nAppraisal " ^ (
+     in print ("Evaluating term:\n" ^ tToString term ^ "\n\nNonce:\n" ^
+               ByteString.show nonce ^ "\n\nEvidence recieved:\n" ^
+               evToString ev ^ "\n\nAppraisal " ^ (
                case appraise ev
-                 of Ok ()   => "succeeded.\n"
+                 of Ok ()   => "succeeded (expected nonce and hash value; signature verified).\n"
                   | Err msg => "failed: " ^ msg ^ "\n")
               )
     end
