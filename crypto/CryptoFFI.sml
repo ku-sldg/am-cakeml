@@ -1,63 +1,75 @@
 (* Depends on: ByteString.sml *)
 
 (* Safe wrappers to FFI crypto functions *)
+structure Crypto = struct
+    exception Err
 
-fun hash bs =
-    let
-        val result = Word8Array.array 64 (Word8.fromInt 0)
+    local
+        val ffiSuccess = Word8.fromInt 0
+        val ffiFailure = Word8.fromInt 1
     in
-        #(sha512) (ByteString.toRawString bs) result;
-        result
-    end
+        fun hash bs =
+            let
+                val result = Word8Array.array 64 (Word8.fromInt 0)
+            in
+                #(sha512) (ByteString.toRawString bs) result;
+                result
+            end
 
-fun hashStr s =
-    let
-        val result = Word8Array.array 64 (Word8.fromInt 0)
-    in
-        #(sha512) s result;
-        result
-    end
+        fun hashStr s =
+            let
+                val result = Word8Array.array 64 (Word8.fromInt 0)
+            in
+                #(sha512) s result;
+                result
+            end
 
-fun signMsg msg =
-    let
-        val result = Word8Array.array 256 (Word8.fromInt 0)
-    in
-        #(signMsg) (ByteString.toRawString msg) result;
-        result
-    end
+        fun signMsg msg =
+            let
+                val result = Word8Array.array 256 (Word8.fromInt 0)
+            in
+                #(signMsg) (ByteString.toRawString msg) result;
+                result
+            end
 
-fun sigCheck sign msg pubMod pubExp =
-    let
-        val result  = Word8Array.array 1 (Word8.fromInt 0)
-        val payload = (ByteString.toRawString sign) ^
-                      (ByteString.toRawString (hash msg)) ^
-                      pubMod ^ ":" ^ pubExp ^ ":"
-    in
-        #(sigCheck) payload result;
-        Word8Array.sub result 0 <> ByteString.zeroByte
-    end
+        fun sigCheck sign msg pubMod pubExp =
+            let
+                val result  = Word8Array.array 1 (Word8.fromInt 0)
+                val payload = (ByteString.toRawString sign) ^
+                              (ByteString.toRawString (hash msg)) ^
+                              pubMod ^ ":" ^ pubExp ^ ":"
+            in
+                #(sigCheck) payload result;
+                Word8Array.sub result 0 = ffiSuccess
+            end
 
-(* len is length of nonce in bytes *)
-fun urand len =
-    let
-        val result = Word8Array.array len (Word8.fromInt 0)
-    in
-        #(urand) "" result;
-        result
-    end
+        (* len is length of nonce in bytes *)
+        fun urand len =
+            let
+                val buffer = Word8Array.array (len+1) (Word8.fromInt 0)
+                val result = Word8Array.array len (Word8.fromInt 0)
+            in
+                #(urand) "" buffer;
+                (if Word8Array.sub buffer 0 = ffiFailure
+                    then raise Err
+                    else Word8Array.copy buffer 1 8 result 0);
+                result
+            end
 
-fun aes256_xkey key =
-    let
-        val result = Word8Array.array 240 (Word8.fromInt 0)
-    in
-        #(aes256_expand_key) key result;
-        result
-    end
+        fun aes256_xkey key =
+            let
+                val result = Word8Array.array 240 (Word8.fromInt 0)
+            in
+                #(aes256_expand_key) key result;
+                result
+            end
 
-fun aes256 pt xkey =
-    let
-        val result = Word8Array.array 16 (Word8.fromInt 0)
-    in
-        #(aes256) (pt ^ xkey) result;
-        result
+        fun aes256 pt xkey =
+            let
+                val result = Word8Array.array 16 (Word8.fromInt 0)
+            in
+                #(aes256) (pt ^ xkey) result;
+                result
+            end
     end
+end

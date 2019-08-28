@@ -3,16 +3,9 @@
 // This socket interface is largely based on the example provided in the
 // getaddrinfo man page http://man7.org/linux/man-pages/man3/getaddrinfo.3.html
 
-// Gcc defines this macro by default, enabling certain definitions in the 
-// standard header files. It is defined here because CompCert does _not_ define
-// the macro. See here for more information:
-//   https://gnu.org/software/libc/manual/html_node/Feature-Test-Macros
-// define _GNU_SOURCE 1
-//
-// defining _GNU_SOURCE 1 defines many standards to be included, not all of
-// which are necessary. For now we include just this posix_c_source, as per the
-// `getaddrinfo` man page
-
+// This macro is needed for getaddrinfo, as documented in the manpage.
+// gcc defines this macro by default, but CompCert does not.
+// We must therefore define it explicitly.
 #define _POSIX_C_SOURCE 201112L
 
 #include <assert.h>     // assert
@@ -22,6 +15,9 @@
 #include <netdb.h>      // getaddrinfo
 #include <string.h>     // memset, strerror
 #include <unistd.h>     // close
+
+#define FFI_SUCCESS 0
+#define FFI_FAILURE 1
 
 // These helper functions are defined in basis_ffi.c
 // I figured it would be good to use the same marshalling paradigm as the
@@ -33,14 +29,10 @@ void int_to_byte2(int i, uint8_t *b);
 int byte8_to_int(uint8_t *b);
 void int_to_byte8(int i, uint8_t *b);
 
-////////////////////////////////////////////////////////////////////////////////
-// Server functions:                                                          //
-////////////////////////////////////////////////////////////////////////////////
-
 // Arguments: qlen (first 2 bytes of c), and port, a string representation of a
 //     number, following qlen
 // Returns: failure flag in a[0], sockfd as 64-bit int in a[1..8]
-void ffilisten(uint8_t * c, long clen, uint8_t * a, long alen) {
+void ffilisten(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
     assert(clen >= 2);
     assert(alen >= 9);
 
@@ -58,7 +50,7 @@ void ffilisten(uint8_t * c, long clen, uint8_t * a, long alen) {
     struct addrinfo * result;
     if (getaddrinfo(0, port, &hints, &result)) {
         freeaddrinfo(result);
-        a[0] = 1;
+        a[0] = FFI_FAILURE;
         return;
     }
 
@@ -80,25 +72,25 @@ void ffilisten(uint8_t * c, long clen, uint8_t * a, long alen) {
     }
     freeaddrinfo(result);
     if (!r || sockfd == -1) {
-        a[0] = 1;
+        a[0] = FFI_FAILURE;
         return;
     }
 
     // Listen for incoming connections, with a maximum queue length of qlen
     if (listen(sockfd, qlen)) {
-        a[0] = 1;
+        a[0] = FFI_FAILURE;
         return;
     }
 
     // return sockfd
-    a[0] = 0;
+    a[0] = FFI_SUCCESS;
     int_to_byte8(sockfd, a+1);
 }
 
 // Argument: sockfd as 64-bit int in c
 // Returns: failure flag in a[0], conn_sockfd as 64-bit int in a[1..8]
 // Blocks until there is an incoming connection
-void ffiaccept(uint8_t * c, long clen, uint8_t * a, long alen) {
+void ffiaccept(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
     assert(clen >= 8);
     assert(alen >= 9);
 
@@ -111,24 +103,20 @@ void ffiaccept(uint8_t * c, long clen, uint8_t * a, long alen) {
     // incoming queue. If there is none, blocks until there is.
     int conn_sockfd = accept(sockfd, (struct sockaddr *)(&conn_addr), &conn_addr_len);
     if(conn_sockfd == -1) {
-        a[0] = 1;
+        a[0] = FFI_FAILURE;
         return;
     }
 
     // return conn_sockfd
-    a[0] = 0;
+    a[0] = FFI_SUCCESS;
     int_to_byte8(conn_sockfd, a+1);
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// Client functions:                                                          //
-////////////////////////////////////////////////////////////////////////////////
 
 // Arguments: host and port, both stored in that order in c, delimited by a null
 //     byte. host is a domain name or ip address, as a string. port is a number,
 //     again as a string. port should be followed by a final null byte.
 // Returns: failure flag in a[0], sockfd as 64-bit int in a[1..8]
-void fficonnect(uint8_t * c, long clen, uint8_t * a, long alen) {
+void fficonnect(uint8_t * c, const long clen, uint8_t * a, const long alen) {
     assert(clen >= 2); // Assumes there are at least the null byte delimiter and terminator
     assert(alen >= 9);
 
@@ -145,7 +133,7 @@ void fficonnect(uint8_t * c, long clen, uint8_t * a, long alen) {
     struct addrinfo * result;
     if (getaddrinfo(host, port, &hints, &result)) {
         freeaddrinfo(result);
-        a[0] = 1;
+        a[0] = FFI_FAILURE;
         return;
     }
 
@@ -163,11 +151,11 @@ void fficonnect(uint8_t * c, long clen, uint8_t * a, long alen) {
     }
     freeaddrinfo(result);
     if (!r || sockfd == -1) {
-        a[0] = 1;
+        a[0] = FFI_FAILURE;
         return;
     }
 
     // return sockfd
-    a[0] = 0;
+    a[0] = FFI_SUCCESS;
     int_to_byte8(sockfd, a+1);
 }

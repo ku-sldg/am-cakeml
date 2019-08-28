@@ -19,18 +19,18 @@ structure Aes256CtrDrbg = struct
        the 2^48 max provided by the NIST document *)
     val max_count = 65536
 
-    fun init () = (Aes256Ctr.init (urand 32) (urand 16), 0)
+    fun init () = (Aes256Ctr.init (Crypto.urand 32) (Crypto.urand 16), 0)
 
     fun reseed drbg = drbg := (init ())
 
     fun genBits drbg =
-        let (* Note: `!` is the dereferencing operator *)
+        let
             val (ctr, count) = !drbg
         in
             if count >= max_count
-                then            (* I actually _have_ to do let/in rather than *)
-                    let val _ = reseed drbg (* semicolon/sequencing, due to   *)
-                    in genBits drbg end     (* right-to-left evaluation order *)
+                then
+                    (reseed drbg;
+                    genBits drbg)
                 else
                     Aes256Ctr.encrCtr ctr
         end
@@ -40,6 +40,6 @@ end
 local
     val dbgr = Ref (Aes256CtrDrbg.init ())
 in
-    (* Returns 16 random bytes *)
+    (* Returns 16 random bytes. TODO: take number of bytes as an argument *)
     fun rand () = Aes256CtrDrbg.genBits dbgr
 end

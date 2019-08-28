@@ -5,7 +5,7 @@
    same key/nonce and "encrypt" the encrypted block sequence in order. *)
 structure Aes256Ctr = struct
     local
-        val xkeyFromKeyBs = ByteString.toRawString o aes256_xkey o ByteString.toRawString
+        val xkeyFromKeyBs = ByteString.toRawString o Crypto.aes256_xkey o ByteString.toRawString
     in
         (* (xkey, nonce, ctr) *)
         type ctr = ByteString.bs * ByteString.bs * ByteString.bs
@@ -19,7 +19,7 @@ structure Aes256Ctr = struct
            the XORing. *)
         fun encrCtr (xkey, _, ctr) =
             let
-                val out = aes256 (ByteString.toRawString ctr) xkey
+                val out = Crypto.aes256 (ByteString.toRawString ctr) xkey
                 val _ = ByteString.addInt ctr 1
             in
                 out

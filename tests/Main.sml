@@ -61,9 +61,9 @@ Expected result: 0x8ea2b7ca516745bfeafc49904b496089
 fun aes256Test () =
     let val hexToRaw = ByteString.toRawString o ByteString.fromHexString
         val key  = hexToRaw "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f"
-        val xkey = ByteString.toRawString (aes256_xkey key)
+        val xkey = ByteString.toRawString (Crypto.aes256_xkey key)
         val pt   = hexToRaw "00112233445566778899aabbccddeeff"
-        val ct   = ByteString.show (aes256 pt xkey)
+        val ct   = ByteString.show (Crypto.aes256 pt xkey)
      in print ("AES-256 test: " ^ ct ^ "\n\n")
     end
 
@@ -99,10 +99,10 @@ fun aes256CtrTest () =
 (* and check the sig in place? *)
 fun sigTest () =
     let val msg = "The private key was stored at ./crypto/sig/rsa/working/myPrivateKey.txt, but now it's in memory as a macro."
-        val sign = (signMsg o ByteString.fromRawString) msg
+        val sign = (Crypto.signMsg o ByteString.fromRawString) msg
         val pubMod = "F5AB9DD3"
         val pubExp = "101"
-        val sigResult = sigCheck sign (ByteString.fromRawString msg) pubMod pubExp
+        val sigResult = Crypto.sigCheck sign (ByteString.fromRawString msg) pubMod pubExp
      in
         print ("Signature Test: \n" ^ (ByteString.show sign) ^ "\n\n" ^ "Signature Check: "
               ^ (if sigResult then "Passed\n" else "Failed\n"))
