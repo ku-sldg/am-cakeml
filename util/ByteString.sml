@@ -189,4 +189,13 @@ structure ByteString = struct
                      end
          in addInt_aux bs n (length bs - 1)
         end
+
+    (* Quick and dirty maps to parameterized array type *)
+    fun cons h t = h :: t
+
+    val toList = foldr cons []
+    val fromList = List.foldr (append o Word8Array.array 1) empty
+
+    fun map f = Array.fromList o List.map f o toList
+    fun unmap f = fromList o List.map f o Array.foldr cons []
 end
