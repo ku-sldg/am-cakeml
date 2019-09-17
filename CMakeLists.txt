@@ -27,7 +27,7 @@ set(core_src
     util/ByteString.sml crypto/CryptoFFI.sml crypto/Aes256.sml crypto/Random.sml
     sockets/SocketFFI.sml util/CoqDefaults.sml interp/CoplandLang.sml
     am/Measurements.sml am/CommTypes.sml JSON/Json.sml JSON/CoplandToJson.sml
-    JSON/JsonToCopland.sml am/CommUtil.sml interp/Eval.sml
+    JSON/JsonToCopland.sml am/CommUtil.sml interp/Eval.sml interp/Instr.sml
 )
 set(test_src   ${core_src} tests/Main.sml)
 set(server_src ${core_src} am/Server.sml)
