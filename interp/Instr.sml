@@ -114,3 +114,5 @@ fun evalVm pl map ec =
                 (parallel_att_vm_thread il2 (List.hd stack))::(List.tl stack))
 
      in fst o List.foldl vmStep (ec, []) end
+
+fun evalTerm pl map ec = evalVm pl map ec o instrCompiler

@@ -29,15 +29,13 @@ set(core_src
     am/Measurements.sml am/CommTypes.sml JSON/Json.sml JSON/CoplandToJson.sml
     JSON/JsonToCopland.sml am/CommUtil.sml interp/Eval.sml interp/Instr.sml
 )
-set(test_src   ${core_src} tests/Main.sml)
 set(server_src ${core_src} am/Server.sml)
 set(client_src ${core_src} am/ClientTest.sml)
+set(vmTest_src ${core_src} tests/vmTest.sml)
+set(test_src   ${core_src} tests/Main.sml)
+
 
 # Targets
-gen_cakeml(test ${test_src})
-target_sources(test PUBLIC ${basis} sockets/socket_ffi.c)
-target_link_libraries(test crypto)
-
 gen_cakeml(server ${server_src})
 target_sources(server PUBLIC ${basis} sockets/socket_ffi.c)
 target_link_libraries(server crypto)
@@ -45,5 +43,13 @@ target_link_libraries(server crypto)
 gen_cakeml(client ${client_src})
 target_sources(client PUBLIC ${basis} sockets/socket_ffi.c)
 target_link_libraries(client crypto)
+
+gen_cakeml(test ${test_src})
+target_sources(test PUBLIC ${basis} sockets/socket_ffi.c)
+target_link_libraries(test crypto)
+
+gen_cakeml(vmTest ${vmTest_src})
+target_sources(vmTest PUBLIC ${basis} sockets/socket_ffi.c)
+target_link_libraries(vmTest crypto)
 
 add_custom_target(am DEPENDS server client)
