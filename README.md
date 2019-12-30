@@ -13,7 +13,7 @@ Create a build directory at the top level of the source tree, then invoke cmake 
 If you need to make changes to the default configuration, type `ccmake ..` to bring up the graphical interface. (See the following section for more details.)
 
 Finally, type `make <target>`, where `<target>` is one of the following:
-- `test`: a test executable
+- `tests`: a test suite
 - `server`: an attestation manager server
 - `client`: an example client
 - `am`: builds `server` and `client`

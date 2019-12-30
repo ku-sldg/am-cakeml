@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.11.2)
+cmake_minimum_required(VERSION 3.10.2)
 set(CMAKE_USER_MAKE_RULES_OVERRIDE "DefaultConfig.cmake")
 project(CakemlAM C ASM)
 
@@ -44,9 +44,9 @@ gen_cakeml(client ${client_src})
 target_sources(client PUBLIC ${basis} sockets/socket_ffi.c)
 target_link_libraries(client crypto)
 
-gen_cakeml(test ${test_src})
-target_sources(test PUBLIC ${basis} sockets/socket_ffi.c)
-target_link_libraries(test crypto)
+gen_cakeml(tests ${test_src})
+target_sources(tests PUBLIC ${basis} sockets/socket_ffi.c)
+target_link_libraries(tests crypto)
 
 gen_cakeml(vmTest ${vmTest_src})
 target_sources(vmTest PUBLIC ${basis} sockets/socket_ffi.c)
