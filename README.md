@@ -3,6 +3,7 @@
 ## Prerequisites
 - CakeML: [Download](https://cakeml.org/download.html) and build the 64-bit version (or the 32-bit version if you are building for the Odroid). This project assumes the `cake` executable and `basis_ffi.c` to be in the directory `~/cake-x64-64`. See the "Configuration" section if you want to put it elsewhere.
 - CMake: This should be available through your package manager.
+- CCMake: Optional, but highly recommended. Provides a GUI for configuring CMake parameters. Download through your package manager (the Ubuntu package is `cmake-curses-gui`).
 
 ## Instructions
 Create a build directory at the top level of the source tree, then invoke cmake from within the directory:
