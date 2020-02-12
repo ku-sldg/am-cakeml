@@ -1,26 +1,9 @@
 cmake_minimum_required(VERSION 3.10.2)
+cmake_policy(SET CMP0076 NEW)
 set(CMAKE_USER_MAKE_RULES_OVERRIDE "DefaultConfig.cmake")
 project(CakemlAM C ASM)
 
-# Config stuff - edit with ccmake
-set(CAKE_DIR ~/cake-x64-64 CACHE PATH "Directory containing cake executable and basis_ffi.c")
-if(APPLE)
-    set(default_os "macOS")
-else()
-    set(default_os "linux")
-endif()
-set(TARGET_OS ${default_os} CACHE STRING "Options are: linux, macOS, and seL4 (case sensitive). Affects which system calls are performed.")
-set(cakec ${CAKE_DIR}/cake)
-set(basis ${CAKE_DIR}/basis_ffi.c)
-mark_as_advanced(FORCE CMAKE_INSTALL_PREFIX)
-mark_as_advanced(CLEAR
-    CMAKE_C_COMPILER CMAKE_ASM_COMPILER CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG
-    CMAKE_C_FLAGS_RELEASE CMAKE_EXE_LINKER_FLAGS CMAKE_VERBOSE_MAKEFILE
-)
-
-# Bring in other CMake stuff (notably after we set up our variables!)
-include(CakemlHelper.cmake)
-add_subdirectory(crypto)
+include(CakeMLHelper.cmake)
 
 # CakeML source/dependency lists
 set(core_src
@@ -31,25 +14,55 @@ set(core_src
 )
 set(server_src ${core_src} am/Server.sml)
 set(client_src ${core_src} am/ClientTest.sml)
-set(vmTest_src ${core_src} tests/vmTest.sml)
-set(test_src   ${core_src} tests/Main.sml)
+set(vmTest_src ${core_src} tests/VmTest.sml)
+set(camkes_src ${core_src} tests/CAmkESTest.sml)
+set(tests_src  ${core_src} tests/Main.sml)
 
+# Unfortunately, the build process will diverge significantly between
+# standalone executables and CAmkES components
+if(${CAmkES})
+    add_subdirectory(crypto)
+    cakeml_component(test
+        CML_SOURCES "${camkes_src}"
+        C_SOURCES "sockets/dummy_ffi.c"
+        LIBS "camkescakeml;crypto"
+    )
 
-# Targets
-gen_cakeml(server ${server_src})
-target_sources(server PUBLIC ${basis} sockets/socket_ffi.c)
-target_link_libraries(server crypto)
+# Standalone executables
+else()
+    # Config
+    if(${APPLE})
+        set(default_os "macOS")
+    else()
+        set(default_os "linux")
+    endif()
+    set(TARGET_OS ${default_os} CACHE STRING "Options are: linux, macOS. Affects which system calls are performed.")
+    string(TOLOWER ${TARGET_OS} target_os_lower)
+    if(NOT (${target_os_lower} STREQUAL "linux" OR ${target_os_lower} STREQUAL "macos"))
+        message(FATAL_ERROR "TARGET_OS value \"${TARGET_OS}\" is invalid. Please select from: linux, macOS.")
+    endif()
+    find_file(BASIS NAMES "basis_ffi.c" PATHS "~/cake-x64-64/" "/cake-x64-64/" "~/cake-x64-32/" "/cake-x64-32/"
+                    DOC "The \"basis_ffi.c\" file bundled with the CakeML compiler.")
+    if("${BASIS}" STREQUAL "basis-NOTFOUND")
+        message(WARNING "No \"basis_ffi.c\" file found! Please set the \"BASIS\" variable manually.")
+    endif()
 
-gen_cakeml(client ${client_src})
-target_sources(client PUBLIC ${basis} sockets/socket_ffi.c)
-target_link_libraries(client crypto)
+    mark_as_advanced(FORCE CMAKE_INSTALL_PREFIX)
+    mark_as_advanced(CLEAR
+        CMAKE_C_COMPILER CMAKE_ASM_COMPILER CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG
+        CMAKE_C_FLAGS_RELEASE CMAKE_EXE_LINKER_FLAGS CMAKE_VERBOSE_MAKEFILE
+    )
 
-gen_cakeml(tests ${test_src})
-target_sources(tests PUBLIC ${basis} sockets/socket_ffi.c)
-target_link_libraries(tests crypto)
-
-gen_cakeml(vmTest ${vmTest_src})
-target_sources(vmTest PUBLIC ${basis} sockets/socket_ffi.c)
-target_link_libraries(vmTest crypto)
-
-add_custom_target(am DEPENDS server client)
+    # Add targets
+    add_subdirectory(crypto)
+    function(build_am_thing name)
+        build_cake("${name}.cake" SOURCES "${ARGN}")
+        add_executable(${name} ${BASIS} sockets/socket_ffi.c)
+        target_link_libraries(${name} "${name}.cake" crypto)
+    endfunction()
+    build_am_thing("server" ${server_src})
+    build_am_thing("client" ${client_src})
+    build_am_thing("vmTest" ${vmTest_src})
+    build_am_thing("tests"  ${tests_src})
+    add_custom_target(am DEPENDS server client)
+endif()
