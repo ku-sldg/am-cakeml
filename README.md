@@ -1,5 +1,7 @@
 # Building
 
+The following documents the process of building standalone executables. The build process for CAmkES components will be documented elsewhere.
+
 ## Prerequisites
 - CakeML: [Download](https://cakeml.org/download.html) and build the 64-bit version (or the 32-bit version if you are building for the Odroid). This project assumes the `cake` executable and `basis_ffi.c` to be in the directory `~/cake-x64-64`. See the "Configuration" section if you want to put it elsewhere.
 - CMake: This should be available through your package manager.
@@ -22,7 +24,7 @@ Finally, type `make <target>`, where `<target>` is one of the following:
 ## Configuration
 From the build directory, type `ccmake ..` to bring up the configuration GUI. Hovering over a variable displays some documentation at the bottom of the screen. After you make changes, press `c` then `g` to save your changes.
 
-Some common use cases include changing the `CAKE_DIR` location (e.g. to `~/cake-x64-32` for the 32-bit CakeML compiler), `CMAKE_C_COMPILER` (e.g. to compcert, a cross-compiler, etc.), or the `PRIV_KEY` values.
+Some common use cases include changing the `CAKE` filepath (e.g. to `~/cake-x64-32/cake` for the 32-bit CakeML compiler), `CMAKE_C_COMPILER` (e.g. to compcert, a cross-compiler, etc.), or the `PRIV_KEY` values.
 
 ## Platforms
 Currently, this project should run under Linux and macOS. We plan to eventually support a version which runs under a seL4 CAmkES component.
