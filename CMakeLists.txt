@@ -22,7 +22,7 @@ set(tests_src  ${core_src} tests/Main.sml)
 # standalone executables and CAmkES components
 if(${CAmkES})
     add_subdirectory(crypto)
-    cakeml_component(test
+    cakeml_component(AM
         CML_SOURCES "${camkes_src}"
         C_SOURCES "sockets/dummy_ffi.c"
         LIBS "camkescakeml;crypto"
