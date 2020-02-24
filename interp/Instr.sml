@@ -1,5 +1,5 @@
-(* Depends on: CoplandLang.sml, ByteString.sml, CoqDefaults.sml, crypto/Random.sml, and
-   crypto/CryptoFFI.sml
+(* Depends on: CoplandLang.sml, ByteString.sml, CoqDefaults.sml, Eval.sml,
+   crypto/Random.sml, and crypto/CryptoFFI.sml
  *)
 
 (* Based on Coq VM implementation, with a couple differences:
