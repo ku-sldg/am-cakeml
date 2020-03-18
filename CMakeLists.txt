@@ -17,6 +17,7 @@ set(client_src ${core_src} am/ClientTest.sml)
 set(vmTest_src ${core_src} tests/VmTest.sml)
 set(camkes_src ${core_src} tests/CAmkESTest.sml)
 set(tests_src  ${core_src} tests/Main.sml)
+set(uav_src    ${core_src} uav/Cache.sml uav/Demo.sml)
 
 # Unfortunately, the build process will diverge significantly between
 # standalone executables and CAmkES components
@@ -64,5 +65,6 @@ else()
     build_am_thing("client" ${client_src})
     build_am_thing("vmTest" ${vmTest_src})
     build_am_thing("tests"  ${tests_src})
+    build_am_thing("uav"    ${uav_src})
     add_custom_target(am DEPENDS server client)
 endif()
