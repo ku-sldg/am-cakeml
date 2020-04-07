@@ -15,7 +15,7 @@ set(core_src
 set(server_src ${core_src} am/Server.sml)
 set(client_src ${core_src} am/ClientTest.sml)
 set(vmTest_src ${core_src} tests/VmTest.sml)
-set(camkes_src ${core_src} tests/CAmkESTest.sml)
+# set(camkes_src ${core_src} tests/CAmkESTest.sml)
 set(tests_src  ${core_src} tests/Main.sml)
 set(uav_src    ${core_src} uav/Cache.sml uav/Demo.sml)
 
@@ -24,8 +24,8 @@ set(uav_src    ${core_src} uav/Cache.sml uav/Demo.sml)
 if(${CAmkES})
     add_subdirectory(crypto)
     cakeml_component(AM
-        CML_SOURCES "${camkes_src}"
-        C_SOURCES "sockets/dummy_ffi.c"
+        CML_SOURCES "${uav_src}"
+        C_SOURCES "sockets/dummy_ffi.c;uav/sys/CAmkES/time.c"
         LIBS "camkescakeml;crypto"
     )
 
@@ -58,7 +58,7 @@ else()
     add_subdirectory(crypto)
     function(build_am_thing name)
         build_cake("${name}.cake" SOURCES "${ARGN}")
-        add_executable(${name} ${BASIS} sockets/socket_ffi.c uav/time.c)
+        add_executable(${name} ${BASIS} sockets/socket_ffi.c uav/sys/${target_os_lower}/time.c)
         target_link_libraries(${name} "${name}.cake" crypto)
     endfunction()
     build_am_thing("server" ${server_src})
