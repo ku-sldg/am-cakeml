@@ -94,6 +94,12 @@ structure ByteString = struct
          in foldri_aux z 0
         end
 
+    (* Assumes unsigned little endian data *)
+    val toInt =
+        let fun accum i w n = (exp 2 (i*8))*(Word8.toInt w) + n
+         in foldri accum 0
+        end
+
     (* Previously called `toString`, changed to emphasize the distinction
        between this and `toRawString`. The "0x" prefix was also dropped,
        since it didn't seem to add much and made parsing more difficult. *)

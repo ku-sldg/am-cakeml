@@ -1,27 +1,42 @@
-(* Cache clear policy: Should be random, but we don't want to use interupts.
-How about, each time the cache is polled we check the current time, find
-diff from last clear, and make decision accordingly. *)
+fun timestamp () =
+    let val result = Word8Array.array 8 (Word8.fromInt 0)
+     in #(timestamp) "" result; ByteString.toInt result
+    end
 
+(* Uses an association list as the underlying data structure. The standard
+   library's hashtable would be more efficient, but likely harder to verify. *)
 structure Cache = struct
     local
-        (* Perhaps type should couple mutable list with a timing policy and
-           metadata *)
-        datatype ('k,'v) cache = Cache ((('k * 'v) list) ref)
-        fun getCache c = case c of Cache r => r
+        (* datatype ('k,'v) cache = Cache ((('k * 'v) list) ref) *)
+        datatype ('k,'v) cache = Cache
+                                 ((('k * 'v) list) ref) (* The mutable storage *)
+                                 int                    (* Reset interval *)
+                                 (int ref)              (* Last reset *)
+
+        fun getCache c = case c of Cache r i t => r
     in
-        (* Exports type but not constructor. *)
+        (* Exports type but not constructors *)
         type ('k, 'v) cache = ('k, 'v) cache
 
-        (* new : () -> ('k,'v) cache *)
+        (* new : int -> ('k,'v) cache *)
+        (* Takes a reset interval length in microseconds *)
         (* Provides a _unique_ reference on every invocation *)
-        fun new () = Cache (Ref [])
+        fun new i = Cache (Ref []) i (Ref (timestamp ()))
+        (* fun new () = Cache (Ref []) *)
 
         (* clear : ('k,'v) cache -> ('k,'v) cache *)
-        fun clear c = (getCache c) := []
+        (* fun clear c = (getCache c) := [] *)
 
         (* lookup : ('k,'v) cache -> option *)
         (* TODO: add time check *)
         fun lookup c k = Alist.lookup (!(getCache c)) k
+
+        fun lookup c k = case c of Cache r i t =>
+            let val time = timestamp ()
+             in if (time - !t) > i
+                then (r := []; t := time; None)
+                else Alist.lookup (!r) k
+            end
 
         (* update : ('k,'v) cache -> 'k * 'v -> () *)
         fun update c (k,v) =

@@ -10,12 +10,19 @@ fun uxas msg = print ("UxAS recieved message: " ^ msg ^ "\n")
 (* attest : addr -> bool *)
 (* Dummy attestation. Only approves localhost *)
 fun attest a = (a = "127.0.0.1")
+(* fun attest i =
+    let val term = Asp Cpy
+        val map  = Map.insert emptyNsMap (S O) "127.0.0.1"
+        val ev   = evalTerm O map Mtc (Att (idToPl i) term)
+     in appraise ev
+    end *)
+
 
 (* checkAddr : addr -> bool *)
 (* returns cached go/nogo decision, or else returns result of a full
    attestation/appraisal if no cache entry exists for the address *)
 local
-    val cache : (addr, bool) Cache.cache = Cache.new ()
+    val cache : (addr, bool) Cache.cache = Cache.new 1000
 in
     fun checkId a = Option.getOpt (Cache.lookup cache a)
                     let val res = attest a
