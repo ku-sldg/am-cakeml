@@ -1,6 +1,14 @@
-fun timestamp () =
+(* fun timestamp () =
     let val result = Word8Array.array 8 (Word8.fromInt 0)
      in #(timestamp) "" result; ByteString.toInt result
+    end *)
+
+fun timestamp () =
+    let val result = Word8Array.array 8 (Word8.fromInt 0)
+     in #(timestamp) "" result;
+        let val stamp = ByteString.toInt result
+         in print (Int.toString stamp ^ "\n"); stamp
+        end
     end
 
 (* Uses an association list as the underlying data structure. The standard
