@@ -22,7 +22,7 @@ fun attest a = (a = "127.0.0.1")
 (* returns cached go/nogo decision, or else returns result of a full
    attestation/appraisal if no cache entry exists for the address *)
 local
-    val cache : (addr, bool) Cache.cache = Cache.new 1000
+    val cache : (addr, bool) Cache.cache = Cache.new 10000000
 in
     fun checkId a = Option.getOpt (Cache.lookup cache a)
                     let val res = attest a
@@ -36,5 +36,30 @@ end
 fun filter a msg = if checkId a then uxas msg else ()
 
 
-val demo = (filter "badAddr"   "This message will be dropped";
-            filter "127.0.0.1" "This message will be forwarded to UxAS")
+(* val demo = (filter "badAddr"   "This message will be dropped";
+            filter "127.0.0.1" "This message will be forwarded to UxAS") *)
+
+(* pulse : int -> ('a -> 'b) -> 'a -> 'c *)
+(* Takes a frequency (in microseconds), a function, and that function's argument.
+   Repeatedly calls the function with the argument, on intervals defined by the
+   frequency. *)
+fun pulse freq f x =
+    let val next = Ref (timestamp () + freq)
+        fun spinUntil c = if c () then () else spinUntil c
+        fun loop io = (io (); loop io)
+     in loop (fn () => (
+            f x;
+            spinUntil (fn () => timestamp () >= !next);
+            next := !next + freq
+        ))
+    end
+
+local
+    val count  = Ref 0
+    val oneSec = 1000000
+in
+    val _ = pulse oneSec (fn () => (
+        print ("Pretend attestation request " ^ Int.toString (!count) ^ "\n");
+        count := !count + 1
+    )) ()
+end
