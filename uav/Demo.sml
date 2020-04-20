@@ -1,43 +1,19 @@
-(* Depends on Cache.sml, Instr.sml *)
+(* Depends on _ and Measurements.sml *)
 
-type uxasMsg = string
-type addr    = string
+(* updateWhitelist : id -> bool -> () *)
+(* temp stub *)
+(* TODO: link with HAMR API *)
+fun updateWhitelist _ _ = ()
 
-(* uxas : uxasMsg -> () *)
-(* Dummy UxAS. Represents message delivery to UxAS *)
-fun uxas msg = print ("UxAS recieved message: " ^ msg ^ "\n")
+(* checkInMsg : () -> (id, string) option *)
+(* temp stub *)
+(* TODO: link with HAMR API *)
+fun checkInMsg () = None
 
-(* attest : addr -> bool *)
-(* Dummy attestation. Only approves localhost *)
-fun attest a = (a = "127.0.0.1")
-(* fun attest i =
-    let val term = Asp Cpy
-        val map  = Map.insert emptyNsMap (S O) "127.0.0.1"
-        val ev   = evalTerm O map Mtc (Att (idToPl i) term)
-     in appraise ev
-    end *)
-
-
-(* checkAddr : addr -> bool *)
-(* returns cached go/nogo decision, or else returns result of a full
-   attestation/appraisal if no cache entry exists for the address *)
-local
-    val cache : (addr, bool) Cache.cache = Cache.new 10000000
-in
-    fun checkId a = Option.getOpt (Cache.lookup cache a)
-                    let val res = attest a
-                     in Cache.update cache (a,res); res
-                    end
-end
-
-(* filter : addr -> uxasMsg -> () *)
-(* Takes an addr and a UxAS message. Forwards or drops the message
-   depending on cache's response to the id. *)
-fun filter a msg = if checkId a then uxas msg else ()
-
-
-(* val demo = (filter "badAddr"   "This message will be dropped";
-            filter "127.0.0.1" "This message will be forwarded to UxAS") *)
+(* send : id -> string -> () *)
+(* temp stub *)
+(* TODO: link with HAMR API *)
+fun send id msg = ()
 
 (* pulse : int -> ('a -> 'b) -> 'a -> 'c *)
 (* Takes a frequency (in microseconds), a function, and that function's argument.
@@ -54,12 +30,31 @@ fun pulse freq f x =
         ))
     end
 
-local
-    val count  = Ref 0
-    val oneSec = 1000000
-in
-    val _ = pulse oneSec (fn () => (
-        print ("Pretend attestation request " ^ Int.toString (!count) ^ "\n");
-        count := !count + 1
-    )) ()
-end
+(* getMsg : () -> (id, string) *)
+fun getMsg () =
+    let val inMsg = checkInMsg ()
+     in case inMsg of
+          Some (id, msg) => (id, msg)
+        | None => getMsg ()
+    end
+
+(* appraise : ByteString.bs -> string -> bool *)
+(* temp stub *)
+(* TODO: parse msg into evidence ast, check sigs, golden values, and nonce *)
+fun appraise nonce msg = True
+
+(* attest : id -> () *)
+fun attest id =
+    let val nonce = genNonce ()
+        val _ = send id nonce
+        val (_, response) = getMsg ()
+     in updateWhitelist id (appraise nonce response)
+    end
+
+
+(* main : () -> 'a *)
+fun main () =
+    let val (id, _) = getMsg ()
+     in pulse 1000000 attest id
+    end
+val () = main ()
