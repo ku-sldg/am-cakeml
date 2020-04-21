@@ -16,7 +16,7 @@ set(core_src
 set(server_src ${core_src} am/Server.sml)
 set(client_src ${core_src} am/ClientTest.sml)
 set(vmTest_src ${core_src} tests/VmTest.sml)
-# set(camkes_src ${core_src} tests/CAmkESTest.sml)
+set(camkes_src ${core_src} tests/CAmkESTest.sml)
 set(tests_src  ${core_src} tests/Main.sml)
 set(uav_src    ${core_src} uav/Cache.sml uav/Demo.sml)
 
@@ -25,8 +25,8 @@ set(uav_src    ${core_src} uav/Cache.sml uav/Demo.sml)
 if(${CAmkES})
     add_subdirectory(crypto)
     cakeml_component(AM
-        CML_SOURCES "${uav_src}"
-        C_SOURCES "sockets/dummy_ffi.c;uav/sys/CAmkES/time.c"
+        CML_SOURCES "${camkes_src}"
+        C_SOURCES "sockets/dummy_ffi.c"
         LIBS "camkescakeml;crypto"
     )
 
