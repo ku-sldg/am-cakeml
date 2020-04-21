@@ -163,6 +163,75 @@ fun jsonToEvidence js =
      of [ev1, ev2] => PP  (jsonToEvidence ev1)  (jsonToEvidence ev2)
      | _ => raise Json.ERR "getPP" "unexpected argument list"
 
+fun jsonToEvC js =
+     case js
+      of Json.AList js' => fromAListC js'
+       | _ =>  raise  Json.ERR "JsonToEvidence" "APDT Evidence does not begin as an AList"
+
+       and
+     fromAListC pairs =
+     case pairs
+      of [("constructor", constructorVal)] => handleNullConstructorC constructorVal
+      |  [("constructor", constructorVal), ("data", args)] => handleConstructorWithArgsC constructorVal args
+      |  [("data", args),  ("constructor", constructorVal)]  => handleConstructorWithArgsC constructorVal args
+      | _ =>  raise  Json.ERR "fromAListC" "does not contain just constructor and data pairs"
+
+     and
+     handleNullConstructorC (Json.String constructor) =
+     case constructor
+      of "Mtc" => Mtc
+      | _ => raise Json.ERR "handleNullConstructorC"  (String.concat ["Unexpected Null constructor for APDT Evidence: ", constructor])
+
+     and
+     handleConstructorWithArgsC (Json.String constructor) (Json.List args) =
+     case constructor of
+        "Uc"  => getUc args
+      | "Gc"  => getGc args
+      | "Hc"  => getHc args
+      | "Nc"  => getNc args
+      | "SSc" => getSSc args
+      | "PPc" => getPPc args
+      |  _ =>  raise  Json.ERR "handleConstructorWithArgsC" (String.concat ["Unexpected constructor for APDT Evidence: ", constructor])
+
+     and
+     getUc data =
+     case data
+      of [ Json.Number (Json.Int aspId), args, bs, ev] =>
+            Uc (Id (natFromInt aspId)) (jsonStringListToList args) (jsonStringToBS bs) (jsonToEvC ev)
+      | _ => raise  Json.ERR "getUc" "unexpected argument list"
+
+     and
+     getGc data =
+     case data
+      of [bs, ev] => Gc (jsonStringToBS bs) (jsonToEvC ev)
+      | _ => raise  Json.ERR "getGc" "unexpected argument list"
+
+     and
+     getHc data =
+     case data
+      of [bs] => Hc (jsonStringToBS bs)
+      | _ => raise  Json.ERR "getHc" "unexpected argument list"
+
+     and
+     getNc data =
+     case data
+      of [Json.Number (Json.Int index), bs, ev] =>
+            Nc (Id (natFromInt index)) (jsonStringToBS bs) (jsonToEvC ev)
+      | _ => raise  Json.ERR "getNc" "unexpected argument list"
+
+     and
+     getSSc data =
+     case data
+      of [ev1, ev2] => SSc (jsonToEvC ev1) (jsonToEvC ev2)
+      | _ => raise  Json.ERR "getSSc" "unexpected argument list"
+
+     and
+     getPPc data =
+     case data
+      of [ev1, ev2] => PPc (jsonToEvC ev1) (jsonToEvC ev2)
+      | _ => raise Json.ERR "getPPc" "unexpected argument list"
+
+
 fun jsonToRequest js =
     case js
       of Json.AList js' => fromAList js'

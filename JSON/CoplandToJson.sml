@@ -12,7 +12,7 @@ fun stringListToJsonList args  =  Json.List (List.map stringToJson args)
 
 fun byteStringToJson bs = Json.String (ByteString.toHexString bs)
 
-fun aspidToJson (Id a) = Json.Number (Json.Int (natToInt a))
+fun idToJson (Id a) = Json.Number (Json.Int (natToInt a))
 
 fun placeToJson pl = Json.Number (Json.Int (natToInt pl))
 
@@ -30,8 +30,8 @@ fun constructorWithArgs cName arglist = Json.AList [("constructor", stringToJson
 
 fun apdtToJson term =
     case term
-     of KIM aspid pl args => constructorWithArgs "KIM" [ aspidToJson aspid, placeToJson pl, stringListToJsonList args]
-      | USM aspid args => constructorWithArgs "USM"  [ aspidToJson aspid, stringListToJsonList args]
+     of KIM aspid pl args => constructorWithArgs "KIM" [ idToJson aspid, placeToJson pl, stringListToJsonList args]
+      | USM aspid args => constructorWithArgs "USM"  [ idToJson aspid, stringListToJsonList args]
       | SIG => noArgConstructor "SIG"
       | HSH => noArgConstructor "HSH"
       | AT pl t1 => constructorWithArgs "AT" [ placeToJson pl, apdtToJson t1]
@@ -43,14 +43,23 @@ fun apdtToJson term =
 fun evidenceToJson evidence =
     case evidence
      of Mt => noArgConstructor "Mt"
-     | U aspid args pl bs ev =>  constructorWithArgs "U" [ aspidToJson aspid, stringListToJsonList args, placeToJson pl, byteStringToJson bs, evidenceToJson ev]
-     | K aspid args pl1 pl2 bs ev =>  constructorWithArgs "K" [ aspidToJson aspid, stringListToJsonList args, placeToJson pl1, placeToJson pl2,  byteStringToJson bs, evidenceToJson ev]
+     | U aspid args pl bs ev =>  constructorWithArgs "U" [ idToJson aspid, stringListToJsonList args, placeToJson pl, byteStringToJson bs, evidenceToJson ev]
+     | K aspid args pl1 pl2 bs ev =>  constructorWithArgs "K" [ idToJson aspid, stringListToJsonList args, placeToJson pl1, placeToJson pl2,  byteStringToJson bs, evidenceToJson ev]
      | G pl ev bs => constructorWithArgs "G" [placeToJson pl, evidenceToJson ev, byteStringToJson bs]
      | H pl bs => constructorWithArgs "H" [placeToJson pl, byteStringToJson bs]
      | N pl index bs ev => constructorWithArgs "N" [placeToJson pl, Json.Number (Json.Int index), byteStringToJson bs, evidenceToJson ev]
      | SS ev1 ev2 => constructorWithArgs "SS" [evidenceToJson ev1, evidenceToJson ev2]
      | PP ev1 ev2 => constructorWithArgs "PP" [evidenceToJson ev1, evidenceToJson ev2]
      |  _ =>  raise  Json.ERR "evidenceToJson" "Unexpected constructor for Evidence term: "
+
+fun evCToJson e = case e of
+      Mtc => noArgConstructor "Mtc"
+    | Uc aid args bs evC => constructorWithArgs "Uc" [idToJson aid, stringListToJsonList args, byteStringToJson bs, evCToJson evC]
+    | Gc bs evC => constructorWithArgs "Gc" [byteStringToJson bs, evCToJson evC]
+    | Hc bs  => constructorWithArgs "Hc" [byteStringToJson bs]
+    | Nc id bs evC => constructorWithArgs "Nc" [idToJson id, byteStringToJson bs, evCToJson evC]
+    | SSc ev1 ev2 => constructorWithArgs "SS" [evCToJson ev1, evCToJson ev2]
+    | PPc ev1 ev2 => constructorWithArgs "PP" [evCToJson ev1, evCToJson ev2]
 
 fun requestToJson (REQ pl1 pl2 map t ev) = Json.AList
     [("toPlace", placeToJson pl1), ("fromPlace", placeToJson pl2), ("reqNameMap", nsMapToJson map),

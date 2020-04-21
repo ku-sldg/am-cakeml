@@ -9,8 +9,9 @@ include(CakeMLHelper.cmake)
 set(core_src
     util/ByteString.sml crypto/CryptoFFI.sml crypto/Aes256.sml crypto/Random.sml
     sockets/SocketFFI.sml util/CoqDefaults.sml interp/CoplandLang.sml
-    am/Measurements.sml am/CommTypes.sml JSON/Json.sml JSON/CoplandToJson.sml
-    JSON/JsonToCopland.sml am/CommUtil.sml interp/Eval.sml interp/Instr.sml
+    am/Measurements.sml am/CommTypes.sml interp/Instr.sml JSON/Json.sml
+    JSON/CoplandToJson.sml JSON/JsonToCopland.sml am/CommUtil.sml
+    interp/Eval.sml interp/VM.sml
 )
 set(server_src ${core_src} am/Server.sml)
 set(client_src ${core_src} am/ClientTest.sml)

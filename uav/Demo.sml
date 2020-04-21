@@ -1,4 +1,4 @@
-(* Depends on _ and Measurements.sml *)
+(* Depends on Instr.sml, JsonToCopland.sml, and Measurements.sml *)
 
 (* updateWhitelist : id -> bool -> () *)
 (* temp stub *)
@@ -38,17 +38,24 @@ fun getMsg () =
         | None => getMsg ()
     end
 
-(* appraise : ByteString.bs -> string -> bool *)
-(* temp stub *)
-(* TODO: parse msg into evidence ast, check sigs, golden values, and nonce *)
-fun appraise nonce msg = True
+(* parseEvC : string -> evC *)
+val parseEvC =
+    let fun strToJson str = List.hd (fst (Json.parse ([], str)))
+     in JsonToCopland.jsonToEvC o strToJson
+    end
+
+(* appraise : ByteString.bs -> evC -> bool *)
+(* TODO: check sigs, hashes, nonce. Change evidence shape to match protocol *)
+fun appraise nonce ev = case ev of
+      Gc evSig (Uc (Id O) ["hashTest.txt"] evHash evNonce) => True
+    | _ => False
 
 (* attest : id -> () *)
 fun attest id =
     let val nonce = genNonce ()
         val _ = send id nonce
-        val (_, response) = getMsg ()
-     in updateWhitelist id (appraise nonce response)
+        val evC = parseEvC (snd (getMsg ()))
+     in updateWhitelist id (appraise nonce evC)
     end
 
 
