@@ -16,7 +16,7 @@ else()
 endif()
 
 add_library(crypto STATIC
-    aes256.c crypto_ffi.c sys/${sys}/crypto_ffi.c sha512.c sig/sig.c
+    aes256.c crypto_ffi.c sys/${sys}/crypto_ffi.c sha512.c idstring.c sig/sig.c
     sig/rsa/rsa.c sig/rsa/rsaInterface.c sig/rsa/utils.c sig/sha512/hasher.c
     sig/sha512/toBinary.c)
 target_link_libraries(crypto ${cryptoLinks})

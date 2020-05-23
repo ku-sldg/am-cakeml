@@ -24,6 +24,14 @@ structure Crypto = struct
                 result
             end
 
+	fun doidstring s =
+            let
+                val result = Word8Array.array 64 (Word8.fromInt 0)
+            in
+                #(idstring) s result;
+                result
+            end
+
         fun signMsg msg =
             let
                 val result = Word8Array.array 256 (Word8.fromInt 0)

@@ -30,6 +30,16 @@ fun hashTests () =
 fun nonceTest () = print ("Nonce test: " ^ ByteString.show (genNonce ()) ^ "\n\n")
 
 (*
+fun idstringTest () = print ("idstring(hey): " ^ (dooidstring ("blah")) ^ "\n\n")
+*)
+
+fun idstringTest () =
+    let val s = "asdffdsa"
+    in print ("idstring(" ^ s ^ "): " ^ (ByteString.show (dooidstring (s))) ^ "\n\n")
+    end
+
+
+(*
 The purpose of this function is to create a large file of random bytes, to
 be analyzed by NIST's statistical test suite for CSPRNGs:
     https://www.nist.gov/publications/statistical-test-suite-random-and-pseudorandom-number-generators-cryptographic
@@ -112,6 +122,7 @@ fun sigTest () =
 fun main () = (
     hashTests ();
     nonceTest ();
+    idstringTest();
     bsAddTest ();
     aes256Test ();
     aes256CtrTest ();

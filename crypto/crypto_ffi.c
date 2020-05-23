@@ -4,6 +4,7 @@
 #include <stdint.h> // uint8_t and uint32_t types
 
 #include "sha512.h"
+#include "idstring.h"
 #include "aes256.h"
 #include "sig/sig.h"
 
@@ -16,6 +17,20 @@ void ffisha512(const uint8_t * c, const long clen, uint8_t * a, const long alen)
     assert(alen >= 64);
     sha512(c, clen, a);
 }
+
+// Arguments: message to be hashed in c
+// Returns: hash in a
+void ffiidstring(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
+    assert(alen >= 64);
+    idstring(c, clen, a);
+    //return c;
+    /*for(int i = 0; i < clen; i++) {
+      a[i] = 
+    } 
+    (*a) = (*c); //(*c); */
+    //a = c;
+}
+
 
 void ffisignMsg(const uint8_t * msg, const long msgLen, uint8_t * signature, const long sigLen) {
     // Prevents complaint about unused arguments

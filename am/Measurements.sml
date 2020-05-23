@@ -12,6 +12,9 @@ fun readFile filename =
 
 val genFileHash = Crypto.hashStr o readFile
 
+fun dooidstring s = Crypto.doidstring s
+
+
 (* Gets a 128 bit (16 byte) nonce *)
 val genNonce = rand
 

@@ -4,6 +4,7 @@
 
 # Temporary files
 *.swp
+*.~
 
 # Executables
 test
