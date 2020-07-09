@@ -1,6 +1,9 @@
 (* Depends on: SocketFFI.sml, Json.sml, JsonToCopland.sml, CoplandToJson.sml,
                CommTypes.sml, CommUtil.sml and Eval.sml *)
 
+val priv = (ByteString.toRawString o ByteString.fromHexString)
+           "2E5773B2A19A2CB05FEE44650D8DC877B3D806F74C199043657C805288CD119B"
+
 (* TODO: Do something with pl1 rather than assuming it is here.
    Also do something with the nameserver mapping *)
 (* When things go well, this returns a JSON evidence string. When they go wrong,
@@ -8,7 +11,7 @@
    said error messages in JSON as well to make it easier on the client. *)
 fun evalJson s =
     let val (REQ pl1 pl2 map t ev) = JsonToCopland.jsonToRequest (strToJson s)
-        val ev' = eval pl2 map ev t
+        val ev' = eval pl2 map priv ev t
         val response = RES pl2 pl1 ev'
      in jsonToStr (CoplandToJson.responseToJson response)
     end

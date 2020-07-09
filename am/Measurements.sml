@@ -10,17 +10,18 @@ fun readFile filename =
         text
     end
 
-val genFileHash = Crypto.hashStr o readFile
+(* val genFileHash = Crypto.hashStr o readFile *)
+val genFileHash = Crypto.hashFile
 
-fun dooidstring s = Crypto.doidstring s
+(* fun dooidstring s = Crypto.doidstring s *)
 
 
 (* Gets a 128 bit (16 byte) nonce *)
 val genNonce = rand
 
-val signEv = Crypto.signMsg o encodeEv
+fun signEv priv = Crypto.signMsg priv o encodeEv
 
-fun verifySig g pubMod pubExp =
+fun verifySig g pub =
     case g
-      of G _ ev bs => Some (Crypto.sigCheck bs (encodeEv ev) pubMod pubExp)
+      of G _ ev bs => Some (Crypto.sigCheck pub bs (encodeEv ev))
        | _ => None

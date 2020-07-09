@@ -2,9 +2,8 @@
    Eval.sml, crypto/Random.sml, and crypto/CryptoFFI.sml
  *)
 
-(* evC -> ByteString.bs *)
-val signEvC  = Crypto.signMsg o encodeEvC
-val genHashC = Crypto.hash    o encodeEvC
+fun signEvC priv = Crypto.signMsg priv o encodeEvC
+val genHashC = Crypto.hash o encodeEvC
 
 (* sp -> evC -> evC *)
 fun splitEvC s e = case s of
@@ -29,22 +28,22 @@ fun instrCompiler t = case t of
         [Split sp1 sp2, Bep (instrCompiler t1) (instrCompiler t2), Joinp]
 
 (* primInstr -> evC -> evC *)
-fun primEv i ec = case i of
+fun primEv i priv ec = case i of
       Umeas id args => Uc id args (measureUsm mapUSM id args) ec
     | Copy => ec
-    | Sign => Gc (signEvC ec) ec
+    | Sign => Gc (signEvC priv ec) ec
     | Hash => Hc (genHashC ec)
 
 (* This function diverges significantly from the Coq implementation.
    It may prove necessary to rewrite it in the original's monadic style. *)
 (* pl -> nsMap -> evC -> instr list -> evC *)
-fun evalVm pl map ec =
-    let fun parallel_att_vm_thread il ec = evalVm pl map ec il
+fun evalVm pl map priv ec =
+    let fun parallel_att_vm_thread il ec = evalVm pl map priv ec il
         (* fun toRemote t pl' ec = evToEvC (dispatchAt (REQ pl pl' map t (evCToEv pl ec))) *)
         fun toRemote t pl' ec = Mtc (* placeholder *)
         (* evC * evC list -> instr -> evC * evC list*)
         fun vmStep (ec, stack) i = case i of
-              PrimInstr p => (primEv p ec, stack)
+              PrimInstr p => (primEv p priv ec, stack)
             | Split s1 s2 => (splitEvC s1 ec, (splitEvC s2 ec)::stack)
             | Joins => (SSc (List.hd stack) ec, List.tl stack)
             | Joinp => (PPc (List.hd stack) ec, List.tl stack)
@@ -55,4 +54,4 @@ fun evalVm pl map ec =
 
      in fst o List.foldl vmStep (ec, []) end
 
-fun evalTerm pl map ec = evalVm pl map ec o instrCompiler
+fun evalTerm pl map priv ec = evalVm pl map priv ec o instrCompiler

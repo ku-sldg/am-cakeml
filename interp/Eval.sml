@@ -47,12 +47,12 @@ fun measureKim map id p args =
 (* I'd love to refactor the various exceptions into a Result/Either type,
    but without do notation, infix ops, or typeclasses, monads become
    pretty unwieldy :( *)
-fun eval pl map ev t =
-    let val evalRec = eval pl map
+fun eval pl map priv ev t =
+    let val evalRec = eval pl map priv
      in case t
           of USM id args => U id args pl (measureUsm mapUSM id args) ev
            | KIM id pl' args => K id args pl pl' (measureKim mapKIM id pl args) ev
-           | SIG => G pl ev (signEv ev)
+           | SIG => G pl ev (signEv priv ev)
            | HSH => H pl (genHash ev)
            | CPY => ev
            | AT pl' t' => dispatchAt (REQ pl pl' map t' ev)

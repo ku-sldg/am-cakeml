@@ -17,7 +17,7 @@ Expected result: 0xDDAF35A193617ABACC417349AE20413112E6FA4E89A97EA20A9EEEE64B55D
 *)
 fun hashTests () =
     let val evidence  = H O (ByteString.fromRawString "abc")
-        val hashTest  = evToString (eval O emptyNsMap evidence HSH)
+        val hashTest  = evToString (eval O emptyNsMap "" evidence HSH)
         val hashFile  = (ByteString.show (genFileHash "hashTest.txt"))
             handle _ => "ERROR: could not find 'hashTest.txt' in the present working directory"
      in print ("Hash test: "      ^ hashTest  ^ "\n\n" ^
@@ -29,14 +29,10 @@ fun hashTests () =
    printed at each invocation. *)
 fun nonceTest () = print ("Nonce test: " ^ ByteString.show (genNonce ()) ^ "\n\n")
 
-(*
-fun idstringTest () = print ("idstring(hey): " ^ (dooidstring ("blah")) ^ "\n\n")
-*)
-
-fun idstringTest () =
+(* fun idstringTest () =
     let val s = "asdffdsa"
     in print ("idstring(" ^ s ^ "): " ^ (ByteString.show (dooidstring (s))) ^ "\n\n")
-    end
+    end *)
 
 
 (*
@@ -105,24 +101,28 @@ fun aes256CtrTest () =
                "Encrypted text 3: " ^ ct3 ^ "\n\n")
     end
 
-(* can I sign a file? *)
-(* and check the sig in place? *)
+(* The good signature should pass the check, and the bad signature should fail *)
 fun sigTest () =
-    let val msg = "The private key was stored at ./crypto/sig/rsa/working/myPrivateKey.txt, but now it's in memory as a macro."
-        val sign = (Crypto.signMsg o ByteString.fromRawString) msg
-        val pubMod = "F5AB9DD3"
-        val pubExp = "101"
-        val sigResult = Crypto.sigCheck sign (ByteString.fromRawString msg) pubMod pubExp
-     in
-        print ("Signature Test: \n" ^ (ByteString.show sign) ^ "\n\n" ^ "Signature Check: "
-              ^ (if sigResult then "Passed\n" else "Failed\n"))
+    let val hexToRaw  = ByteString.toRawString o ByteString.fromHexString
+        val privGood  = hexToRaw "2E5773B2A19A2CB05FEE44650D8DC877B3D806F74C199043657C805288CD119B"
+        val privBad   = hexToRaw "2E5773B2A19A2CB05FEE44650D8DC877B3D806F84C199043657C805288CD119B"
+        val pub       = hexToRaw "490E2422528F14AC6A48DDB9D72CB30B8345AF2E939003BC7A33A6057F2FFB0101000000000000002DD0B7F53A560000A049D882A37F00000000000000000000"
+        val msg       = ByteString.fromRawString "foo bar"
+        val signGood  = Crypto.signMsg privGood msg
+        val signBad   = Crypto.signMsg privBad  msg
+        val checkGood = Crypto.sigCheck pub signGood msg
+        val checkBad  = Crypto.sigCheck pub signBad msg
+     in print ("Good Signature: \n" ^ (ByteString.show signGood) ^ "\n" ^
+               "Signature Check: "  ^ (if checkGood then "Passed" else "Failed") ^ "\n\n" ^
+               "Bad Signature: \n"  ^ (ByteString.show signBad) ^ "\n" ^
+               "Signature Check: "  ^ (if checkBad  then "Passed" else "Failed") ^ "\n")
     end
 
 (* Run all tests *)
 fun main () = (
     hashTests ();
     nonceTest ();
-    idstringTest();
+    (* idstringTest(); *)
     bsAddTest ();
     aes256Test ();
     aes256CtrTest ();
