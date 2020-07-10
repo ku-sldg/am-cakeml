@@ -32,7 +32,7 @@ if(${CAmkES})
 
 # Standalone executables
 else()
-    # Config
+    # OS Config
     if(${APPLE})
         set(default_os "macOS")
     else()
@@ -49,6 +49,25 @@ else()
         message(WARNING "No \"basis_ffi.c\" file found! Please set the \"BASIS\" variable manually.")
     endif()
 
+    # Arch Config
+    set(TARGET_ARCH "native" CACHE STRING "Options: \"native\", \"armv7\", or \"other\".")
+    string(TOLOWER ${TARGET_ARCH} target_arch_lower)
+    if("${target_arch_lower}" STREQUAL "armv7")
+        set(CMAKE_C_FLAGS "-mfloat-abi=hard ${CMAKE_C_FLAGS}")
+        find_program (arm-hf-gcc arm-linux-gnueabihf-gcc)
+        if("${arm-hf-gcc}" STREQUAL "arm-hf-gcc-NOTFOUND")
+            message(WARNING "Cross-compiling to the armv7 architecture requires hard-float support. Please ensure your C compiler supports this.")
+        else()
+            set(CMAKE_C_COMPILER ${arm-hf-gcc})
+        endif()
+        unset(arm-hf-gcc)
+    elseif(NOT(("${target_arch_lower}" STREQUAL "native") OR ("${target_arch_lower}" STREQUAL "other")))
+        message(FATAL_ERROR "TARGET_ARCH value \"${TARGET_ARCH}\" is invalid. Please select from: \"native\", \"armv7\", or \"other\".")
+    endif()
+
+    string(COMPARE NOTEQUAL "${target_arch_lower}" "native" default_static_linking)
+    set(STATIC_LINKING default_static_linking CACHE BOOL "")
+
     mark_as_advanced(FORCE CMAKE_INSTALL_PREFIX)
     mark_as_advanced(CLEAR
         CMAKE_C_COMPILER CMAKE_ASM_COMPILER CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG
@@ -60,7 +79,10 @@ else()
     function(build_am_thing name)
         build_cake("${name}.cake" SOURCES "${ARGN}")
         add_executable(${name} ${BASIS} sockets/socket_ffi.c uav/sys/${target_os_lower}/time.c)
-        target_link_libraries(${name} "${name}.cake" crypto)
+        if(${STATIC_LINKING})
+            set(link_flags "-static-libgcc -static")
+        endif()
+        target_link_libraries(${name} "${name}.cake" crypto ${link_flags})
     endfunction()
     build_am_thing("server" ${server_src})
     build_am_thing("client" ${client_src})

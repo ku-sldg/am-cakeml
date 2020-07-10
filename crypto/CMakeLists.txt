@@ -40,20 +40,15 @@ set(kremlin_path "${hacl_release_dir}/kremlin/include")
 set(kremlib_path "${hacl_release_dir}/kremlin/kremlib/dist/minimal")
 
 # Config by arch
-set(TARGET_ARCH native CACHE STRING "Options: \"native\", \"armv7\", or \"other\".")
-string(TOLOWER ${TARGET_ARCH} target_arch_lower)
-if(${target_arch_lower} STREQUAL "native")
+if("${target_arch_lower}" STREQUAL "native")
     include(HaclConfig.cmake)
-    message(STATUS "comp defns: ${comp_defns}")
     add_compile_definitions(${comp_defns})
-elseif(${target_arch_lower} STREQUAL "armv7")
-    # todo hf compiler
+elseif("${target_arch_lower}" STREQUAL "armv7")
+    # Make sure whole-project is hard-float
     add_compile_definitions(IS_ARM_7 BROKEN_INTRINSICS IS_NOT_X64 KRML_VERIFIED_UINT128)
     add_compile_definitions(Lib_IntVector_Intrinsics_vec256="void *")
-elseif(${target_arch_lower} STREQUAL "other")
-    message(WARNING "TARGET_ARCH value \"other\" implies cross-compilation to some unknown target. The relevant CMAKE variables will need to be configured manually.")
-else()
-    message(FATAL_ERROR "TARGET_ARCH value \"${TARGET_ARCH}\" is invalid. Please select from: \"native\", \"armv7\", or \"other\".")
+elseif("${target_arch_lower}" STREQUAL "other")
+    message(WARNING "TARGET_ARCH value \"other\" implies cross-compilation to an unspecified target. The relevant CMake variables will need to be configured manually.")
 endif()
 
 # file(GLOB hacl_sources ${hacl_path}/Hacl_Hash.c ${hacl_path}/Hacl_Ed25519.c ${hacl_path}/Hacl_Curve25519_51.c)
