@@ -59,7 +59,7 @@ structure Crypto = struct
              in #(urand) "" buffer;
                 (if Word8Array.sub buffer 0 = ffiFailure
                     then raise Err
-                    else Word8Array.copy buffer 1 8 result 0);
+                    else Word8Array.copy buffer 1 len result 0);
                 result
             end
 

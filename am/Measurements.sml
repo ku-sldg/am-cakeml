@@ -16,8 +16,8 @@ val genFileHash = Crypto.hashFile
 (* fun dooidstring s = Crypto.doidstring s *)
 
 
-(* Gets a 128 bit (16 byte) nonce *)
-val genNonce = rand
+(* val genNonce = rand *)
+fun genNonce () = Crypto.urand 16
 
 fun signEv priv = Crypto.signMsg priv o encodeEv
 
