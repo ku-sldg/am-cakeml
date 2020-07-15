@@ -5,25 +5,22 @@ project(CakemlAM C ASM)
 
 include(CakeMLHelper.cmake)
 
-# CakeML source/dependency lists
-set(core_src
-    util/ByteString.sml crypto/CryptoFFI.sml crypto/Aes256.sml crypto/Random.sml
-    sockets/SocketFFI.sml util/CoqDefaults.sml interp/CoplandLang.sml
-    am/Measurements.sml am/CommTypes.sml interp/Instr.sml JSON/Json.sml
-    JSON/CoplandToJson.sml JSON/JsonToCopland.sml am/CommUtil.sml
-    interp/Eval.sml interp/VM.sml
-)
-set(server_src ${core_src} am/Server.sml)
-set(client_src ${core_src} am/ClientTest.sml)
-set(vmTest_src ${core_src} tests/VmTest.sml)
-set(camkes_src ${core_src} tests/CAmkESTest.sml)
-set(tests_src  ${core_src} tests/Main.sml)
-set(uav_src    ${core_src} uav/Cache.sml uav/Demo.sml)
+set(util_src util/ByteString.sml util/CoqDefaults.sml util/Json.sml)
+set(cop_src ${util_src} copland/Instr.sml copland/AM.sml copland/VM.sml
+    copland/json/CoplandToJson.sml copland/json/JsonToCopland.sml)
+set(crypto_src system/crypto/CryptoFFI.sml)
+set(socket_src system/sockets/SocketFFI.sml)
+set(server_am_src ${cop_src} ${crypto_src} am/Measurements.sml ${socket_src}
+    am/CommTypes.sml am/ServerAm.sml)
+
+set(client_src ${server_am_src} apps/serverClient/ClientTest.sml)
+set(server_src ${server_am_src} apps/serverClient/Server.sml)
+set(tests_src  ${server_am_src} apps/tests/Main.sml)
 
 # Unfortunately, the build process will diverge significantly between
 # standalone executables and CAmkES components
 if(${CAmkES})
-    add_subdirectory(crypto)
+    add_subdirectory(system/crypto)
     cakeml_component(AM
         CML_SOURCES "${camkes_src}"
         C_SOURCES "sockets/dummy_ffi.c"
@@ -75,10 +72,10 @@ else()
     )
 
     # Add targets
-    add_subdirectory(crypto)
+    add_subdirectory(system/crypto)
     function(build_am_thing name)
         build_cake("${name}.cake" SOURCES "${ARGN}")
-        add_executable(${name} ${BASIS} sockets/socket_ffi.c uav/sys/${target_os_lower}/time.c)
+        add_executable(${name} ${BASIS} system/sockets/socket_ffi.c)
         if(${STATIC_LINKING})
             set(link_flags "-static-libgcc -static")
         endif()
@@ -86,8 +83,8 @@ else()
     endfunction()
     build_am_thing("server" ${server_src})
     build_am_thing("client" ${client_src})
-    build_am_thing("vmTest" ${vmTest_src})
+    # build_am_thing("vmTest" ${vmTest_src})
     build_am_thing("tests"  ${tests_src})
-    build_am_thing("uav"    ${uav_src})
+    # build_am_thing("uav"    ${uav_src})
     add_custom_target(am DEPENDS server client)
 endif()

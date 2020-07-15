@@ -1,5 +1,5 @@
-(* Depends on: SocketFFI.sml, Json.sml, JsonToCopland.sml, CoplandToJson.sml,
-               CommTypes.sml, CommUtil.sml and Eval.sml *)
+(* Depends on: util, copland, system/sockets, am/Measurementsm am/CommTypes,
+   am/ServerAm *)
 
 val priv = (ByteString.toRawString o ByteString.fromHexString)
            "2E5773B2A19A2CB05FEE44650D8DC877B3D806F74C199043657C805288CD119B"
@@ -10,16 +10,15 @@ val priv = (ByteString.toRawString o ByteString.fromHexString)
    it returns a raw error message string. In the future, we may want to wrap
    said error messages in JSON as well to make it easier on the client. *)
 fun evalJson s =
-    let val (REQ pl1 pl2 map t ev) = JsonToCopland.jsonToRequest (strToJson s)
-        val ev' = eval pl2 map priv ev t
+    let val (REQ pl1 pl2 map t ev) = jsonToRequest (strToJson s)
+        val am = setMe (serverAm priv emptyNsMap) pl2
+        val ev' = evalTerm am ev t
         val response = RES pl2 pl1 ev'
-     in jsonToStr (CoplandToJson.responseToJson response)
+     in jsonToStr (responseToJson response)
     end
     handle Json.ERR s1 s2 => (TextIO.print_err ("JSON error"^s1^": "^s2^"\n");
                               "Invalid JSON/Copland term")
-         | USMexpn (Id n) => "Invalid USM id: "^(natToString n)^"\n"
-         | KIMexpn (Id n) => "Invalid KIM id: "^(natToString n)^"\n"
-
+         | USMexpn s => "USM error: "^s^"\n"
 
 fun respondToMsg client = Socket.output client (evalJson (Socket.inputAll client))
 

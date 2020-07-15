@@ -1,7 +1,4 @@
-(* Depends on: CoplandLang.sml, ByteString.sml, crypto/Random.sml, and
-   crypto/CryptoFFI.sml*)
-
-val genHash = Crypto.hash o encodeEv
+(* Depends on: copland/Instr.sml, crypto/CryptoFFI.sml*)
 
 fun readFile filename =
     let val fd = TextIO.openIn filename
@@ -10,18 +7,18 @@ fun readFile filename =
         text
     end
 
-(* val genFileHash = Crypto.hashStr o readFile *)
-val genFileHash = Crypto.hashFile
-
 (* fun dooidstring s = Crypto.doidstring s *)
 
-
-(* val genNonce = rand *)
 fun genNonce () = Crypto.urand 16
 
-fun signEv priv = Crypto.signMsg priv o encodeEv
+fun hashFileUsm args = case args of
+      [fileName] => Crypto.hashFile fileName
+    | _ => raise USMexpn "hashFileUsm expects a single argument"
 
+val usmMap = Map.fromList id_compare [(Id O, hashFileUsm)]
+
+(* Appraisal *)
 fun verifySig g pub =
     case g
-      of G _ ev bs => Some (Crypto.sigCheck pub bs (encodeEv ev))
+      of G bs ev => Some (Crypto.sigCheck pub bs (encodeEv ev))
        | _ => None
