@@ -25,14 +25,14 @@ structure Crypto = struct
                     else (Word8Array.copy buffer 1 64 result 0; result)
             end
 
-        (* fun hashDir path exclPath =
+        fun hashDir path exclPath =
             let val result = Word8Array.array 64 (Word8.fromInt 0)
                 val null_byte = Word8Array.array 1 (Word8.fromInt 0)
                 val null_byte_s = ByteString.toRawString null_byte
                 val input = path ^ null_byte_s ^ exclPath ^ null_byte_s
              in #(dirHash) input result;
                 result
-            end *)
+            end
 
         fun signMsg priv msg =
             if String.size priv <> 32 then raise Err else

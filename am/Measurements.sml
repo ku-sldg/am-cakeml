@@ -15,7 +15,15 @@ fun hashFileUsm args = case args of
       [fileName] => Crypto.hashFile fileName
     | _ => raise USMexpn "hashFileUsm expects a single argument"
 
-val usmMap = Map.fromList id_compare [(Id O, hashFileUsm)]
+fun hashDirectoryUSM args =
+    case args
+     of [path,excludedPath] => Crypto.hashDir path excludedPath
+      | [path] => Crypto.hashDir path ""
+      | _ => raise USMexpn "hashDirectoryUSM expects 1 or 2 arguments"
+
+val usmMap = Map.fromList id_compare [(Id O, hashFileUsm),((Id (S O)),hashDirectoryUSM)]
+
+
 
 (* Appraisal *)
 fun verifySig g pub =

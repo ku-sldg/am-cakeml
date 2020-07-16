@@ -12,6 +12,8 @@
 
 #include "Hacl_Hash.h"
 #include "Hacl_Ed25519.h"
+#include "meas.h"
+#include "debug.h"
 
 #define FFI_SUCCESS 0
 #define FFI_FAILURE 1
@@ -21,6 +23,118 @@
 #define PUB_LEN  64
 #define SIG_LEN  64
 
+void ffidirHash(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
+
+  printf("Calling ffidirHash\n\n");
+
+  char *path = (char *) c;
+  char newPath[clen];
+  char excludePath[clen];
+
+  /*
+  printf("path: \n");
+  for(int i = 0; i < clen; i++){
+    printf("%c",path[i]);
+  }
+  printf("\n");
+  */
+
+  int j = 0;
+  for(int i = 0; i < clen; i++){
+    newPath[i] = path[i];
+    if(path[i] == '\0'){
+      j = i;
+      break;
+    }
+  }
+
+  //printf("j: %i\n",j);
+  //printf("clen: %i\n",clen);
+
+  for(int i = j+1, k = 0; i < clen; i++,k++){
+    excludePath[k] = path[i];
+    //printf("path[i] = %c\n",path[i]);
+    if(path[i] == '\0'){
+      //printf("i inside for: %i\n",i);
+      break;  // TODO: do we need this if block?
+    }
+  }
+
+  DEBUG_PRINT("newPath: \n%s\n",newPath);
+  DEBUG_PRINT("excludePath: \n%s\n",excludePath);
+  //return;
+
+
+  unsigned char *digest = malloc(alen);
+
+  int digest_len = 64;
+  unsigned char *message = malloc(digest_len * 2 * sizeof(char));
+
+  // initialize message to all 0s for consistent hash
+  for(int i = 0; i < digest_len * 2; i++){
+    message[i] = 0;
+  }
+
+  /*
+  printf("Initial message: \n");
+  for(int i = 0; i < digest_len * 2; i++){
+    printf("%u",message[i]);
+  }
+  printf("\n");
+  */
+
+  /*
+  #ifdef DOSSL
+  char sslDescrip[10] = "SSL";
+  #else
+  char sslDescrip[10] = "NOT SSL";
+  #endifx
+  */
+
+  DEBUG_PRINT("\n\n");
+
+  //printf("calling doCompositeHash(Using %s)\n",sslDescrip);
+  DEBUG_PRINT("calling doCompositeHashh\n");
+  doCompositeHash(newPath,excludePath,&digest,message);
+  //printf("After doCompositeHash(Using %s)\n",sslDescrip);
+  DEBUG_PRINT("After doCompositeHash\n");
+
+  memcpy(a,digest,alen);
+
+  if(!(digest == NULL))
+    free(digest);
+
+  if(!(message == NULL))
+    free(message);
+}
+
+void ffifileHash(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
+    printf("calling ffifileHash\n\n");
+    assert(alen >= 65);
+
+    const char * filename = (const char *)c;
+    // DEBUG_PRINT("Filename: %s\n", filename);
+
+    size_t file_size = 0;
+    void *file = NULL;
+
+    int res = readFileContents(filename,&file,&file_size);
+    ffi_assert(res == 0);
+    printf("file_size after rfc(%s): %i\n",filename,file_size);
+    printf("file contents after rfc: %s\n",file);
+
+    Hacl_Hash_SHA2_hash_512((uint8_t *)file, (uint32_t)file_size, a+1);
+
+    int err = munmap(file, file_size);
+    ffi_assert(err != -1);
+
+    a[0] = FFI_SUCCESS;
+}
+
+
+
+
+/*
 void ffifileHash(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
     assert(alen >= 65);
 
@@ -38,6 +152,8 @@ void ffifileHash(const uint8_t * c, const long clen, uint8_t * a, const long ale
 
     void * file = mmap((void *)NULL, file_size, PROT_READ, MAP_SHARED, fd, 0);
 
+    printf("file_size after mmap: %i\n",file_size);
+    printf("file contents after mmap: %s\n",file);
     Hacl_Hash_SHA2_hash_512((uint8_t *)file, (uint32_t)file_size, a+1);
 
     err = munmap(file, file_size);
@@ -45,6 +161,9 @@ void ffifileHash(const uint8_t * c, const long clen, uint8_t * a, const long ale
 
     a[0] = FFI_SUCCESS;
 }
+*/
+
+
 
 // Arguments: message to be hashed in c
 // Returns: hash in a

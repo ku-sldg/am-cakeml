@@ -17,6 +17,8 @@ set(client_src ${server_am_src} apps/serverClient/ClientTest.sml)
 set(server_src ${server_am_src} apps/serverClient/Server.sml)
 set(tests_src  ${server_am_src} apps/tests/Main.sml)
 
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DEBUGPRINT=1")
+
 # Unfortunately, the build process will diverge significantly between
 # standalone executables and CAmkES components
 if(${CAmkES})
