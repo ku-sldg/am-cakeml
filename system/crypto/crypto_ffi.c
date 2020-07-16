@@ -18,30 +18,32 @@
 #define FFI_SUCCESS 0
 #define FFI_FAILURE 1
 #define ffi_assert(cond) {if (!(cond)) { a[0] = FFI_FAILURE; return; }}
+#define ffi_fail() {a[0] = FFI_FAILURE; return; }
 
 #define PRIV_LEN 32
 #define PUB_LEN  64
 #define SIG_LEN  64
 
 void ffifileHash(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
-    printf("calling ffifileHash\n\n");
+    DEBUG_PRINT("calling ffifileHash\n\n");
     assert(alen >= 65);
 
     const char * filename = (const char *)c;
     // DEBUG_PRINT("Filename: %s\n", filename);
 
     size_t file_size = 0;
-    void *file = NULL;
 
-    int res = readFileContents(filename,&file,&file_size);
-    ffi_assert(res == 0);
-    printf("file_size after rfc(%s): %i\n",filename,file_size);
-    printf("file contents after rfc: %s\n",file);
+    void * file = mapFileContents(filename, &file_size);
+    ffi_assert(file != NULL);
+    DEBUG_PRINT("file_size after rfc(%s): %i\n",filename,file_size);
+    DEBUG_PRINT("file contents after rfc: %s\n",file);
 
     Hacl_Hash_SHA2_hash_512((uint8_t *)file, (uint32_t)file_size, a+1);
 
     int err = munmap(file, file_size);
-    ffi_assert(err != -1);
+    if (err == -1) {
+        DEBUG_PRINT("Failed to unmap file: %s\n",filename);
+    }
 
     a[0] = FFI_SUCCESS;
 }
@@ -75,58 +77,24 @@ void ffifileHash(const uint8_t * c, const long clen, uint8_t * a, const long ale
 }
 */
 
+#define DIGEST_LEN 64
 void ffidirHash(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
+    DEBUG_PRINT("Calling ffidirHash\n\n");
 
-  printf("Calling ffidirHash\n\n");
+    char * path = (char *)c;
+    char * exclPath = path + strlen(path);
 
-  char *path = (char *) c;
-  char newPath[clen];
-  char excludePath[clen];
+    DEBUG_PRINT("path: \n%s\n", path);
+    DEBUG_PRINT("excludePath: \n%s\n", exclPath);
 
-  int j = 0;
-  for(int i = 0; i < clen; i++){
-    newPath[i] = path[i];
-    if(path[i] == '\0'){
-      j = i;
-      break;
-    }
-  }
+    uint8_t message[DIGEST_LEN *2] = {0}; // initializes to zero
 
-  for(int i = j+1, k = 0; i < clen; i++,k++){
-    excludePath[k] = path[i];
-    if(path[i] == '\0'){
-      break;  // TODO: do we need this if block?
-    }
-  }
+    DEBUG_PRINT("\ncalling doCompositeHashh\n");
+    if(!doCompositeHash(path, exclPath, a+1, (uint8_t *)message))
+        ffi_fail();
+    DEBUG_PRINT("After doCompositeHash\n");
 
-  DEBUG_PRINT("newPath: \n%s\n",newPath);
-  DEBUG_PRINT("excludePath: \n%s\n",excludePath);
-
-  int digest_len = 64;
-  uint8_t *message = malloc(digest_len * 2 * sizeof(char));
-
-  // initialize message to all 0s for consistent hash
-  for(int i = 0; i < digest_len * 2; i++){
-    message[i] = 0;
-  }
-
-  
-  //#ifdef DOSSL
-  //char sslDescrip[10] = "SSL";
-  //#else
-  //char sslDescrip[10] = "NOT SSL";
-  //#endifx
-
-  //printf("calling doCompositeHash(Using %s)\n",sslDescrip);
-  DEBUG_PRINT("\ncalling doCompositeHashh\n");
-  doCompositeHash(newPath,excludePath,a+1,message); //&digest
-  //printf("After doCompositeHash(Using %s)\n",sslDescrip);
-  DEBUG_PRINT("After doCompositeHash\n");
-
-  if(!(message == NULL))
-    free(message);
-
-  a[0] = FFI_SUCCESS;  // TODO: this should depend on a result from doCompositeHash?
+    a[0] = FFI_SUCCESS;  // TODO: this should depend on a result from doCompositeHash?
 }
 
 

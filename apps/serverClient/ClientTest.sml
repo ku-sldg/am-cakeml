@@ -2,7 +2,7 @@
 
 (*val term  = Att (S O) (Lseq (Asp (Aspc (Id O) ["hashTest.txt"])) (Asp Sig))*)
 
-val dir = "/Users/adampetz/Documents/Summer_2019/cakeml-am/test_dir2" (*"/Users/adampetz/Documents/Summer_2019/cakeml-am/copland"*)
+val dir = "/home/grant/lab/cakeml-am/test_dir2" (*"/Users/adampetz/Documents/Summer_2019/cakeml-am/copland"*)
 
 val subterm = (Asp (Aspc (Id (S O)) [dir]))
 val term = Att (S O) (Lseq subterm (Asp Sig))
