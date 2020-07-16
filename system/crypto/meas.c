@@ -20,7 +20,7 @@
 
 #define readFile_assert(cond,i) {if ((!cond)) { return i; }}
 
-void doCompositeHash(const char *basePath, const char *excludePath, uint8_t **digest, uint8_t *message)
+void doCompositeHash(const char *basePath, const char *excludePath, uint8_t *digest, uint8_t *message)
 { 
     if(!strcmp(basePath,excludePath)){
       return;
@@ -56,24 +56,24 @@ void doCompositeHash(const char *basePath, const char *excludePath, uint8_t **di
 
 	  DEBUG_PRINT("Adding hash for: %s\n",newPath);
 	    
-	  hash_file_contents(newPath, digest);
+	  hash_file_contents(newPath, &digest);
 
 	  DEBUG_PRINT("HASH added for path: %s\n",newPath);
 	  //DEBUG_PRINT("Diges len: %i\n",digest_len);
 	    
-	  memcpy(message+digest_len,(*digest),digest_len);
+	  memcpy(message+digest_len,digest,digest_len);
 	  
           //#ifdef DOSSL
 	  //digest_message((unsigned char *)message,digest_len*2, digest, &digest_len);
           //#else
 	  //Hacl_Hash_SHA2_hash_512((uint8_t *)file, (uint32_t)file_size, (*digest));
-	  Hacl_Hash_SHA2_hash_512(message, digest_len*2, (*digest));
+	  Hacl_Hash_SHA2_hash_512(message, digest_len*2, digest);
 	  //sha512((uint8_t *)message,digest_len*2,(uint8_t *)(*digest));
 	  //#endif
 
 	  DEBUG_PRINT("HASH FINAL added for path: %s\n",newPath);
 
-	  memcpy(message,(*digest),digest_len);
+	  memcpy(message,digest,digest_len);
 
 	}
 	// Construct new path from our base path

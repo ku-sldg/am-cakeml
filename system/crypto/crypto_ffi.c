@@ -65,10 +65,10 @@ void ffidirHash(const uint8_t * c, const long clen, uint8_t * a, const long alen
   //return;
 
 
-  unsigned char *digest = malloc(alen);
+  //unsigned char *digest = malloc(alen);
 
   int digest_len = 64;
-  unsigned char *message = malloc(digest_len * 2 * sizeof(char));
+  uint8_t *message = malloc(digest_len * 2 * sizeof(char));
 
   // initialize message to all 0s for consistent hash
   for(int i = 0; i < digest_len * 2; i++){
@@ -95,14 +95,14 @@ void ffidirHash(const uint8_t * c, const long clen, uint8_t * a, const long alen
 
   //printf("calling doCompositeHash(Using %s)\n",sslDescrip);
   DEBUG_PRINT("calling doCompositeHashh\n");
-  doCompositeHash(newPath,excludePath,&digest,message);
+  doCompositeHash(newPath,excludePath,a,message); //&digest
   //printf("After doCompositeHash(Using %s)\n",sslDescrip);
   DEBUG_PRINT("After doCompositeHash\n");
 
-  memcpy(a,digest,alen);
+  //memcpy(a,digest,alen);
 
-  if(!(digest == NULL))
-    free(digest);
+  //if(!(digest == NULL))
+  // free(digest);
 
   if(!(message == NULL))
     free(message);
