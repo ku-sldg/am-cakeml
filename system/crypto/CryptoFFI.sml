@@ -26,12 +26,15 @@ structure Crypto = struct
             end
 
         fun hashDir path exclPath =
-            let val result = Word8Array.array 64 (Word8.fromInt 0)
+            let val buffer = Word8Array.array 65 (Word8.fromInt 0)
+		val result = Word8Array.array 64 (Word8.fromInt 0)
                 val null_byte = Word8Array.array 1 (Word8.fromInt 0)
                 val null_byte_s = ByteString.toRawString null_byte
                 val input = path ^ null_byte_s ^ exclPath ^ null_byte_s
-             in #(dirHash) input result;
-                result
+             in #(dirHash) input buffer;
+	     	if Word8Array.sub buffer 0 = ffiFailure
+                    then ByteString.empty
+                    else (Word8Array.copy buffer 1 64 result 0; result)
             end
 
         fun signMsg priv msg =

@@ -56,7 +56,7 @@ void doCompositeHash(const char *basePath, const char *excludePath, uint8_t *dig
 
 	  DEBUG_PRINT("Adding hash for: %s\n",newPath);
 	    
-	  hash_file_contents(newPath, &digest);
+	  hash_file_contents(newPath, digest);
 
 	  DEBUG_PRINT("HASH added for path: %s\n",newPath);
 	  //DEBUG_PRINT("Diges len: %i\n",digest_len);
@@ -86,7 +86,7 @@ void doCompositeHash(const char *basePath, const char *excludePath, uint8_t *dig
     } 
 }
 
-int hash_file_contents(const char *filename, uint8_t **digest) {
+int hash_file_contents(const char *filename, uint8_t *digest) {
     size_t file_size = 0;
     void *file = NULL;
 
@@ -95,17 +95,12 @@ int hash_file_contents(const char *filename, uint8_t **digest) {
     printf("file_size after rfc(%s): %i\n",filename,file_size);
     printf("file contents after rfc: %s\n",file);
 
-    Hacl_Hash_SHA2_hash_512((uint8_t *)file, (uint32_t)file_size, (*digest));
+    Hacl_Hash_SHA2_hash_512((uint8_t *)file, (uint32_t)file_size, digest);
 
     int err = munmap(file, file_size);
     readFile_assert((err != -1),-4);
 
     return 0;
-
-
-
-
-
 
   /*
   DEBUG_PRINT("Start of hash_file_contents\n");

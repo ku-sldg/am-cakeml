@@ -23,6 +23,29 @@
 #define PUB_LEN  64
 #define SIG_LEN  64
 
+void ffifileHash(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
+    printf("calling ffifileHash\n\n");
+    assert(alen >= 65);
+
+    const char * filename = (const char *)c;
+    // DEBUG_PRINT("Filename: %s\n", filename);
+
+    size_t file_size = 0;
+    void *file = NULL;
+
+    int res = readFileContents(filename,&file,&file_size);
+    ffi_assert(res == 0);
+    printf("file_size after rfc(%s): %i\n",filename,file_size);
+    printf("file contents after rfc: %s\n",file);
+
+    Hacl_Hash_SHA2_hash_512((uint8_t *)file, (uint32_t)file_size, a+1);
+
+    int err = munmap(file, file_size);
+    ffi_assert(err != -1);
+
+    a[0] = FFI_SUCCESS;
+}
+
 void ffidirHash(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
 
   printf("Calling ffidirHash\n\n");
@@ -95,7 +118,7 @@ void ffidirHash(const uint8_t * c, const long clen, uint8_t * a, const long alen
 
   //printf("calling doCompositeHash(Using %s)\n",sslDescrip);
   DEBUG_PRINT("calling doCompositeHashh\n");
-  doCompositeHash(newPath,excludePath,a,message); //&digest
+  doCompositeHash(newPath,excludePath,a+1,message); //&digest
   //printf("After doCompositeHash(Using %s)\n",sslDescrip);
   DEBUG_PRINT("After doCompositeHash\n");
 
@@ -106,29 +129,8 @@ void ffidirHash(const uint8_t * c, const long clen, uint8_t * a, const long alen
 
   if(!(message == NULL))
     free(message);
-}
 
-void ffifileHash(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
-    printf("calling ffifileHash\n\n");
-    assert(alen >= 65);
-
-    const char * filename = (const char *)c;
-    // DEBUG_PRINT("Filename: %s\n", filename);
-
-    size_t file_size = 0;
-    void *file = NULL;
-
-    int res = readFileContents(filename,&file,&file_size);
-    ffi_assert(res == 0);
-    printf("file_size after rfc(%s): %i\n",filename,file_size);
-    printf("file contents after rfc: %s\n",file);
-
-    Hacl_Hash_SHA2_hash_512((uint8_t *)file, (uint32_t)file_size, a+1);
-
-    int err = munmap(file, file_size);
-    ffi_assert(err != -1);
-
-    a[0] = FFI_SUCCESS;
+  a[0] = FFI_SUCCESS;  // TODO: this should depend on a result from doCompositeHash
 }
 
 
