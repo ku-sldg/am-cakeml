@@ -46,96 +46,6 @@ void ffifileHash(const uint8_t * c, const long clen, uint8_t * a, const long ale
     a[0] = FFI_SUCCESS;
 }
 
-void ffidirHash(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
-
-  printf("Calling ffidirHash\n\n");
-
-  char *path = (char *) c;
-  char newPath[clen];
-  char excludePath[clen];
-
-  /*
-  printf("path: \n");
-  for(int i = 0; i < clen; i++){
-    printf("%c",path[i]);
-  }
-  printf("\n");
-  */
-
-  int j = 0;
-  for(int i = 0; i < clen; i++){
-    newPath[i] = path[i];
-    if(path[i] == '\0'){
-      j = i;
-      break;
-    }
-  }
-
-  //printf("j: %i\n",j);
-  //printf("clen: %i\n",clen);
-
-  for(int i = j+1, k = 0; i < clen; i++,k++){
-    excludePath[k] = path[i];
-    //printf("path[i] = %c\n",path[i]);
-    if(path[i] == '\0'){
-      //printf("i inside for: %i\n",i);
-      break;  // TODO: do we need this if block?
-    }
-  }
-
-  DEBUG_PRINT("newPath: \n%s\n",newPath);
-  DEBUG_PRINT("excludePath: \n%s\n",excludePath);
-  //return;
-
-
-  //unsigned char *digest = malloc(alen);
-
-  int digest_len = 64;
-  uint8_t *message = malloc(digest_len * 2 * sizeof(char));
-
-  // initialize message to all 0s for consistent hash
-  for(int i = 0; i < digest_len * 2; i++){
-    message[i] = 0;
-  }
-
-  /*
-  printf("Initial message: \n");
-  for(int i = 0; i < digest_len * 2; i++){
-    printf("%u",message[i]);
-  }
-  printf("\n");
-  */
-
-  /*
-  #ifdef DOSSL
-  char sslDescrip[10] = "SSL";
-  #else
-  char sslDescrip[10] = "NOT SSL";
-  #endifx
-  */
-
-  DEBUG_PRINT("\n\n");
-
-  //printf("calling doCompositeHash(Using %s)\n",sslDescrip);
-  DEBUG_PRINT("calling doCompositeHashh\n");
-  doCompositeHash(newPath,excludePath,a+1,message); //&digest
-  //printf("After doCompositeHash(Using %s)\n",sslDescrip);
-  DEBUG_PRINT("After doCompositeHash\n");
-
-  //memcpy(a,digest,alen);
-
-  //if(!(digest == NULL))
-  // free(digest);
-
-  if(!(message == NULL))
-    free(message);
-
-  a[0] = FFI_SUCCESS;  // TODO: this should depend on a result from doCompositeHash
-}
-
-
-
-
 /*
 void ffifileHash(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
     assert(alen >= 65);
@@ -164,6 +74,60 @@ void ffifileHash(const uint8_t * c, const long clen, uint8_t * a, const long ale
     a[0] = FFI_SUCCESS;
 }
 */
+
+void ffidirHash(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
+
+  printf("Calling ffidirHash\n\n");
+
+  char *path = (char *) c;
+  char newPath[clen];
+  char excludePath[clen];
+
+  int j = 0;
+  for(int i = 0; i < clen; i++){
+    newPath[i] = path[i];
+    if(path[i] == '\0'){
+      j = i;
+      break;
+    }
+  }
+
+  for(int i = j+1, k = 0; i < clen; i++,k++){
+    excludePath[k] = path[i];
+    if(path[i] == '\0'){
+      break;  // TODO: do we need this if block?
+    }
+  }
+
+  DEBUG_PRINT("newPath: \n%s\n",newPath);
+  DEBUG_PRINT("excludePath: \n%s\n",excludePath);
+
+  int digest_len = 64;
+  uint8_t *message = malloc(digest_len * 2 * sizeof(char));
+
+  // initialize message to all 0s for consistent hash
+  for(int i = 0; i < digest_len * 2; i++){
+    message[i] = 0;
+  }
+
+  
+  //#ifdef DOSSL
+  //char sslDescrip[10] = "SSL";
+  //#else
+  //char sslDescrip[10] = "NOT SSL";
+  //#endifx
+
+  //printf("calling doCompositeHash(Using %s)\n",sslDescrip);
+  DEBUG_PRINT("\ncalling doCompositeHashh\n");
+  doCompositeHash(newPath,excludePath,a+1,message); //&digest
+  //printf("After doCompositeHash(Using %s)\n",sslDescrip);
+  DEBUG_PRINT("After doCompositeHash\n");
+
+  if(!(message == NULL))
+    free(message);
+
+  a[0] = FFI_SUCCESS;  // TODO: this should depend on a result from doCompositeHash?
+}
 
 
 
