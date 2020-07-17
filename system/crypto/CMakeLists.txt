@@ -57,7 +57,7 @@ set_source_files_properties(${hacl_sources} PROPERTIES GENERATED True)
 
 # Crypto library
 # add_library(crypto STATIC crypto_ffi.c sys/${sys}/crypto_ffi.c meas.c ${hacl_sources})
-add_library(crypto STATIC crypto_ffi.c sys/${sys}/crypto_ffi.c ${hacl_sources})
+add_library(crypto STATIC crypto_ffi.c meas.c sys/${sys}/crypto_ffi.c ${hacl_sources})
 include_directories(BEFORE ${hacl_path} ${kremlin_path} ${kremlib_path})
 target_link_libraries(crypto ${cryptoLinks})
 add_dependencies(crypto hacl-star)

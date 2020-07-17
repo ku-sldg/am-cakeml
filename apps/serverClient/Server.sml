@@ -18,7 +18,7 @@ fun evalJson s =
     end
     handle Json.ERR s1 s2 => (TextIO.print_err ("JSON error"^s1^": "^s2^"\n");
                               "Invalid JSON/Copland term")
-         | USMexpn s => "USM error: "^s^"\n"
+         | USMexpn s => (TextIO.print_err ("USM error: "^s^"\n"); "USM failure")
 
 fun respondToMsg client = Socket.output client (evalJson (Socket.inputAll client))
 
@@ -35,6 +35,7 @@ fun startServer port qLen =
      in loop handleIncoming (Socket.listen port qLen)
     end
     handle Socket.Err => TextIO.print_err "Socket failure on listener instantiation\n"
+         | Crypto.Err => TextIO.print_err "Crypto error\n"
          | _          => TextIO.print_err "Fatal: unknown error\n"
 
 fun main () =

@@ -1,14 +1,8 @@
 // FFI interface to our verified crypto algorithms.
 
-#include <assert.h> // asserts
+#include <assert.h>
 #include <stddef.h>
-#include <stdint.h> // uint8_t and uint32_t types
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <sys/mman.h>
-#include <string.h>
+#include <stdint.h>
 
 #include "Hacl_Hash.h"
 #include "Hacl_Ed25519.h"
@@ -20,31 +14,6 @@
 #define PRIV_LEN 32
 #define PUB_LEN  64
 #define SIG_LEN  64
-
-void ffifileHash(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
-    assert(alen >= 65);
-
-    const char * filename = (const char *)c;
-    // DEBUG_PRINT("Filename: %s\n", filename);
-
-    int fd = open(filename, O_RDONLY);
-    ffi_assert(fd != -1);
-
-    struct stat st;
-    int err = stat(filename, &st);
-    ffi_assert(err != -1);
-    size_t file_size = (size_t)st.st_size;
-    ffi_assert(file_size > 0);
-
-    void * file = mmap((void *)NULL, file_size, PROT_READ, MAP_SHARED, fd, 0);
-
-    Hacl_Hash_SHA2_hash_512((uint8_t *)file, (uint32_t)file_size, a+1);
-
-    err = munmap(file, file_size);
-    ffi_assert(err != -1);
-
-    a[0] = FFI_SUCCESS;
-}
 
 // Arguments: message to be hashed in c
 // Returns: hash in a
