@@ -1,3 +1,8 @@
+# About
+A Copland Attestation Manager (AM). See [here](https://ku-sldg.github.io/copland/) for more information about Copland.
+
+This project makes use of formally verified components, including the CakeML compiler, and the EverCrypt crypto implementations. It aims for portability, targeting minimal environments such as seL4.
+
 # Building
 
 The following documents the process of building standalone executables for Linux and MacOS.
