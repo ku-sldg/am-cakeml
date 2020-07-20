@@ -20,7 +20,9 @@ Create a build directory at the top level of the source tree, then invoke cmake 
 
 If you need to make changes to the default configuration, type `ccmake ..` to bring up the graphical interface. (See the following section for more details.)
 
-Finally, type `make <target>`, where `<target>` is `server`, `client`, `tests`, etc. Refer to the `apps` directory for the full list of targets.
+To build the test suite, type `make tests`.
+
+To build another target, type `make <target>`. Refer to the `apps` directory for the full list of targets.
 
 ### Configuration
 From the build directory, type `ccmake ..` to bring up the configuration GUI. Hovering over a variable displays some documentation at the bottom of the screen. After you make changes, press `c` then `g` to save your changes.
