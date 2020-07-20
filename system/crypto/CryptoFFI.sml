@@ -2,7 +2,7 @@
 
 (* Safe wrappers to FFI crypto functions *)
 structure Crypto = struct
-    exception Err
+    exception Err string
 
     local
         val ffiSuccess = Word8.fromInt 0
@@ -21,7 +21,7 @@ structure Crypto = struct
                 val result = Word8Array.array 64 (Word8.fromInt 0)
              in #(fileHash) filename buffer;
                 if Word8Array.sub buffer 0 = ffiFailure
-                    then raise Err
+                    then raise (Err ("hashFile FFI Failure, perhaps could not find file: " ^ filename))
                     else (Word8Array.copy buffer 1 64 result 0; result)
             end
 
@@ -32,12 +32,12 @@ structure Crypto = struct
                 val input = path ^ null_byte_s ^ exclPath ^ null_byte_s
              in #(dirHash) input buffer;
                 if Word8Array.sub buffer 0 = ffiFailure
-                    then raise Err
+                    then raise (Err ("hadhDir FFI Failure, perhaps could not find directory: " ^ path))
                     else (Word8Array.copy buffer 1 64 result 0; result)
             end
 
         fun signMsg priv msg =
-            if String.size priv <> 32 then raise Err else
+            if String.size priv <> 32 then raise (Err "Wrong private key size, Error in signMsg FFI") else
             let val result  = Word8Array.array 64 (Word8.fromInt 0)
                 val payload = priv ^ (ByteString.toRawString msg)
              in #(signMsg) payload result;
@@ -46,7 +46,7 @@ structure Crypto = struct
 
         (* sigCheck : string -> ByteString.bs -> ByteString.bs -> ByteString.bs *)
         fun sigCheck pub sign msg =
-            if String.size pub <> 64 then raise Err else
+            if String.size pub <> 64 then raise (Err "Wrong public key size, Error in sigCheck FFI") else
             let val result  = Word8Array.array 1 (Word8.fromInt 0)
                 val payload = pub ^ (ByteString.toRawString sign)
                                   ^ (ByteString.toRawString msg)
@@ -60,7 +60,7 @@ structure Crypto = struct
                 val result = Word8Array.array len (Word8.fromInt 0)
              in #(urand) "" buffer;
                 (if Word8Array.sub buffer 0 = ffiFailure
-                    then raise Err
+                    then raise (Err "urand FFI Failure")
                     else Word8Array.copy buffer 1 len result 0);
                 result
             end

@@ -27,15 +27,15 @@ fun handleIncoming listener =
      in respondToMsg client;
         Socket.close client
     end
-    handle Socket.Err       => TextIO.print_err "Socket failure\n"
+    handle Socket.Err s     => TextIO.print_err ("Socket failure: " ^ s ^ "\n")
          | Socket.InvalidFD => TextIO.print_err "Invalid file descriptor\n"
 
 fun startServer port qLen =
     let fun loop f x = (f x; loop f x)
      in loop handleIncoming (Socket.listen port qLen)
     end
-    handle Socket.Err => TextIO.print_err "Socket failure on listener instantiation\n"
-         | Crypto.Err => TextIO.print_err "Crypto error\n"
+    handle Socket.Err s => TextIO.print_err ("Socket failure on listener instantiation: " ^ s ^ "\n")
+         | Crypto.Err s => TextIO.print_err ("Crypto error: " ^ s ^ "\n")
          | _          => TextIO.print_err "Fatal: unknown error\n"
 
 fun main () =

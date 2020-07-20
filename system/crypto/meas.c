@@ -53,6 +53,10 @@ void ffidirHash(const uint8_t * c, const long clen, uint8_t * a, const long alen
     DEBUG_PRINT("Calling ffidirHash\n\n");
 
     char * path = (char *)c;
+
+    struct stat sb;
+    ffi_assert (stat(path, &sb) == 0 && S_ISDIR(sb.st_mode));
+
     char * exclPath = path + strlen(path);
 
     DEBUG_PRINT("path: \n%s\n", path);

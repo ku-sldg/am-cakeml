@@ -5,6 +5,10 @@ val am = serverAm "" emptyNsMap
 
 (* Examples *)
 
+val goldenFileHash = "DDAF35A193617ABACC417349AE20413112E6FA4E89A97EA20A9EEEE64B55D39A2192992A274FC1A836BA3C23A3FEEBBD454D4423643CE80E2A9AC94FA54CA49F"
+
+val goldenDirHash = "ABB6B162CD1C782999C2991E13A5038DA559E822EBECBDA4CBF2B5A188EE0D1A2E84C8CB996C39AE0E5D988538B626EA84F038A3A6D59C658449677A65EF4351" 
+
 (*
 The first hash test hashes the string "abc". This is the first example provided
 by NIST in their document "Descriptions of SHA-256, SHA-384, and SHA-512",
@@ -15,27 +19,43 @@ The second hashes a file called "hashTest.txt". This contains the exact same
 string (without a final newline char, despite editors really wanting to insert
 one) so we can again compare against the desired result.
 
-Expected result: 0xDDAF35A193617ABACC417349AE20413112E6FA4E89A97EA20A9EEEE64B55D39A2192992A274FC1A836BA3C23A3FEEBBD454D4423643CE80E2A9AC94FA54CA49F
+Expected result:
+0xDDAF35A193617ABACC417349AE20413112E6FA4E89A97EA20A9EEEE64B55D39A2192992A274FC1A836BA3C23A3FEEBBD454D4423643CE80E2A9AC94FA54CA49F
 *)
+
 fun hashTests () =
     let val evidence = H (ByteString.fromRawString "abc")
         val hashTest = evToString (evalTerm am evidence (Asp Hsh))
-        val hashFile = (ByteString.show (Crypto.hashFile "hashTest.txt"))
-            handle _ => "ERROR: could not find 'hashTest.txt' in the present working directory"
+	val hashFilev = (Crypto.hashFile "hashTest.txt")
+	val hashFileS = (ByteString.show hashFilev)
+            handle (Crypto.Err s) => "ERROR: " ^ s
      in print ("Hash test: "      ^ hashTest  ^ "\n\n" ^
-               "Hash file test: " ^ hashFile  ^ "\n\n" )
+               "Hash file test: \n" ^ hashFileS ^ "\n" ^
+	       (if(ByteString.toHexString hashFilev = goldenFileHash) then "Golden Value Check:  Passed" else "Golden Value Check:  Failed") ^ "\n\n")
     end
+
+
+(*
+This test hashes a directory called testDir.
+
+Expected result(composite hash):
+0xABB6B162CD1C782999C2991E13A5038DA559E822EBECBDA4CBF2B5A188EE0D1A2E84C8CB996C39AE0E5D988538B626EA84F038A3A6D59C658449677A65EF4351
+*)
+fun hashDirTest () =
+    let val hashDirv = (Crypto.hashDir "testDir" "")
+        val hashDirS = (ByteString.show hashDirv)
+            handle (Crypto.Err s) => "ERROR: " ^ s
+     in print ("Hash directory test: \n" ^ hashDirS ^ "\n" ^
+              (if(ByteString.toHexString hashDirv = goldenDirHash) then "Golden Value Check:  Passed" else "Golden Value Check:  Failed") ^ "\n\n")
+    end
+
+
+
 
 (* Just prints a nonce. It's difficult to determine the quality of a single
    random number though. At the very least, we can verify a new number is
    printed at each invocation. *)
 fun nonceTest () = print ("Nonce test: " ^ ByteString.show (genNonce ()) ^ "\n\n")
-
-(* fun idstringTest () =
-    let val s = "asdffdsa"
-    in print ("idstring(" ^ s ^ "): " ^ (ByteString.show (dooidstring (s))) ^ "\n\n")
-    end *)
-
 
 (*
 The purpose of this function is to create a large file of random bytes, to
@@ -70,8 +90,8 @@ fun sigTest () =
 (* Run all tests *)
 fun main () = (
     hashTests ();
+    hashDirTest ();
     nonceTest ();
-    (* idstringTest(); *)
     sigTest ()
     ) handle _ => TextIO.print_err "Fatal: unknown error\n"
 val _ = main ()
