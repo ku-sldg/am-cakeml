@@ -44,8 +44,8 @@ else()
     endif()
     find_file(BASIS NAMES "basis_ffi.c" PATHS "~/cake-x64-64/" "/cake-x64-64/" "~/cake-x64-32/" "/cake-x64-32/"
                     DOC "The \"basis_ffi.c\" file bundled with the CakeML compiler.")
-    if("${BASIS}" STREQUAL "basis-NOTFOUND")
-        message(WARNING "No \"basis_ffi.c\" file found! Please set the \"BASIS\" variable manually.")
+    if("${BASIS}" STREQUAL "BASIS-NOTFOUND")
+        message(FATAL_ERROR "No \"basis_ffi.c\" file found! Please set the \"BASIS\" variable manually.")
     endif()
 
     # Arch Config
