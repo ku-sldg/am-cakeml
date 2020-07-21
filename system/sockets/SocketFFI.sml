@@ -3,7 +3,7 @@
 (* Safe(ish) wrapper to FFI socket functions *)
 structure Socket = struct
     (* Generic socket exception *)
-    exception Err
+    exception Err string
 
     local
         (* Shared/reused buffers *)
@@ -24,7 +24,7 @@ structure Socket = struct
                 val _ = #(listen) c fdbuf
             in
                 if Word8Array.sub fdbuf 0 = Word8.fromInt 1
-                    then raise Err
+                    then raise (Err "Error in listen()")
                     else Fd (Word8Array.substring fdbuf 1 8)
             end
 
@@ -35,7 +35,7 @@ structure Socket = struct
                 val _ = #(accept) (getFd sockfd) fdbuf
             in
                 if Word8Array.sub fdbuf 0 = Word8.fromInt 1
-                    then raise Err
+                    then raise (Err "Error in accept()")
                     else Fd (Word8Array.substring fdbuf 1 8)
             end
 
@@ -47,7 +47,7 @@ structure Socket = struct
                 val _ = #(connect) c fdbuf
             in
                 if Word8Array.sub fdbuf 0 = Word8.fromInt 1
-                    then raise Err
+                    then raise (Err "Error in connect()")
                     else Fd (Word8Array.substring fdbuf 1 8)
             end
 

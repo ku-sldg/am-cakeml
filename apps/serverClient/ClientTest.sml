@@ -38,7 +38,7 @@ fun sendReq addr =
                     | Err msg => "failed: " ^ msg ^ "\n")
               )
     end
-    handle Socket.Err       => TextIO.print_err "Socket failure on connection\n"
+    handle Socket.Err s     => TextIO.print_err ("Socket failure on connection: " ^ s ^ "\n")
          | Socket.InvalidFD => TextIO.print_err "Invalid file descriptor\n"
          | DispatchErr s    => TextIO.print_err ("Dispatch error: "^s^"\n")
          | _                => TextIO.print_err "Fatal: unknown error\n"

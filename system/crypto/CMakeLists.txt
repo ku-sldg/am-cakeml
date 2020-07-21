@@ -13,6 +13,8 @@ else()
     # set(cryptoLinks "m")
 endif()
 
+#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DDEBUGPRINT")
+
 # Fetch hacl-star v0.2.1
 # ExternalProject_Add(hacl-star
 #     URL https://github.com/project-everest/hacl-star/releases/download/v0.2.1/hacl-star-v0.2.1.tar.bz2
