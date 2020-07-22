@@ -13,9 +13,11 @@ set(socket_src system/sockets/SocketFFI.sml)
 set(server_am_src ${cop_src} ${crypto_src} am/Measurements.sml ${socket_src}
     am/CommTypes.sml am/ServerAm.sml)
 
+set(tests_src  ${server_am_src} apps/tests/Main.sml)
 set(client_src ${server_am_src} apps/serverClient/ClientTest.sml)
 set(server_src ${server_am_src} apps/serverClient/Server.sml)
-set(tests_src  ${server_am_src} apps/tests/Main.sml)
+
+set(gs_src ${server_am_src} apps/case/Groundstation.sml)
 
 # Unfortunately, the build process will diverge significantly between
 # standalone executables and CAmkES components
@@ -81,10 +83,12 @@ else()
         endif()
         target_link_libraries(${name} "${name}.cake" crypto ${link_flags})
     endfunction()
+
+    build_am_thing("tests"  ${tests_src})
+
     build_am_thing("server" ${server_src})
     build_am_thing("client" ${client_src})
-    # build_am_thing("vmTest" ${vmTest_src})
-    build_am_thing("tests"  ${tests_src})
-    # build_am_thing("uav"    ${uav_src})
     add_custom_target(am DEPENDS server client)
+    
+    build_am_thing("groundstation" ${gs_src})
 endif()
