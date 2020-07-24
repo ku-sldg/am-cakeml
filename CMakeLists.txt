@@ -8,7 +8,8 @@ include(CakeMLHelper.cmake)
 set(util_src util/ByteString.sml util/CoqDefaults.sml util/Json.sml)
 set(cop_src ${util_src} copland/Instr.sml copland/AM.sml copland/VM.sml
     copland/json/CoplandToJson.sml copland/json/JsonToCopland.sml)
-set(crypto_src system/crypto/CryptoFFI.sml)
+# TODO: separate meas from crypto
+set(crypto_src system/crypto/CryptoFFI.sml system/crypto/MeasFFI.sml)
 set(socket_src system/sockets/SocketFFI.sml)
 set(server_am_src ${cop_src} ${crypto_src} am/Measurements.sml ${socket_src}
     am/CommTypes.sml am/ServerAm.sml)
@@ -89,6 +90,6 @@ else()
     build_am_thing("server" ${server_src})
     build_am_thing("client" ${client_src})
     add_custom_target(am DEPENDS server client)
-    
+
     build_am_thing("groundstation" ${gs_src})
 endif()

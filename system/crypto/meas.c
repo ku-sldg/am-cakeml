@@ -8,6 +8,7 @@
 #include <string.h>
 #include <dirent.h>
 #include <stdlib.h>
+#include <stddef.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -16,8 +17,9 @@
 #include <string.h>
 
 #include "debug.h"
-#include "Hacl_Hash.h"
 #include "meas.h"
+
+#include "Hacl_Hash.h"
 
 #define FFI_SUCCESS 0
 #define FFI_FAILURE 1
@@ -171,4 +173,53 @@ void * mapFileContents(const char * filename, size_t * file_size){
 
     *file_size = file_size_v;
     return mmap((void *)NULL, file_size_v, PROT_READ, MAP_SHARED, fd, 0);
+}
+
+// Returns 1 (true) for success, 0 (false) for failure
+int hash_region(char * pid, long addr, size_t len, uint8_t * hash) {
+    char path_buf[256];
+    int err = sprintf(path_buf, "/proc/%s/mem", pid);
+    if (err < 0) return 0;
+
+    FILE * stream = fopen(path_buf, "r");
+    if (!stream) {
+        DEBUG_PRINT("Failed to open %s\n", path_buf);
+        return 0;
+    }
+
+    void * region = malloc(len);
+    err = fseek(stream, addr, SEEK_SET);
+    if (err == -1) {
+        DEBUG_PRINT("fseek failed\n");
+        fclose(stream);
+        free(region);
+        return 0;
+    }
+    int numRead = fread(region, 1, len, stream);
+    fclose(stream);
+    if (numRead < len) {
+        DEBUG_PRINT("fread failed\n");
+        free(region);
+        return 0;
+    }
+
+    Hacl_Hash_SHA2_hash_512((uint8_t *)region, len, hash);
+
+    free(region);
+    return 1;
+}
+
+void ffihashRegion(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
+    assert(clen >= 3);
+    assert(alen >= 65);
+
+    char * pid = (char *)c;
+    char * addrHex = pid + strlen(pid);
+    char * lenHex  = addrHex + strlen(addrHex);
+
+    long addr = strtol(addrHex, NULL, 16);
+    long len  = strtol(lenHex,  NULL, 16);
+
+    int good = hash_region(pid, addr, (size_t)len, a+1);
+    a[0] = good ? FFI_SUCCESS : FFI_FAILURE;
 }

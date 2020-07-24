@@ -1,4 +1,4 @@
-(* Depends on: copland/Instr.sml, crypto/CryptoFFI.sml*)
+(* Depends on: copland/Instr, crypto/CryptoFFI, crypto/Meas *)
 
 fun readFile filename =
     let val fd = TextIO.openIn filename
@@ -12,15 +12,15 @@ fun readFile filename =
 fun genNonce () = Crypto.urand 16
 
 fun hashFileUsm args = (case args of
-      [fileName] => Crypto.hashFile fileName
+      [fileName] => Meas.hashFile fileName
     | _ => raise USMexpn "hashFileUsm expects a single argument"
-) handle Crypto.Err x => raise USMexpn ("hashFileUsm failed, possibly failed to find file: " ^ x)
+) handle Meas.Err x => raise USMexpn ("hashFileUsm failed, possibly failed to find file: " ^ x)
 
 fun hashDirectoryUSM args = (case args of
-      [path,excludedPath] => Crypto.hashDir path excludedPath
-    | [path] => Crypto.hashDir path ""
+      [path,excludedPath] => Meas.hashDir path excludedPath
+    | [path] => Meas.hashDir path ""
     | _ => raise USMexpn "hashDirectoryUSM expects 1 or 2 arguments"
-) handle Crypto.Err x => raise USMexpn ("hashDirectoryUSM failed, , possibly failed to find directory: " ^ x)
+) handle Meas.Err x => raise USMexpn ("hashDirectoryUSM failed, , possibly failed to find directory: " ^ x)
 
 val usmMap = Map.fromList id_compare [(Id O, hashFileUsm),((Id (S O)),hashDirectoryUSM)]
 
