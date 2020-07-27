@@ -1,15 +1,20 @@
-(* Depends on: copland/Instr, crypto/CryptoFFI, crypto/Meas *)
+(* Depends on: util, copland/Instr, system/crypto *)
 
+(* Crypto *)
+fun verifySig g pub =
+    case g
+      of G bs ev => Some (Crypto.sigCheck pub bs (encodeEv ev))
+       | _ => None
+
+fun genNonce () = Crypto.urand 16
+
+(* Meas *)
 fun readFile filename =
     let val fd = TextIO.openIn filename
         val text = TextIO.inputAll fd
      in TextIO.closeIn fd;
         text
     end
-
-(* fun dooidstring s = Crypto.doidstring s *)
-
-fun genNonce () = Crypto.urand 16
 
 fun hashFileUsm args = (case args of
       [fileName] => Meas.hashFile fileName
@@ -24,10 +29,36 @@ fun hashDirectoryUSM args = (case args of
 
 val usmMap = Map.fromList id_compare [(Id O, hashFileUsm),((Id (S O)),hashDirectoryUSM)]
 
+val words = String.tokens Char.isSpace
+val lines = String.tokens (op = #"\n")
 
+(* Requires root priveleges *)
+fun getMaps pid =
+    let fun parseAddr str =
+            let val [addr1, addr2] = String.tokens (op = #"-") str
+             in (addr1, addr2)
+            end
+        fun parsePerms str =
+            (String.sub str 0 = #"r",
+             String.sub str 1 = #"w",
+             String.sub str 2 = #"x",
+             String.sub str 3 = #"p")
+        fun parseLine line = case words line of
+              [addr, perms, _, _, _, name] =>
+                  Some (parseAddr addr, parsePerms perms, name)
+            | [addr, perms, _, _, _] =>
+                  Some (parseAddr addr, parsePerms perms, "")
+            | _ => None
+            handle _ => None
+        fun parseMaps str = List.mapPartial parseLine (lines str)
+     in parseMaps (readFile ("/proc/" ^ pid ^ "/maps"))
+    end
 
-(* Appraisal *)
-fun verifySig g pub =
-    case g
-      of G bs ev => Some (Crypto.sigCheck pub bs (encodeEv ev))
-       | _ => None
+fun measProc pid = 
+    let fun hashable (_, (r, w, x, _), _) = r andalso not w andalso x
+        val sections = List.filter hashable (getMaps pid)
+        fun hashSect ((sAddr, eAddr), _, _) = Meas.hashRegion pid sAddr eAddr
+        val hashes = List.map hashSect sections
+        val xored  = List.foldr (ByteString.xor) ByteString.empty hashes
+     in Crypto.hash xored
+    end 

@@ -214,11 +214,11 @@ void ffihashRegion(const uint8_t * c, const long clen, uint8_t * a, const long a
     assert(alen >= 65);
 
     char * pid = (char *)c;
-    char * addrHex = pid + strlen(pid);
-    char * lenHex  = addrHex + strlen(addrHex);
+    char * startHex = pid + strlen(pid);
+    char * endHex = startHex + strlen(startHex);
 
-    long addr = strtol(addrHex, NULL, 16);
-    long len  = strtol(lenHex,  NULL, 16);
+    long addr = strtol(startHex, NULL, 16);
+    long len  = strtol(endHex,   NULL, 16) - addr;
 
     int good = hash_region(pid, addr, (size_t)len, a+1);
     a[0] = good ? FFI_SUCCESS : FFI_FAILURE;

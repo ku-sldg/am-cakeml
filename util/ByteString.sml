@@ -165,17 +165,21 @@ structure ByteString = struct
             arr
         end
 
-    (* Warning: the next two functions are very ad hoc *)
-
-    (* bs1 and bs2 should be the same size. If they aren't, the returned
-       ByteString will be the size of the smaller input, and the xor will
-       be performed from the left side (e.g. 0x00F xor 0xFF = 0xFF). *)
-    fun xor bs1 bs2 =
-        let val len = min (length bs1) (length bs2)
-            val arr = Word8Array.array len zeroByte
-            fun xor_aux i =
-                if i < len then (
-                    Word8Array.update arr i (Word8.xorb (Word8Array.sub bs1 i) (Word8Array.sub bs2 i));
+    (* If bs1 and bs2 are not the the same length, the smaller one will 
+       be conceptually left-padded with zeros. *)
+    fun xor bs1 bs2 = 
+        let val (small, smallLen, big, bigLen) =
+            let val bs1Len = length bs1 
+                val bs2Len = length bs2 
+             in if bs1Len < bs2Len
+                  then (bs1, bs1Len, bs2, bs2Len)
+                  else (bs2, bs2Len, bs1, bs1Len)
+            end
+            val arr = copy big
+            val off = bigLen - smallLen
+            fun xor_aux i = 
+                if i < smallLen then (
+                    Word8Array.update arr i (Word8.xorb (Word8Array.sub big (i+off)) (Word8Array.sub small i));
                     xor_aux (i+1)
                 ) else arr
          in xor_aux 0

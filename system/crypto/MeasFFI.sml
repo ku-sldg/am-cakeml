@@ -28,13 +28,13 @@ structure Meas = struct
                     else (Word8Array.copy buffer 1 64 result 0; result)
             end
 
-        (* pid in decimal, addr and len in hex *)
+        (* pid in decimal, start and end in hex *)
         (* string -> string -> string -> ByteString.bs *)
-        fun hashRegion pid addr len =
+        fun hashRegion pid startAddr endAddr =
             let val buffer = Word8Array.array 65 (Word8.fromInt 0)
                 val result = Word8Array.array 64 (Word8.fromInt 0)
                 val null   = String.str (Char.chr 0)
-                val input  = pid ^ null ^ addr ^ null ^ len
+                val input  = pid ^ null ^ startAddr ^ null ^ endAddr
              in #(hashRegion) input buffer;
                 if Word8Array.sub buffer 0 = ffiFailure
                     then raise (Err ("hashRegion FFI Failure, perhaps did not have privileges"))
