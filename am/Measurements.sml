@@ -16,18 +16,19 @@ fun readFile filename =
         text
     end
 
-fun hashFileUsm args = (case args of
-      [fileName] => Meas.hashFile fileName
-    | _ => raise USMexpn "hashFileUsm expects a single argument"
-) handle Meas.Err x => raise USMexpn ("hashFileUsm failed, possibly failed to find file: " ^ x)
+(* Hashes a group of bytestrings in an order-agnostic way
+   (by xor-ing them together) *)
+(* hashSet -> ByteString.bs list -> Bytestring.bs *)
+val hashSet = Crypto.hash o List.foldr (ByteString.xor) ByteString.empty
 
-fun hashDirectoryUSM args = (case args of
-      [path,excludedPath] => Meas.hashDir path excludedPath
-    | [path] => Meas.hashDir path ""
-    | _ => raise USMexpn "hashDirectoryUSM expects 1 or 2 arguments"
-) handle Meas.Err x => raise USMexpn ("hashDirectoryUSM failed, , possibly failed to find directory: " ^ x)
-
-val usmMap = Map.fromList id_compare [(Id O, hashFileUsm),((Id (S O)),hashDirectoryUSM)]
+fun hashDir path exclPath = 
+   let val dirEntries  = Meas.readDirNoDot path 
+       val files       = List.mapPartial (fn (n,t) => if t = Meas.Reg then Some n else None) dirEntries 
+       val fileHashes  = List.map Meas.hashFile files
+       val subDirs     = List.mapPartial (fn (n,t) => if t = Meas.Dir then Some (path^"/"^n) else None) dirEntries
+       val filtSubDirs = List.filter (op = exclPath) subDirs
+    in hashSet (fileHashes @ List.map (flip hashDir exclPath) filtSubDirs)
+   end 
 
 val words = String.tokens Char.isSpace
 val lines = String.tokens (op = #"\n")
@@ -59,6 +60,19 @@ fun measProc pid =
         val sections = List.filter hashable (getMaps pid)
         fun hashSect ((sAddr, eAddr), _, _) = Meas.hashRegion pid sAddr eAddr
         val hashes = List.map hashSect sections
-        val xored  = List.foldr (ByteString.xor) ByteString.empty hashes
-     in Crypto.hash xored
+     in hashSet hashes
     end 
+
+(* USMs *)
+fun hashFileUsm args = (case args of
+      [fileName] => Meas.hashFile fileName
+    | _ => raise USMexpn "hashFileUsm expects a single argument"
+) handle Meas.Err x => raise USMexpn ("hashFileUsm failed, possibly failed to find file: " ^ x)
+
+fun hashDirectoryUSM args = (case args of
+      [path,excludedPath] => hashDir path excludedPath
+    | [path] => hashDir path ""
+    | _ => raise USMexpn "hashDirectoryUSM expects 1 or 2 arguments"
+) handle Meas.Err x => raise USMexpn ("hashDirectoryUSM failed, , possibly failed to find directory: " ^ x)
+
+val usmMap = Map.fromList id_compare [(Id O, hashFileUsm),((Id (S O)),hashDirectoryUSM)]

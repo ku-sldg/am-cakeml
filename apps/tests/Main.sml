@@ -7,7 +7,7 @@ val am = serverAm "" emptyNsMap
 
 val goldenFileHash = "DDAF35A193617ABACC417349AE20413112E6FA4E89A97EA20A9EEEE64B55D39A2192992A274FC1A836BA3C23A3FEEBBD454D4423643CE80E2A9AC94FA54CA49F"
 
-val goldenDirHash = "ABB6B162CD1C782999C2991E13A5038DA559E822EBECBDA4CBF2B5A188EE0D1A2E84C8CB996C39AE0E5D988538B626EA84F038A3A6D59C658449677A65EF4351"
+val goldenDirHash = "CF83E1357EEFB8BDF1542850D66D8007D620E4050B5715DC83F4A921D36CE9CE47D0D13C5D85F2B0FF8318D2877EEC2F63B931BD47417A81A538327AF927DA3E"
 
 (*
 The first hash test hashes the string "abc". This is the first example provided
@@ -38,11 +38,11 @@ fun hashTests () =
 This test hashes a directory called testDir.
 
 Expected result(composite hash):
-0xABB6B162CD1C782999C2991E13A5038DA559E822EBECBDA4CBF2B5A188EE0D1A2E84C8CB996C39AE0E5D988538B626EA84F038A3A6D59C658449677A65EF4351
+0xCF83E1357EEFB8BDF1542850D66D8007D620E4050B5715DC83F4A921D36CE9CE47D0D13C5D85F2B0FF8318D2877EEC2F63B931BD47417A81A538327AF927DA3E
 *)
 fun hashDirTest () =
-    let val hashDirv = (Meas.hashDir "testDir" "")
-        val hashDirS = (ByteString.show hashDirv)
+    let val hashDirv = hashDir "testDir" ""
+        val hashDirS = ByteString.show hashDirv
      in print ("Hash directory test: \n" ^ hashDirS ^ "\n" ^
               (if(ByteString.toHexString hashDirv = goldenDirHash) then "Golden Value Check:  Passed" else "Golden Value Check:  Failed") ^ "\n\n")
     end
@@ -94,3 +94,4 @@ fun main () = (
     sigTest ()
 ) handle _ => TextIO.print_err "Fatal: unknown error\n"
 val _ = main ()
+(* val _ = print ((ByteString.toHexString (measProc "15748")) ^ "\n") *)

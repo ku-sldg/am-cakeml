@@ -9,12 +9,12 @@
 #include <dirent.h>
 #include <stdlib.h>
 #include <stddef.h>
+#include <errno.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/mman.h>
-#include <string.h>
 
 #include "debug.h"
 #include "meas.h"
@@ -23,6 +23,7 @@
 
 #define FFI_SUCCESS 0
 #define FFI_FAILURE 1
+#define FFI_BUFFER_TOO_SMALL 2
 #define ffi_assert(cond) {if (!(cond)) { a[0] = FFI_FAILURE; return; }}
 
 #define DIGEST_LEN 64
@@ -222,4 +223,84 @@ void ffihashRegion(const uint8_t * c, const long clen, uint8_t * a, const long a
 
     int good = hash_region(pid, addr, (size_t)len, a+1);
     a[0] = good ? FFI_SUCCESS : FFI_FAILURE;
+}
+
+// CakeML function `dirEntries : string -> (string * entryType) list`
+//  - Takes a filename, and returns a list of entries, along with type (file, dir, etc.)
+
+// First byte of `a` is the error flag, as usual. After that, a list of directory entries
+// and their type are encoded as a type-signaling byte, followed by the null-terminated 
+// string name. 
+#define ENC_DT_UNKNOWN 0
+#define ENC_DT_REG     1
+#define ENC_DT_DIR     2
+#define ENC_DT_FIFO    3
+#define ENC_DT_SOCK    4
+#define ENC_DT_CHR     5
+#define ENC_DT_BLK     6
+#define ENC_DT_LNK     7
+void ffireadDir(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
+    assert(clen > 0);
+    assert(alen > 0);
+
+    const char * dirName = (const char *)c;
+    DIR * dir = opendir(dirName);
+    if (!dir) {
+        a[0] = FFI_FAILURE;
+        return;
+    }
+
+    int prev_errno = errno;
+    errno = 0;
+    long apos = 0;
+    for (struct dirent * entry = readdir(dir); entry; entry = readdir(dir)) {
+        // Check buffer space remaining
+        size_t d_len = strlen(entry->d_name);
+        if(apos + d_len + 2 >= alen) {
+            a[0] = FFI_BUFFER_TOO_SMALL;
+            return;
+        }
+        
+        // Encode entry type
+        switch(entry->d_type) {
+            case DT_UNKNOWN:
+                a[apos] = ENC_DT_UNKNOWN;
+                break;
+            case DT_REG:
+                a[apos] = ENC_DT_REG;
+                break;
+            case DT_DIR:
+                a[apos] = ENC_DT_DIR;
+                break;
+            case DT_FIFO:
+                a[apos] = ENC_DT_FIFO;
+                break;
+            case DT_SOCK:
+                a[apos] = ENC_DT_SOCK;
+                break;
+            case DT_CHR:
+                a[apos] = ENC_DT_CHR;
+                break;
+            case DT_BLK:
+                a[apos] = ENC_DT_BLK;
+                break;
+            case DT_LNK:
+                a[apos] = ENC_DT_LNK;
+                break;
+            default: 
+                assert(!"Unreachable");
+        }
+        apos++;
+        
+        // Copy over entry name
+        strcpy((char *)(a+apos), entry->d_name);
+        apos += d_len+1;
+    }
+    if (errno) {
+        a[0] = FFI_FAILURE;
+        return;
+    }
+    errno = prev_errno;
+
+    closedir(dir);
 }
