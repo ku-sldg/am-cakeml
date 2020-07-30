@@ -93,3 +93,4 @@ fun main () = (
     nonceTest ();
     sigTest ()
 ) handle _ => TextIO.print_err "Fatal: unknown error\n"
+val _ = main ()
