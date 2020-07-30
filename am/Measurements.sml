@@ -16,17 +16,16 @@ fun readFile filename =
         text
     end
 
-(* Hashes a group of bytestrings in an order-agnostic way
-   (by xor-ing them together) *)
+(* Hashes a group of bytestrings in an order-agnostic way (by xor-ing them together) *)
 (* hashSet -> ByteString.bs list -> Bytestring.bs *)
 val hashSet = Crypto.hash o List.foldr (ByteString.xor) ByteString.empty
 
 fun hashDir path exclPath = 
    let val dirEntries  = Meas.readDirNoDot path 
-       val files       = List.mapPartial (fn (n,t) => if t = Meas.Reg then Some n else None) dirEntries 
+       val files       = List.mapPartial (fn (n,t) => if t = Meas.Reg then Some (path^"/"^n) else None) dirEntries 
        val fileHashes  = List.map Meas.hashFile files
        val subDirs     = List.mapPartial (fn (n,t) => if t = Meas.Dir then Some (path^"/"^n) else None) dirEntries
-       val filtSubDirs = List.filter (op = exclPath) subDirs
+       val filtSubDirs = List.filter (op <> exclPath) subDirs
     in hashSet (fileHashes @ List.map (flip hashDir exclPath) filtSubDirs)
    end 
 
@@ -62,6 +61,20 @@ fun measProc pid =
         val hashes = List.map hashSect sections
      in hashSet hashes
     end 
+
+fun findProc name = 
+    let fun getProcDir (n,t) = if t = Meas.Dir andalso Option.isSome (Int.fromString n) then Some n else None
+        val procDirs = List.mapPartial getProcDir (Meas.readDirNoDot "/proc")
+        fun getStat procDir = Some (readFile ("/proc/" ^ procDir ^ "/stat")) handle _ => None
+        val stats = List.mapPartial getStat procDirs
+        fun parseStat stat = case String.tokens (op = #" ") stat of
+              (pid :: name' :: _) => (pid, name')
+        fun procMatch (pid, name') = if name' = ("(" ^ name ^ ")") then Some pid else None
+     in List.mapPartial (procMatch o parseStat) stats
+    end
+
+(* Returns a list of hashes since a proc name may appear multiple times *)
+val measProcsByName = List.map measProc o findProc
 
 (* USMs *)
 fun hashFileUsm args = (case args of

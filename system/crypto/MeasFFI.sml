@@ -54,25 +54,25 @@ structure Meas = struct
             | Lnk
 
         local 
-            val unknown = Word8.fromInt 0
-            val reg     = Word8.fromInt 1
-            val dir     = Word8.fromInt 2
-            val fifo    = Word8.fromInt 3
-            val sock    = Word8.fromInt 4
-            val chr     = Word8.fromInt 5
-            val blk     = Word8.fromInt 6
-            val lnk     = Word8.fromInt 7
+            val unknown = Char.chr 1
+            val reg     = Char.chr 2
+            val dir     = Char.chr 3
+            val fifo    = Char.chr 4
+            val sock    = Char.chr 5
+            val chr     = Char.chr 6
+            val blk     = Char.chr 7
+            val lnk     = Char.chr 8
             val parseResult = 
-                let fun toEntryType enc = case enc of
-                          unknown => Unknown
-                        | reg     => Reg 
-                        | dir     => Dir 
-                        | fifo    => Fifo 
-                        | sock    => Sock 
-                        | chr     => Chr 
-                        | blk     => Blk 
-                        | lnk     => Lnk 
-                        | _ => raise (Err "readDir FFI failure, unrecognized entry type") 
+                let fun toEntryType enc =
+                        if enc = unknown   then Unknown
+                        else if enc = reg  then Reg
+                        else if enc = dir  then Dir
+                        else if enc = fifo then Fifo
+                        else if enc = sock then Sock
+                        else if enc = chr  then Chr
+                        else if enc = blk  then Blk
+                        else if enc = lnk  then Lnk
+                        else raise (Err "readDir FFI failure, unrecognized entry type")
                     fun decodeEntry str = (String.extract str 1 None, toEntryType (String.sub str 0))
                  in List.map decodeEntry o String.tokens (op = null)
                 end
@@ -81,17 +81,20 @@ structure Meas = struct
             fun readDir dirName = 
                 let fun go bufLen = 
                         let val buffer = Word8Array.array bufLen (Word8.fromInt 0)
-                         in #(readDir) dirName buffer;
-                            case Word8Array.sub buffer 0 of
-                                  ffiSuccess => parseResult (Word8Array.substring buffer 1 (bufLen-1))
-                                | ffiFailure => raise (Err "readDir FFI failure, perhaps not a directory")
-                                | ffiBufferTooSmall => go (bufLen * 2)
+                            val _ = #(readDir) dirName buffer;
+                            val ffiResult = Word8Array.sub buffer 0 
+                         in if ffiResult = ffiSuccess then 
+                                parseResult (Word8Array.substring buffer 1 (bufLen-1))
+                            else if ffiResult = ffiBufferTooSmall then 
+                                go (bufLen * 2)
+                            else
+                                raise (Err "readDir FFI failure, perhaps not a directory")
                         end
                  in go 256
                 end
         end
 
         (* version of readDir that filters out the "." and ".." entries *)
-        val readDirNoDot = List.filter (fn (n,t) => n = "." orelse n = "..") o readDir
+        val readDirNoDot = List.filter (fn (n,t) => n <> "." andalso n <> "..") o readDir
     end
 end

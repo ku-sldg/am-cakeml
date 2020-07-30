@@ -33,21 +33,20 @@ void ffifileHash(const uint8_t * c, const long clen, uint8_t * a, const long ale
     assert(alen >= 65);
 
     const char * filename = (const char *)c;
-    // DEBUG_PRINT("Filename: %s\n", filename);
+    DEBUG_PRINT("Filename: %s\n", filename);
 
     size_t file_size = 0;
 
     void * file = mapFileContents(filename, &file_size);
-    ffi_assert(file != NULL);
+    ffi_assert(file != NULL || file_size == 0);
+
     DEBUG_PRINT("file_size after rfc(%s): %i\n",filename,file_size);
     DEBUG_PRINT("file contents after rfc: %s\n",file);
 
     Hacl_Hash_SHA2_hash_512((uint8_t *)file, (uint32_t)file_size, a+1);
 
-    int err = munmap(file, file_size);
-    if (err == -1) {
+    if (file && munmap(file, file_size) == -1)
         DEBUG_PRINT("Failed to unmap file: %s\n",filename);
-    }
 
     a[0] = FFI_SUCCESS;
 }
@@ -231,14 +230,14 @@ void ffihashRegion(const uint8_t * c, const long clen, uint8_t * a, const long a
 // First byte of `a` is the error flag, as usual. After that, a list of directory entries
 // and their type are encoded as a type-signaling byte, followed by the null-terminated 
 // string name. 
-#define ENC_DT_UNKNOWN 0
-#define ENC_DT_REG     1
-#define ENC_DT_DIR     2
-#define ENC_DT_FIFO    3
-#define ENC_DT_SOCK    4
-#define ENC_DT_CHR     5
-#define ENC_DT_BLK     6
-#define ENC_DT_LNK     7
+#define ENC_DT_UNKNOWN 1
+#define ENC_DT_REG     2
+#define ENC_DT_DIR     3
+#define ENC_DT_FIFO    4
+#define ENC_DT_SOCK    5
+#define ENC_DT_CHR     6
+#define ENC_DT_BLK     7
+#define ENC_DT_LNK     8
 void ffireadDir(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
     assert(clen > 0);
     assert(alen > 0);
@@ -252,7 +251,7 @@ void ffireadDir(const uint8_t * c, const long clen, uint8_t * a, const long alen
 
     int prev_errno = errno;
     errno = 0;
-    long apos = 0;
+    long apos = 1;
     for (struct dirent * entry = readdir(dir); entry; entry = readdir(dir)) {
         // Check buffer space remaining
         size_t d_len = strlen(entry->d_name);
