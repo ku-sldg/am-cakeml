@@ -20,17 +20,7 @@ structure Meas = struct
                     then raise (Err ("hashFile FFI Failure, perhaps could not find file: " ^ filename))
                     else (Word8Array.copy buffer 1 64 result 0; result)
             end
-
-        (* fun hashDir path exclPath =
-            let val buffer = Word8Array.array 65 (Word8.fromInt 0)
-                val result = Word8Array.array 64 (Word8.fromInt 0)
-                val input = path ^ nullStr ^ exclPath ^ nullStr
-             in #(dirHash) input buffer;
-                if Word8Array.sub buffer 0 = ffiFailure
-                    then raise (Err ("hadhDir FFI Failure, perhaps could not find directory: " ^ path))
-                    else (Word8Array.copy buffer 1 64 result 0; result)
-            end *)
-        
+       
         (* pid in decimal, start and end in hex *)
         (* string -> string -> string -> ByteString.bs *)
         fun hashRegion pid startAddr endAddr =
