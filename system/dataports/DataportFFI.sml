@@ -16,7 +16,7 @@ in
 end
 
 (* writeDataportBS : String -> ByteString.BS -> () *)
-val writeDataportBS = writeDataport o ByteString.toRawString
+fun writeDataportBS name = (writeDataport name) o ByteString.toRawString
 
 
 fun emitEvent dummy =

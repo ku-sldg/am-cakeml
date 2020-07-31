@@ -10,15 +10,17 @@ set(cop_src ${util_src} copland/Instr.sml copland/AM.sml copland/VM.sml
     copland/json/CoplandToJson.sml copland/json/JsonToCopland.sml)
 set(crypto_src system/crypto/CryptoFFI.sml)
 set(socket_src system/sockets/SocketFFI.sml)
+set(time_src system/time/TimeFFI.sml)
 set(dataport_src system/dataports/DataportFFI.sml)
 set(server_am_src ${cop_src} ${crypto_src} am/Measurements.sml ${socket_src}
-    am/CommTypes.sml am/ServerAm.sml ${dataport_src})
+    am/CommTypes.sml am/ServerAm.sml)
 
 set(tests_src  ${server_am_src} apps/tests/Main.sml)
 set(client_src ${server_am_src} apps/serverClient/ClientTest.sml)
 set(server_src ${server_am_src} apps/serverClient/Server.sml)
 
-set(gs_src ${server_am_src} apps/case/Groundstation.sml)
+set(gs_src  ${server_am_src} apps/case/Groundstation.sml)
+set(uav_src ${server_am_src} ${dataport_src} ${time_src} apps/case/Uav.sml)
 
 # Unfortunately, the build process will diverge significantly between
 # standalone executables and CAmkES components
@@ -78,7 +80,7 @@ else()
     add_subdirectory(system/crypto)
     function(build_am_thing name)
         build_cake("${name}.cake" SOURCES "${ARGN}")
-        add_executable(${name} ${BASIS} system/sockets/socket_ffi.c system/dataports/dataport_ffi.c)
+        add_executable(${name} ${BASIS} system/sockets/socket_ffi.c)
         if(${STATIC_LINKING})
             set(link_flags "-static-libgcc -static")
         endif()
@@ -91,5 +93,8 @@ else()
     build_am_thing("client" ${client_src})
     add_custom_target(am DEPENDS server client)
     
-    build_am_thing("groundstation" ${gs_src})
+    build_am_thing("gs_am"  ${gs_src})
+    build_am_thing("uav_am" ${uav_src})
+    target_sources("uav_am" PRIVATE system/dataports/dataport_ffi.c system/time/sys/linux/time.c)
+    add_custom_target(case DEPENDS server client)
 endif()
