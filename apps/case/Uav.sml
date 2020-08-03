@@ -18,6 +18,9 @@ fun loop io = (io (); loop io)
 (* when : bool -> ('a -> ()) -> 'a -> () *)
 fun when b f x = if b then f x else ()
 
+(* TODO: add timestamp *)
+fun log s = print (s^"\n")
+
 val idToBytes =
     let fun rightFourChars str =
         let val strSize = String.size str
@@ -47,7 +50,8 @@ fun addToWhitelist dataport idOpt =
              | None    => "0"
         val zero = Word8.fromInt 48 (* ascii '0' char *)
         val content = bsToLen 12 zero (ByteString.fromRawString id_list)
-     in writeDataportBS dataport content
+     in log ("Writing " ^ id_list ^ " to " ^ dataport);
+        writeDataportBS dataport content
     end
 
 (* pulse : int -> ('a -> 'b) -> 'a -> 'c *)
@@ -85,16 +89,20 @@ fun reqAttest dataport gs id =
         val ev = parseEv (Socket.inputAll gs)
         val spin = loop o const
      in if appraise nonce ev
-          then addToWhitelist dataport (Some id)
-          else (addToWhitelist dataport None; spin ())
+          then (log "Appraisal succeeded"; addToWhitelist dataport (Some id))
+          else (log "Appraisal failed"; addToWhitelist dataport None; spin ())
     end
 
 (* mainLoop : string -> () *)
 fun mainLoop dataport =
-    let val listener = Socket.listen 5000 5
+    let val _ = log ("Uav starting with dataport: " ^ dataport)
+        val listener = Socket.listen 5000 5
+        val _ = log "Listening on port 5000"
         val gs  = Socket.accept listener
+        val _ = log "Accepting incoming connection"
         val msg = Socket.inputAll gs
         val id  = Option.valOf (Int.fromString msg) (* For now, we assume the initial message is just the id *)
+        val _ = log ("Beginning appraisal loop with groundstation: " ^ msg)
      in loop (fn () => reqAttest dataport gs id)
     end
     handle Socket.Err _ => TextIO.print_err "Socket error\n"

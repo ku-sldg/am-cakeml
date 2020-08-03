@@ -3,6 +3,9 @@
 (* loop : ('a -> 'b) -> 'a -> 'c *)
 fun loop f x = (f x; loop f x)
 
+(* TODO: add timestamp *)
+fun log s = print (s^"\n")
+
 val dir = "/home/uxas/ex/p2/01_Waterway/"
 val hashes = Lseq (Asp (Aspc (Id O) [dir ^ "cfg_WaterwaySearch_GS.xml"])) (
              Lseq (Asp (Aspc (Id O) [dir ^ "Messages/OperatingRegion_336.xml"])) (
@@ -22,15 +25,18 @@ in
         let val nonce  = N (Id O) (ByteString.fromRawString (Socket.inputAll uav)) Mt
             val ev     = (evalTerm am Mt term) handle _ => Mt
             val jsonEv = jsonToStr (evToJson ev)
-         in Socket.output uav jsonEv
+         in log ("Send evidence: " ^ jsonEv);
+            Socket.output uav jsonEv
         end
 end
 
 
 (* mainLoop : string -> () *)
-fun mainLoop addr = let fun go () =
+fun mainLoop addr =
+    let fun go () =
         let val uav = Socket.connect addr 5000
-         in Socket.output uav "500";
+         in log "Connected to uav";
+            Socket.output uav "500";
             loop attest uav
         end
         handle Socket.Err err => ()
