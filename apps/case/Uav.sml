@@ -39,15 +39,15 @@ fun bsToLen len b bs =
          | Less    => ByteString.append bs (Word8Array.array (len - oldLen) b)
     end
 
-(* addToWhitelist : id option -> () *)
+(* addToWhitelist : dataport -> id option -> () *)
 (* Right now, this just writes over the first id, since we only have one groundstation *)
-fun addToWhitelist idOpt =
+fun addToWhitelist dataport idOpt =
     let val id_list = case idOpt
             of Some id => idToBytes id
              | None    => "0"
         val zero = Word8.fromInt 48 (* ascii '0' char *)
         val content = bsToLen 12 zero (ByteString.fromRawString id_list)
-     in writeDataportBS "/dev/uio4" content (* TODO: take dataport name as a commandline argument *)
+     in writeDataportBS dataport content
     end
 
 (* pulse : int -> ('a -> 'b) -> 'a -> 'c *)
@@ -78,27 +78,36 @@ fun appraise nonce ev = case ev of
           Option.valOf (verifySig ev pub)
     | _ => False
 
-(* attest : Socket.fd -> id -> () *)
-fun attest gs id =
+(* reqAttest : dataport -> Socket.fd -> id -> () *)
+fun reqAttest dataport gs id =
     let val nonce = genNonce ()
         val _ = Socket.output gs (ByteString.toRawString nonce)
         val ev = parseEv (Socket.inputAll gs)
         val spin = loop o const
      in if appraise nonce ev
-          then addToWhitelist (Some id)
-          else (addToWhitelist None; spin ())
+          then addToWhitelist dataport (Some id)
+          else (addToWhitelist dataport None; spin ())
     end
 
-(* main : () -> () *)
-fun main () =
+(* mainLoop : string -> () *)
+fun mainLoop dataport =
     let val listener = Socket.listen 5000 5
         val gs  = Socket.accept listener
         val msg = Socket.inputAll gs
         val id  = Option.valOf (Int.fromString msg) (* For now, we assume the initial message is just the id *)
-     in loop (fn () => attest gs id)
+     in loop (fn () => reqAttest dataport gs id)
     end
     handle Socket.Err _ => TextIO.print_err "Socket error\n"
          | DataportErr  => TextIO.print_err "Dataport error\n"
          | Json.ERR _ _ => TextIO.print_err "Json error\n"
          | _            => TextIO.print_err "Fatal: unknown error\n"
+
+fun main () =
+    let val name  = CommandLine.name ()
+        val usage = "Usage: " ^ name ^ " dataport\n"
+                  ^ "e.g.   " ^ name ^ " /dev/uio4\n"
+     in case CommandLine.arguments () of
+              [dataport] => mainLoop dataport
+            | _ => TextIO.print_err usage
+    end
 val () = main ()

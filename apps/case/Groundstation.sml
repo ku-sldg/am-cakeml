@@ -38,7 +38,9 @@ fun mainLoop addr = let fun go () =
     handle _ => TextIO.print_err "Fatal: unknown error\n"
 
 fun main () =
-    let val usage = "Usage: ./groundstation address\ne.g.   ./groundstation 192.168.2.7\n"
+    let val name  = CommandLine.name ()
+        val usage = "Usage: " ^ name ^ " address\n"
+                  ^ "e.g.   " ^ name ^" 192.168.2.7\n"
      in case CommandLine.arguments () of
               [addr] => mainLoop addr
             | _ => TextIO.print_err usage
