@@ -50,7 +50,7 @@ fun addToWhitelist dataport idOpt =
              | None    => "0"
         val zero = Word8.fromInt 48 (* ascii '0' char *)
         val content = bsToLen 12 zero (ByteString.fromRawString id_list)
-     in log ("Writing " ^ id_list ^ " to " ^ dataport);
+     in log ("Writing " ^ ByteString.toRawString content ^ " to " ^ dataport);
         writeDataportBS dataport content
     end
 
@@ -103,7 +103,7 @@ fun mainLoop dataport =
         val msg = Socket.inputAll gs
         val id  = Option.valOf (Int.fromString msg) (* For now, we assume the initial message is just the id *)
         val _ = log ("Beginning appraisal loop with groundstation: " ^ msg)
-     in loop (fn () => reqAttest dataport gs id)
+     in pulse 10000 (fn () => reqAttest dataport gs id) ()
     end
     handle Socket.Err _ => TextIO.print_err "Socket error\n"
          | DataportErr  => TextIO.print_err "Dataport error\n"
