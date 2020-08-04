@@ -95,7 +95,15 @@ else()
     
     build_am_thing("gs_am"  ${gs_src})
     build_am_thing("uav_am" ${uav_src})
-    target_sources("uav_am" PRIVATE system/dataports/uav_dataport_ffi.c system/time/sys/linux/time.c)
-    target_include_directories("uav_am" PRIVATE ${am_queue})
+    # Hacky way to prevent CMAKE complaints
+    if(NOT "${am_queue}" STREQUAL "")
+        set(am_src ${am_queue}/src/am_queue.c)
+    endif()
+    target_sources("uav_am" PRIVATE
+        system/dataports/uav_dataport_ffi.c
+        system/time/sys/linux/time.c
+        ${am_src}
+    )
+    target_include_directories("uav_am" PRIVATE ${am_queue}/include)
     add_custom_target(case DEPENDS gs_am uav_am)
 endif()
