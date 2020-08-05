@@ -75,12 +75,22 @@ val parseEv =
     end
 
 (* appraise : ByteString.bs -> ev -> bool *)
-fun appraise nonce ev = case ev of
+(* fun appraise nonce ev = case ev of
       G evSign (U (Id (S O)) args evHash (N i evNonce Mt)) =>
           ByteString.deepEq evNonce nonce andalso 
           List.exists (op = (ByteString.toHexString evHash)) goldenHashes andalso 
           Option.valOf (verifySig ev pub)
-    | _ => False
+    | _ => False *)
+fun appraise nonce ev = case ev of
+      G evSign (U (Id (S O)) args evHash (N i evNonce Mt)) =>
+          if not (ByteString.deepEq evNonce nonce) then 
+              (log "Bad nonce"; False)
+          else if not (List.exists (op = (ByteString.toHexString evHash)) goldenHashes) then 
+              (log "Bad hash value"; False) 
+          else if not (Option.valOf (verifySig ev pub)) then 
+              (log "Bad signature"; False)
+          else True
+    | _ => (log "Bad evidence shape"; False)
 
 (* reqAttest : dataport -> Socket.fd -> id -> () *)
 fun reqAttest dataport gs id =

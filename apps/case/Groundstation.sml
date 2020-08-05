@@ -6,12 +6,10 @@ fun loop f x = (f x; loop f x)
 (* TODO: add timestamp *)
 fun log s = print (s^"\n")
 
-val dir = "/home/uxas/ex/p2/01_Waterway/"
-val hashes = Lseq (Asp (Aspc (Id O) [dir ^ "cfg_WaterwaySearch_GS.xml"])) (
-             Lseq (Asp (Aspc (Id O) [dir ^ "Messages/OperatingRegion_336.xml"])) (
-             Lseq (Asp (Aspc (Id O) [dir ^ "Messages/tasks/1000_LineSearch_LINE_Waterway_Deschutes.xml"]))
-                  (Asp (Aspc (Id O) [dir ^ "Messages/tasks/1001_AutomationRequest_LINE_Waterway_Deschutes.xml"]))))
-val term = Lseq hashes (Asp Hsh)
+val dir = "/home/uxas"
+val exclDir = "/home/uxas/ex/p2/01_Waterway/RUNDIR_WaterwaySearch_GS"
+val subterm = (Asp (Aspc (Id (S O)) [dir,exclDir]))
+val term = Lseq subterm (Asp Sig)
 
 local
     (* This is obviously a placeholder value. In a real system, we'd want to
@@ -25,7 +23,7 @@ in
         let val nonce  = N (Id O) (ByteString.fromRawString (Socket.inputAll uav)) Mt
             val ev     = (evalTerm am Mt term) handle _ => Mt
             val jsonEv = jsonToStr (evToJson ev)
-         in log ("Send evidence: " ^ jsonEv);
+         in log ("Send evidence: " ^ evToString ev);
             Socket.output uav jsonEv
         end
 end
