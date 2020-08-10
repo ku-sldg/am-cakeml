@@ -6,11 +6,6 @@
 *.swp
 *~
 
-# Executables
-test
-server
-client
-
 # Directories
 /build
 
@@ -18,3 +13,6 @@ client
 CMakeFiles
 cmake_install.cmake
 CMakeCache.txt
+
+# Editor stuff
+/.vscode

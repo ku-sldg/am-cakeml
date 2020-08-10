@@ -4,5 +4,6 @@
 int doCompositeHash(const char *basePath, const char *excludePath, uint8_t *digest, uint8_t *message);
 int hash_file_contents(const char *filename, uint8_t *digest);
 void * mapFileContents(const char *filename, size_t *file_size);
+int hash_region(char * pid, long addr, size_t len, uint8_t * hash);
 
 #endif

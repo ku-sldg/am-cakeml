@@ -58,7 +58,7 @@ set(hacl_sources ${hacl_path}/Hacl_Hash.c ${hacl_path}/Hacl_Ed25519.c ${hacl_pat
 set_source_files_properties(${hacl_sources} PROPERTIES GENERATED True)
 
 # Crypto library
-# add_library(crypto STATIC crypto_ffi.c sys/${sys}/crypto_ffi.c meas.c ${hacl_sources})
+# TODO: separate meas from crypto, or make meas optional
 add_library(crypto STATIC crypto_ffi.c meas.c sys/${sys}/crypto_ffi.c ${hacl_sources})
 include_directories(BEFORE ${hacl_path} ${kremlin_path} ${kremlib_path})
 target_link_libraries(crypto ${cryptoLinks})

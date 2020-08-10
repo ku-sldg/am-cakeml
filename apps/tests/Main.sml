@@ -7,7 +7,7 @@ val am = serverAm "" emptyNsMap
 
 val goldenFileHash = "DDAF35A193617ABACC417349AE20413112E6FA4E89A97EA20A9EEEE64B55D39A2192992A274FC1A836BA3C23A3FEEBBD454D4423643CE80E2A9AC94FA54CA49F"
 
-val goldenDirHash = "ABB6B162CD1C782999C2991E13A5038DA559E822EBECBDA4CBF2B5A188EE0D1A2E84C8CB996C39AE0E5D988538B626EA84F038A3A6D59C658449677A65EF4351" 
+val goldenDirHash = "A4EA2BB49B0FF60D240FC17C63548892EF3A3BB618718FB562FE603916EF1211EC51BB59CA137782F277450016EDEA9E33CE30B08538AA5A306933920CE272C6"
 
 (*
 The first hash test hashes the string "abc". This is the first example provided
@@ -24,30 +24,29 @@ Expected result:
 *)
 
 fun hashTests () =
-    let val evidence = H (ByteString.fromRawString "abc")
-        val hashTest = evToString (evalTerm am evidence (Asp Hsh))
-	val hashFilev = (Crypto.hashFile "hashTest.txt")
-	val hashFileS = (ByteString.show hashFilev)
-            handle (Crypto.Err s) => "ERROR: " ^ s
+    let val evidence  = H (ByteString.fromRawString "abc")
+        val hashTest  = evToString (evalTerm am evidence (Asp Hsh))
+        val hashFilev = Meas.hashFile "hashTest.txt"
+        val hashFileS = ByteString.show hashFilev
      in print ("Hash test: "      ^ hashTest  ^ "\n\n" ^
                "Hash file test: \n" ^ hashFileS ^ "\n" ^
-	       (if(ByteString.toHexString hashFilev = goldenFileHash) then "Golden Value Check:  Passed" else "Golden Value Check:  Failed") ^ "\n\n")
+               (if(ByteString.toHexString hashFilev = goldenFileHash) then "Golden Value Check:  Passed" else "Golden Value Check:  Failed") ^ "\n\n")
     end
-
+    handle (Meas.Err s) => TextIO.print_err ("ERROR: " ^ s ^ "\n")
 
 (*
 This test hashes a directory called testDir.
 
 Expected result(composite hash):
-0xABB6B162CD1C782999C2991E13A5038DA559E822EBECBDA4CBF2B5A188EE0D1A2E84C8CB996C39AE0E5D988538B626EA84F038A3A6D59C658449677A65EF4351
+0xA4EA2BB49B0FF60D240FC17C63548892EF3A3BB618718FB562FE603916EF1211EC51BB59CA137782F277450016EDEA9E33CE30B08538AA5A306933920CE272C6
 *)
 fun hashDirTest () =
-    let val hashDirv = (Crypto.hashDir "testDir" "")
-        val hashDirS = (ByteString.show hashDirv)
-            handle (Crypto.Err s) => "ERROR: " ^ s
+    let val hashDirv = hashDir "testDir" ""
+        val hashDirS = ByteString.show hashDirv
      in print ("Hash directory test: \n" ^ hashDirS ^ "\n" ^
               (if(ByteString.toHexString hashDirv = goldenDirHash) then "Golden Value Check:  Passed" else "Golden Value Check:  Failed") ^ "\n\n")
     end
+    handle (Meas.Err s) => TextIO.print_err ("ERROR: " ^ s ^ "\n")
 
 
 
@@ -93,5 +92,5 @@ fun main () = (
     hashDirTest ();
     nonceTest ();
     sigTest ()
-    ) handle _ => TextIO.print_err "Fatal: unknown error\n"
+) handle _ => TextIO.print_err "Fatal: unknown error\n"
 val _ = main ()
