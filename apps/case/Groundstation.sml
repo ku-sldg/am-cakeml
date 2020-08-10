@@ -21,7 +21,7 @@ in
     (* attest : Socket.fd -> () *)
     fun attest uav =
         let val nonce  = N (Id O) (ByteString.fromRawString (Socket.inputAll uav)) Mt
-            val ev     = (evalTerm nonce Mt term) handle _ => Mt
+            val ev     = (evalTerm am nonce term) handle _ => Mt
             val jsonEv = jsonToStr (evToJson ev)
          in log ("Send evidence: " ^ evToString ev);
             Socket.output uav jsonEv
