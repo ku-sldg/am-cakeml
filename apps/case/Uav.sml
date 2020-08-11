@@ -4,10 +4,17 @@
        compile time, or read from a file at runtime *)
 val pub = (ByteString.toRawString o ByteString.fromHexString) "490E2422528F14AC6A48DDB9D72CB30B8345AF2E939003BC7A33A6057F2FFB0101000000000000002DD0B7F53A560000A049D882A37F00000000000000000000"
 
-val goldenHashes = 
-    let val hash_gs_step2 = "540FD206F8B981BAE3EEB984F418ABE8B556CF63FE7A67EE8E1FEDB60780946EE6E235BFA439A924001E9676058245B70998A4749121994DAFE2C0CF6A154465"
-        val hash_gs_threat_3A1 = "890F87D306C8201AE764FF91D116D413A8DAB71B5BF73370F35BCB24F9C38AB0720EA0E18C4C717D7782F818255DFA0D62D165E1DA2A705C71A260164BDEEDCB"
-        val hash_gs_threat_3A2 = "E267FA81E1577C6373C84ECC6A5C5A364073D7DB2F3E5DCB44D7F93F9CF6F9F3D5C85C640140CF574DD31EFA2E16AA58FFC325397AE6753C503B058A0DFF3655"
+val goldenUxasHashes = 
+    let val hash_gs_step2 = "DA6E955AC98F83C65806E2B45A6E6D58BD570930F07E957E7B0ADF0EA09B2E1DB18780897B596B97A20D429638C7E163CDAF9B594201D57689DF4D1B385DFAC4"
+        val hash_gs_threat_3A1 = "20C78BA379D880C192691431A704D5F4A96AD76470D6F9E1D576640CD43A5516A38B53E740F9C77ABAC4DB53AB336B34F8F9330EAE43A43E5CCC8B45CA5D6837"
+        val hash_gs_threat_3A2 = "7312F44ED8761A21F4C3597E45B8774277B73DDF4EA0133E9FAFE11912B19EC71441E05DB3EEB5D58C0C1D3E7ABE4ED70BF99AFCF39E0081AEE42F3028CAB8F1"
+     in [hash_gs_step2, hash_gs_threat_3A1, hash_gs_threat_3A2]
+    end
+
+val goldenDirHashes = 
+    let val hash_gs_step2 = "1A02BD2959EBDD7371803A2D8D2FEA6BC1D119D8C7F3DB053A3A2C13960CD1B698DAB0ED87FC73E34350C84534BC0CADEEF909A4BF451E85A9E42E9BEA01E9F8"
+        val hash_gs_threat_3A1 = "B94950EB5CBFB74E5EE4285F980BCF470D0F2391DDD2DA33BBB68CB7F918ED054BED85B638B799FD2D268F83AAA943A93C760F43823736D53719D363AAA880E9"
+        val hash_gs_threat_3A2 = "F5E7C64E438243431DA725995C708F25FE9969071066ACD3E120AE9F5FB4C3735A0CE4AB2C77B5641AECB0AEAD98C283E831DF13D2E10BC5943E6BA93C09F093"
      in [hash_gs_step2, hash_gs_threat_3A1, hash_gs_threat_3A2]
     end
 (* End of config.  *)
@@ -75,17 +82,16 @@ val parseEv =
     end
 
 (* appraise : ByteString.bs -> ev -> bool *)
-(* fun appraise nonce ev = case ev of
-      G evSign (U (Id (S O)) args evHash (N i evNonce Mt)) =>
-          ByteString.deepEq evNonce nonce andalso 
-          List.exists (op = (ByteString.toHexString evHash)) goldenHashes andalso 
-          Option.valOf (verifySig ev pub)
-    | _ => False *)
 fun appraise nonce ev = case ev of
-      G evSign (U (Id (S O)) args evHash (N i evNonce Mt)) =>
+      G evSign
+      (U (Id (S (S O))) uxasArgs uxasHash 
+      (U (Id (S O)) dirHashArgs dirHash
+      (N i evNonce Mt))) =>
           if not (ByteString.deepEq evNonce nonce) then 
               (log "Bad nonce"; False)
-          else if not (List.exists (op = (ByteString.toHexString evHash)) goldenHashes) then 
+          else if not (List.exists (op = (ByteString.toHexString uxasHash)) goldenUxasHashes) then 
+              (log "Bad uxas hash"; False)
+          else if not (List.exists (op = (ByteString.toHexString dirHash)) goldenDirHashes) then 
               (log "Bad hash value"; False) 
           else if not (Option.valOf (verifySig ev pub)) then 
               (log "Bad signature"; False)
