@@ -6,10 +6,11 @@ fun loop f x = (f x; loop f x)
 (* TODO: add timestamp *)
 fun log s = print (s^"\n")
 
-val dir = "/home/uxas"
-val exclDir = "/home/uxas/ex/p2/01_Waterway/RUNDIR_WaterwaySearch_GS"
-val subterm = (Asp (Aspc (Id (S O)) [dir,exclDir]))
-val term = Lseq subterm (Asp Sig)
+val dir      = "/home/uxas/ex"
+val exclDir  = "/home/uxas/ex/p2/01_Waterway/RUNDIR_WaterwaySearch_GS"
+val dirMeas  = Asp (Aspc (Id (S O)) [dir,exclDir])
+val procMeas = Asp (Aspc (Id (S (S O))) ["uxas"])
+val term = Lseq dirMeas (Lseq procMeas (Asp Sig))
 
 local
     (* This is obviously a placeholder value. In a real system, we'd want to
