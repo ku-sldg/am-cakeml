@@ -26,22 +26,22 @@ void ffiwriteDataport(const uint8_t * c, const long clen, uint8_t * a, const lon
     int fd = open((const char *)c, O_RDWR);
     ffi_assert(fd >= 0);
 
-    queue_t * dataport = (queue_t *)mmap(NULL, sizeof(queue_t), PROT_READ | PROT_WRITE, MAP_SHARED, fd, getpagesize());
-    ffi_assert(dataport != (queue_t *)(-1));
+    am_queue_t * dataport = (queue_t *)mmap(NULL, sizeof(am_queue_t), PROT_READ | PROT_WRITE, MAP_SHARED, fd, getpagesize());
+    ffi_assert(dataport != (am_queue_t *)(-1));
 
     uint8_t * emit = (uint8_t *)mmap(NULL, 0x1000, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     ffi_assert(emit != (uint8_t *)(-1));
 
-    queue_init(dataport);
+    am_queue_init(dataport);
 
     static data_t data;
     ffi_assert(length <= DATA_T_MAX_PAYLOAD);
     memcpy((void *)data.payload, (const void *)msg, length);
 
-    queue_enqueue(dataport, &data);
+    am_queue_enqueue(dataport, &data);
     emit[0] = 1;
 
-    munmap(dataport, sizeof(queue_t));
+    munmap(dataport, sizeof(am_queue_t));
     munmap(emit, 0x1000);
     close(fd);
 
