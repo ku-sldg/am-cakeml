@@ -39,13 +39,14 @@ fun startServer port qLen =
          | _          => TextIO.print_err "Fatal: unknown error\n"
 
 fun main () =
-    let val usage = "Usage: ./server portNumber queueLength\ne.g.   ./server 5000 5\n"
-     in case CommandLine.arguments ()
-          of [portStr, qLenStr] => (
-             case (Int.fromString portStr, Int.fromString qLenStr)
-               of (Some port, Some qLen) => startServer port qLen
-                | _ => TextIO.print_err usage)
+    let val name  = CommandLine.name ()
+        val usage = "Usage: " ^ name ^ " portNumber queueLength\n"
+                  ^ "e.g.   " ^ name ^ " 5000 5\n"
+     in case CommandLine.arguments () of
+             [portStr, qLenStr] => (
+                case (Int.fromString portStr, Int.fromString qLenStr) of
+                     (Some port, Some qLen) => startServer port qLen
+                    | _ => TextIO.print_err usage)
            | _ => TextIO.print_err usage
     end
-
 val _ = main ()

@@ -8,9 +8,17 @@ This project makes use of formally verified components, including the CakeML com
 The following documents the process of building standalone executables for Linux and MacOS.
 
 ### Prerequisites
-- CakeML: [Download](https://cakeml.org/download.html) and build the 64-bit version (or the 32-bit version if you are building for the Odroid). This project assumes the `cake` executable and `basis_ffi.c` to be in the directory `~/cake-x64-64`. See the "Configuration" section if you want to put it elsewhere.
+- CakeML v1322: [Download](https://github.com/CakeML/cakeml/releases/tag/v1322) the CakeML compiler (`cake-x64-64.tar.gz` is most likely the version you want, it targets 64-bit architectures). Unpack the tarball, run `make cake`, then put the `cake` executable on your system path. E.g.
+```sh
+tar -xzf cake-x64-64.tar.gz
+cd cake-x64-64
+make cake 
+mv cake ~/usr/bin
+```
+- C compiler
+- Make
 - CMake: Version 3.10.2 or higher.
-- CCMake: Optional, but highly recommended. Provides a GUI for configuring CMake parameters. Download through your package manager (the Ubuntu package is `cmake-curses-gui`).
+- CCMake: Optional, but highly recommended. Provides a GUI for configuring CMake parameters.
 
 ### Instructions
 Create a build directory at the top level of the source tree, then invoke cmake from within the directory:
@@ -18,7 +26,7 @@ Create a build directory at the top level of the source tree, then invoke cmake 
     mkdir build && cd build
     cmake ..
 
-If you need to make changes to the default configuration, type `ccmake ..` to bring up the graphical interface. (See the following section for more details.)
+If you need to make changes to the default configuration, type `ccmake ..` to bring up the graphical interface. (See the "Configuration" section for more details.)
 
 To build the test suite, type `make tests`.
 
