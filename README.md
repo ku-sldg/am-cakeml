@@ -38,7 +38,7 @@ To test a  successful install, navigate to `apps/tests/` and run `../../build/te
 ### Configuration
 From the build directory, type `ccmake ..` to bring up the configuration GUI. Hovering over a variable displays some documentation at the bottom of the screen. After you make changes, press `c` then `g` to save your changes.
 
-This manual configuration should not be necessary for most builds. It may be necessary if you want to use a C compiler other than your default compiler, if your cake files are in an unexpected location, if you want to cross-compile, etc.
+This manual configuration should not be necessary for most builds. It may be necessary if you want to use a C compiler other than your default compiler, change the compile flags, cross-compile, etc.
 
 # Misc.
 
