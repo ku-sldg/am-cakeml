@@ -20,14 +20,14 @@ val copMeasDir =
     )
 val goldenHashDir = "A4EA2BB49B0FF60D240FC17C63548892EF3A3BB618718FB562FE603916EF1211EC51BB59CA137782F277450016EDEA9E33CE30B08538AA5A306933920CE272C6"
 
-val proc = "foo"
+val proc = "testProc"
 val procHashId = Id (S (S O))
 val copMeasProc = 
     Att (S O) (Lseq
         (Asp (Aspc procHashId [proc]))
         (Asp Sig)
     )
-val goldenHashProc = ""
+val goldenHashProc = "44A02B3F57554166DFCDC358AA720AFDA9A0DD7E37B19CC8EE4BA66BA7A9828EEFFA24EE2B989B2C3EEA08F8E98A9877C0007205640A9985D802CBD0BE1FB26D"
 
 datatype ('t, 'e) result = Ok 't
                          | Err 'e
@@ -81,7 +81,7 @@ fun doMeasDir am =
     end
 
 fun appraiseProc nonce ev = case ev of
-    G evSign (U (Id (S (S O))) ["foo"] evHash (N (Id O) evNonce Mt)) =>
+    G evSign (U (Id (S (S O))) ["testProc"] evHash (N (Id O) evNonce Mt)) =>
         if not (ByteString.deepEq evNonce nonce) then
             Err "Bad nonce value"
         else if ByteString.toHexString evHash <> goldenHashProc then
@@ -107,7 +107,8 @@ fun doMeasProc am =
 fun sendReqs addr =
     let val am = serverAm "" (Map.insert emptyNsMap (S O) addr)
      in doMeasFile am; print "\n\n";
-        doMeasDir  am; print "\n"
+        doMeasDir  am; print "\n\n";
+        doMeasProc am; print "\n"
     end
     handle Socket.Err s     => TextIO.print_err ("Socket failure on connection: " ^ s ^ "\n")
          | Socket.InvalidFD => TextIO.print_err "Invalid file descriptor\n"
