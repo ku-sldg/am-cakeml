@@ -4,7 +4,7 @@ An example of a server/client pair. The client sends a Copland term to measure t
 Build the server with `make server`, the client with `make client`, or both with `make am`.
 
 ## Run
-From this directory, launch the server with `../../build/server 5000 5`. This starts the server on port 5000, with a queue length of 5 (the maximum number of queued incoming connections).
+From this directory, launch the server with `sudo ../../build/server 5000 5`. This starts the server on port 5000, with a queue length of 5 (the maximum number of queued incoming connections).
 
 Next, run the test process, `./testProc`.
 
