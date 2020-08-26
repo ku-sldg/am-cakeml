@@ -13,7 +13,7 @@ The following documents the process of building standalone executables for Linux
 tar -xzf cake-x64-64.tar.gz
 cd cake-x64-64
 make cake 
-mv cake ~/usr/bin
+cp cake /usr/bin
 ```
 - C compiler
 - Make
