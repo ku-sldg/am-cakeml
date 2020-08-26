@@ -22,10 +22,10 @@ mv cake ~/usr/bin
 
 ### Instructions
 Create a build directory at the top level of the source tree, then invoke cmake from within the directory:
-
+```sh
     mkdir build && cd build
     cmake ..
-
+```
 If you need to make changes to the default configuration, type `ccmake ..` to bring up the graphical interface. (See the "Configuration" section for more details.)
 
 To build the test suite, type `make tests`.

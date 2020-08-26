@@ -4,11 +4,6 @@
 val priv = (ByteString.toRawString o ByteString.fromHexString)
            "2E5773B2A19A2CB05FEE44650D8DC877B3D806F74C199043657C805288CD119B"
 
-(* TODO: Do something with pl1 rather than assuming it is here.
-   Also do something with the nameserver mapping *)
-(* When things go well, this returns a JSON evidence string. When they go wrong,
-   it returns a raw error message string. In the future, we may want to wrap
-   said error messages in JSON as well to make it easier on the client. *)
 fun evalJson s =
     let val (REQ pl1 pl2 map t ev) = jsonToRequest (strToJson s)
         val am = setMe (serverAm priv emptyNsMap) pl2
