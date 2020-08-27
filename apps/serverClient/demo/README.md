@@ -52,8 +52,8 @@
     * `./modDir.sh`
     * Modifies contents of `testDir/1.txt`
 1. Observe contents of testDir/1.txt in terminal D
-    * \<navigate to testDir/>, `cat 1.txt`
-    1. Run client in terminal A:  directory measurement
+    * \<navigate to testDir/> --> `cat 1.txt`
+1. Run client in terminal A:  directory measurement
     * `./client localhost dirMeas`
     *  Appraisal fails with a "Bad hash value"
 1.  Repair `testDir/1.txt` from terminal C
