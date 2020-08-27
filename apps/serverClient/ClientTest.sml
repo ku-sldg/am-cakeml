@@ -68,58 +68,10 @@ fun appraiseFileGen nonce ev golden_hash = case ev of
     | _ => Err "Unexpected shape of evidence"
 
 fun appraiseFile nonce ev = appraiseFileGen nonce ev goldenHashFile
-
-    (* case ev of
-    G evSign (U (Id O) ["hashTest.txt"] evHash (N (Id O) evNonce Mt)) =>
-        if not (ByteString.deepEq evNonce nonce) then
-            Err "Bad nonce value"
-        else if ByteString.toHexString evHash <> goldenHashFile then
-            Err "Bad hash value"
-        else if not (Option.valOf (verifySig ev pub)) then
-            Err "Bad signature"
-        else Ok ()
-    | _ => Err "Unexpected shape of evidence" *)
 fun doMeasFile am = doMeasFileGen am copMeasFile appraiseFile
-                                  (*
-    let val nonce = genNonce ()
-        val ev = evalTerm am (N (Id O) nonce Mt) copMeasFile 
-     in print (
-            "Evaluating term:\n" ^ termToString copMeasFile ^ "\n\n" ^
-            "Nonce: " ^ ByteString.show nonce ^ "\n\n" ^ 
-            "Evidence: " ^ evToString ev ^ "\n\n" ^
-            "Appraisal " ^ (case appraiseFile nonce ev of 
-                  Ok ()   => "succeeded"
-                | Err msg => "failed: " ^ msg 
-            )
-        )
-    end *)
 
 fun appraiseProcFile nonce ev = appraiseFileGen nonce ev goldenHashProcFile
-    (* case ev of
-    G evSign (U (Id O) _ evHash (N (Id O) evNonce Mt)) =>
-        if not (ByteString.deepEq evNonce nonce) then
-            Err "Bad nonce value"
-        else if ByteString.toHexString evHash <> goldenHashFileProc then
-            Err "Bad hash value"
-        else if not (Option.valOf (verifySig ev pub)) then
-            Err "Bad signature"
-        else Ok ()
-    | _ => Err "Unexpected shape of evidence"
-*)
 fun doMeasProcFile am = doMeasFileGen am copMeasFile2 appraiseProcFile
-    (*
-    let val nonce = genNonce ()
-        val ev = evalTerm am (N (Id O) nonce Mt) copMeasFile2
-     in print (
-            "Evaluating term:\n" ^ termToString copMeasFile2 ^ "\n\n" ^
-            "Nonce: " ^ ByteString.show nonce ^ "\n\n" ^ 
-            "Evidence: " ^ evToString ev ^ "\n\n" ^
-            "Appraisal " ^ (case appraiseFile2 nonce ev of 
-                  Ok ()   => "succeeded"
-                | Err msg => "failed: " ^ msg 
-            )
-        )
-    end *)
 
 fun appraiseDir nonce ev = case ev of
     G evSign (U (Id (S O)) ["testDir"] evHash (N (Id O) evNonce Mt)) =>
@@ -176,7 +128,7 @@ fun sendReqs addr meas =
          | "dirMeas" => (doMeasDir am; print "\n\n")
          | "procMeas" => (doMeasProc am; print "\n\n")
          | "procFileMeas" => (doMeasProcFile am; print "\n\n")
-         | s => TextIO.print_err ("Measurement \"" ^ s ^ "\" unknown.\n Try one of:  \"fileMeas\", \"dirMeas\", \"procMeas\"\n")
+         | s => TextIO.print_err ("Measurement \"" ^ s ^ "\" unknown.\n Try one of:  \"fileMeas\", \"dirMeas\", \"procMeas\", \"procFileMeas\"\n")
     end
     handle Socket.Err s     => TextIO.print_err ("Socket failure on connection: " ^ s ^ "\n")
          | Socket.InvalidFD => TextIO.print_err "Invalid file descriptor\n"
