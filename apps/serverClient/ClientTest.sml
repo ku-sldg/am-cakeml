@@ -10,7 +10,17 @@ val copMeasFile =
         (Asp Sig)
     )
 val goldenHashFile = "E56B5C95EE35B7CC24FC6FE76A604A62ADD3A4A21759E33F08780B9BE79107EDB8CCB04A5214DCC51DDAF26884D7BD884D71E718EA9BD8064A0D02BBCCB2F08B"
-    (* "DDAF35A193617ABACC417349AE20413112E6FA4E89A97EA20A9EEEE64B55D39A2192992A274FC1A836BA3C23A3FEEBBD454D4423643CE80E2A9AC94FA54CA49F" *)
+(* "DDAF35A193617ABACC417349AE20413112E6FA4E89A97EA20A9EEEE64B55D39A2192992A274FC1A836BA3C23A3FEEBBD454D4423643CE80E2A9AC94FA54CA49F" *)
+
+val file2 = "testProc/good/testProc"
+(*val fileHashId = Id O*)
+val copMeasFile2 =
+    Att (S O) (Lseq
+        (Asp (Aspc fileHashId [file2]))
+        (Asp Sig)
+    )
+val goldenHashFile2 = "DAD3346C2B4B9DE2F34B738032F0BDF8DCB0A732493EF8F56FD8BBDAC572B66FDCFF36D86C390239BC87732E0D7149414F2AD0B2EDFEBB0ADB072667A131BEB8"
+(*"E56B5C95EE35B7CC24FC6FE76A604A62ADD3A4A21759E33F08780B9BE79107EDB8CCB04A5214DCC51DDAF26884D7BD884D71E718EA9BD8064A0D02BBCCB2F08B"*)
 
 val dir = "testDir" 
 val dirHashId = Id (S O)
@@ -54,6 +64,30 @@ fun doMeasFile am =
             "Nonce: " ^ ByteString.show nonce ^ "\n\n" ^ 
             "Evidence: " ^ evToString ev ^ "\n\n" ^
             "Appraisal " ^ (case appraiseFile nonce ev of 
+                  Ok ()   => "succeeded"
+                | Err msg => "failed: " ^ msg 
+            )
+        )
+    end
+
+fun appraiseFile2 nonce ev = case ev of
+    G evSign (U (Id O) _ evHash (N (Id O) evNonce Mt)) =>
+        if not (ByteString.deepEq evNonce nonce) then
+            Err "Bad nonce value"
+        else if ByteString.toHexString evHash <> goldenHashFile2 then
+            Err "Bad hash value"
+        else if not (Option.valOf (verifySig ev pub)) then
+            Err "Bad signature"
+        else Ok ()
+    | _ => Err "Unexpected shape of evidence"
+fun doMeasProcFile am = 
+    let val nonce = genNonce ()
+        val ev = evalTerm am (N (Id O) nonce Mt) copMeasFile2
+     in print (
+            "Evaluating term:\n" ^ termToString copMeasFile2 ^ "\n\n" ^
+            "Nonce: " ^ ByteString.show nonce ^ "\n\n" ^ 
+            "Evidence: " ^ evToString ev ^ "\n\n" ^
+            "Appraisal " ^ (case appraiseFile2 nonce ev of 
                   Ok ()   => "succeeded"
                 | Err msg => "failed: " ^ msg 
             )
@@ -114,6 +148,7 @@ fun sendReqs addr meas =
            "fileMeas" => (doMeasFile am; print "\n\n")
          | "dirMeas" => (doMeasDir am; print "\n\n")
          | "procMeas" => (doMeasProc am; print "\n\n")
+         | "procFileMeas" => (doMeasProcFile am; print "\n\n")
          | s => TextIO.print_err ("Measurement \"" ^ s ^ "\" unknown.\n Try one of:  \"fileMeas\", \"dirMeas\", \"procMeas\"\n")
     end
     handle Socket.Err s     => TextIO.print_err ("Socket failure on connection: " ^ s ^ "\n")
