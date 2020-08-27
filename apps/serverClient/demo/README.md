@@ -91,7 +91,6 @@
 1.  Start good test process:
     *  navigate to `/apps/serverClient/testProc/good/`
     * `./testProc`
-    new header
 1.  Run client in terminal A: proc measurement
     * `./client localhost procMeas`
     *  Appraisal fails with a "Bad hash value"
