@@ -2,25 +2,22 @@
 
 val pub = (ByteString.toRawString o ByteString.fromHexString) "490E2422528F14AC6A48DDB9D72CB30B8345AF2E939003BC7A33A6057F2FFB0101000000000000002DD0B7F53A560000A049D882A37F00000000000000000000"
 
-val file = "hashTest.txt"
-val fileHashId = Id O
-val copMeasFile =
+fun copMeasFileGen f =
+    let val fileHashId = Id O in
     Att (S O) (Lseq
-        (Asp (Aspc fileHashId [file]))
+        (Asp (Aspc fileHashId [f]))
         (Asp Sig)
-    )
-val goldenHashFile = "E56B5C95EE35B7CC24FC6FE76A604A62ADD3A4A21759E33F08780B9BE79107EDB8CCB04A5214DCC51DDAF26884D7BD884D71E718EA9BD8064A0D02BBCCB2F08B"
-(* "DDAF35A193617ABACC417349AE20413112E6FA4E89A97EA20A9EEEE64B55D39A2192992A274FC1A836BA3C23A3FEEBBD454D4423643CE80E2A9AC94FA54CA49F" *)
+              )
+    end
+        
 
-val file2 = "testProc/good/testProc"
-(*val fileHashId = Id O*)
-val copMeasFile2 =
-    Att (S O) (Lseq
-        (Asp (Aspc fileHashId [file2]))
-        (Asp Sig)
-    )
-val goldenHashFile2 = "DAD3346C2B4B9DE2F34B738032F0BDF8DCB0A732493EF8F56FD8BBDAC572B66FDCFF36D86C390239BC87732E0D7149414F2AD0B2EDFEBB0ADB072667A131BEB8"
-(*"E56B5C95EE35B7CC24FC6FE76A604A62ADD3A4A21759E33F08780B9BE79107EDB8CCB04A5214DCC51DDAF26884D7BD884D71E718EA9BD8064A0D02BBCCB2F08B"*)
+val file = "hashTest.txt"
+val copMeasFile = copMeasFileGen file
+val goldenHashFile = "E56B5C95EE35B7CC24FC6FE76A604A62ADD3A4A21759E33F08780B9BE79107EDB8CCB04A5214DCC51DDAF26884D7BD884D71E718EA9BD8064A0D02BBCCB2F08B"
+
+val procFile = "testProc/good/testProc"
+val copMeasFile2 = copMeasFileGen procFile
+val goldenHashProcFile = "DAD3346C2B4B9DE2F34B738032F0BDF8DCB0A732493EF8F56FD8BBDAC572B66FDCFF36D86C390239BC87732E0D7149414F2AD0B2EDFEBB0ADB072667A131BEB8"
 
 val dir = "testDir" 
 val dirHashId = Id (S O)
@@ -30,7 +27,6 @@ val copMeasDir =
         (Asp Sig)
     )
 val goldenHashDir = "873B27E32B748D695A9934E14A4CFE995EC62C4AFEB50D85613D0C35D42D1A50302514C2E21DBD65A3148AF39E20554AA31C6274560EE9473CC734CE35F60E42"
-   (* "A4EA2BB49B0FF60D240FC17C63548892EF3A3BB618718FB562FE603916EF1211EC51BB59CA137782F277450016EDEA9E33CE30B08538AA5A306933920CE272C6" *)
 
 val proc = "testProc"
 val procHashId = Id (S (S O))
@@ -44,9 +40,36 @@ val goldenHashProc = "AF9F0EAD72487DCF7514D5825EE0D32FB1BBACB9CD17F4BC0B81DC4311
 (*"BC6EB058F40400330ECB82CB4F9FDA032CAAD38A0FB5C7F5AC9E3C69F28698D4C3E5100DE88509AF70A05CA05A8125A1716D80252AB088CA440087C69021382D"*)
 
 datatype ('t, 'e) result = Ok 't
-                         | Err 'e
+       | Err 'e
 
-fun appraiseFile nonce ev = case ev of
+fun doMeasFileGen am t f_app = 
+    let val nonce = genNonce ()
+        val ev = evalTerm am (N (Id O) nonce Mt) t 
+     in print (
+            "Evaluating term:\n" ^ termToString t ^ "\n\n" ^
+            "Nonce: " ^ ByteString.show nonce ^ "\n\n" ^ 
+            "Evidence: " ^ evToString ev ^ "\n\n" ^
+            "Appraisal " ^ (case f_app nonce ev of 
+                  Ok ()   => "succeeded"
+                | Err msg => "failed: " ^ msg 
+            )
+        )
+    end
+
+fun appraiseFileGen nonce ev golden_hash = case ev of
+    G evSign (U (Id O) _ evHash (N (Id O) evNonce Mt)) =>
+        if not (ByteString.deepEq evNonce nonce) then
+            Err "Bad nonce value"
+        else if ByteString.toHexString evHash <> golden_hash then
+            Err "Bad hash value"
+        else if not (Option.valOf (verifySig ev pub)) then
+            Err "Bad signature"
+        else Ok ()
+    | _ => Err "Unexpected shape of evidence"
+
+fun appraiseFile nonce ev = appraiseFileGen nonce ev goldenHashFile
+
+    (* case ev of
     G evSign (U (Id O) ["hashTest.txt"] evHash (N (Id O) evNonce Mt)) =>
         if not (ByteString.deepEq evNonce nonce) then
             Err "Bad nonce value"
@@ -55,8 +78,9 @@ fun appraiseFile nonce ev = case ev of
         else if not (Option.valOf (verifySig ev pub)) then
             Err "Bad signature"
         else Ok ()
-    | _ => Err "Unexpected shape of evidence"
-fun doMeasFile am = 
+    | _ => Err "Unexpected shape of evidence" *)
+fun doMeasFile am = doMeasFileGen am copMeasFile appraiseFile
+                                  (*
     let val nonce = genNonce ()
         val ev = evalTerm am (N (Id O) nonce Mt) copMeasFile 
      in print (
@@ -68,19 +92,22 @@ fun doMeasFile am =
                 | Err msg => "failed: " ^ msg 
             )
         )
-    end
+    end *)
 
-fun appraiseFile2 nonce ev = case ev of
+fun appraiseProcFile nonce ev = appraiseFileGen nonce ev goldenHashProcFile
+    (* case ev of
     G evSign (U (Id O) _ evHash (N (Id O) evNonce Mt)) =>
         if not (ByteString.deepEq evNonce nonce) then
             Err "Bad nonce value"
-        else if ByteString.toHexString evHash <> goldenHashFile2 then
+        else if ByteString.toHexString evHash <> goldenHashFileProc then
             Err "Bad hash value"
         else if not (Option.valOf (verifySig ev pub)) then
             Err "Bad signature"
         else Ok ()
     | _ => Err "Unexpected shape of evidence"
-fun doMeasProcFile am = 
+*)
+fun doMeasProcFile am = doMeasFileGen am copMeasFile2 appraiseProcFile
+    (*
     let val nonce = genNonce ()
         val ev = evalTerm am (N (Id O) nonce Mt) copMeasFile2
      in print (
@@ -92,7 +119,7 @@ fun doMeasProcFile am =
                 | Err msg => "failed: " ^ msg 
             )
         )
-    end
+    end *)
 
 fun appraiseDir nonce ev = case ev of
     G evSign (U (Id (S O)) ["testDir"] evHash (N (Id O) evNonce Mt)) =>
