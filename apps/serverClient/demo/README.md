@@ -93,9 +93,9 @@
     * `./testProc`
 1.  Run client in terminal A: proc measurement
     * `./client localhost procMeas`
-    *  Appraisal fails with a "Bad hash value"
+    *  Appraisal fails with a "Bad hash value" (Needs per-platform provisioning)
 1.  Provision good test process
-    * Copy/Paste golden hash value from Evidence to `apps/serverClient/ClientTest.sml`
+    * Copy/Paste golden hash value from Evidence to `apps/serverClient/ClientTest.sml` --> (val goldenHashProc)
     * Re-build client source in termain A:  `make am`
 1.  Run client in terminal A: proc measurement
     * `./client localhost procMeas`
