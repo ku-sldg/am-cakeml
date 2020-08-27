@@ -104,11 +104,13 @@ fun doMeasProc am =
         )
     end
 
-fun sendReqs addr =
+fun sendReqs addr meas =
     let val am = serverAm "" (Map.insert emptyNsMap (S O) addr)
-     in doMeasFile am; print "\n\n";
-        doMeasDir  am; print "\n\n";
-        doMeasProc am; print "\n"
+    in case meas of
+           "fileMeas" => (doMeasFile am; print "\n\n")
+         | "dirMeas" => (doMeasDir am; print "\n\n")
+         | "procMeas" => (doMeasProc am; print "\n\n")
+         | s => TextIO.print_err ("Measurement \"" ^ s ^ "\" unknown.\n Try one of:  \"fileMeas\", \"dirMeas\", \"procMeas\"\n")
     end
     handle Socket.Err s     => TextIO.print_err ("Socket failure on connection: " ^ s ^ "\n")
          | Socket.InvalidFD => TextIO.print_err "Invalid file descriptor\n"
@@ -117,11 +119,11 @@ fun sendReqs addr =
 
 fun main () =
     let val name  = CommandLine.name ()
-        val usage = "Usage: " ^ name ^ " address\n"
-                  ^ "e.g.   " ^ name ^ " 127.0.0.1\n"
+        val usage = "Usage: " ^ name ^ " address" ^ " measurement\n"
+                  ^ "e.g.   " ^ name ^ " 127.0.0.1" ^ " fileMeas\n"
      in case CommandLine.arguments () of
-              [addr] => sendReqs addr
-            | _ => TextIO.print_err usage
+            [addr,meas] => sendReqs addr meas
+          | _ => TextIO.print_err usage
      end
 
 val _ = main ()
