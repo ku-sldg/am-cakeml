@@ -4,11 +4,11 @@
 * Build commands
 * Testing successful install
 ## 2. Tour of code repo (directory structure)
-* /copland:  core AM code
-* /system:  crypto and comm
-* /util:  bytestrings and json
-* /am:  measurement utils
-* /apps:  application-specific logic
+* `/copland`:  core AM code
+* `/system`:  crypto and comm
+* `/util`:  bytestrings and json
+* `/am`:  measurement utils
+* `/apps`:  application-specific logic
     * serverClient
     * test suite
     * case
@@ -16,10 +16,10 @@
 ### Setup
 
 * Open 4 terminals (A,B,C,D)
-    * A=   /build
-    * B=   /apps/serverClient
-    * C=   /apps/serverClient/demo
-    * D=   /apps/serverClient
+    * A=   `/build`
+    * B=   `/apps/serverClient`
+    * C=   `/apps/serverClient/demo`
+    * D=   `/apps/serverClient`
         
 * Start server in terminal B
     * `sudo ../../build/server 5000 5`
@@ -96,7 +96,7 @@
     *  Appraisal fails with a "Bad hash value" (Needs per-platform provisioning)
 1.  Provision good test process
     * Copy/Paste golden hash value from Evidence to `apps/serverClient/ClientTest.sml` --> (val goldenHashProc)
-    * Re-build client source in termain A:  `make am`
+    * Re-build client source in termainal A:  `make am`
 1.  Run client in terminal A: proc measurement
     * `./client localhost procMeas`
     *  Appraisal succeeds
