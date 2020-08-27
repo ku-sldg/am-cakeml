@@ -1,1 +1,1 @@
-abc
+good hashTest.txt
