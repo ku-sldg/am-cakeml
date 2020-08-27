@@ -1,2 +1,1 @@
-abc
-bad code here
+bad hashTest code here!
