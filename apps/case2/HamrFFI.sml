@@ -12,6 +12,8 @@ val unitBuf  = Word8Array.array 1 nullByte
 (* Necessary? *)
 (* val _ = #(initializeComponent) "" emptyBuf *)
 
+datatype logType = Info | Debug | Error
+
 structure Api = struct 
 
     (*
@@ -33,10 +35,8 @@ structure Api = struct
     end
     *)
 
-    datatype logType = Info | Debug | Error
-
     (* logType -> string -> () *)
-    fun log logT msg = case logT of
+    fun log lType msg = case lType of
           Info  => #(api_logInfo)  msg emptyBuf
         | Debug => #(api_logDebug) msg emptyBuf
         | Error => #(api_logError) msg emptyBuf

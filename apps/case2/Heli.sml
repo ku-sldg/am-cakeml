@@ -1,5 +1,7 @@
 (* Depends on util, copland *)
 
+val log = Api.log
+
 exception Undef
 (* () -> 'a *)
 fun undefined () = raise Undef
@@ -7,28 +9,44 @@ fun undefined () = raise Undef
 
 (* string -> string *)
 val hexToRaw = ByteString.toRawString o ByteString.fromHexString
+val rawToHex = ByteString.toHexString o ByteString.fromRawString
 
 val pub = hexToRaw "490E2422528F14AC6A48DDB9D72CB30B8345AF2E939003BC7A33A6057F2FFB0101000000000000002DD0B7F53A560000A049D882A37F00000000000000000000"
 
 (* () -> connection *)
 (* Blocking/waiting. *)
 (* connection type includes relevant info like ip address, whatever we need to send requests and add to whitelist *)
-fun waitGetConnection () = undefined ()
+fun waitGetConnection () = (
+    log Info "Waiting for connection";
+    undefined ()
+)
 
 (* () -> string option *)
 (* returns Nothing in the case of a timeout. *)
-fun waitGetResponse conn = undefined ()
+fun waitGetResponse conn = (
+   log Info "Waiting for response";
+   undefined ()
+)
 
 (* connection -> string -> () *)
-fun sendReq conn req = undefined ()
+fun sendReq conn req = (
+   log Info ("Sending request " ^ (rawToHex req));
+   undefined ()
+)
 
 (* connection -> () *)
 (* idempotent *)
-fun addToWhitelist conn = undefined ()
+fun addToWhitelist conn = (
+    log Info "Adding something to the whitelist";
+    undefined ()
+)
 
 (* connection -> () *)
 (* idempotent *)
-fun removeFromWhitelist conn = undefined ()
+fun removeFromWhitelist conn = (
+    log Info "Removing something from the whitelist";
+    undefined ()
+)
 
 (* string -> ev option *)
 fun parseResp resp = 
@@ -51,23 +69,46 @@ fun attest conn =
         val _ = sendReq conn nonce
      in case waitGetResponse () of
               Some resp => case parseResp resp of
-                    Some ev => if appraise ev
-                        then (addToWhitelist conn; True)
-                        else (removeFromWhitelist conn; False)
-                  | _ => (removeFromWhitelist conn; False)
-            | _ => (removeFromWhitelist conn; False)
+                    Some ev => if appraise ev then (
+                            log Info "Appraisal succeeded";
+                            addToWhitelist conn;
+                            True
+                        ) else (
+                            log Info "Appraisal failed";
+                            removeFromWhitelist conn;
+                            False
+                        )
+                  | _ => (
+                          log Info "Evidence failed to parse";
+                          removeFromWhitelist conn;
+                          False
+                      )
+            | _ => (
+                    log Info "Request timed-out";
+                    removeFromWhitelist conn;
+                    False
+                )
     end
 
 (* () -> () *)
 (* blocks/waits until start of next period *)
-fun waitForNextTick () = undefined ()
+fun waitForNextTick () = (
+    log Info "Waiting for the start of the next period";
+    undefined ()
+)
+
+(* connection -> () *)
+fun closeConnection conn = (
+    log Info "Closing conection";
+    undefined ()
+)
 
 (* conn -> () *)
 (* Loops infinitely unless appraisal fails, or timeout *)
 fun attestLoop conn = (
     if attest conn
         then (waitForNextTick (); attestLoop conn)
-        else () (* TODO: log message *)
+        else closeConnection conn
 )
 
 (* () -> 'a *)

@@ -25,7 +25,7 @@ set(standalone_am_src ${cop_src} ${crypto_src} am/CommTypes.sml)
 #set(uav_src ${server_am_src} ${time_src} system/dataports/UavDataportFFI.sml apps/case/Uav.sml)
 
 set(case2_client_src ${server_am_src} apps/case2/Client.sml)
-set(heli_src ${standalone_am_src}  apps/case2/Heli.sml)
+set(heli_src ${standalone_am_src} apps/case2/HamrFFI.sml apps/case2/Heli.sml)
 
 # Unfortunately, the build process will diverge significantly between
 # standalone executables and CAmkES components
