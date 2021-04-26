@@ -11,17 +11,21 @@ set(cop_src ${util_src} copland/Instr.sml copland/AM.sml copland/VM.sml
 # TODO: separate meas from crypto
 set(crypto_src system/crypto/CryptoFFI.sml system/crypto/MeasFFI.sml)
 set(socket_src system/sockets/SocketFFI.sml)
-set(time_src system/time/TimeFFI.sml)
-set(dataport_src system/dataports/DataportFFI.sml)
+# set(time_src system/time/TimeFFI.sml)
+# set(dataport_src system/dataports/DataportFFI.sml)
 set(server_am_src ${cop_src} ${crypto_src} am/Measurements.sml ${socket_src}
     am/CommTypes.sml am/ServerAm.sml)
+set(standalone_am_src ${cop_src} ${crypto_src} am/CommTypes.sml)
 
-set(tests_src  ${server_am_src} apps/tests/Main.sml)
-set(client_src ${server_am_src} apps/serverClient/ClientTest.sml)
-set(server_src ${server_am_src} apps/serverClient/Server.sml)
+#set(tests_src  ${server_am_src} apps/tests/Main.sml)
+#set(client_src ${server_am_src} apps/serverClient/ClientTest.sml)
+#set(server_src ${server_am_src} apps/serverClient/Server.sml)
 
-set(gs_src  ${server_am_src} apps/case/Groundstation.sml)
-set(uav_src ${server_am_src} ${time_src} system/dataports/UavDataportFFI.sml apps/case/Uav.sml)
+#set(gs_src  ${server_am_src} apps/case/Groundstation.sml)
+#set(uav_src ${server_am_src} ${time_src} system/dataports/UavDataportFFI.sml apps/case/Uav.sml)
+
+set(case2_client_src ${server_am_src} apps/case2/Client.sml)
+set(heli_src ${standalone_am_src}  apps/case2/Heli.sml)
 
 # Unfortunately, the build process will diverge significantly between
 # standalone executables and CAmkES components
@@ -74,7 +78,7 @@ else()
 
     # Add targets
     add_subdirectory(system/crypto)
-    function(build_am_thing name)
+    function(build_am_exe name)
         build_cake("${name}.cake" SOURCES "${ARGN}")
         add_executable(${name} system/basis_ffi.c system/sockets/socket_ffi.c)
         if(${STATIC_LINKING})
@@ -82,25 +86,27 @@ else()
         endif()
         target_link_libraries(${name} "${name}.cake" crypto ${link_flags})
     endfunction()
+    function(build_am_lib name)
+        build_cake("${name}.cake" SOURCES "${ARGN}")
+        #add_library(${name} system/basis_ffi.c)
+        if(${STATIC_LINKING})
+            set(link_flags "-static-libgcc -static")
+        endif()
+        #target_link_libraries(${name} "${name}.cake" crypto ${link_flags})
+    endfunction()
 
-    build_am_thing("tests"  ${tests_src})
 
-    build_am_thing("server" ${server_src})
-    build_am_thing("client" ${client_src})
-    add_custom_target(am DEPENDS server client)
+    # build_am_thing("tests"  ${tests_src})
+
+    # build_am_thing("server" ${server_src})
+    # build_am_thing("client" ${client_src})
+    # add_custom_target(am DEPENDS server client)
     
-    build_am_thing("gs_am"  ${gs_src})
-    build_am_thing("uav_am" ${uav_src})
-    # Hacky way to prevent CMAKE complaints
-    if(NOT "${am_queue}" STREQUAL "")
-        set(am_src ${am_queue}/src/am_queue.c)
-    endif()
-    target_sources("uav_am" PRIVATE
-        system/dataports/uav_dataport_ffi.c
-        system/time/sys/linux/time.c
-        ${am_src}
-    )
-    target_include_directories("uav_am" PRIVATE ${am_queue}/include)
-    set_target_properties(uav_am PROPERTIES EXCLUDE_FROM_ALL true)
-    add_custom_target(case DEPENDS gs_am uav_am)
+    # build_am_thing("gs_am"  ${gs_src})
+    # build_am_thing("uav_am" ${uav_src})
+
+    build_am_exe("case2_client_am"  ${case2_client_src})
+    build_am_lib("heli_am" ${heli_src})
+
+    # set_target_properties(case2_client_am PROPERTIES EXCLUDE_FROM_ALL true)
 endif()
