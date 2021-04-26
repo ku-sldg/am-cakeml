@@ -55,9 +55,23 @@ fun parseResp resp =
     end
     handle _ => None
 
-(* ev -> bool *)
+(* Definition taken from am/measurements. That file is mostly linux-specific. Long-term, this function should be moved somewhere else *)
+fun verifySig g pub = 
+    case g of
+          G bs ev => Some (Crypto.sigCheck pub bs (encodeEv ev))
+        | _ => None
+
+(* bytestring -> ev -> bool *)
 (* true if appraisal succeeds *)
-fun appraise ev = undefined ()
+fun appraise nonce ev = case ev of
+      G evSign (N _ evNonce Mt) => 
+          if not (ByteString.deepEq evNonce nonce) then
+              (log Info "Appraisal failed, bad nonce"; False)
+          else if not (Option.valOf (verifySig ev pub)) then
+              (log Info "Appraisal failed, bad signature"; False)
+          else
+              (log Info "Appraisal succeeded"; True)
+    | _ => (log Info "Unexpected evidence structure"; False)
 
 (* () -> ByteString *)
 fun genNonce () = undefined ()
@@ -65,29 +79,21 @@ fun genNonce () = undefined ()
 (* true if appraisal succeeds *)
 (* might need to be refactored to differentiate bad appraisal from timeout and misc. errors (the former might warrant a permanent blacklisting, while the latter would not) *)
 fun attest conn = 
-    let val nonce = ByteString.toRawString (genNonce ())
-        val _ = sendReq conn nonce
+    let val nonce = genNonce ()
+        val _ = sendReq conn (ByteString.toRawString nonce)
      in case waitGetResponse () of
               Some resp => case parseResp resp of
-                    Some ev => if appraise ev then (
-                            log Info "Appraisal succeeded";
-                            addToWhitelist conn;
-                            True
-                        ) else (
-                            log Info "Appraisal failed";
-                            removeFromWhitelist conn;
-                            False
-                        )
-                  | _ => (
-                          log Info "Evidence failed to parse";
+                    Some ev =>
+                        if appraise nonce ev then
+                            (addToWhitelist conn; True) 
+                        else
+                            ( removeFromWhitelist conn; False)
+                  | _ => (log Info "Evidence failed to parse";
                           removeFromWhitelist conn;
-                          False
-                      )
-            | _ => (
-                    log Info "Request timed-out";
+                          False)
+            | _ => (log Info "Request timed-out";
                     removeFromWhitelist conn;
-                    False
-                )
+                    False)
     end
 
 (* () -> () *)
