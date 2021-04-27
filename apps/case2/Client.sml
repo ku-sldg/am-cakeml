@@ -17,8 +17,14 @@ val protocol = Asp Sig
 
 local
     (* Placeholder value. *)
+    (* good key *)
     val priv = (ByteString.toRawString o ByteString.fromHexString)
                "2E5773B2A19A2CB05FEE44650D8DC877B3D806F74C199043657C805288CD119B"
+    (* bad key *)
+    (*
+    val priv = (ByteString.toRawString o ByteString.fromHexString)
+               "2F5773B2A19A2CB05FEE44650D8DC877B3D806F74C199043657C805288CD119B"
+    *)
     val am = serverAm priv emptyNsMap
 in
     (* attest : Socket.fd -> () *)
@@ -49,10 +55,11 @@ fun main () =
     let val name  = CommandLine.name ()
         val usage = "Usage: " ^ name ^ " address port\n"
                   ^ "e.g.   " ^ name ^" 192.168.2.7 5000"
-     in case CommandLine.arguments () of
+     in (case CommandLine.arguments () of
               [addr, portStr] => case Int.fromNatString portStr of
                 Some port => mainLoop addr port
               | None      => TextIO.print usage
-            | _ => TextIO.print usage
+            | _ => TextIO.print usage)
+         handle _ => TextIO.print usage
     end
 val _ = main ()
