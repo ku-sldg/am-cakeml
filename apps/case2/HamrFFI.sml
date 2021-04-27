@@ -1,6 +1,5 @@
 (* Depends on ByteString *)
 
-
 val nullByte = Word8.fromInt 0
 val emptyBuf = Word8Array.array 0 nullByte
 val unitBuf  = Word8Array.array 1 nullByte
@@ -18,7 +17,7 @@ structure Api = struct
 
     (* string -> () *)
     (* TODO: Add safety rails to limit size of req *)
-    fun sendRequest req = #(api_send_attestationRequest) req emptyBuf
+    fun sendRequest req = #(api_send_AttestationRequest) req emptyBuf
 
     (* () -> string *)
     local
@@ -29,7 +28,7 @@ structure Api = struct
     in 
         fun getResponse () = 
             let val in_buf = Word8Array.array (respMaxLen + 1) nullByte in
-                #(api_receiveInput) "" in_buf;
+                #(api_get_AttestationResponse) "" in_buf;
                 if Word8Array.sub in_buf 0 = ffi_err then
                     (* Is this an error? If this is polling-based, it could just mean nothing is available atm *)
                     (log Error "api_get_AttestationResponse error"; "")

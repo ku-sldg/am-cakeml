@@ -106,7 +106,14 @@ else()
     # build_am_thing("uav_am" ${uav_src})
 
     build_am_exe("case2_client_am"  ${case2_client_src})
-    build_am_lib("heli_am" ${heli_src})
+    #build_am_lib("heli_am" ${heli_src})
+
+    build_cake("heli_am.cake" SOURCES "${heli_src}")
+    add_executable(heli_am system/basis_ffi.c apps/case2/fake_ffi.c)
+    if(${STATIC_LINKING})
+        set(link_flags "-static-libgcc -static")
+    endif()
+    target_link_libraries(heli_am "heli_am.cake" crypto ${link_flags})
 
     # set_target_properties(case2_client_am PROPERTIES EXCLUDE_FROM_ALL true)
 endif()
