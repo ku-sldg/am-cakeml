@@ -1,40 +1,15 @@
 (* Depends on ByteString *)
-(*
-  Stray thoughts: 
-  - do these ffi calls have any error code reporting?
-  - what is purpose of initialize, sendOutput, recieveInput?
-*)
+
 
 val nullByte = Word8.fromInt 0
 val emptyBuf = Word8Array.array 0 nullByte
 val unitBuf  = Word8Array.array 1 nullByte
 
-(* Necessary? *)
-(* val _ = #(initializeComponent) "" emptyBuf *)
+val ffi_err = nullByte
 
 datatype logType = Info | Debug | Error
 
 structure Api = struct 
-
-    (*
-    (* String -> () *)
-    fun sendOutput out = #(api_sendOutput) out emptyBuf
-
-    (* () -> String *)
-    local
-        (* val inBuf = Word8Array.array 2048 nullByte *)
-        fun getLeadingStr buf = case Word8Array.findi ((op =) nullByte) buf of
-              Some (i, _) =>  Word8Array.substring buf 0 i
-            | _ => ByteString.toRawString buf
-    in 
-        fun receiveInput () = 
-        let val inBuf = Word8Array.array 2048 nullByte in
-            #(api_receiveInput) "" inBuf;
-            getLeadingStr inBuf
-        end
-    end
-    *)
-
     (* logType -> string -> () *)
     fun log lType msg = case lType of
           Info  => #(api_logInfo)  msg emptyBuf
@@ -52,11 +27,21 @@ structure Api = struct
     (* string -> () *)
     (* TODO: Add safety rails to limit size of req *)
     fun sendTrustedIds trustedIds = #(api_send_TrustedIds) trustedIds emptyBuf
-    (* Don't we also need a getTrustedIds function, so that we can just update one? I suppose we can maintain that internally *)
 
-    (* What do these do? *)
-    (* fun getInitiateAttestation *)
-    (* fun sendTerminateAttestation *)
+    (* () -> connection Option *)
+    (* Seems to be blocking? *)
+    fun getConnection () = 
+        let val conn_len = 8 (* random placeholder val *)
+            val out_buf = Word8Array.array (conn_len + 1) nullByte
+         in #(api_get_InitiateAttestation) "" out_buf;
+            if Word8Array.sub out_buf 0 = ffi_err then
+                (log Error "api_get_InitiateAttestation error"; None)
+            else
+                Some (Word8Array.substring out_buf 1 conn_len)
+        end
+    
+    (* connection -> () *)
+    fun closeConnection conn = #(api_send_TerminateAttestation) conn emptyBuf
 
     fun pacerWait () = #(sb_pacer_notification_wait) "" unitBuf
 
