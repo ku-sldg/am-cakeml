@@ -21,8 +21,22 @@ structure Api = struct
     fun sendRequest req = #(api_send_attestationRequest) req emptyBuf
 
     (* () -> string *)
-    (* TODO *)
-    fun getResponse () = ""
+    local
+        val respMaxLen = 2048
+        fun getLeadingStr buf = case Word8Array.findi ((op =) nullByte) buf of
+              Some (i, _) =>  Word8Array.substring buf 0 i
+            | _ => ByteString.toRawString buf
+    in 
+        fun getResponse () = 
+            let val in_buf = Word8Array.array (respMaxLen + 1) nullByte in
+                #(api_receiveInput) "" in_buf;
+                if Word8Array.sub in_buf 0 = ffi_err then
+                    (* Is this an error? If this is polling-based, it could just mean nothing is available atm *)
+                    (log Error "api_get_AttestationResponse error"; "")
+                else 
+                    getLeadingStr (ByteString.fromRawString (Word8Array.substring in_buf 1 respMaxLen))
+            end
+    end
 
     (* string -> () *)
     (* TODO: Add safety rails to limit size of req *)
