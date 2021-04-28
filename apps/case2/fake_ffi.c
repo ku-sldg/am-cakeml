@@ -62,6 +62,7 @@ int get_listener(int qlen, char * port) {
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
+    hints.ai_protocol = IPPROTO_TCP;
 
     struct addrinfo * result;
     if (getaddrinfo(0, port, &hints, &result)) {
@@ -102,6 +103,17 @@ int get_accept(int sockfd) {
     // accept returns the sockfd corresponding to the first connection in the
     // incoming queue. If there is none, blocks until there is.
     int conn_sockfd = accept(sockfd, (struct sockaddr *)(&conn_addr), &conn_addr_len);
+
+    // set timeout window
+    struct timeval timeout;
+    timeout.tv_sec = 5;
+    timeout.tv_usec = 0;
+    int err = setsockopt(conn_sockfd, SOL_SOCKET, SO_RCVTIMEO, (const void *)(&timeout), (socklen_t)sizeof(timeout));
+    if (err == -1) {
+        perror("setsockopt error: ");
+        exit(1);
+    }
+
     return conn_sockfd;
 }
 

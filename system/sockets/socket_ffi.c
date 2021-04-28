@@ -46,6 +46,7 @@ void ffilisten(const uint8_t * c, const long clen, uint8_t * a, const long alen)
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
+    hints.ai_protocol = IPPROTO_TCP;
 
     struct addrinfo * result;
     if (getaddrinfo(0, port, &hints, &result)) {
