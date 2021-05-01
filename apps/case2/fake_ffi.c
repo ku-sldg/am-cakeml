@@ -1,5 +1,7 @@
 // This file will be regenerated, do not edit
 
+#define _GNU_SOURCE
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <assert.h>
@@ -12,9 +14,7 @@
 #include <sys/socket.h> // socket, bind, listen, getaddrinfo
 #include <netdb.h>      // getaddrinfo
 #include <unistd.h>     // close
-
-#define FFI_SUCCESS 1
-#define FFI_FAILURE 0
+#include <fcntl.h>
 
 // Globals
 int listener_fd;
@@ -22,6 +22,13 @@ bool listener_open = false;
 int conn_fd;
 bool conn_open = false;
 
+void ffiapi_receiveInput(unsigned char *parameter, long parameterSizeBytes, unsigned char *output, long outputSizeBytes) {
+  return;
+}
+
+void ffiapi_sendOutput(unsigned char *parameter, long parameterSizeBytes, unsigned char *output, long outputSizeBytes) {
+  return;
+}
 
 void ffiapi_logInfo(unsigned char *parameter, long parameterSizeBytes, unsigned char *output, long outputSizeBytes){
   printf("INFO: %s\n", parameter);
@@ -41,14 +48,12 @@ void ffiapi_send_AttestationRequest(unsigned char *parameter, long parameterSize
   write(conn_fd, (const void *)parameter, 16);
 }
 
+
 void ffiapi_get_AttestationResponse(unsigned char *parameter, long parameterSizeBytes, unsigned char *output, long outputSizeBytes) {
   assert(outputSizeBytes = 2049);
 
   ssize_t n_read = read(conn_fd, ((void *)output)+1, 2048);
-  if (n_read > 0)
-    output[0] = FFI_SUCCESS;
-  else
-    output[0] = FFI_FAILURE;
+  output[0] = n_read > 0;
 }
 
 void ffiapi_send_TrustedIds(unsigned char *parameter, long parameterSizeBytes, unsigned char *output, long outputSizeBytes) {
@@ -94,43 +99,35 @@ int get_listener(int qlen, char * port) {
     if (listen(sockfd, qlen))
         return -1;
 
+    int flags = fcntl(sockfd, F_GETFL);
+    fcntl(sockfd, F_SETFL, flags | O_NONBLOCK);
+
     return sockfd;
 }
 
 int get_accept(int sockfd) {
     struct sockaddr_in conn_addr;
     unsigned int conn_addr_len = (unsigned int)(sizeof(struct sockaddr_in));
-    // accept returns the sockfd corresponding to the first connection in the
-    // incoming queue. If there is none, blocks until there is.
-    int conn_sockfd = accept(sockfd, (struct sockaddr *)(&conn_addr), &conn_addr_len);
-
-    // set timeout window
-    struct timeval timeout;
-    timeout.tv_sec = 5;
-    timeout.tv_usec = 0;
-    int err = setsockopt(conn_sockfd, SOL_SOCKET, SO_RCVTIMEO, (const void *)(&timeout), (socklen_t)sizeof(timeout));
-    if (err == -1) {
-        perror("setsockopt error: ");
-        exit(1);
-    }
-
+    int conn_sockfd = accept4(sockfd, (struct sockaddr *)(&conn_addr), &conn_addr_len, SOCK_NONBLOCK);
     return conn_sockfd;
 }
 
 void ffiapi_get_InitiateAttestation(unsigned char *parameter, long parameterSizeBytes, unsigned char *output, long outputSizeBytes) {
-  assert(!listener_open && !conn_open);
+  assert(!conn_open);
 
-  while (!listener_open) {
+  if (!listener_open) {
     listener_fd = get_listener(1, "5000");
-    if (listener_fd != -1)
-      listener_open = true;
+    assert(listener_fd != -1);
+    listener_open = true;
   }
   
   conn_fd = get_accept(listener_fd);
-  for (; conn_fd == -1; conn_fd = get_accept(listener_fd)) {}
-  conn_open = true;
-  
-  output[0] = FFI_SUCCESS;
+  if (conn_fd == -1)
+    output[0] = false;
+  else {
+    conn_open = true;
+    output[0] = true;
+  }
 }
 
 void ffiapi_send_TerminateAttestation(unsigned char *parameter, long parameterSizeBytes, unsigned char *output, long outputSizeBytes) {
@@ -146,6 +143,7 @@ void ffiapi_send_TerminateAttestation(unsigned char *parameter, long parameterSi
   return;
 }
 
+// Waits until 0.5 seconds after last pacer tick
 void ffisb_pacer_notification_wait(unsigned char *parameter, long parameterSizeBytes, unsigned char *output, long outputSizeBytes) {
   static bool firstRun = true;
   static time_t prev;
@@ -156,8 +154,12 @@ void ffisb_pacer_notification_wait(unsigned char *parameter, long parameterSizeB
   } else {
     time_t now;
     time(&now);
-    for(; difftime(now, prev) < 5; time(&now)) {}
+    for(; difftime(now, prev) < 0.5; time(&now)) {}
     prev = now;
   }
-  output[0] = 1;
+  output[0] = true;
+}
+
+void ffisb_pacer_notification_emit(unsigned char *parameter, long parameterSizeBytes, unsigned char *output, long outputSizeBytes) {
+  output[0] = true;
 }

@@ -32,6 +32,7 @@ in
         let val nonce  = N (Id O) (ByteString.fromRawString (Socket.inputAll heliAM)) Mt
             val ev     = (evalTerm am nonce protocol) handle _ => (log Error "Protocol evaluation failed"; Mt)
             val jsonEv = jsonToStr (evToJson ev)
+                       ^ (String.str (Char.chr 0)) (* append explicit null-byte *)
          in log Info ("Sending evidence: " ^ evToString ev);
             Socket.output heliAM jsonEv
         end

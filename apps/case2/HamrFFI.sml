@@ -1,62 +1,71 @@
 (* Depends on ByteString *)
 
-val nullByte = Word8.fromInt 0
-val emptyBuf = Word8Array.array 0 nullByte
-val unitBuf  = Word8Array.array 1 nullByte
-
-val ffi_err = nullByte
-
 datatype logType = Info | Debug | Error
 
 structure Api = struct 
-    (* logType -> string -> () *)
-    fun log lType msg = case lType of
-          Info  => #(api_logInfo)  msg emptyBuf
-        | Debug => #(api_logDebug) msg emptyBuf
-        | Error => #(api_logError) msg emptyBuf
-
-    (* string -> () *)
-    (* TODO: Add safety rails to limit size of req *)
-    fun sendRequest req = #(api_send_AttestationRequest) req emptyBuf
-
-    (* () -> string *)
     local
-        val respMaxLen = 2048
-        fun getLeadingStr buf = case Word8Array.findi ((op =) nullByte) buf of
-              Some (i, _) =>  Word8Array.substring buf 0 i
-            | _ => ByteString.toRawString buf
-    in 
-        fun getResponse () = 
-            let val in_buf = Word8Array.array (respMaxLen + 1) nullByte in
-                #(api_get_AttestationResponse) "" in_buf;
-                if Word8Array.sub in_buf 0 = ffi_err then
-                    (* Is this an error? If this is polling-based, it could just mean nothing is available atm *)
-                    (log Error "api_get_AttestationResponse error"; "")
-                else 
-                    getLeadingStr (ByteString.fromRawString (Word8Array.substring in_buf 1 respMaxLen))
-            end
-    end
+        val nullByte  = Word8.fromInt 0
+        val emptyBuf  = Word8Array.array 0 nullByte
+        val singleBuf = Word8Array.array 1 nullByte
+        val c_false   = nullByte
+    in
 
-    (* string -> () *)
-    (* TODO: Add safety rails to limit size of req *)
-    fun sendTrustedIds trustedIds = #(api_send_TrustedIds) trustedIds emptyBuf
+        (* () -> () *)
+        fun receiveInput () = #(api_receiveInput) "" emptyBuf
 
-    (* () -> connection Option *)
-    (* Seems to be blocking? *)
-    fun getConnection () = 
-        let val conn_len = 8 (* random placeholder val *)
-            val out_buf = Word8Array.array (conn_len + 1) nullByte
-         in #(api_get_InitiateAttestation) "" out_buf;
-            if Word8Array.sub out_buf 0 = ffi_err then
-                (log Error "api_get_InitiateAttestation error"; None)
-            else
-                Some (Word8Array.substring out_buf 1 conn_len)
+        (* () -> () *)
+        fun sendOutput () = #(api_sendOutput) "" emptyBuf
+
+        (* logType -> string -> () *)
+        fun log lType msg = case lType of
+              Info  => #(api_logInfo)  msg emptyBuf
+            | Debug => #(api_logDebug) msg emptyBuf
+            | Error => #(api_logError) msg emptyBuf
+
+        (* string -> () *)
+        (* TODO: Add safety rails to limit size of req *)
+        fun sendRequest req = #(api_send_AttestationRequest) req emptyBuf
+
+        (* () -> string option *)
+        local
+            val respMaxLen = 2048
+            fun getLeadingStr buf = case Word8Array.findi ((op =) nullByte) buf of
+                  Some (i, _) =>  Word8Array.substring buf 0 i
+                | _ => ByteString.toRawString buf
+        in 
+            fun getResponse () = 
+                let val in_buf = Word8Array.array (respMaxLen + 1) nullByte in
+                    #(api_get_AttestationResponse) "" in_buf;
+                    if Word8Array.sub in_buf 0 = c_false then
+                        None
+                    else 
+                        Some (getLeadingStr (ByteString.fromRawString (Word8Array.substring in_buf 1 respMaxLen)))
+                end
         end
-    
-    (* connection -> () *)
-    fun closeConnection conn = #(api_send_TerminateAttestation) conn emptyBuf
 
-    fun pacerWait () = #(sb_pacer_notification_wait) "" unitBuf
+        (* string -> () *)
+        (* TODO: Add safety rails to limit size of req *)
+        fun sendTrustedIds trustedIds = #(api_send_TrustedIds) trustedIds emptyBuf
 
-    (* What does pacer emit do? *)
+        (* () -> Bool *)
+        fun getConnection () = (
+            #(api_get_InitiateAttestation) "" singleBuf;
+            Word8Array.sub singleBuf 0 <> c_false
+        )
+        
+        (* () -> () *)
+        fun closeConnection () = #(api_send_TerminateAttestation) "" emptyBuf
+
+        (* () -> Bool *)
+        fun pacer_emit() = (
+            #(sb_pacer_notification_emit) "" singleBuf;
+            Word8Array.sub singleBuf 0 <> c_false
+        )
+
+        (* () -> Bool *)
+        fun pacer_wait() = (
+            #(sb_pacer_notification_wait) "" singleBuf;
+            Word8Array.sub singleBuf 0 <> c_false
+        )
+    end
 end
