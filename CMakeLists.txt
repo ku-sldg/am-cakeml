@@ -105,4 +105,6 @@ else()
 
     build_cake("heli_am" SOURCES "${heli_src}")
     target_link_libraries(heli_am crypto)
+
+    add_custom_target(case DEPENDS client heli_am)
 endif()
