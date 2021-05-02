@@ -64,11 +64,18 @@ else()
         CMAKE_C_FLAGS_RELEASE CMAKE_EXE_LINKER_FLAGS CMAKE_VERBOSE_MAKEFILE
     )
 
+    set(BASIS_FILE "" CACHE FILEPATH "File path to `basis_ffi.c`. If empty, will use default.")
+    if ("${BASIS_FILE}" STREQUAL "")
+	set(basis_file system/basis_ffi.c)
+    else()
+        set(basis_file ${BASIS_FILE})
+    endif()
+
     # Add targets
     add_subdirectory(system/crypto)
     function(build_am_exe name)
         build_cake("${name}.cake" SOURCES "${ARGN}")
-        add_executable(${name} system/basis_ffi.c system/sockets/socket_ffi.c)
+        add_executable(${name} ${basis_file} system/sockets/socket_ffi.c)
         if(${STATIC_LINKING})
             set(link_flags "-static-libgcc -static")
         endif()
@@ -97,7 +104,7 @@ else()
     #build_am_lib("heli_am" ${heli_src})
 
     build_cake("heli_am.cake" SOURCES "${heli_src}")
-    add_executable(fake_heli_am system/basis_ffi.c apps/case2/fake_ffi.c)
+    add_executable(fake_heli_am ${basis_file} apps/case2/fake_ffi.c)
     if(${STATIC_LINKING})
         set(link_flags "-static-libgcc -static")
     endif()
