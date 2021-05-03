@@ -57,7 +57,7 @@ void ffiapi_get_AttestationResponse(unsigned char *parameter, long parameterSize
 }
 
 void ffiapi_send_TrustedIds(unsigned char *parameter, long parameterSizeBytes, unsigned char *output, long outputSizeBytes) {
-  printf("Sending trusted ids: [%i,%i,%i,%i]\n", *((int32_t*)parameter), *((int32_t*)parameter + 1), *((int32_t*)parameter + 2), *((int32_t*)parameter + 3));
+  printf("Sending trusted ids: [%li,%li,%li,%li]\n", *((int64_t*)parameter), *((int64_t*)parameter + 1), *((int64_t*)parameter + 2), *((int64_t*)parameter + 3));
 }
 
 int get_listener(int qlen, char * port) {
@@ -128,6 +128,9 @@ void ffiapi_get_InitiateAttestation(unsigned char *parameter, long parameterSize
     conn_open = true;
     output[0] = true;
   }
+
+  // Always reports ip 127.0.0.1
+  memcpy((void *)(output+1), (const void *)"\x7F\x00\x00\x01", 4);
 }
 
 void ffiapi_send_TerminateAttestation(unsigned char *parameter, long parameterSizeBytes, unsigned char *output, long outputSizeBytes) {

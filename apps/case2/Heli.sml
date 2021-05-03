@@ -13,35 +13,39 @@ val rawToHex = ByteString.toHexString o ByteString.fromRawString
 val pub = hexToRaw "490E2422528F14AC6A48DDB9D72CB30B8345AF2E939003BC7A33A6057F2FFB0101000000000000002DD0B7F53A560000A049D882A37F00000000000000000000"
 
 local
-    val connId = "ABCD" (* arbitrary placeholder id *)
-    val emptyId = ByteString.toRawString (Word8Array.array 4 (Word8.fromInt 0))
+    val protocol_id = "ABCD" (* arbitrary placeholder id *)
+    val emptyId = ByteString.toRawString (Word8Array.array 8 (Word8.fromInt 0))
     val trusted_ids = Array.array 4 emptyId
     val flatten_ids = Array.foldl (op String.^) ""
+    
+    fun getId ip = ip ^ protocol_id
 in
-    (* () -> () *)
+    (* string -> () *)
     (* idempotent *)
-    fun addToWhitelist () = (
-        log Info ("Adding 0x" ^ (rawToHex connId) ^ " to the whitelist");
-        if Array.exists ((op =) connId) trusted_ids then
-            log Info ("0x" ^ (rawToHex connId) ^ " already in the whitelist")
-        else case Array.findi (const ((op =) emptyId)) trusted_ids of
-              Some (i, _) => Array.update trusted_ids i connId
-            | None => (
-                log Error "No room in the whitelist, overwriting first entry";
-                Array.update trusted_ids 0 connId
-            );
-        Api.sendTrustedIds (flatten_ids trusted_ids)
-    )
+    fun addToWhitelist ip =
+        let val id = getId ip
+         in log Info ("Adding 0x" ^ (rawToHex id) ^ " to the whitelist");
+            if Array.exists ((op =) id) trusted_ids then
+                log Info ("0x" ^ (rawToHex id) ^ " already in the whitelist")
+            else case Array.findi (const ((op =) emptyId)) trusted_ids of
+                  Some (i, _) => Array.update trusted_ids i id
+                | None => (
+                    log Error "No room in the whitelist, overwriting first entry";
+                    Array.update trusted_ids 0 id
+                );
+            Api.sendTrustedIds (flatten_ids trusted_ids)
+        end
 
-    (* () -> () *)
+    (* string -> () *)
     (* idempotent *)
-    fun removeFromWhitelist () = (
-        log Info ("Removing 0x" ^ (rawToHex connId) ^ " from the whitelist");
-        case Array.findi (const ((op =) connId)) trusted_ids of
-              Some (i, _) => Array.update trusted_ids i emptyId
-            | None => log Info "Connection not in the whitelist";
-        Api.sendTrustedIds (flatten_ids trusted_ids)
-    )
+    fun removeFromWhitelist ip =
+        let val id = getId ip
+         in log Info ("Removing 0x" ^ (rawToHex id) ^ " from the whitelist");
+            case Array.findi (const ((op =) id)) trusted_ids of
+                  Some (i, _) => Array.update trusted_ids i emptyId
+                | None => log Info "Connection not in the whitelist";
+            Api.sendTrustedIds (flatten_ids trusted_ids)
+        end
 end
 
 (* string -> ev option *)
@@ -92,38 +96,39 @@ fun getResponse () = case Api.getResponse () of
 
 datatype am_state =
       NoConnection
-    | SendingRequest
-    | GettingResponse ByteString.bs (* argument is the nonce *)
+    | SendingRequest  string               (* ip addr *)
+    | GettingResponse string ByteString.bs (* ip addr, nonce *)
 
 local
     val curr_state = Ref NoConnection
-    fun rmAndClose () = (
-        removeFromWhitelist ();
+    fun rmAndClose ip = (
+        removeFromWhitelist ip;
         Api.closeConnection ();
         log Info "Closing conection";
         curr_state := NoConnection
     )
 in 
     (* () -> () *)
-    fun attestation_step () = case !curr_state of
-          NoConnection =>
-              if Api.getConnection () then (
-                  log Info "Connection received";
-                  curr_state := SendingRequest;
-                  attestation_step()
-              ) else 
-                  log Info "No connection"
-        | SendingRequest => (
-              curr_state := GettingResponse (sendRequest ())
+    fun attestation_step () = case (!curr_state) of
+          NoConnection => (
+              case Api.getConnection () of
+                    Some ip => (
+                        log Info ("Connection received from: 0x" ^ (rawToHex ip));
+                        curr_state := SendingRequest ip;
+                        attestation_step ()
+                  )
+                  | _ => log Info "No connection"
           )
-        | GettingResponse nonce => 
+        | (SendingRequest ip) => 
+              curr_state := (GettingResponse ip (sendRequest ()))
+        | (GettingResponse ip nonce) => 
               case getResponse () of 
                     Some ev => 
                         if appraise nonce ev then (
-                            addToWhitelist ();
-                            curr_state := SendingRequest
-                        ) else rmAndClose ()
-                  | _ => rmAndClose ()
+                            addToWhitelist ip;
+                            curr_state := SendingRequest ip
+                        ) else rmAndClose ip
+                  | _ => rmAndClose ip
 end
 
 (* () -> 'a *)

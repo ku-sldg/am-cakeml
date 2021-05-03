@@ -8,6 +8,28 @@ structure Api = struct
         val emptyBuf  = Word8Array.array 0 nullByte
         val singleBuf = Word8Array.array 1 nullByte
         val c_false   = nullByte
+
+        (* (string -> Word8Array.Array -> ()) -> int -> string -> string option *)
+        fun getDataEvent ffi data_len arg = 
+            let val out_buf = Word8Array.array (1 + data_len) nullByte
+             in ffi arg out_buf;
+                if Word8Array.sub out_buf 0 = c_false then
+                    None
+                else 
+                    Some (Word8Array.substring out_buf 1 data_len)
+            end
+
+        (* (string -> Word8Array.Array -> ()) -> string -> bool *)
+        fun getEvent ffi arg = (
+            ffi arg singleBuf;
+            Word8Array.sub singleBuf 0 <> c_false
+        )
+
+        (* first-class function wrappers *)
+        fun att_resp_ffi   arg out = #(api_get_AttestationResponse) arg out
+        fun init_att_ffi   arg out = #(api_get_InitiateAttestation) arg out
+        fun pacer_emit_ffi arg out = #(sb_pacer_notification_emit)  arg out
+        fun pacer_wait_ffi arg out = #(sb_pacer_notification_wait)  arg out
     in
 
         (* () -> () *)
@@ -25,47 +47,33 @@ structure Api = struct
         (* string -> () *)
         (* TODO: Add safety rails to limit size of req *)
         fun sendRequest req = #(api_send_AttestationRequest) req emptyBuf
-
+        
         (* () -> string option *)
         local
-            val respMaxLen = 2048
             fun getLeadingStr buf = case Word8Array.findi ((op =) nullByte) buf of
                   Some (i, _) =>  Word8Array.substring buf 0 i
                 | _ => ByteString.toRawString buf
         in 
             fun getResponse () = 
-                let val in_buf = Word8Array.array (respMaxLen + 1) nullByte in
-                    #(api_get_AttestationResponse) "" in_buf;
-                    if Word8Array.sub in_buf 0 = c_false then
-                        None
-                    else 
-                        Some (getLeadingStr (ByteString.fromRawString (Word8Array.substring in_buf 1 respMaxLen)))
-                end
+                Option.map (getLeadingStr o ByteString.fromRawString)
+                  (getDataEvent att_resp_ffi 2048 "")
         end
 
         (* string -> () *)
         (* TODO: Add safety rails to limit size of req *)
         fun sendTrustedIds trustedIds = #(api_send_TrustedIds) trustedIds emptyBuf
 
-        (* () -> Bool *)
-        fun getConnection () = (
-            #(api_get_InitiateAttestation) "" singleBuf;
-            Word8Array.sub singleBuf 0 <> c_false
-        )
+        (* () -> string option *)
+        (* ip address as raw string *)
+        fun getConnection () = getDataEvent init_att_ffi 4 ""
         
         (* () -> () *)
         fun closeConnection () = #(api_send_TerminateAttestation) "" emptyBuf
 
         (* () -> Bool *)
-        fun pacer_emit() = (
-            #(sb_pacer_notification_emit) "" singleBuf;
-            Word8Array.sub singleBuf 0 <> c_false
-        )
+        fun pacer_emit () = getEvent pacer_emit_ffi ""
 
         (* () -> Bool *)
-        fun pacer_wait() = (
-            #(sb_pacer_notification_wait) "" singleBuf;
-            Word8Array.sub singleBuf 0 <> c_false
-        )
+        fun pacer_wait () = getEvent pacer_wait_ffi ""
     end
 end
