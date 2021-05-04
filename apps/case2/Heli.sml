@@ -74,8 +74,11 @@ fun appraise nonce ev = case ev of
     | _ => (log Info "Unexpected evidence structure"; False)
 
 (* () -> ByteString *)
-(* Placeholder *)
-fun genNonce () = Word8Array.array 16 (Word8.fromInt 0)
+fun genNonce () = 
+    let val out = Word8Array.array 16 (Word8.fromInt 0)
+     in #(fakeRand) "" out;
+        out
+    end
 
 (* () -> ByteString.bs *)
 fun sendRequest () =
