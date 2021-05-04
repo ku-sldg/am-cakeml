@@ -88,50 +88,69 @@ fun sendRequest () =
         nonce
     end
 
-fun getResponse () = case Api.getResponse () of
-      Some resp => (
-          log Info ("Received response: " ^ resp);
-          case parseResp resp of 
-                Some ev => Some ev
-              | _ => (log Info "Evidence failed to parse"; None)
-      )
-    | None => (log Info "No Response Received"; None)
-
 datatype am_state =
       NoConnection
     | SendingRequest  string               (* ip addr *)
     | GettingResponse string ByteString.bs (* ip addr, nonce *)
 
 local
+    (* attestation frequency = (att_len + 1) * pacer frequency *)
+    (* att_len >= 1 *)
+    val att_len = 1
+    val pacer_count = Ref 0
+    fun incr count = count := (!count + 1) mod att_len
+
     val curr_state = Ref NoConnection
+
     fun rmAndClose ip = (
         removeFromWhitelist ip;
         Api.closeConnection ();
         log Info "Closing conection";
-        curr_state := NoConnection
+        curr_state := NoConnection;
+        pacer_count := 0
     )
 in 
     (* () -> () *)
-    fun attestation_step () = case (!curr_state) of
+    fun attestation_step () = (
+        log Debug ("Pacer count: " ^ Int.toString (!pacer_count));
+        case !curr_state of
           NoConnection => (
               case Api.getConnection () of
                     Some ip => (
                         log Info ("Connection received from: 0x" ^ (rawToHex ip));
                         curr_state := SendingRequest ip;
-                        attestation_step ()
+                        attestation_step()
                   )
-                  | _ => log Info "No connection"
+                  | None => log Info "No connection"
           )
-        | (SendingRequest ip) => 
-              curr_state := (GettingResponse ip (sendRequest ()))
-        | (GettingResponse ip nonce) => 
-              case getResponse () of 
-                    Some ev => 
-                        if appraise nonce ev then (
-                            addToWhitelist ip;
-                            curr_state := SendingRequest ip
-                        ) else rmAndClose ip
-                  | _ => rmAndClose ip
+        | SendingRequest ip => (
+              if !pacer_count = 0 then 
+                  curr_state := GettingResponse ip (sendRequest ())
+              else ();
+              incr pacer_count
+          )
+        | GettingResponse ip nonce =>
+              case Api.getResponse () of
+                    Some resp => (
+                        log Info ("Received response: " ^ resp);
+                        case parseResp resp of
+                            Some ev =>
+                                if appraise nonce ev then (
+                                    addToWhitelist ip;
+                                    curr_state := SendingRequest ip;
+                                    incr pacer_count
+                                ) else rmAndClose ip
+                          | None => (
+                                log Info "Evidence failed to parse";
+                                rmAndClose ip
+                          )
+                    )
+                  | None => 
+                        if !pacer_count = 0 then
+                            rmAndClose ip
+                        else 
+                            incr pacer_count
+    )
 end
 
 (* () -> 'a *)
