@@ -2,6 +2,8 @@
 
 (* Safe(ish) wrapper to FFI socket functions *)
 structure Socket = struct
+    val _ = #(socketLibInit) "" (Word8Array.array 0 (Word8.fromInt 0))
+
     (* Generic socket exception *)
     exception Err string
 
@@ -47,8 +49,8 @@ structure Socket = struct
                 val _ = #(connect) c fdbuf
             in
                 if Word8Array.sub fdbuf 0 = Word8.fromInt 1
-                    then raise (Err "Error in connect()")
-                    else Fd (Word8Array.substring fdbuf 1 8)
+                    then None
+                    else Some (Fd (Word8Array.substring fdbuf 1 8))
             end
 
         (* Returns a pretty string for debug printing file descriptors *)
@@ -102,6 +104,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *)
 
         exception InvalidFD
+        exception Timeout
 
         local
             val iobuff = Word8Array.array 2052 (Word8.fromInt 0)
@@ -178,6 +181,54 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                             end
                     in inputAll_aux (Word8Array.array 127 (Word8.fromInt 0)) 0 end
             end
+
+            local
+                fun read fd n =
+                    let val a = Marshalling.n2w2 n iobuff 0 
+                     in
+                        #(socketReadTimeout) fd iobuff;
+                        case Word8.toInt (Word8Array.sub iobuff 0) of
+                              0 => raise InvalidFD
+                            | 1 => raise Timeout
+                            | _ => Marshalling.w22n iobuff 1
+                    end
+
+                fun input fd buff off len =
+                    let fun input0 off len count =
+                        let val nwant = min len 2048
+                            val nread = read fd nwant
+                        in
+                            if nread = 0 then count else
+                            (Word8Array.copy iobuff 4 nread buff off;
+                                if nread < nwant then count+nread else
+                                input0 (off + nread) (len - nread) (count + nread))
+                        end
+                    in input0 off len 0 end
+
+                fun extend_array arr =
+                    let
+                        val len = Word8Array.length arr
+                        val arr' = Word8Array.array (2*len) (Word8.fromInt 0)
+                    in (Word8Array.copy arr 0 len arr' 0; arr') end
+            in
+                fun inputAllTimeout fd =
+                    let fun inputAll_aux arr i =
+                            let val len = Word8Array.length arr in
+                                if i < len then
+                                    let
+                                        val nwant = len - i
+                                        val nread = input (getFd fd) arr i nwant
+                                    in
+                                        if nread < nwant then Word8Array.substring arr 0 (i+nread)
+                                        else inputAll_aux arr (i + nread)
+                                    end
+                                else inputAll_aux (extend_array arr) i
+                            end
+                     in Some (inputAll_aux (Word8Array.array 127 (Word8.fromInt 0)) 0)
+                    end handle Timeout => None
+
+            end
+
 
             (* Close function *)
             fun close fd =

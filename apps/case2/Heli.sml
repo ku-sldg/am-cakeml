@@ -112,7 +112,7 @@ local
 in 
     (* () -> () *)
     fun attestation_step () = (
-        log Debug ("Pacer count: " ^ Int.toString (!pacer_count));
+        (* log Debug ("Pacer count: " ^ Int.toString (!pacer_count)); *)
         case !curr_state of
           NoConnection => (
               case Api.getConnection () of

@@ -14,11 +14,13 @@ fun socketDispatch me nsMap pl ev t =
               Some a => a
             | None => raise DispatchErr ("Place "^ plToString pl ^" not in nameserver map")
         val req  = (REQ pl me nsMap t ev)
-        val fd   = Socket.connect addr 5000
+        val fd   = Option.valOf (Socket.connect addr 5000)
         val (RES _ _ ev) = (serverSend fd req; serverRcv fd)
      in Socket.close fd;
         ev
     end
+    (* Option.valOf could trigger exception *)
+    handle _ => raise Socket.Err "Connection error"
 
 (* privKey -> nsMap -> am *)
 fun serverAm privKey nsMap = Am

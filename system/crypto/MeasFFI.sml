@@ -86,5 +86,23 @@ structure Meas = struct
 
         (* version of readDir that filters out the "." and ".." entries *)
         val readDirNoDot = List.filter (fn (n,t) => n <> "." andalso n <> "..") o readDir
+    
+        (* string -> string *)
+        fun newProc filepath = 
+            let val dataLen = 10
+                val out = Word8Array.array (dataLen + 1) (Word8.fromInt 0)
+             in #(newProc) filepath out;
+                if Word8Array.sub out 0 = ffiFailure then
+                    raise (Err "newProc FFI failure, could not fork")
+                else 
+                    Word8Array.substring out 1 dataLen
+            end
+
+        (* string -> bool *)
+        fun childTerminated pid =
+            let val out = Word8Array.array 1 (Word8.fromInt 0)
+             in #(childTerminated) pid out;
+                Word8Array.sub out 0 <> (Word8.fromInt 0)
+            end
     end
 end

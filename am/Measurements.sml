@@ -93,4 +93,38 @@ fun measProcsUsm args = (case args of
     | _ => raise USMexpn "measProcsUsm expects a single argument"
 ) handle Meas.Err x => raise USMexpn ("measProcsUsm failed: " ^ x)
 
-val usmMap = Map.fromList id_compare [(Id O, hashFileUsm),(Id (S O),hashDirectoryUsm),(Id (S (S O)),measProcsUsm)]
+
+fun checkRestartChild pid filepath = 
+    if Meas.childTerminated pid then 
+        Some (Meas.newProc filepath)
+    else 
+        None
+
+local
+    val vdtuPath = "/mnt/c/Users/Grant/linux/lab/am-cakeml-case2/apps/case2/spin"
+    val vdtuPid = Ref ""
+in 
+    fun startVdtu () = (
+        print "Launcing VDTU\n";
+        vdtuPid := Meas.newProc vdtuPath
+    )
+
+    fun checkRestartVdtu () = case checkRestartChild (!vdtuPid) vdtuPath of
+          Some pid => (
+              TextIO.print_err "VDTU terminated, restarting\n";
+              vdtuPid := pid
+          )
+        | _ => ()
+
+    fun measVdtuUsm args = (case args of 
+          [] => measProc (!vdtuPid)
+        | _  => raise USMexpn "meas_vdtu expects 0 arguments"
+    ) handle Meas.Err x => raise USMexpn ("measVdtuUsm failed: " ^ x)
+end
+
+val usmMap = Map.fromList id_compare [
+    (Id O, hashFileUsm),
+    (Id (S O), hashDirectoryUsm),
+    (Id (S (S O)), measProcsUsm),
+    (Id (S (S (S O))), measVdtuUsm)
+]

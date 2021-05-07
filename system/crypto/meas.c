@@ -9,12 +9,15 @@
 #include <dirent.h>
 #include <stdlib.h>
 #include <stddef.h>
+#include <stdbool.h>
 #include <errno.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/mman.h>
+#include <unistd.h>
+#include <grp.h>
 
 #include "debug.h"
 #include "meas.h"
@@ -200,4 +203,44 @@ void ffireadDir(const uint8_t * c, const long clen, uint8_t * a, const long alen
     errno = prev_errno;
 
     closedir(dir);
+}
+
+bool dropRoot(const char * user, gid_t gid, uid_t uid) {
+    return initgroups(user, (gid_t)NULL) == 0
+        && setgid(gid) == 0
+        && setuid(uid) == 0;
+}
+
+void ffinewProc(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
+    assert(alen >= 11);
+
+    pid_t pid = fork();
+    if (pid == -1) {
+        // Fork failed
+        a[0] = FFI_FAILURE;
+        return;
+    }
+    else if (pid == 0) {
+        // Child process
+        // dropRoot
+        execl((const char *)c, (char *)NULL);
+    }
+    else {
+        // Parent process
+        a[0] = FFI_SUCCESS;
+        sprintf((char *)(a+1), "%u", (unsigned int)pid);
+    }
+}
+
+// Writes 'true' to a[0] if child has terminated
+void ffichildTerminated(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
+    assert(alen >= 1);
+
+    pid_t pid = (pid_t)atoi((const char *)c);
+    pid_t ret = waitpid(pid, (int *)NULL, WNOHANG);
+    
+    // if (ret == -1)
+    //     error
+
+    a[0] = ret == pid; 
 }

@@ -1,5 +1,3 @@
-// This file will be regenerated, do not edit
-
 #define _GNU_SOURCE
 
 #include <stdbool.h>
