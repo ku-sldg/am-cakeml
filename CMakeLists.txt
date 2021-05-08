@@ -9,11 +9,11 @@ set(util_src util/ByteString.sml util/CoqDefaults.sml util/Json.sml)
 set(cop_src ${util_src} copland/Instr.sml copland/AM.sml copland/VM.sml
     copland/json/CoplandToJson.sml copland/json/JsonToCopland.sml)
 # TODO: separate meas from crypto
-set(crypto_src system/crypto/CryptoFFI.sml system/crypto/MeasFFI.sml)
+set(crypto_src system/crypto/CryptoFFI.sml)
 set(socket_src system/sockets/SocketFFI.sml)
 # set(time_src system/time/TimeFFI.sml)
 # set(dataport_src system/dataports/DataportFFI.sml)
-set(server_am_src ${cop_src} ${crypto_src} am/Measurements.sml ${socket_src}
+set(server_am_src ${cop_src} ${crypto_src} system/crypto/MeasFFI.sml am/Measurements.sml ${socket_src}
     am/CommTypes.sml am/ServerAm.sml)
 set(standalone_am_src ${cop_src} ${crypto_src} am/CommTypes.sml)
 
@@ -110,7 +110,7 @@ else()
     endif()
     target_link_libraries(fake_heli_am "heli_am.cake" crypto ${link_flags})
 
-    build_cake("heli_am" SOURCES "${heli_src}")
+    build_cake("heli_am" ENTRY_NAME "run" SOURCES "${heli_src}")
     target_link_libraries(heli_am crypto)
 
     add_custom_target(case DEPENDS client heli_am)
