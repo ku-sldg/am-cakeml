@@ -88,8 +88,9 @@ structure Meas = struct
         val readDirNoDot = List.filter (fn (n,t) => n <> "." andalso n <> "..") o readDir
     
         (* string -> string *)
+        (* Warning! Doesn't detect when program fails to launch (i.e. if file doesn't exist) *)
         fun newProc filepath = 
-            let val dataLen = 10
+            let val dataLen = 5
                 val out = Word8Array.array (dataLen + 1) (Word8.fromInt 0)
              in #(newProc) filepath out;
                 if Word8Array.sub out 0 = ffiFailure then

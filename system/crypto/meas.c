@@ -212,7 +212,7 @@ bool dropRoot(const char * user, gid_t gid, uid_t uid) {
 }
 
 void ffinewProc(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
-    assert(alen >= 11);
+    assert(alen >= 6);
 
     pid_t pid = fork();
     if (pid == -1) {

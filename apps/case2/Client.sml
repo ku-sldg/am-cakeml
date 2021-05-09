@@ -58,7 +58,7 @@ fun mainLoop addr port = (
     | _ => log Error "Fatal: unknown error"
 
 fun init addr port = (
-    startVdtu;
+    startVdtu ();
     mainLoop addr port
 )
 

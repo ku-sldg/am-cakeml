@@ -1,3 +1,5 @@
 (* Depends on Copland *)
 
-val protocol = Asp Sig
+val protocol = Lseq
+    (Asp (Aspc (Id (S (S (S O)))) []))
+    (Asp Sig)

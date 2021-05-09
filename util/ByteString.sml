@@ -156,6 +156,7 @@ structure ByteString = struct
          in len = length bs2 andalso deepEq_aux 0
         end
 
+    (* TODO: rename concat *)
     fun append bs1 bs2 =
         let val bs1Len = length bs1
             val bs2Len = length bs2

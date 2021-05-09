@@ -15,6 +15,7 @@ fun readFile filename =
      in TextIO.closeIn fd;
         text
     end
+                 
 
 (* Hashes a group of bytestrings in an order-agnostic way (by xor-ing them together) *)
 (* hashSet -> ByteString.bs list -> Bytestring.bs *)
@@ -76,6 +77,9 @@ fun findProc name =
 (* Returns a list of hashes since a proc name may appear multiple times *)
 val measProcsByName = List.map measProc o findProc
 
+(* string -> ByteString.bs * string *)
+fun newProcHash filepath = (Meas.hashFile filepath, Meas.newProc filepath)
+
 (* USMs *)
 fun hashFileUsm args = (case args of
       [fileName] => Meas.hashFile fileName
@@ -93,33 +97,36 @@ fun measProcsUsm args = (case args of
     | _ => raise USMexpn "measProcsUsm expects a single argument"
 ) handle Meas.Err x => raise USMexpn ("measProcsUsm failed: " ^ x)
 
-
 fun checkRestartChild pid filepath = 
     if Meas.childTerminated pid then 
-        Some (Meas.newProc filepath)
+        Some (newProcHash filepath)
     else 
         None
 
 local
-    val vdtuPath = "/mnt/c/Users/Grant/linux/lab/am-cakeml-case2/apps/case2/spin"
-    val vdtuPid = Ref ""
+    (* Placeholder *)
+    val vdtuPath = "/home/grant/lab/am-cakeml-case2/apps/case2/spin"
+    val vdtu = Ref (ByteString.empty, "")
+    fun getVdtuBinHash () = fst (!vdtu)
+    fun getVdtuPid ()     = snd (!vdtu)
 in 
     fun startVdtu () = (
-        print "Launcing VDTU\n";
-        vdtuPid := Meas.newProc vdtuPath
+        print "Launching VDTU\n";
+        vdtu := newProcHash vdtuPath
     )
 
-    fun checkRestartVdtu () = case checkRestartChild (!vdtuPid) vdtuPath of
-          Some pid => (
+    fun checkRestartVdtu () = case checkRestartChild (getVdtuPid ()) vdtuPath of
+          Some newVdtu => (
               TextIO.print_err "VDTU terminated, restarting\n";
-              vdtuPid := pid
+              vdtu := newVdtu
           )
         | _ => ()
 
     fun measVdtuUsm args = (case args of 
-          [] => measProc (!vdtuPid)
+          [] => ByteString.append (getVdtuBinHash ()) (measProc (getVdtuPid ()))
         | _  => raise USMexpn "meas_vdtu expects 0 arguments"
     ) handle Meas.Err x => raise USMexpn ("measVdtuUsm failed: " ^ x)
+           | _          => raise USMexpn  "measVdtuUsm failed"
 end
 
 val usmMap = Map.fromList id_compare [

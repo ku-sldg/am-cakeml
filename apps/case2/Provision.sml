@@ -32,12 +32,20 @@ fun quotes str = "\"" ^ str ^ "\""
 val showGoldens = showList (quotes o ByteString.show)
 
 (* ByteString.bs list -> () *)
-fun printGoldens goldens = print ("val goldenHashes = " ^ (showGoldens goldens) ^ "\n")
+fun writeGoldens goldens = 
+    let val header  = "(* This file was auto-generated. Do not edit *)\n\n"
+        val content = "val goldenHashes = " ^ (showGoldens goldens) ^ "\n"
+        val file = TextIO.openOut "GoldenHashes.sml"
+     in TextIO.output file (header ^ content);
+        TextIO.closeOut file
+    end
 
 fun main () =
     let val priv = (ByteString.toRawString o ByteString.fromHexString) "2E5773B2A19A2CB05FEE44650D8DC877B3D806F74C199043657C805288CD119B"
         val am = serverAm priv emptyNsMap (* TODO: provisioner am template *)
+        val _ = startVdtu ()
         val ev = (evalTerm am Mt protocol) handle _ => (TextIO.print_err "Protocol evaluation failed\n"; Mt)
-     in printGoldens (goldenHashes ev)
-    end
+     in print "Writing to GoldenHashes.sml\n";
+        writeGoldens (goldenHashes ev)
+    end handle _ => TextIO.print_err "Fatal error\n"
 val () = main ()

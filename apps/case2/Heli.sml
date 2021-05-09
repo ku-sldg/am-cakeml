@@ -64,9 +64,11 @@ fun verifySig g pub =
 (* bytestring -> ev -> bool *)
 (* true if appraisal succeeds *)
 fun appraise nonce ev = case ev of
-      G evSign (N _ evNonce Mt) => 
+      G evSign (U _ _ evHash (N _ evNonce Mt)) => 
           if not (ByteString.deepEq evNonce nonce) then
               (log Info "Appraisal failed, bad nonce"; False)
+          else if (ByteString.show evHash) <> (List.hd goldenHashes) then 
+              (log Info "Appraisal failed, bad hash"; False)
           else if not (Option.valOf (verifySig ev pub)) then
               (log Info "Appraisal failed, bad signature"; False)
           else
