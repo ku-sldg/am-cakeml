@@ -177,7 +177,7 @@ void ffisocketReadTimeout (unsigned char *c, long clen, unsigned char *a, long a
     FD_ZERO(&set);
     FD_SET(fd, &set);
     struct timeval timeout;
-    timeout.tv_sec = 10; // 10 second timeout
+    timeout.tv_sec = 30; // 30 second timeout
     timeout.tv_usec = 0;
 
     int ret = select(fd+1, &set, (fd_set *)NULL, (fd_set *)NULL, &timeout);

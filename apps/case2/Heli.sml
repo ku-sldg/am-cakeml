@@ -98,7 +98,7 @@ datatype am_state =
 local
     (* attestation frequency = (att_len + 1) * pacer frequency *)
     (* att_len >= 1 *)
-    val att_len = 1
+    val att_len = 9 (* ~5 second attestation period *)
     val pacer_count = Ref 0
     fun incr count = count := (!count + 1) mod att_len
 

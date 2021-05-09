@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
+#include <sys/time.h>
 
 #include <sys/types.h>  // socket, bind, listen, getaddrinfo
 #include <sys/socket.h> // socket, bind, listen, getaddrinfo
@@ -144,18 +144,23 @@ void ffiapi_send_TerminateAttestation(unsigned char *parameter, long parameterSi
   return;
 }
 
+int difftimeval(struct timeval end, struct timeval start) {
+    return (end.tv_sec  - start.tv_sec)* 1000000
+         + (end.tv_usec - start.tv_usec);
+}
+
 // Waits until 0.5 seconds after last pacer tick
 void ffisb_pacer_notification_wait(unsigned char *parameter, long parameterSizeBytes, unsigned char *output, long outputSizeBytes) {
   static bool firstRun = true;
-  static time_t prev;
+  static struct timeval prev;
 
   if (firstRun) {
     firstRun = false;
-    time(&prev);
+    gettimeofday(&prev, NULL);
   } else {
-    time_t now;
-    time(&now);
-    for(; difftime(now, prev) < 0.5; time(&now)) {}
+    struct timeval now;
+    gettimeofday(&now, NULL);
+    for(; difftimeval(now, prev) < 500000; gettimeofday(&now, NULL)) {}
     prev = now;
   }
   output[0] = true;
