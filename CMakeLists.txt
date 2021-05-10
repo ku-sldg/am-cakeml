@@ -47,7 +47,7 @@ set(kremlib_path "${hacl_release_dir}/kremlin/kremlib/dist/minimal")
 set(hacl_sources ${hacl_path}/Hacl_Hash.c ${hacl_path}/Hacl_Ed25519.c ${hacl_path}/Hacl_Curve25519_51.c)
 set_source_files_properties(${hacl_sources} PROPERTIES GENERATED True)
 
-add_definitions(-DIS_ARM_8 -DBROKEN_INTRINSICS -DKRML_VERIFIED_UINT128)
+add_definitions(-DIS_ARM_7 -DBROKEN_INTRINSICS -DKRML_VERIFIED_UINT128)
 add_definitions(-DLib_IntVector_Intrinsics_vec256="void *")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mfpu=neon -mfloat-abi=softfp")
 
