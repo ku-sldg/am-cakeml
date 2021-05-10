@@ -38,7 +38,7 @@ function(build_cake name)
         1
         PARSED_ARGS
         ""
-        "SOURCES"
+        "SOURCES;C_SOURCES"
         "ENTRY_NAME"
     )
     if(NOT "${PARSED_ARGS_UNPARSED_ARGUMENTS}" STREQUAL "")
@@ -60,10 +60,10 @@ function(build_cake name)
         DEPENDS ${abs_bin_prefix}.cml
         VERBATIM
     )
-    add_library(${name} STATIC "${abs_bin_prefix}.cake.S")
+    add_library(${name} STATIC "${abs_bin_prefix}.cake.S" "${PARSED_ARGS_C_SOURCES}")
 endfunction()
 
-# Builds a CAmkES component from CakeML and C sourse files.
+# Builds a CAmkES component from CakeML and C source files.
 # Args: name - name of the component
 #       CML_SOURCES - CakeML source files, in order (they'll be concatenated together)
 #       C_SOURCES - C source files
