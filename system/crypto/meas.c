@@ -205,10 +205,13 @@ void ffireadDir(const uint8_t * c, const long clen, uint8_t * a, const long alen
     closedir(dir);
 }
 
-bool dropRoot(const char * user, gid_t gid, uid_t uid) {
-    return initgroups(user, (gid_t)NULL) == 0
-        && setgid(gid) == 0
-        && setuid(uid) == 0;
+bool dropRoot() {
+    int nobody = 65534;
+    gid_t group = (gid_t)nobody;
+    uid_t user = (uid_t)nobody;
+    return setgroups(1, (const gid_t *)(&group)) != -1
+        && setgid(group) == 0
+        && setuid(user) == 0;
 }
 
 void ffinewProc(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
@@ -222,7 +225,9 @@ void ffinewProc(const uint8_t * c, const long clen, uint8_t * a, const long alen
     }
     else if (pid == 0) {
         // Child process
-        // dropRoot
+        if (!dropRoot())
+            exit(1);
+
         execl((const char *)c, (char *)NULL);
     }
     else {
