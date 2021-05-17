@@ -30,6 +30,19 @@ fun hashDir path exclPath =
     in hashSet (fileHashes @ List.map (flip hashDir exclPath) filtSubDirs)
    end 
 
+fun listMinus minuend subtrahend = List.filter (not o flip List.member subtrahend) minuend
+
+fun hashDir2 path exclPaths = 
+   let val dirEntries  = Meas.readDirNoDot path 
+       val files       = List.mapPartial (fn (n,t) => if t = Meas.Reg then Some (path^"/"^n) else None) dirEntries 
+       val fileHashes  = List.map Meas.hashFile files
+       val subDirs     = List.mapPartial (fn (n,t) => if t = Meas.Dir then Some (path^"/"^n) else None) dirEntries
+       val filtSubDirs = listMinus subDirs exclPaths
+    in hashSet (fileHashes @ List.map (flip hashDir2 exclPaths) filtSubDirs)
+   end
+
+val hashFiles = hashSet o List.map Meas.hashFile
+
 val words = String.tokens Char.isSpace
 val lines = String.tokens (op = #"\n")
 
@@ -56,7 +69,10 @@ fun getMaps pid =
     end
 
 fun measProc pid = 
-    let fun hashable (_, (r, w, x, _), _) = r andalso not w andalso x
+    let
+        (* val _ = print (pid ^ "\n") *)
+        (* val _ = print ((ByteString.show (ByteString.fromRawString pid)) ^"\n") *)
+        fun hashable (_, (r, w, x, _), _) = r andalso not w andalso x
         val sections = List.filter hashable (getMaps pid)
         fun hashSect ((sAddr, eAddr), _, _) = Meas.hashRegion pid sAddr eAddr
         val hashes = List.map hashSect sections
@@ -78,7 +94,7 @@ fun findProc name =
 val measProcsByName = List.map measProc o findProc
 
 (* string -> ByteString.bs * string *)
-fun newProcHash filepath = (Meas.hashFile filepath, Meas.newProc filepath)
+fun newProcHash filepath args = (Meas.hashFile filepath, Meas.newProc filepath args)
 
 (* USMs *)
 fun hashFileUsm args = (case args of
@@ -97,41 +113,74 @@ fun measProcsUsm args = (case args of
     | _ => raise USMexpn "measProcsUsm expects a single argument"
 ) handle Meas.Err x => raise USMexpn ("measProcsUsm failed: " ^ x)
 
-fun checkRestartChild pid filepath = 
+fun checkRestartChild pid filepath args = 
     if Meas.childTerminated pid then 
-        Some (newProcHash filepath)
+        Some (newProcHash filepath args)
     else 
         None
 
 local
     (* Placeholder *)
-    val vdtuPath = "/home/grant/lab/am-cakeml-case2/apps/case2/spin"
-    val vdtu = Ref (ByteString.empty, "")
-    fun getVdtuBinHash () = fst (!vdtu)
-    fun getVdtuPid ()     = snd (!vdtu)
+    val pythonPath = "/usr/bin/python3"
+    val dtuDir = "/media/vclient/dtu-soldier-client"
+    val dtuFiles = pythonPath :: (List.map (fn file => dtuDir ^ "/" ^ file)
+                   ["dtu_soldier_client.py", "dtu_soldier_client_constants.py",
+                    "https_client.py", "https_server_handler.py", "ndo_client.py"])
+    val dtuMainPy = dtuDir ^ "/dtu_soldier_client.py"
+    val dtu = Ref (None : string option)
 in 
-    fun startVdtu () = (
-        print "Launching VDTU\n";
-        vdtu := newProcHash vdtuPath
-    )
+    (* () -> () *)
+    fun startDtuUnsafe () = dtu := Some (Meas.newProc pythonPath [dtuMainPy])
 
-    fun checkRestartVdtu () = case checkRestartChild (getVdtuPid ()) vdtuPath of
-          Some newVdtu => (
-              TextIO.print_err "VDTU terminated, restarting\n";
-              vdtu := newVdtu
-          )
-        | _ => ()
+    (* () -> bool *)
+    fun startDtu () = 
+        let val pythonHash = Meas.hashFile pythonPath 
+            val dtuHash = hashFiles dtuFiles
+         in if (ByteString.show dtuHash) = dtuGolden then (
+                print "Launching DTU Soldier Client\n";
+                dtu := Some (Meas.newProc pythonPath [dtuMainPy]);
+                True
+            ) else (
+                print "Can't launch DTU. Unexpected hashes\n";
+                dtu := None;
+                False
+            )
+        end
 
-    fun measVdtuUsm args = (case args of 
-          [] => ByteString.append (getVdtuBinHash ()) (measProc (getVdtuPid ()))
-        | _  => raise USMexpn "meas_vdtu expects 0 arguments"
-    ) handle Meas.Err x => raise USMexpn ("measVdtuUsm failed: " ^ x)
-           | _          => raise USMexpn  "measVdtuUsm failed"
+    fun updateDtuStatus () = whenSome (!dtu) (fn pid => (
+        if Meas.childTerminated pid then (
+            print "DTU terminated\n";
+            dtu := None
+        ) else ()
+    ))
+
+    fun checkDtuTerminated () = case !(dtu) of 
+          Some pid => Meas.childTerminated pid
+        | None => True
+        
+    (* Will spin forever while dtu is corrupted *)
+    fun checkRestartDtu () = 
+        let fun loopUntilTrue io () = if io () then () else loopUntilTrue io ()
+         in updateDtuStatus ();
+            when (!dtu = None) (loopUntilTrue startDtu)
+        end
+
+    fun provisionDtu () = 
+        let val procHash = option ByteString.empty measProc (!dtu)
+            val dtuHash = hashFiles dtuFiles 
+         in (dtuHash, ByteString.append dtuHash procHash)
+        end
+    
+    fun measDtuUsm args = (case args of 
+          [] => ByteString.append (ByteString.unshow dtuGolden) (option ByteString.empty measProc (!dtu))
+        | _  => raise USMexpn "meas_dtu expects 0 arguments"
+    ) handle Meas.Err x => raise USMexpn ("measDtuUsm failed: " ^ x)
+           | _          => raise USMexpn  "measDtuUsm failed"
 end
 
 val usmMap = Map.fromList id_compare [
     (Id O, hashFileUsm),
     (Id (S O), hashDirectoryUsm),
     (Id (S (S O)), measProcsUsm),
-    (Id (S (S (S O))), measVdtuUsm)
+    (Id (S (S (S O))), measDtuUsm)
 ]

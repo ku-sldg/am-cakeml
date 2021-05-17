@@ -217,6 +217,35 @@ bool dropRoot() {
 void ffinewProc(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
     assert(alen >= 6);
 
+    // We assume no more than 255 arguments
+    char * argv[256] = {0};
+    { // parse into argv
+        int c_i = 0;
+        int argv_i = 0;
+        bool in_arg = false;
+        for(; c_i < clen && argv_i < 254; c_i++)
+            if (in_arg && c[c_i] == (char)0)
+                in_arg = false;
+            else if (!in_arg && c[c_i] != (char)0) {
+                argv[argv_i] = c + c_i;
+                argv_i++;
+                in_arg = true;
+            }
+    }
+
+    // printf("c: ");
+    // for (int i = 0; i < clen; i++)
+    //     if(c[i] == (char)0) 
+    //         printf(".");
+    //     else
+    //         printf("%c", c[i]);
+    // printf("\n");
+
+    // printf("argv:\n");
+    // for(int i = 0; argv[i] != (char *)NULL; i++)
+    //     printf("%d: %s\n", i, argv[i]);
+    // printf("\n");
+
     pid_t pid = fork();
     if (pid == -1) {
         // Fork failed
@@ -225,10 +254,11 @@ void ffinewProc(const uint8_t * c, const long clen, uint8_t * a, const long alen
     }
     else if (pid == 0) {
         // Child process
-        if (!dropRoot())
-            exit(1);
 
-        execl((const char *)c, (char *)NULL);
+        // if (!dropRoot())
+        //     exit(1);
+
+        execv((const char *)c, argv);
     }
     else {
         // Parent process

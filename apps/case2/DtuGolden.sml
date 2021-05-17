@@ -1,0 +1,3 @@
+(* This file was auto-generated. Do not edit manually. Use the provisioner to generate new golden hashes. *)
+
+val dtuGolden = "0x895DE722EDEE098676B2938A20059B8899D09D4B107EA2B556B7F862ABA13F656C89DEA81C55398AF321C648B1FA9F254C77BC5B163326AA59AC4B5D791B5684"

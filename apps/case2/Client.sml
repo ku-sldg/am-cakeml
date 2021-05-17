@@ -5,21 +5,15 @@ fun loop f x = (f x; loop f x)
 
 datatype logType = Info | Debug | Error
 
-(* logType -> String -> () *)
-(* Add timestamp? *)
-fun log lType msg = case lType of
-      Info  => TextIO.print (msg ^ "\n")
-    | Debug => TextIO.print (msg ^ "\n")
-    | Error => TextIO.print_err (msg ^ "\n")
-
-(* 'b -> ('a -> 'b) 'a option -> 'b *)
-fun option b f opt = case opt of 
-      Some a => f a 
-    | None   => b
-
-(* 'a option -> ('a -> ()) -> () *)
-fun whenSome opt io = option () io opt
-(* val whenSome = flip (option ())  *)
+local 
+    val logFile = TextIO.openOut "client.log"
+in 
+    (* logType -> String -> () *)
+    fun log lType msg = case lType of
+          Info  => TextIO.output logFile ("INFO: "  ^ msg ^ "\n")
+        | Debug => TextIO.output logFile ("DEBUG: " ^ msg ^ "\n")
+        | Error => TextIO.output logFile ("ERROR: " ^ msg ^ "\n")
+end
 
 local
     (* Placeholder value. *)
@@ -31,7 +25,7 @@ in
     (* loops unless timeout *)
     fun attestLoop heliAM = whenSome (Socket.inputAllTimeout heliAM) (fn input => (
         let val nonce  = N (Id O) (ByteString.fromRawString input) Mt
-            val _      = checkRestartVdtu ()
+            val _      = checkRestartDtu ()
             val ev     = (evalTerm am nonce protocol) handle _ => (log Error "Protocol evaluation failed"; Mt)
             val jsonEv = jsonToStr (evToJson ev)
                        ^ (String.str (Char.chr 0)) (* append explicit null-byte *)
@@ -44,7 +38,7 @@ end
 
 (* mainLoop : string -> int -> () *)
 fun mainLoop addr port = (
-    checkRestartVdtu ();
+    checkRestartDtu ();
     whenSome (Socket.connect addr port) (fn heliAM => (
         log Info "Connected to HeliAM";
         attestLoop heliAM;
@@ -58,7 +52,7 @@ fun mainLoop addr port = (
     | _ => log Error "Fatal: unknown error"
 
 fun init addr port = (
-    startVdtu ();
+    startDtu ();
     mainLoop addr port
 )
 
@@ -67,21 +61,12 @@ fun main () =
         val usage = "Usage: " ^ name ^ " address port\n"
                   ^ "e.g.   " ^ name ^ " 192.168.2.7 5000\n"
      in (case CommandLine.arguments () of
-              [addr, portStr] => case Int.fromNatString portStr of
-                Some port => init addr port
-              | None      => TextIO.print usage
+              ["--provision"] => provisionMain ()
+            | [addr, portStr] => (
+                case Int.fromNatString portStr of
+                  Some port => init addr port
+                | None      => TextIO.print_err "Invalid port\n")
             | _ => TextIO.print usage
-        ) handle _ => TextIO.print usage
+        ) handle _ => TextIO.print_err "Fatal: unknown error\n"
     end
 val _ = main ()
-
-(*
-fun waitForTerminate pid = if Meas.childTerminated pid then () else waitForTerminate pid
-
-val () = 
-    let val pid = Meas.newProc "/mnt/c/Users/Grant/linux/lab/am-cakeml-case2/apps/case2/spin"
-     in print (pid ^ "\n");
-        waitForTerminate pid;
-        print "Child terminated\n"
-    end
-*)

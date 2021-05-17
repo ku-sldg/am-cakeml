@@ -67,7 +67,7 @@ fun appraise nonce ev = case ev of
       G evSign (U _ _ evHash (N _ evNonce Mt)) => 
           if not (ByteString.deepEq evNonce nonce) then
               (log Info "Appraisal failed, bad nonce"; False)
-          else if (ByteString.show evHash) <> (List.hd goldenHashes) then 
+          else if not (List.member (ByteString.show evHash) goldenHashes) then
               (log Info "Appraisal failed, bad hash"; False)
           else if not (Option.valOf (verifySig ev pub)) then
               (log Info "Appraisal failed, bad signature"; False)
@@ -159,7 +159,7 @@ end
 (* Infinite loop *)
 fun loop () =
     if Api.pacer_wait () then (
-        log Info "Pacer-cycle start";
+        (* log Info "Pacer-cycle start"; *)
         Api.receiveInput ();
         attestation_step ();
         Api.sendOutput ();

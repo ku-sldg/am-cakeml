@@ -5,7 +5,7 @@ project(CakemlAM C ASM)
 
 include(CakeMLHelper.cmake)
 
-set(util_src util/ByteString.sml util/CoqDefaults.sml util/Json.sml)
+set(util_src util/ByteString.sml util/CoqDefaults.sml util/Json.sml util/Misc.sml)
 set(cop_src ${util_src} copland/Instr.sml copland/AM.sml copland/VM.sml
     copland/json/CoplandToJson.sml copland/json/JsonToCopland.sml)
 # TODO: separate meas from crypto
@@ -24,8 +24,8 @@ set(standalone_am_src ${cop_src} ${crypto_src} am/CommTypes.sml)
 #set(gs_src  ${server_am_src} apps/case/Groundstation.sml)
 #set(uav_src ${server_am_src} ${time_src} system/dataports/UavDataportFFI.sml apps/case/Uav.sml)
 
-set(case2_client_src ${server_am_src} apps/case2/Protocol.sml apps/case2/Client.sml)
-set(provision_src ${server_am_src} apps/case2/Protocol.sml apps/case2/Provision.sml)
+set(case2_client_src apps/case2/DtuGolden.sml ${server_am_src} apps/case2/Protocol.sml apps/case2/Provision.sml apps/case2/Client.sml)
+# set(provision_src apps/case2/GoldenHashes.sml ${server_am_src} apps/case2/Protocol.sml apps/case2/Provision.sml)
 set(heli_src ${standalone_am_src} apps/case2/HamrFFI.sml apps/case2/GoldenHashes.sml apps/case2/Heli.sml)
 
 # Unfortunately, the build process will diverge significantly between
@@ -104,7 +104,7 @@ else()
     build_am_exe("client"  ${case2_client_src})
     #build_am_lib("heli_am" ${heli_src})
 
-    build_am_exe("provision" ${provision_src})
+    # build_am_exe("provision" ${provision_src})
 
     build_cake("heli_am.cake" SOURCES "${heli_src}")
     add_executable(fake_heli_am ${basis_file} apps/case2/fake_ffi.c)

@@ -87,16 +87,21 @@ structure Meas = struct
         (* version of readDir that filters out the "." and ".." entries *)
         val readDirNoDot = List.filter (fn (n,t) => n <> "." andalso n <> "..") o readDir
     
-        (* string -> string *)
+        (* string -> [string] -> string *)
         (* Warning! Doesn't detect when program fails to launch (i.e. if file doesn't exist) *)
-        fun newProc filepath = 
-            let val dataLen = 5
+        fun newProc filepath args = 
+            let val dataLen = 12
                 val out = Word8Array.array (dataLen + 1) (Word8.fromInt 0)
-             in #(newProc) filepath out;
+                val command = String.concat (intersperse (String.str (Char.chr 0)) (filepath :: args))
+                val nullByte = Word8.fromInt 0
+                fun getLeadingStr buf = case Word8Array.findi ((op =) nullByte) buf of
+                      Some (i, _) =>  Word8Array.substring buf 0 i
+                    | _ => ByteString.toRawString buf
+             in #(newProc) command out;
                 if Word8Array.sub out 0 = ffiFailure then
                     raise (Err "newProc FFI failure, could not fork")
                 else 
-                    Word8Array.substring out 1 dataLen
+                    getLeadingStr (ByteString.fromRawString (Word8Array.substring out 1 dataLen))
             end
 
         (* string -> bool *)
