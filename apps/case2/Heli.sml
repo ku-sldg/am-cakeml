@@ -13,10 +13,13 @@ val rawToHex = ByteString.toHexString o ByteString.fromRawString
 val pub = hexToRaw "490E2422528F14AC6A48DDB9D72CB30B8345AF2E939003BC7A33A6057F2FFB0101000000000000002DD0B7F53A560000A049D882A37F00000000000000000000"
 
 local
-    val protocol_id = "ABCD" (* arbitrary placeholder id *)
+    val protocol_id_buf = Word8Array.array 4 (Word8.fromInt 0)
+    val _ = Word8Array.update protocol_id_buf 3 (Word8.fromInt 2)
+    val protocol_id = ByteString.toRawString protocol_id_buf
+
     val emptyId = ByteString.toRawString (Word8Array.array 8 (Word8.fromInt 0))
     val trusted_ids = Array.array 4 emptyId
-    val flatten_ids = Array.foldl (op String.^) ""
+    val flatten_ids = Array.foldl (op ^) ""
     
     fun getId ip = ip ^ protocol_id
 in
@@ -64,7 +67,7 @@ fun verifySig g pub =
 (* bytestring -> ev -> bool *)
 (* true if appraisal succeeds *)
 fun appraise nonce ev = case ev of
-      G evSign (U _ _ evHash (N _ evNonce Mt)) => 
+      G evSign (SS (H evHash) (N _ evNonce Mt)) => 
           if not (ByteString.deepEq evNonce nonce) then
               (log Info "Appraisal failed, bad nonce"; False)
           else if not (List.member (ByteString.show evHash) goldenHashes) then

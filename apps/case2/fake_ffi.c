@@ -55,7 +55,15 @@ void ffiapi_get_AttestationResponse(unsigned char *parameter, long parameterSize
 }
 
 void ffiapi_send_TrustedIds(unsigned char *parameter, long parameterSizeBytes, unsigned char *output, long outputSizeBytes) {
-  printf("Sending trusted ids: [%li,%li,%li,%li]\n", *((int64_t*)parameter), *((int64_t*)parameter + 1), *((int64_t*)parameter + 2), *((int64_t*)parameter + 3));
+  printf("Sending trusted id list:");
+  for (int i = 0; i < parameterSizeBytes; i++) {
+      if (i % 8 == 0)
+          printf(",");
+      if (i % 4 == 0)
+          printf(" ");
+      printf("%02x", parameter[i]);
+  }
+  printf("\n");
 }
 
 int get_listener(int qlen, char * port) {

@@ -5,7 +5,12 @@ fun loop f x = (f x; loop f x)
 
 datatype logType = Info | Debug | Error
 
-local 
+(* logType -> String -> () *)
+fun log lType msg = case lType of
+      Info  => TextIO.print (msg ^ "\n")
+    | Debug => TextIO.print ("DEBUG: " ^ msg ^ "\n")
+    | Error => TextIO.print_err (msg ^ "\n")
+(* local 
     val logFile = TextIO.openOut "client.log"
 in 
     (* logType -> String -> () *)
@@ -13,7 +18,7 @@ in
           Info  => TextIO.output logFile ("INFO: "  ^ msg ^ "\n")
         | Debug => TextIO.output logFile ("DEBUG: " ^ msg ^ "\n")
         | Error => TextIO.output logFile ("ERROR: " ^ msg ^ "\n")
-end
+end *)
 
 local
     (* Placeholder value. *)
@@ -25,7 +30,7 @@ in
     (* loops unless timeout *)
     fun attestLoop heliAM = whenSome (Socket.inputAllTimeout heliAM) (fn input => (
         let val nonce  = N (Id O) (ByteString.fromRawString input) Mt
-            val _      = checkRestartDtu ()
+            (* val _      = checkRestartDtu () *)
             val ev     = (evalTerm am nonce protocol) handle _ => (log Error "Protocol evaluation failed"; Mt)
             val jsonEv = jsonToStr (evToJson ev)
                        ^ (String.str (Char.chr 0)) (* append explicit null-byte *)
@@ -38,7 +43,7 @@ end
 
 (* mainLoop : string -> int -> () *)
 fun mainLoop addr port = (
-    checkRestartDtu ();
+    (* checkRestartDtu (); *)
     whenSome (Socket.connect addr port) (fn heliAM => (
         log Info "Connected to HeliAM";
         attestLoop heliAM;
@@ -52,7 +57,7 @@ fun mainLoop addr port = (
     | _ => log Error "Fatal: unknown error"
 
 fun init addr port = (
-    startDtu ();
+    (* startDtu (); *)
     mainLoop addr port
 )
 
