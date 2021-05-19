@@ -139,6 +139,27 @@ structure ByteString = struct
             arr
         end
 
+    datatype endianness = Little | Big
+
+    fun intToBytes endian len num = 
+        let val buf = Word8Array.array len (Word8.fromInt 0)
+            fun intToBytesLittle i number = 
+                if i < len then (
+                    Word8Array.update buf i (Word8.fromInt (number mod 256));
+                    intToBytesLittle (i+1) (number div 256)
+                ) else ()
+            fun intToBytesBig i number = 
+                if i >= 0 then (
+                    Word8Array.update buf i (Word8.fromInt (number mod 256));
+                    intToBytesBig (i-1) (number div 256)
+                ) else ()
+         in 
+            (case endian of
+                  Little => intToBytesLittle 0 num
+                | Big => intToBytesBig (len - 1) num);
+            buf
+        end
+
     fun copy bs =
         let val bsLen = length bs
             val arr = Word8Array.array bsLen zeroByte
