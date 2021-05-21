@@ -25,6 +25,6 @@ val pythonDynamicHashProtocol = Asp (Aspc (Id (S (S O))) ["python3"])
 val protocol =
     Lseq
         (Bseq (NONE, ALL)
-            (Lseq (Lseq dtuFileHashProtocol pythonDynamicHashProtocol) (Asp Hsh))
+            (Lseq dtuFileHashProtocol (Asp Hsh))
             (Asp Cpy))
         (Asp Sig)
