@@ -5,7 +5,7 @@ project(CakemlAM C ASM)
 
 include(CakeMLHelper.cmake)
 
-set(util_src util/ByteString.sml util/CoqDefaults.sml util/Json.sml)
+set(util_src Util/Extra.sml util/ByteString.sml Util/Misc.sml util/CoqDefaults.sml util/Json.sml)
 set(cop_src ${util_src} copland/Instr.sml copland/AM.sml copland/VM.sml
     copland/json/CoplandToJson.sml copland/json/JsonToCopland.sml)
 # TODO: separate meas from crypto

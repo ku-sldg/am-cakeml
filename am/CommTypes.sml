@@ -1,4 +1,4 @@
-(* Depends on: util/CoqDefaults, util/Json, copland/Instr,
+(* Depends on: util, copland/Instr,
    copland/Json/CoplandToJson *)
 
 type addr = string

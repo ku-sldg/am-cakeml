@@ -1,8 +1,8 @@
-(* Depends on: util/ByteString, copland/Instr *)
+(* Depends on: util, copland/Instr *)
 
-local type bs = ByteString.bs in
+local type bs = BString.bstring in
 type copEval = ev -> term -> ev
-type key = string
+type key = bs
 type usm = arg list -> bs
 
 datatype am = Am

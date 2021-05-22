@@ -1,4 +1,4 @@
-(* Depends on: util/ByteString, util/Json, copland/Instr *)
+(* Depends on: util, copland/Instr *)
 
 fun stringToSp n =
     case n
@@ -8,7 +8,7 @@ fun stringToSp n =
 fun jsonStringToString (Json.String s) = s
 fun jsonStringListToList (Json.List args)  = List.map jsonStringToString args
 
-fun jsonStringToBS (Json.String s) = ByteString.fromHexString s
+fun jsonStringToBS (Json.String s) = BString.unshow s
 
 (* json object to apdt object *)
 fun jsonToTerm js = case js of

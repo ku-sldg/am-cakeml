@@ -5,32 +5,22 @@ structure Meas = struct
     exception Err string
 
     local
-        val ffiSuccess = Word8.fromInt 0
-        val ffiFailure = Word8.fromInt 1
-        val ffiBufferTooSmall = Word8.fromInt 2
-
-        val null = Char.chr 0
-        val nullStr = String.str null
+        fun ffi_fileHash   x y = #(fileHash)   x y
+        fun ffi_hashRegion x y = #(hashRegion) x y
+        fun ffi_readDir    x y = #(readDir)    x y
     in
-        fun hashFile filename =
-            let val buffer = Word8Array.array 65 (Word8.fromInt 0)
-                val result = Word8Array.array 64 (Word8.fromInt 0)
-             in #(fileHash) filename buffer;
-                if Word8Array.sub buffer 0 = ffiFailure
-                    then raise (Err ("hashFile FFI Failure, perhaps could not find file: " ^ filename))
-                    else (Word8Array.copy buffer 1 64 result 0; result)
-            end
-       
+        (* string -> bstring *)
+        fun hashFile filename = case FFI.callOpt ffi_fileHash 64 (BString.fromString filename) of 
+              Some bs => bs 
+            | None => raise (Err ("hashFile FFI Failure, perhaps could not find file: " ^ filename))
+        
+        (* string -> string -> string -> bstring *)
         (* pid in decimal, start and end in hex *)
-        (* string -> string -> string -> ByteString.bs *)
-        fun hashRegion pid startAddr endAddr =
-            let val buffer = Word8Array.array 65 (Word8.fromInt 0)
-                val result = Word8Array.array 64 (Word8.fromInt 0)
-                val input  = pid ^ nullStr ^ startAddr ^ nullStr ^ endAddr
-             in #(hashRegion) input buffer;
-                if Word8Array.sub buffer 0 = ffiFailure
-                    then raise (Err "hashRegion FFI Failure, perhaps did not have privileges")
-                    else (Word8Array.copy buffer 1 64 result 0; result)
+        fun hashRegion pid startAddr endAddr = 
+            let val payload = FFI.nullSeparated [pid, startAddr, endAddr]
+             in case FFI.callOpt ffi_hashRegion 64 payload of 
+                      Some bs => bs 
+                    | None => raise (Err "hashRegion FFI Failure, perhaps did not have privileges")
             end
 
         datatype entryType =
@@ -44,14 +34,16 @@ structure Meas = struct
             | Lnk
 
         local 
-            val unknown = Char.chr 1
-            val reg     = Char.chr 2
-            val dir     = Char.chr 3
-            val fifo    = Char.chr 4
-            val sock    = Char.chr 5
-            val chr     = Char.chr 6
-            val blk     = Char.chr 7
-            val lnk     = Char.chr 8
+            val unknown = Word8.fromInt 1
+            val reg     = Word8.fromInt 2
+            val dir     = Word8.fromInt 3
+            val fifo    = Word8.fromInt 4
+            val sock    = Word8.fromInt 5
+            val chr     = Word8.fromInt 6
+            val blk     = Word8.fromInt 7
+            val lnk     = Word8.fromInt 8
+
+            (* bstring -> (string * entryType) list *)
             val parseResult = 
                 let fun toEntryType enc =
                         if enc = unknown   then Unknown
@@ -63,27 +55,17 @@ structure Meas = struct
                         else if enc = blk  then Blk
                         else if enc = lnk  then Lnk
                         else raise (Err "readDir FFI failure, unrecognized entry type")
-                    fun decodeEntry str = (String.extract str 1 None, toEntryType (String.sub str 0))
-                 in List.map decodeEntry o String.tokens (op = null)
+                    fun decodeEntry bs = (BString.toString (BString.tl bs), toEntryType (BString.hd bs))
+                  in List.map decodeEntry o BString.tokens (op = Word8Extra.null)
                 end
         in 
-            (* readDir : string -> (string * entryType) list *)
-            fun readDir dirName = 
-                let fun go bufLen = 
-                        let val buffer = Word8Array.array bufLen (Word8.fromInt 0)
-                            val _ = #(readDir) dirName buffer;
-                            val ffiResult = Word8Array.sub buffer 0 
-                         in if ffiResult = ffiSuccess then 
-                                parseResult (Word8Array.substring buffer 1 (bufLen-1))
-                            else if ffiResult = ffiBufferTooSmall then 
-                                go (bufLen * 2)
-                            else
-                                raise (Err "readDir FFI failure, perhaps not a directory")
-                        end
-                 in go 256
-                end
+            (* string -> (string * entryType) list *)
+            fun readDir dirName = case FFI.callOptFlex ffi_readDir 256 (BString.fromString dirName) of
+                  Some bs => parseResult bs
+                | None => raise (Err "readDir FFI failure, perhaps not a directory")
         end
 
+        (* string -> (string * entryType) list *)
         (* version of readDir that filters out the "." and ".." entries *)
         val readDirNoDot = List.filter (fn (n,t) => n <> "." andalso n <> "..") o readDir
     end

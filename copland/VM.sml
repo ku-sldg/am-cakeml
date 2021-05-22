@@ -1,4 +1,4 @@
-(* Depends on: ByteString.sml, Instr.sml, AM.sml CoqDefaults.sml *)
+(* Depends on: util, Instr.sml, AM.sml *)
 
 (* sp -> ev -> ev *)
 fun splitEv s e = case s of

@@ -1,4 +1,4 @@
-(* Depends on: util/ByteString, util/Json, copland/Instr *)
+(* Depends on: util, copland/Instr *)
 
 fun intToJson n = Json.Number (Json.Int n)
 
@@ -6,7 +6,7 @@ fun stringToJson s = Json.String s
 
 fun stringListToJsonList args  =  Json.List (List.map stringToJson args)
 
-fun byteStringToJson bs = Json.String (ByteString.toHexString bs)
+fun byteStringToJson bs = Json.String (BString.show bs)
 
 fun idToJson (Id a) = Json.Number (Json.Int (natToInt a))
 

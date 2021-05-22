@@ -1,4 +1,4 @@
-(* Depends on: ByteString.sml *)
+(* Depends on: Util *)
 
 (* Safe(ish) wrapper to FFI socket functions *)
 structure Socket = struct
@@ -6,54 +6,45 @@ structure Socket = struct
     exception Err string
 
     local
-        (* Shared/reused buffers *)
-        val fdbuf = Word8Array.array 9 (Word8.fromInt 0)
-        val cbuf = Word8Array.array 2 (Word8.fromInt 0)
-        (* The null char (used here to delimit args) *)
-        val null = String.str (Char.chr 0)
-
-        datatype fd = Fd string
+        datatype sockfd = Fd BString.bstring
         fun getFd (Fd s) = s
+        fun getFdString (Fd s) = (BString.toString s)
+
+        fun ffi_listen  x y = #(listen)  x y
+        fun ffi_accept  x y = #(accept)  x y
+        fun ffi_connect x y = #(connect) x y
     in
+        type sockfd = sockfd
+
+        (* int -> int -> sockfd *)
         (* Takes a port number and maximum queue length, and returns the fd of a new
            actively listening socket *)
-        fun listen port qLen =
-            let
-                val _ = Marshalling.n2w2 qLen cbuf 0
-                val c = (ByteString.toRawString cbuf) ^ (Int.toString port)
-                val _ = #(listen) c fdbuf
-            in
-                if Word8Array.sub fdbuf 0 = Word8.fromInt 1
-                    then raise (Err "Error in listen()")
-                    else Fd (Word8Array.substring fdbuf 1 8)
+        fun listen port qLen = 
+            let val payload = BString.concat (FFI.n2w2 qLen) (BString.fromString (Int.toString port))
+             in case FFI.callOpt ffi_listen 8 payload of 
+                      Some bs => Fd bs
+                    | None => raise (Err "Error in listen()")
             end
 
+        (* sockfd -> sockfd *)
         (* Takes the fd of an actively listening socket, returns the fd of a connection *)
         (* Blocks until there is an incoming connection *)
-        fun accept sockfd =
-            let
-                val _ = #(accept) (getFd sockfd) fdbuf
-            in
-                if Word8Array.sub fdbuf 0 = Word8.fromInt 1
-                    then raise (Err "Error in accept()")
-                    else Fd (Word8Array.substring fdbuf 1 8)
+        fun accept sockfd = case FFI.callOpt ffi_accept 8 (getFd sockfd) of 
+              Some bs => Fd bs
+            | None => raise (Err "Error in accept()")
+
+        (* string -> int -> sockfd *)
+        (* Takes the host in the format of a domain name or IPv4 address,
+           and port, an integer corresponding to a port number. Returns a fd. *)
+        fun connect host port = 
+            let val payload = FFI.nullSeparated [host, (Int.toString port)]
+             in case FFI.callOpt ffi_connect 8 payload of 
+                      Some bs => Fd bs
+                    | None => raise (Err "Error in connect()")
             end
 
-        (* Takes the host as a string, in the format of a domain name or IPv4 address,
-           and port, and integer corresponding to a port number. Returns a fd. *)
-        fun connect host port =
-            let
-                val c = host ^ null ^ (Int.toString port) ^ null
-                val _ = #(connect) c fdbuf
-            in
-                if Word8Array.sub fdbuf 0 = Word8.fromInt 1
-                    then raise (Err "Error in connect()")
-                    else Fd (Word8Array.substring fdbuf 1 8)
-            end
-
-        (* Returns a pretty string for debug printing file descriptors *)
-        val showFD = ByteString.show o ByteString.fromRawString o getFd
-
+        (* sockfd -> string *)
+        val showFd = BString.show o getFd
 
     (* The following code is adaptped from the TextIO implementation in the
        basis library. It is stripped of the instream/outstream constructors.
@@ -130,7 +121,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                     let val z = String.size s
                         val n = if z <= 2048 then z else 2048
                         val fl = Word8Array.copyVec s 0 n iobuff 4
-                        val a = write (getFd fd) n 0 in
+                        val a = write (getFdString fd) n 0 in
                             output fd (String.substring s n (z-n))
                     end
             end
@@ -169,7 +160,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                                 if i < len then
                                     let
                                         val nwant = len - i
-                                        val nread = input (getFd fd) arr i nwant
+                                        val nread = input (getFdString fd) arr i nwant
                                     in
                                         if nread < nwant then Word8Array.substring arr 0 (i+nread)
                                         else inputAll_aux arr (i + nread)
@@ -181,7 +172,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
             (* Close function *)
             fun close fd =
-                let val a = #(close) (getFd fd) iobuff in
+                let val a = #(close) (getFdString fd) iobuff in
                 if Word8Array.sub iobuff 0 = Word8.fromInt 0
                 then () else raise InvalidFD
             end

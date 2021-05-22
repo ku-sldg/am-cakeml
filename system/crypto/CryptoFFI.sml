@@ -1,60 +1,44 @@
-(* Depends on: ByteString.sml *)
+(* Depends on: Util *)
 
 (* Safe wrappers to FFI crypto functions *)
 structure Crypto = struct
     exception Err string
 
     local
-        val ffiSuccess = Word8.fromInt 0
-        val ffiFailure = Word8.fromInt 1
+        fun ffi_sha512      x y = #(sha512)            x y
+        fun ffi_signMsg     x y = #(signMsg)           x y
+        fun ffi_sigCheck    x y = #(sigCheck)          x y
+        fun ffi_urand       x y = #(urand)             x y
+        fun ffi_aes256_xkey x y = #(aes256_expand_key) x y
+        fun ffi_aes256      x y = #(aes256)            x y
     in
-        fun hashStr s =
-            let val result = Word8Array.array 64 (Word8.fromInt 0)
-             in #(sha512) s result;
-                result
-            end
+        (* bstring -> bstring *)
+        val hash = FFI.call ffi_sha512 64
 
-        val hash = hashStr o ByteString.toRawString
-
+        (* bstring -> bstring -> bstring *)
         fun signMsg priv msg =
-            if String.size priv <> 32 then raise (Err "Wrong private key size, Error in signMsg FFI") else
-            let val result  = Word8Array.array 64 (Word8.fromInt 0)
-                val payload = priv ^ (ByteString.toRawString msg)
-             in #(signMsg) payload result;
-                result
-            end
+            if BString.length priv <> 32 then
+                raise (Err "Wrong private key size, Error in signMsg FFI")
+            else 
+                FFI.call ffi_signMsg 64 (BString.concat priv msg)
 
-        (* sigCheck : string -> ByteString.bs -> ByteString.bs -> ByteString.bs *)
-        fun sigCheck pub sign msg =
-            if String.size pub <> 64 then raise (Err "Wrong public key size, Error in sigCheck FFI") else
-            let val result  = Word8Array.array 1 (Word8.fromInt 0)
-                val payload = pub ^ (ByteString.toRawString sign)
-                                  ^ (ByteString.toRawString msg)
-             in #(sigCheck) payload result;
-                Word8Array.sub result 0 = ffiSuccess
-            end
 
-        (* len is length of nonce in bytes *)
-        fun urand len =
-            let val buffer = Word8Array.array (len+1) (Word8.fromInt 0)
-                val result = Word8Array.array len (Word8.fromInt 0)
-             in #(urand) "" buffer;
-                (if Word8Array.sub buffer 0 = ffiFailure
-                    then raise (Err "urand FFI Failure")
-                    else Word8Array.copy buffer 1 len result 0);
-                result
-            end
+        (* bstring -> bstring -> bstring -> bstring *)
+        fun sigCheck pub sign msg = 
+            if BString.length pub <> 64 then
+                raise (Err "Wrong public key size, Error in sigCheck FFI")
+            else
+                FFI.callBool ffi_sigCheck (BString.concatList [pub, sign, msg])
 
-        fun aes256_xkey key =
-            let val result = Word8Array.array 240 (Word8.fromInt 0)
-             in #(aes256_expand_key) key result;
-                result
-            end
+        (* int -> bstring *)
+        fun urand len = case FFI.callOpt ffi_urand len BString.empty of 
+              Some bs => bs 
+            | None => raise (Err "urand FFI Failure")
 
-        fun aes256 pt xkey =
-            let val result = Word8Array.array 16 (Word8.fromInt 0)
-             in #(aes256) (pt ^ xkey) result;
-                result
-            end
+        (* bstring -> bstring *)
+        val aes256_xkey = FFI.call ffi_aes256_xkey 240
+
+        (* bstring -> bstring -> bstring *)
+        fun aes256 pt xkey = FFI.call ffi_aes256 16 (BString.concat pt xkey)
     end
 end

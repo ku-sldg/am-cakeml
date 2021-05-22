@@ -1,8 +1,7 @@
 (* Depends on: util, copland, system/sockets, am/Measurementsm am/CommTypes,
    am/ServerAm *)
 
-val priv = (ByteString.toRawString o ByteString.fromHexString)
-           "2E5773B2A19A2CB05FEE44650D8DC877B3D806F74C199043657C805288CD119B"
+val priv = BString.unshow "2E5773B2A19A2CB05FEE44650D8DC877B3D806F74C199043657C805288CD119B"
 
 (* TODO: Do something with pl1 rather than assuming it is here.
    Also do something with the nameserver mapping *)

@@ -1,14 +1,17 @@
 (* Depends on: util, copland/Instr, system/crypto *)
 
 (* Crypto *)
+(* term -> bstring -> bool option *)
 fun verifySig g pub =
     case g
       of G bs ev => Some (Crypto.sigCheck pub bs (encodeEv ev))
        | _ => None
 
+(* () -> bstring *)
 fun genNonce () = Crypto.urand 16
 
 (* Meas *)
+(* string -> string *)
 fun readFile filename =
     let val fd = TextIO.openIn filename
         val text = TextIO.inputAll fd
@@ -16,10 +19,13 @@ fun readFile filename =
         text
     end
 
+(* bstring list -> bstring *)
 (* Hashes a group of bytestrings in an order-agnostic way (by xor-ing them together) *)
-(* hashSet -> ByteString.bs list -> Bytestring.bs *)
-val hashSet = Crypto.hash o List.foldr (ByteString.xor) ByteString.empty
+(* Note that the endianness of the xor operation is largely irrelevant. It only effects 
+   whether bytestrings are padded from the left or right to equalize their lengths *)
+val hashSet = Crypto.hash o List.foldr (BString.xor BString.LittleEndian) BString.empty
 
+(* string -> string -> bstring *)
 fun hashDir path exclPath = 
    let val dirEntries  = Meas.readDirNoDot path 
        val files       = List.mapPartial (fn (n,t) => if t = Meas.Reg then Some (path^"/"^n) else None) dirEntries 
@@ -29,7 +35,9 @@ fun hashDir path exclPath =
     in hashSet (fileHashes @ List.map (flip hashDir exclPath) filtSubDirs)
    end 
 
+(* string -> string list *)
 val words = String.tokens Char.isSpace
+(* string -> string list *)
 val lines = String.tokens (op = #"\n")
 
 (* Requires root priveleges *)
@@ -89,7 +97,7 @@ fun hashDirectoryUsm args = (case args of
 ) handle Meas.Err x => raise USMexpn ("hashDirectoryUsm failed, possibly failed to find directory: " ^ x)
 
 fun measProcsUsm args = (case args of 
-      [name] => List.foldl ByteString.append ByteString.empty (measProcsByName name) 
+      [name] => BString.concatList (measProcsByName name) 
     | _ => raise USMexpn "measProcsUsm expects a single argument"
 ) handle Meas.Err x => raise USMexpn ("measProcsUsm failed: " ^ x)
 

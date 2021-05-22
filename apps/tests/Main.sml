@@ -1,7 +1,7 @@
 (* Depends on: util, copland, system/crypto, am/Measurements, am/CommTypes,
    am/ServerAm*)
 
-val am = serverAm "" emptyNsMap
+val am = serverAm (BString.empty) emptyNsMap
 
 (* Examples *)
 
@@ -24,13 +24,13 @@ Expected result:
 *)
 
 fun hashTests () =
-    let val evidence  = H (ByteString.fromRawString "abc")
+    let val evidence  = H (BString.fromString "abc")
         val hashTest  = evToString (evalTerm am evidence (Asp Hsh))
         val hashFilev = Meas.hashFile "hashTest.txt"
-        val hashFileS = ByteString.show hashFilev
+        val hashFileS = BString.show hashFilev
      in print ("Hash test: "      ^ hashTest  ^ "\n\n" ^
                "Hash file test: \n" ^ hashFileS ^ "\n" ^
-               (if(ByteString.toHexString hashFilev = goldenFileHash) then "Golden Value Check:  Passed" else "Golden Value Check:  Failed") ^ "\n\n")
+               (if(BString.show hashFilev = goldenFileHash) then "Golden Value Check:  Passed" else "Golden Value Check:  Failed") ^ "\n\n")
     end
     handle (Meas.Err s) => TextIO.print_err ("ERROR: " ^ s ^ "\n")
 
@@ -42,9 +42,9 @@ Expected result(composite hash):
 *)
 fun hashDirTest () =
     let val hashDirv = hashDir "testDir" ""
-        val hashDirS = ByteString.show hashDirv
+        val hashDirS = BString.show hashDirv
      in print ("Hash directory test: \n" ^ hashDirS ^ "\n" ^
-              (if(ByteString.toHexString hashDirv = goldenDirHash) then "Golden Value Check:  Passed" else "Golden Value Check:  Failed") ^ "\n\n")
+              (if(BString.show hashDirv = goldenDirHash) then "Golden Value Check:  Passed" else "Golden Value Check:  Failed") ^ "\n\n")
     end
     handle (Meas.Err s) => TextIO.print_err ("ERROR: " ^ s ^ "\n")
 
@@ -54,7 +54,7 @@ fun hashDirTest () =
 (* Just prints a nonce. It's difficult to determine the quality of a single
    random number though. At the very least, we can verify a new number is
    printed at each invocation. *)
-fun nonceTest () = print ("Nonce test: " ^ ByteString.show (genNonce ()) ^ "\n\n")
+fun nonceTest () = print ("Nonce test: " ^ BString.show (genNonce ()) ^ "\n\n")
 
 (*
 The purpose of this function is to create a large file of random bytes, to
@@ -71,18 +71,17 @@ be analyzed by NIST's statistical test suite for CSPRNGs:
 
 (* The good signature should pass the check, and the bad signature should fail *)
 fun sigTest () =
-    let val hexToRaw  = ByteString.toRawString o ByteString.fromHexString
-        val privGood  = hexToRaw "2E5773B2A19A2CB05FEE44650D8DC877B3D806F74C199043657C805288CD119B"
-        val privBad   = hexToRaw "2E5773B2A19A2CB05FEE44650D8DC877B3D806F84C199043657C805288CD119B"
-        val pub       = hexToRaw "490E2422528F14AC6A48DDB9D72CB30B8345AF2E939003BC7A33A6057F2FFB0101000000000000002DD0B7F53A560000A049D882A37F00000000000000000000"
-        val msg       = ByteString.fromRawString "foo bar"
+    let val privGood  = BString.unshow "2E5773B2A19A2CB05FEE44650D8DC877B3D806F74C199043657C805288CD119B"
+        val privBad   = BString.unshow "2E5773B2A19A2CB05FEE44650D8DC877B3D806F84C199043657C805288CD119B"
+        val pub       = BString.unshow "490E2422528F14AC6A48DDB9D72CB30B8345AF2E939003BC7A33A6057F2FFB0101000000000000002DD0B7F53A560000A049D882A37F00000000000000000000"
+        val msg       = BString.fromString "foo bar"
         val signGood  = Crypto.signMsg privGood msg
         val signBad   = Crypto.signMsg privBad  msg
         val checkGood = Crypto.sigCheck pub signGood msg
         val checkBad  = Crypto.sigCheck pub signBad msg
-     in print ("Good Signature: \n" ^ (ByteString.show signGood) ^ "\n" ^
+     in print ("Good Signature: \n" ^ (BString.show signGood) ^ "\n" ^
                "Signature Check: "  ^ (if checkGood then "Passed" else "Failed") ^ "\n\n" ^
-               "Bad Signature: \n"  ^ (ByteString.show signBad) ^ "\n" ^
+               "Bad Signature: \n"  ^ (BString.show signBad) ^ "\n" ^
                "Signature Check: "  ^ (if checkBad  then "Passed" else "Failed") ^ "\n")
     end
 
@@ -92,5 +91,8 @@ fun main () = (
     hashDirTest ();
     nonceTest ();
     sigTest ()
-) handle _ => TextIO.print_err "Fatal: unknown error\n"
+) handle Meas.Err msg => TextIO.print_err ("Meas err: " ^ msg ^ "\n")
+       | Crypto.Err msg => TextIO.print_err ("Crypto err: " ^ msg ^ "\n")
+       | Word8Extra.InvalidHex => TextIO.print_err ("Invalid hex\n")
+       | _ => TextIO.print_err "Fatal: unknown error\n"
 val _ = main ()

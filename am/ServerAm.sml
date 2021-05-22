@@ -20,7 +20,7 @@ fun socketDispatch me nsMap pl ev t =
         ev
     end
 
-(* privKey -> nsMap -> am *)
+(* key -> nsMap -> am *)
 fun serverAm privKey nsMap = Am
     O
     (socketDispatch O nsMap)

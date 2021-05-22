@@ -1,6 +1,4 @@
-(* Depends on: util/ByteString, util/CoqDefaults.sml *)
-
-(* TODO: rename ASTs? *)
+(* Depends on: util *)
 
 datatype id = Id nat
 fun id_compare (Id i) (Id j) = nat_compare i j
@@ -72,7 +70,7 @@ fun termToString t = concatWith " "
 type n_id = id
 val nIdToString = idToString
 
-local type bs = ByteString.bs in
+local type bs = BString.bstring in
 datatype ev =
       Mt
     | U asp_id (arg list) bs ev
@@ -87,23 +85,23 @@ fun evToString e = concatWith " "
     let fun parens e = "(" ^ evToString e ^ ")"
      in case e of
           Mt           => ["Mt"]
-        | U i al bs ev => ["U", aspIdToString i, listToString al argToString, ByteString.show bs, parens ev]
-        | G bs ev      => ["G", ByteString.show bs, parens ev]
-        | H bs         => ["H", ByteString.show bs]
-        | N i bs ev    => ["N", nIdToString i, ByteString.show bs, parens ev]
+        | U i al bs ev => ["U", aspIdToString i, listToString al argToString, BString.show bs, parens ev]
+        | G bs ev      => ["G", BString.show bs, parens ev]
+        | H bs         => ["H", BString.show bs]
+        | N i bs ev    => ["N", nIdToString i, BString.show bs, parens ev]
         | SS ev1 ev2   => ["SS", parens ev1, parens ev2]
         | PP ev1 ev2   => ["PP", parens ev1, parens ev2]
     end
 
-(* ev -> ByteString.bs *)
+(* ev -> bstring *)
 val encodeEv =
     let fun evList ev = case ev of
-          Mt         => [ByteString.empty]
+          Mt         => [BString.empty]
         | U _ _ bs e => bs :: evList e
         | G bs e     => bs :: evList e
         | H bs       => [bs]
         | N _ bs e   => bs :: evList e
         | SS e1 e2   => evList e1 @ evList e2
         | PP e1 e2   => evList e1 @ evList e2
-     in List.foldr ByteString.append ByteString.empty o evList
+     in BString.concatList o evList
     end

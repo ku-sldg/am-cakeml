@@ -1,7 +1,10 @@
-fun timestamp () =
-    let val result = Word8Array.array 8 (Word8.fromInt 0)
-     in #(timestamp) "" result; ByteString.toInt result
-    end
+local 
+    fun ffi_timestamp x y = #(timestamp) x y
+in
+    (* () -> int *)
+    fun timeStamp () = BString.toInt BString.LittleEndian (FFI.call ffi_timestamp 8 BString.empty)
+end
+
 
 (* Uses an association list as the underlying data structure. The standard
    library's hashtable would be more efficient, but likely harder to verify. *)
