@@ -16,9 +16,6 @@
 #include <fcntl.h>
 #include <sys/mman.h>
 
-#include "debug.h"
-#include "meas.h"
-
 #include "Hacl_Hash.h"
 
 #define FFI_SUCCESS 0
@@ -26,29 +23,28 @@
 #define FFI_BUFFER_TOO_SMALL 2
 #define ffi_assert(cond) {if (!(cond)) { a[0] = FFI_FAILURE; return; }}
 
-#define DIGEST_LEN 64
+// TODO: add compile-time switch for MacOS-variant
+void ffiurand(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
+    // Prevents complaint about unused arguments
+    (void)c; (void)clen;
 
-void ffifileHash(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
-    DEBUG_PRINT("calling ffifileHash\n\n");
-    assert(alen >= 65);
+    // We need at least enough space to return success/fail.
+    assert(alen >= 1);
 
-    const char * filename = (const char *)c;
-    DEBUG_PRINT("Filename: %s\n", filename);
+    int fd = open("/dev/urandom", O_RDONLY);
+    if(fd == -1) {
+        close(fd);
+        a[0] = FFI_FAILURE;
+        return;
+    }
 
-    size_t file_size = 0;
-
-    void * file = mapFileContents(filename, &file_size);
-    ffi_assert(file != NULL || file_size == 0);
-
-    DEBUG_PRINT("file_size after rfc(%s): %i\n",filename,file_size);
-    DEBUG_PRINT("file contents after rfc: %s\n",file);
-
-    Hacl_Hash_SHA2_hash_512((uint8_t *)file, (uint32_t)file_size, a+1);
-
-    if (file && munmap(file, file_size) == -1)
-        DEBUG_PRINT("Failed to unmap file: %s\n",filename);
-
-    a[0] = FFI_SUCCESS;
+    size_t want = (size_t)alen-1;
+    ssize_t got = read(fd, a+1, want);
+    if(got < 0 || (size_t)got != want)
+        a[0] = FFI_FAILURE;
+    else
+        a[0] = FFI_SUCCESS;
+    close(fd);
 }
 
 void * mapFileContents(const char * filename, size_t * file_size){
@@ -62,13 +58,29 @@ void * mapFileContents(const char * filename, size_t * file_size){
         return NULL;
     size_t file_size_v = (size_t)st.st_size;
     if(file_size_v == 0){
-        DEBUG_PRINT("zero length file\n");
         *file_size = 0;
         return NULL;
     }
 
     *file_size = file_size_v;
     return mmap((void *)NULL, file_size_v, PROT_READ, MAP_SHARED, fd, 0);
+}
+
+void ffifileHash(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
+    assert(alen >= 65);
+
+    const char * filename = (const char *)c;
+
+    size_t file_size = 0;
+
+    void * file = mapFileContents(filename, &file_size);
+    ffi_assert(file != NULL || file_size == 0);
+
+    Hacl_Hash_SHA2_hash_512((uint8_t *)file, (uint32_t)file_size, a+1);
+
+    file && munmap(file, file_size) == -1;
+
+    a[0] = FFI_SUCCESS;
 }
 
 // Returns 1 (true) for success, 0 (false) for failure
@@ -78,15 +90,12 @@ int hash_region(char * pid, long addr, size_t len, uint8_t * hash) {
     if (err < 0) return 0;
 
     FILE * stream = fopen(path_buf, "r");
-    if (!stream) {
-        DEBUG_PRINT("Failed to open %s\n", path_buf);
+    if (!stream)
         return 0;
-    }
 
     void * region = malloc(len);
     err = fseek(stream, addr, SEEK_SET);
     if (err == -1) {
-        DEBUG_PRINT("fseek failed\n");
         fclose(stream);
         free(region);
         return 0;
@@ -94,7 +103,6 @@ int hash_region(char * pid, long addr, size_t len, uint8_t * hash) {
     int numRead = fread(region, 1, len, stream);
     fclose(stream);
     if (numRead < len) {
-        DEBUG_PRINT("fread failed\n");
         free(region);
         return 0;
     }
@@ -115,8 +123,6 @@ void ffihashRegion(const uint8_t * c, const long clen, uint8_t * a, const long a
 
     long addr = strtol(startHex, NULL, 16);
     long len  = strtol(endHex,   NULL, 16) - addr;
-
-    DEBUG_PRINT("Pid: %s, Address: %lx, length: %lx\n", pid, addr, len);
 
     int good = hash_region(pid, addr, (size_t)len, a+1);
     a[0] = good ? FFI_SUCCESS : FFI_FAILURE;

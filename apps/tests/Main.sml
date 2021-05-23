@@ -54,8 +54,10 @@ fun hashDirTest () =
    random number though. At the very least, we can verify a new number is
    printed at each invocation. *)
 fun nonceTest () = 
-    let val rng = Random.seed (Crypto.urand 32)
-     in print ("Nonce test: " ^ BString.show (Random.random rng 16) ^ "\n\n")
+    let val rng = Random.seed (Meas.urand 32)
+     in print ("Nonce test: \n"
+              ^ BString.show (Random.random rng 16) ^ "\n" 
+              ^ BString.show (Random.random rng 16) ^"\n\n")
     end
 
 (*

@@ -23,7 +23,7 @@ fun appraise nonce ev = case ev of
 
 fun sendReq addr =
     let val am    = serverAm BString.empty (Map.insert emptyNsMap (S O) addr)
-        val nonce = Random.random (Random.seed (Crypto.urand 32)) 16
+        val nonce = Random.random (Random.seed (Meas.urand 32)) 16
         val ev    = evalTerm am (N (Id O) nonce Mt) term
      in print ("Evaluating term:\n" ^ termToString term ^ "\n\nNonce:\n" ^
                BString.show nonce ^ "\n\nEvidence recieved:\n" ^

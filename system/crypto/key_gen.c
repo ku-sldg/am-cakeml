@@ -1,17 +1,28 @@
 #include <stdint.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 #include "Hacl_Ed25519.h"
 
 #define PRIV_LEN 32
 #define PUB_LEN  64
 
-#define FFI_SUCCESS 0
-#define FFI_FAILURE 1
+bool urand(uint8_t * buf, const long len) {
+    int fd = open("/dev/urandom", O_RDONLY);
+    if(fd == -1)
+        return false;
 
-// Defined in sys/.../crypto_ffi.c
-void ffiurand(const uint8_t * c, const long clen, uint8_t * a, const long alen);
+    size_t want = (size_t)len;
+    size_t got = (size_t)read(fd, (void *)buf, want);
+    close(fd);
+    
+    return got == want;
+}
 
 void print_bytes(uint8_t * bytes, int len) {
     // printf("0x");
@@ -19,17 +30,14 @@ void print_bytes(uint8_t * bytes, int len) {
         printf("%02X", bytes[i]);
 }
 
-// Borrows the ffi interface to multi-platform prng to generate the private key.
-// The private key is then generated from the private key.
+// Uses /dev/urandom to get private key.
+// The public key is then generated from the private key.
 int main(void) {
-    const long buf_len = PRIV_LEN + 1;
-    uint8_t buf[buf_len];
-    ffiurand((const uint8_t *)NULL, (const long)0, (uint8_t *)buf, buf_len);
-    if (buf[0] == FFI_FAILURE) {
+    uint8_t priv[PRIV_LEN];
+    if (!urand((uint8_t *)priv, PRIV_LEN)) {
         printf("Failed to generate public key.\n");
         return 1;
     }
-    uint8_t * priv = (uint8_t *)buf + 1;
 
     printf("Private key (hexadecimal):\n");
     print_bytes(priv, PRIV_LEN);

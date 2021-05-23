@@ -2,7 +2,7 @@ local
     fun ffi_timestamp x y = #(timestamp) x y
 in
     (* () -> int *)
-    fun timeStamp () = BString.toInt BString.LittleEndian (FFI.call ffi_timestamp 8 BString.empty)
+    fun timestamp () = BString.toInt BString.LittleEndian (FFI.call ffi_timestamp 8 BString.empty)
 end
 
 

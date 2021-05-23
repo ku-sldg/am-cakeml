@@ -8,7 +8,13 @@ structure Meas = struct
         fun ffi_fileHash   x y = #(fileHash)   x y
         fun ffi_hashRegion x y = #(hashRegion) x y
         fun ffi_readDir    x y = #(readDir)    x y
+        fun ffi_urand      x y = #(urand)      x y
     in
+        (* int -> bstring *)
+        fun urand len = case FFI.callOpt ffi_urand len BString.empty of 
+              Some bs => bs 
+            | None => raise (Err "urand FFI Failure")
+
         (* string -> bstring *)
         fun hashFile filename = case FFI.callOpt ffi_fileHash 64 (BString.fromString filename) of 
               Some bs => bs 
