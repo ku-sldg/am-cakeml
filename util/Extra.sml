@@ -103,3 +103,11 @@ end
 structure Word8ArrayExtra = struct 
     fun nulls len = Word8Array.array len Word8Extra.null
 end
+
+structure TextIOExtra = struct 
+    (* string -> () *)
+    fun printLn s = TextIO.print (s ^ "\n")
+
+    (* string -> () *)
+    fun printLn_err s = TextIO.print_err (s ^ "\n")
+end

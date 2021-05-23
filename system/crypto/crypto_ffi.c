@@ -6,6 +6,7 @@
 
 #include "Hacl_Hash.h"
 #include "Hacl_Ed25519.h"
+#include "Hacl_Chacha20_Vec32.h"
 
 #define FFI_SUCCESS 0
 #define FFI_FAILURE 1
@@ -49,7 +50,7 @@ void ffisigCheck(const uint8_t * c, const long clen, uint8_t * a, const long ale
 
 // Arguments: key in c
 // Returns: xkey in a
-void ffiaes256_expand_key(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
+// void ffiaes256_expand_key(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
     // assert(clen >= 32);
     // assert(alen >= 240);
     //
@@ -59,11 +60,11 @@ void ffiaes256_expand_key(const uint8_t * c, const long clen, uint8_t * a, const
     // uint32_t xkey[60];
     // aes256_expand_key(key, xkey);
     // cpyWordsToBytes(xkey, a, 60);
-}
+// }
 
 // Arguments: message block in first 16 blocks of c, xkey in the next 240
 // Returns: ciphertext in a
-void ffiaes256(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
+// void ffiaes256(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
     // assert(clen >= 255);
     // assert(alen >= 16);
     //
@@ -76,4 +77,36 @@ void ffiaes256(const uint8_t * c, const long clen, uint8_t * a, const long alen)
     // uint32_t ct[4];
     // aes256_block_enc(pt, xkey, ct);
     // cpyWordsToBytes(ct, a, 4);
+// }
+
+// c is [key (32 bytes), nonce (12 bytes), count (4 bytes), text ...]
+void ffichacha20_encrypt(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
+    uint32_t len = (uint32_t)(clen - 48);
+
+    assert(clen > 48);
+    assert(alen >= len);
+
+    uint8_t * key = c;
+    uint8_t * nonce = c + 32;
+    uint32_t ctr;
+    memcpy((void *)(&ctr), (const void *)(c + 44), 4);
+    uint8_t * text = c + 48;
+
+    Hacl_Chacha20_Vec32_chacha20_encrypt_32(len, a, text, key, nonce, ctr);
+}
+
+// c is [key (32 bytes), nonce (12 bytes), count (4 bytes), text ...]
+void ffichacha20_decrypt(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
+    uint32_t len = (uint32_t)(clen - 48);
+
+    assert(clen > 48);
+    assert(alen >= len);
+
+    uint8_t * key = c;
+    uint8_t * nonce = c + 32;
+    uint32_t ctr;
+    memcpy((void *)(&ctr), (const void *)(c + 44), 4);
+    uint8_t * cipher = c + 48;
+
+    Hacl_Chacha20_Vec32_chacha20_decrypt_32(len, a, cipher, key, nonce, ctr);
 }

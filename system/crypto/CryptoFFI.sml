@@ -9,8 +9,9 @@ structure Crypto = struct
         fun ffi_signMsg     x y = #(signMsg)           x y
         fun ffi_sigCheck    x y = #(sigCheck)          x y
         fun ffi_urand       x y = #(urand)             x y
-        fun ffi_aes256_xkey x y = #(aes256_expand_key) x y
-        fun ffi_aes256      x y = #(aes256)            x y
+        (* fun ffi_aes256_xkey x y = #(aes256_expand_key) x y *)
+        (* fun ffi_aes256      x y = #(aes256)            x y *)
+        fun ffi_chacha20_encrypt x y = #(chacha20_encrypt) x y
     in
         (* bstring -> bstring *)
         val hash = FFI.call ffi_sha512 64
@@ -36,9 +37,16 @@ structure Crypto = struct
             | None => raise (Err "urand FFI Failure")
 
         (* bstring -> bstring *)
-        val aes256_xkey = FFI.call ffi_aes256_xkey 240
+        (* val aes256_xkey = FFI.call ffi_aes256_xkey 240 *)
 
         (* bstring -> bstring -> bstring *)
-        fun aes256 pt xkey = FFI.call ffi_aes256 16 (BString.concat pt xkey)
+        (* fun aes256 pt xkey = FFI.call ffi_aes256 16 (BString.concat pt xkey) *)
+
+        (* bstring -> bstring -> int -> bstring -> bstring *)
+        fun encrypt key nonce ctr text = 
+            let val ctr_bstring = BString.fromIntLength 4 BString.LittleEndian ctr
+                val payload = BString.concatList [key, nonce, ctr_bstring, text]
+             in FFI.call ffi_chacha20_encrypt (BString.length text) payload
+            end
     end
 end

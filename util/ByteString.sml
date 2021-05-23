@@ -172,5 +172,8 @@ structure BString = struct
                       LittleEndian => fromNatLittle i 
                     | BigEndian    => rev (fromNatLittle i)
             end
+
+        (* int -> endian -> int -> bstring *)
+        fun fromIntLength len endian = toLength endian len o fromInt endian
     end
 end

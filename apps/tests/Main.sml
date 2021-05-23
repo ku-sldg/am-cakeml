@@ -5,9 +5,8 @@ val am = serverAm (BString.empty) emptyNsMap
 
 (* Examples *)
 
-val goldenFileHash = "DDAF35A193617ABACC417349AE20413112E6FA4E89A97EA20A9EEEE64B55D39A2192992A274FC1A836BA3C23A3FEEBBD454D4423643CE80E2A9AC94FA54CA49F"
-
-val goldenDirHash = "A4EA2BB49B0FF60D240FC17C63548892EF3A3BB618718FB562FE603916EF1211EC51BB59CA137782F277450016EDEA9E33CE30B08538AA5A306933920CE272C6"
+val goldenFileHash = BString.unshow "DDAF35A193617ABACC417349AE20413112E6FA4E89A97EA20A9EEEE64B55D39A2192992A274FC1A836BA3C23A3FEEBBD454D4423643CE80E2A9AC94FA54CA49F"
+val goldenDirHash  = BString.unshow "7BE9FDA48F4179E611C698A73CFF09FAF72869431EFEE6EAAD14DE0CB44BBF66503F752B7A8EB17083355F3CE6EB7D2806F236B25AF96A24E22B887405C20081"
 
 (*
 The first hash test hashes the string "abc". This is the first example provided
@@ -20,7 +19,7 @@ string (without a final newline char, despite editors really wanting to insert
 one) so we can again compare against the desired result.
 
 Expected result:
-0xDDAF35A193617ABACC417349AE20413112E6FA4E89A97EA20A9EEEE64B55D39A2192992A274FC1A836BA3C23A3FEEBBD454D4423643CE80E2A9AC94FA54CA49F
+DDAF35A193617ABACC417349AE20413112E6FA4E89A97EA20A9EEEE64B55D39A2192992A274FC1A836BA3C23A3FEEBBD454D4423643CE80E2A9AC94FA54CA49F
 *)
 
 fun hashTests () =
@@ -30,7 +29,7 @@ fun hashTests () =
         val hashFileS = BString.show hashFilev
      in print ("Hash test: "      ^ hashTest  ^ "\n\n" ^
                "Hash file test: \n" ^ hashFileS ^ "\n" ^
-               (if(BString.show hashFilev = goldenFileHash) then "Golden Value Check:  Passed" else "Golden Value Check:  Failed") ^ "\n\n")
+               (if hashFilev = goldenFileHash then "Golden Value Check:  Passed" else "Golden Value Check:  Failed") ^ "\n\n")
     end
     handle (Meas.Err s) => TextIO.print_err ("ERROR: " ^ s ^ "\n")
 
@@ -38,13 +37,13 @@ fun hashTests () =
 This test hashes a directory called testDir.
 
 Expected result(composite hash):
-0xA4EA2BB49B0FF60D240FC17C63548892EF3A3BB618718FB562FE603916EF1211EC51BB59CA137782F277450016EDEA9E33CE30B08538AA5A306933920CE272C6
+7BE9FDA48F4179E611C698A73CFF09FAF72869431EFEE6EAAD14DE0CB44BBF66503F752B7A8EB17083355F3CE6EB7D2806F236B25AF96A24E22B887405C20081
 *)
 fun hashDirTest () =
     let val hashDirv = hashDir "testDir" ""
         val hashDirS = BString.show hashDirv
      in print ("Hash directory test: \n" ^ hashDirS ^ "\n" ^
-              (if(BString.show hashDirv = goldenDirHash) then "Golden Value Check:  Passed" else "Golden Value Check:  Failed") ^ "\n\n")
+              (if hashDirv = goldenDirHash then "Golden Value Check:  Passed" else "Golden Value Check:  Failed") ^ "\n\n")
     end
     handle (Meas.Err s) => TextIO.print_err ("ERROR: " ^ s ^ "\n")
 
@@ -54,7 +53,10 @@ fun hashDirTest () =
 (* Just prints a nonce. It's difficult to determine the quality of a single
    random number though. At the very least, we can verify a new number is
    printed at each invocation. *)
-fun nonceTest () = print ("Nonce test: " ^ BString.show (genNonce ()) ^ "\n\n")
+fun nonceTest () = 
+    let val rng = Random.seed (Crypto.urand 32)
+     in print ("Nonce test: " ^ BString.show (Random.random rng 16) ^ "\n\n")
+    end
 
 (*
 The purpose of this function is to create a large file of random bytes, to

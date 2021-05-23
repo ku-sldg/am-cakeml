@@ -8,7 +8,7 @@ fun verifySig g pub =
        | _ => None
 
 (* () -> bstring *)
-fun genNonce () = Crypto.urand 16
+(* fun genNonce () = Crypto.urand 16 *)
 
 (* Meas *)
 (* string -> string *)

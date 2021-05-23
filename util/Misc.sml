@@ -33,18 +33,20 @@ structure Result = struct
 end
 
 structure FFI = struct 
+    type ffi = string -> byte_array -> unit
+
     val success = Word8.fromInt 0
     val failure = Word8.fromInt 1
     val bufferTooSmall = Word8.fromInt 2
 
-    (* (string -> byte_array -> ()) -> int -> bstring -> bstring *)
+    (* ffi -> int -> bstring -> bstring *)
     fun call ffi len input = 
         let val out = Word8ArrayExtra.nulls len 
         in ffi (BString.toString input) out;
             BString.fromByteArray out 
         end
 
-    (* (string -> byte_array -> ()) -> int -> bstring -> bstring option *)
+    (* ffi -> int -> bstring -> bstring option *)
     fun callOpt ffi len input = 
         let val result = call ffi (len+1) input
          in if BString.hd result = success then 
@@ -53,7 +55,7 @@ structure FFI = struct
                 None
         end
 
-    (* (string -> byte_array -> ()) -> int -> bstring -> bstring option *)
+    (* ffi -> int -> bstring -> bstring option *)
     fun callOptFlex ffi defaultLen input = 
         let fun callOptFlex_aux len = 
                 let val result = call ffi len input
@@ -68,7 +70,7 @@ structure FFI = struct
          in callOptFlex_aux defaultLen
         end
     
-    (* (string -> byte_array -> ()) -> bstring -> bool *)
+    (* ffi -> bstring -> bool *)
     fun callBool ffi input = BString.hd (call ffi 1 input) = success
 
     local 
