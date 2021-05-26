@@ -14,6 +14,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <unistd.h>
 #include <sys/mman.h>
 
 #include "Hacl_Hash.h"
@@ -54,16 +55,21 @@ void * mapFileContents(const char * filename, size_t * file_size){
 
     struct stat st;
     int err = stat(filename, &st);
-    if (err == -1)
+    if (err == -1) {
+        close(fd);
         return NULL;
+    }
     size_t file_size_v = (size_t)st.st_size;
     if(file_size_v == 0){
+        close(fd);
         *file_size = 0;
         return NULL;
     }
 
     *file_size = file_size_v;
-    return mmap((void *)NULL, file_size_v, PROT_READ, MAP_SHARED, fd, 0);
+    void * ret = mmap((void *)NULL, file_size_v, PROT_READ, MAP_SHARED, fd, 0);
+    close(fd);
+    return ret;
 }
 
 void ffifileHash(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
@@ -78,8 +84,7 @@ void ffifileHash(const uint8_t * c, const long clen, uint8_t * a, const long ale
 
     Hacl_Hash_SHA2_hash_512((uint8_t *)file, (uint32_t)file_size, a+1);
 
-    file && munmap(file, file_size) == -1;
-
+    munmap(file, file_size);
     a[0] = FFI_SUCCESS;
 }
 
@@ -160,6 +165,7 @@ void ffireadDir(const uint8_t * c, const long clen, uint8_t * a, const long alen
         // Check buffer space remaining
         size_t d_len = strlen(entry->d_name);
         if(apos + d_len + 2 >= alen) {
+            closedir(dir);
             a[0] = FFI_BUFFER_TOO_SMALL;
             return;
         }
@@ -199,11 +205,12 @@ void ffireadDir(const uint8_t * c, const long clen, uint8_t * a, const long alen
         strcpy((char *)(a+apos), entry->d_name);
         apos += d_len+1;
     }
+    
+    closedir(dir);
+
     if (errno) {
         a[0] = FFI_FAILURE;
         return;
     }
     errno = prev_errno;
-
-    closedir(dir);
 }
