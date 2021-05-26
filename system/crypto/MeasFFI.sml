@@ -78,7 +78,7 @@ structure Meas = struct
                             else if ffiResult = ffiBufferTooSmall then 
                                 go (bufLen * 2)
                             else
-                                raise (Err "readDir FFI failure, perhaps not a directory")
+                                raise (Err ("readDir FFI failure: can't read " ^ dirName))
                         end
                  in go 256
                 end

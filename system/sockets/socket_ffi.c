@@ -192,7 +192,7 @@ void ffisocketReadTimeout (unsigned char *c, long clen, unsigned char *a, long a
     else {
         // good to read
         int nread = read(fd, (void *)(a+4), n);
-        if(nread < 0){
+        if(nread <= 0){
             a[0] = 0;
         }
         else{

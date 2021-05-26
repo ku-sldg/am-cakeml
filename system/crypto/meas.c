@@ -61,17 +61,22 @@ void * mapFileContents(const char * filename, size_t * file_size){
 
     struct stat st;
     int err = stat(filename, &st);
-    if (err == -1)
+    if (err == -1) {
+        close(fd);
         return NULL;
+    }
     size_t file_size_v = (size_t)st.st_size;
     if(file_size_v == 0){
         DEBUG_PRINT("zero length file\n");
+        close(fd);
         *file_size = 0;
         return NULL;
     }
 
     *file_size = file_size_v;
-    return mmap((void *)NULL, file_size_v, PROT_READ, MAP_SHARED, fd, 0);
+    void * ret = mmap((void *)NULL, file_size_v, PROT_READ, MAP_SHARED, fd, 0);
+    close(fd);
+    return ret;
 }
 
 // Returns 1 (true) for success, 0 (false) for failure
@@ -147,6 +152,7 @@ void ffireadDir(const uint8_t * c, const long clen, uint8_t * a, const long alen
     DIR * dir = opendir(dirName);
     if (!dir) {
         a[0] = FFI_FAILURE;
+        perror((const char *)NULL);
         return;
     }
 
@@ -157,6 +163,7 @@ void ffireadDir(const uint8_t * c, const long clen, uint8_t * a, const long alen
         // Check buffer space remaining
         size_t d_len = strlen(entry->d_name);
         if(apos + d_len + 2 >= alen) {
+            closedir(dir);
             a[0] = FFI_BUFFER_TOO_SMALL;
             return;
         }
@@ -198,6 +205,8 @@ void ffireadDir(const uint8_t * c, const long clen, uint8_t * a, const long alen
     }
     if (errno) {
         a[0] = FFI_FAILURE;
+        closedir(dir);
+        perror((const char *)NULL);
         return;
     }
     errno = prev_errno;

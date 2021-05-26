@@ -1,8 +1,5 @@
 (* Depends on copland, sockets, am, protocol *)
 
-(* loop : ('a -> 'b) -> 'a -> 'c *)
-fun loop f x = (f x; loop f x)
-
 datatype logType = Info | Debug | Error
 
 (* logType -> String -> () *)
@@ -10,15 +7,6 @@ fun log lType msg = case lType of
       Info  => TextIO.print (msg ^ "\n")
     | Debug => TextIO.print ("DEBUG: " ^ msg ^ "\n")
     | Error => TextIO.print_err (msg ^ "\n")
-(* local 
-    val logFile = TextIO.openOut "client.log"
-in 
-    (* logType -> String -> () *)
-    fun log lType msg = case lType of
-          Info  => TextIO.output logFile ("INFO: "  ^ msg ^ "\n")
-        | Debug => TextIO.output logFile ("DEBUG: " ^ msg ^ "\n")
-        | Error => TextIO.output logFile ("ERROR: " ^ msg ^ "\n")
-end *)
 
 local
     (* Placeholder value. *)
@@ -28,17 +16,24 @@ local
 in
     (* attest : Socket.fd -> () *)
     (* loops unless timeout *)
-    fun attestLoop heliAM = whenSome (Socket.inputAllTimeout heliAM) (fn input => (
-        let val nonce  = N (Id O) (ByteString.fromRawString input) Mt
-            (* val _      = checkRestartDtu () *)
-            val ev     = (evalTerm am nonce protocol) handle _ => (log Error "Protocol evaluation failed"; Mt)
-            val jsonEv = jsonToStr (evToJson ev)
-                       ^ (String.str (Char.chr 0)) (* append explicit null-byte *)
-         in log Info ("Sending evidence: " ^ evToString ev);
-            Socket.output heliAM jsonEv;
-            attestLoop heliAM
-        end
-    ))
+    fun attestLoop heliAM = (case Socket.inputAllTimeout heliAM of
+          None => log Info "Socket read timeout"
+        | Some input => (
+            log Info ("Input: " ^ (ByteString.show (ByteString.fromRawString input)));
+            let val nonce = N (Id O) (ByteString.fromRawString input) Mt
+                (* val _      = checkRestartDtu () *)
+                val ev = (evalTerm am nonce protocol)
+                    handle USMexpn err => (log Error ("Usm err: " ^ err); Mt)
+                         | _           => (log Error "Unknown error in protocol evaluation"; Mt)
+                val jsonEv = jsonToStr (evToJson ev)
+                           ^ (String.str (Char.chr 0)) (* append explicit null-byte *)
+             in log Info ("Sending evidence: " ^ evToString ev);
+                Socket.output heliAM jsonEv;
+                attestLoop heliAM
+            end
+        )
+    ) handle Socket.InvalidFD => log Error "Socket error: invalid file descriptor. (Connection may have been closed server-side.)"
+           | Socket.Err err   => log Error ("Socket error: " ^ err)
 end
 
 (* mainLoop : string -> int -> () *)
@@ -47,14 +42,12 @@ fun mainLoop addr port = (
     whenSome (Socket.connect addr port) (fn heliAM => (
         log Info "Connected to HeliAM";
         attestLoop heliAM;
-        log Info "HeliAM timeout, closing connection.";
+        log Info "Closing connection.";
         Socket.close heliAM
     ));
     mainLoop addr port
-) handle 
-      Socket.Err err => (log Error ("Socket error: " ^ err); mainLoop addr port)
-    | Socket.InvalidFD => (log Error ("Socket error: invalid file descriptor"); mainLoop addr port)
-    | _ => log Error "Fatal: unknown error"
+) handle Socket.Err err => log Error ("Socket error: " ^ err)
+       | _              => log Error "Fatal: unknown error"
 
 fun init addr port = (
     (* startDtu (); *)
