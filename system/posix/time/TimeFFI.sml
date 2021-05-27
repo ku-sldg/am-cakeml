@@ -5,6 +5,20 @@ in
     fun timestamp () = BString.toInt BString.LittleEndian (FFI.call ffi_timestamp 8 BString.empty)
 end
 
+(* int -> () *)
+fun waitUntil time = if timestamp () >= time then () else waitUntil time
+
+(* int -> () *)
+fun wait timeframe = waitUntil (timestamp () + timeframe)
+
+(* int -> ('a -> 'b) -> 'a -> 'c  *)
+(* If io takes longer than the period, the next loop cycle will occur immediately. *)
+fun pacer period io = loop (fn x => (
+    let val next = timestamp () + period
+     in io x;
+        waitUntil next
+    end
+))
 
 (* Uses an association list as the underlying data structure. The standard
    library's hashtable would be more efficient, but likely harder to verify. *)

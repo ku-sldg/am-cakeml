@@ -97,3 +97,9 @@ fun whenSome opt io = OptionExtra.option () io opt
 
 (* ('a, 'e) result -> ('a -> ()) -> () *)
 fun whenOk res io = Result.result io (const ()) res
+
+(* ('a -> 'b) -> 'a -> 'c *)
+fun loop io x = (
+    io x;
+    loop io x
+)
