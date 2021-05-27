@@ -98,6 +98,16 @@ endfunction()
 # Concatenates files with unix "cat" program
 function(cat name file)
     set(abs_name "${CMAKE_BINARY_DIR}/${name}")
+    add_custom_command(
+        OUTPUT ${abs_name}
+        COMMAND cat ${file} ${ARGN} > ${abs_name}
+        DEPENDS ${file} ${ARGN}
+    )
+endfunction()
+
+# cat using relative filepaths
+function(cat_rel name file)
+    set(abs_name "${CMAKE_BINARY_DIR}/${name}")
     foreach(filepath ${file} ${ARGN})
         list(APPEND abs_files "${CMAKE_CURRENT_SOURCE_DIR}/${filepath}")
     endforeach(filepath)
