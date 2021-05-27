@@ -1,4 +1,6 @@
-An example of a server/client pair. The client sends a Copland term to measure the `hashTest.txt` file.
+# An example of a server/client pair #
+
+The client sends a Copland term to measure the `hashTest.txt` file.
 
 ## Build
 Build the server with `make server`, the client with `make client`, or both with `make am`.
