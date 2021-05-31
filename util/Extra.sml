@@ -19,7 +19,7 @@ structure ListExtra = struct
 end
 
 structure OptionExtra = struct 
-    (* 'b -> ('a -> 'b) 'a option -> 'b *)
+    (* 'b -> ('a -> 'b) -> 'a option -> 'b *)
     fun option b f opt = case opt of 
           Some a => f a 
         | None   => b
@@ -92,6 +92,7 @@ structure Word8Extra = struct
            |   _  => raise InvalidHex
         val getHalfByte = Array.sub bytes o hexMap
     in
+        (* string -> word *)
         fun fromHex s =
             let val top = String.sub s 0
                 val bot = String.sub s 1
@@ -100,7 +101,8 @@ structure Word8Extra = struct
     end
 end
 
-structure Word8ArrayExtra = struct 
+structure Word8ArrayExtra = struct
+    (* int -> Word8Array *)
     fun nulls len = Word8Array.array len Word8Extra.null
 end
 

@@ -12,24 +12,70 @@ datatype ('a, 'e) result =
       Ok  'a
     | Err 'e
 
-structure Result = struct 
+structure Result = struct
+    exception Result
+
+    (* 'a -> ('a, 'e) result *)
+    fun ok x = Ok x
+    
+    (* 'e -> ('a, 'e) result *)
+    fun err e = Err e
+
+    (* ('a, 'e) result -> 'a *)
+    fun okValOf xr = case xr of
+          Ok x => x
+        | Err _ => raise Result
+
+    (* ('a, 'e) result -> 'e *)
+    fun errValOf xr = case xr of
+          Ok _ => raise Result
+        | Err e => e
+
     (* ('a -> 'c) -> ('b -> 'c) -> ('a, 'b) result -> 'c *)
     fun result fo fe res = case res of 
           Ok  a => fo a
         | Err e => fe e
 
+    (* ('a, 'e) result -> 'a -> 'a *)
+    fun getRes xr default = result id (const default) xr    
+
     (* ('a -> 'b) -> ('a, 'e) result -> ('b, 'e) result *)
-    fun map f res = case res of 
-          Ok  a => Ok (f a)
-        | Err e => Err e
+    fun map f res = result (ok o f) err res
+
+    (* ('e -> 'f) -> ('a, 'e) result -> ('a, 'f) result *)
+    fun mapErr f res = result ok (err o f) res
 
     (* (('a, 'e) result, 'e) result -> ('a, 'e) result *)
-    fun join res = case res of 
-          Ok  res' => res' 
-        | Err e    => Err e
+    fun join res = result id err res
 
     (* ('a -> ('b, 'e) result) -> ('a, 'e) result -> ('b, 'e) result *)
-    fun bind f = join o map f
+    fun bind f = result f err
+
+    (* ('a -> unit) -> ('a, 'e) result -> unit *)
+    fun app f = result f (const ())
+
+    (* ('e -> unit) -> ('a, 'e) result -> unit *)
+    fun appErr f = result (const ()) f
+
+    (* ('a, 'e) result -> bool *)
+    fun isOk xr = result (const True) (const False) xr
+
+    (* ('a, 'e) result -> bool *)
+    fun isErr xr = result (const False) (const True) xr
+
+    (* ('a -> 'a -> bool) -> ('e -> 'e -> bool) -> ('a, 'e) result -> ('a, 'e) result -> bool *)
+    fun equal okeq erreq xr yr = case (xr, yr) of
+          (Ok x, Ok y) => okeq x y
+        | (Err ex, Err ey) => erreq ex ey
+        | (Ok _, Err _) => False
+        | (Err _, Ok _) => False
+    
+    (* ('a -> 'a -> ordering) -> ('e -> 'e -> ordering) -> ('a, 'e) result -> ('a, 'e) result -> ordering *)
+    fun compare okord errord xr yr = case (xr, yr) of
+          (Ok x, Ok y) => okord x y
+        | (Ok _, Err _) => Less
+        | (Err _, Ok _) => Greater
+        | (Err ex, Err ey) => errord ex ey
 end
 
 structure FFI = struct 
