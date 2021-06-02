@@ -1,3 +1,12 @@
+(* Dependencies:
+ * ../../util/Bytestring.sml
+ *   ../../util/Extra.sml
+ * ../../util/Json.sml
+ *)
+
+exception EthereumExn string
+
+(***************** [JSON RPC](https://eth.wiki/json-rpc/API) *****************)
 (* formJsonRpc : int -> string -> Json.json list -> Json.json
  * Creates an Ethereum (geth client) JSON RPC call with ID number `id`, using
  * method `method`, with parameters `params`.
@@ -105,31 +114,80 @@ fun formEthSendTransaction id from to data =
         formJsonRpc id "eth_sendTransaction" [object]
     end
 
-(* **WARNING**: Int.fmt does not return twos-complement representation *)
-(* encodeInt : int -> string
- * Transforms a ML integer into Ethereum JSON ABI
- *)
-fun encodeInt n =
-    if n < 0 then raise Domain else ();
-    let
-        val hexStr = Int.fmt StringCvt.HEX n;
-        val hexStrLen = String.size hexStr;
-    in
-        StringCvt.padLeft #"0" 64 hexStr
-    end
+(*** [ABI Encoding](https://docs.soliditylang.org/en/develop/abi-spec.html) ***)
+local
 
-(* encodeString : string -> string
- * Transforms a ML string into Ethereum JSON ABI
- *)
-fun encodeString str =
-    let
-        val strLen = String.size str;
-        val strLenEnc = encodeInt strLen;
-    in
-        ""
-    end
+    (* encodeIntHelper : int -> string
+    * Transforms a ML integer into Ethereum JSON ABI int256.
+    *)
+    fun encodeIntHelper n =
+        BString.show (BString.fromIntLength 32 BString.BigEndian n)
 
-(* decodeString : string -> string
- * Transforms an Ethereum JSON ABI encoded string into a ML string
- *)
-fun decodeString enc = ""
+    (* decodeIntHelper : string -> int
+    * Transforms an Ethereum JSON ABI int256 into an ML integer.
+    * 
+    * Raises a `Word8Extra.InvalidHex` exception when `BString.unshow` cannot
+    * parse the input.
+    *)
+    fun decodeIntHelper enc =
+        BString.toInt BString.BigEndian (BString.unshow enc)
+in
+    (* encodeInt : int -> string
+     * Transforms a ML integer into Ethereum JSON ABI uint256.
+     *
+     * 256-bit integers in Ethereum are encoded in their hexidecimal form (64
+     * hexits or 32 bytes).
+     *)
+    fun encodeInt n =
+        if n >= 0
+        then String.concat ["0x", encodeIntHelper n]
+        else raise EthereumExn "Can only encode non-negative integers."
+
+    (* decodeInt : string -> int
+    * Transforms an Ethereum JSON ABI int256 into an ML integer.
+    * 
+    * Raises a `Word8Extra.InvalidHex` exception when `BString.unshow` cannot
+    * parse the input. Raises `EthereumExn` when the encoding does not start
+    * with `"0x"`. Raises an exception through String.substring if input is too
+    * short.
+    *)
+    fun decodeInt enc =
+        if String.substring enc 0 2 = "0x"
+        then decodeIntHelper (String.substring enc 2 64)
+        else raise EthereumExn "Hex string did not start with \"0x\"."
+    
+    (* encodeBytes : BString.bstring -> string
+    * Transforms a ML byte string into Ethereum JSON ABI.
+    * 
+    * Bytes are encoded by first encoding the length as a 256-bit unsigned
+    * integer, then representing the byte string as a sequence of hexits, and
+    * then padding with zeros at the end so the final result consists of a
+    * multiple of 32-bytes.
+    *)
+    fun encodeBytes bs =
+        let
+            val bsLen = BString.length bs
+            val offset = bsLen mod 32
+            val suffix =
+                if offset = 0
+                then ""
+                else BString.show (BString.nulls (32 - offset))
+        in
+            String.concat ["0x", encodeIntHelper bsLen, BString.show bs, suffix]
+        end
+
+    (* decodeBytes : string -> BString.bstring
+    * Transforms an Ethereum JSON ABI encoded string into a ML string
+    *
+    * Raises `EthereumExn` when the encoding does not start with `"0x"`. Raises
+    * a `Word8Extra.InvalidHex` exception if length or data parameters cannot be
+    * parsed from the input. Raises an exception through `BString.substring` if
+    * the length parameter is too short.
+    *)
+    fun decodeBytes enc =
+        let
+            val length = decodeInt (String.substring enc 0 66)
+        in
+            BString.unshow (String.substring enc 66 (2 * length))
+        end
+end
