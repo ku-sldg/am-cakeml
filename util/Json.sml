@@ -10,9 +10,6 @@ struct
 
 exception ERR string string
 
-fun fst p = case p of (x,y) =>  x
-fun snd p = case p of (x,y) =>  y
-
 fun eRR_MESG pair = print (fst pair^": "^snd pair)
 
 datatype number
@@ -322,4 +319,132 @@ fun fromFileMany filename =
     in
         ((parseMany ([], ss)), "")
     end
+
+(********************************* Utilities *********************************)
+(* jsonWalker : 'a -> 'a -> 'a -> (bool -> 'a) -> (int -> 'a) -> (string -> 'a) ->
+ *              'a -> ('a -> 'a -> 'a) -> 'a -> (string -> 'a -> 'a -> 'a) ->
+ *              json -> 'a
+ *
+ * Walks an entire `json` value to build another, arbitrary type.
+ *)
+fun jsonWalker nullVal lBraceVal lBracketVal boolFn intFn stringFn nilVal consFn objNilVal objConsFn xjs =
+    let
+        val jsonWalker = jsonWalker nullVal lBraceVal lBracketVal boolFn intFn stringFn nilVal consFn objNilVal objConsFn
+        fun listWalker value accum = consFn (jsonWalker value) accum
+        fun objWalker (tag, value) accum = objConsFn tag (jsonWalker value) accum 
+    in
+        case xjs of
+          Null => nullVal
+        | LBRACE => lBraceVal
+        | LBRACK => lBracketVal
+        | Boolean b => boolFn b
+        | Number (Int n) => intFn n
+        | String str => stringFn str
+        | List jss => List.foldr listWalker nilVal jss
+        | AList strjss => List.foldr objWalker objNilVal strjss
+    end
+
+(* isNull : json -> bool
+ * Determines whether a JSON value is `null`.
+ *)
+fun isNull xjs =
+    case xjs of
+      Null => True
+    | _ => False
+(* isBoolean : json -> bool
+ * Determines whether a JSON value is a boolean.
+ *)
+fun isBoolean xjs =
+    case xjs of
+      Boolean _ => True
+    | _ => False
+(* isInt : json -> bool
+ * Determines whether a JSON value is an integer.
+ *)
+fun isInt xjs =
+    case xjs of
+      Number (Int _) => True
+    | _ => False
+(* isString : json -> bool
+ * Determines whether a JSON value is a string.
+ *)
+fun isString xjs =
+    case xjs of
+      String _ => True
+    | _ => False
+(* isList : json -> bool
+ * Determines whether a JSON value is a list.
+ *)
+fun isList xjs =
+    case xjs of
+      List _ => True
+    | _ => False
+(* isAList : json -> bool
+ * Determines whether a JSON value is an object.
+ *)
+fun isAList xjs =
+    case xjs of
+      AList _ => True
+    | _ => False
+(* toBoolean : json -> bool option
+ * fromBoolean : bool -> json
+ * Converts json to and from a boolean.
+ *)
+fun fromBoolean b = Boolean b
+fun toBoolean xjs =
+    case xjs of
+      Boolean b => Some b
+    | _ => None
+(* toInt : json -> int option
+ * fromInt : bool -> json
+ * Converts json to and from an integer.
+ *)
+fun fromInt n = Number (Int n)
+fun toInt xjs =
+    case xjs of
+      Number (Int n) => Some n
+    | _ => None
+(* toString : json -> string option
+ * fromString : string -> json
+ * Converts json to and from a string.
+ *)
+fun fromString str = String str
+fun toString xjs =
+    case xjs of
+      String str => Some str
+    | _ => None
+(* toList : json -> (json list) option
+ * fromList : json list -> json
+ * Converts json to and from a list of json values.
+ *)
+fun fromList jss = List jss
+fun toList xjs =
+    case xjs of
+      List jss => Some jss
+    | _ => None
+(* toAList : json -> ((string * json) list) option
+ * fromAList : (string * json) list -> json
+ * Converts json to and from a list of string, json pairs.
+ *)
+fun fromAList xys = AList xys
+fun toAList xjs =
+    case xjs of
+      AList xys => Some xys
+    | _ => None
+
+(* lookup : string -> json -> option json
+ * Looks up to see if `key` is a key in the json value `xjs`.
+ *)
+fun lookup key xjs =
+    case xjs of
+      AList strjss => (* Map.lookup (Map.fromList String.compare strjss) key *)
+        let
+            fun search xys =
+                case xys of
+                  [] => None
+                | (x, y)::xys' => if x = key then Some y else search xys'
+        in
+            search strjss
+        end
+    | _ => None
 end
