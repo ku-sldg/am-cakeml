@@ -457,7 +457,7 @@ fun lookup key xjs =
  *)
 fun toString xjs =
     let
-        fun keyValFn (str, js) = String.concatWith " : " [str, toString js]
+        fun keyValFn (str, js) = String.concat ["\"", str, "\" : ", toString js]
     in
         case xjs of
           Null => "null"

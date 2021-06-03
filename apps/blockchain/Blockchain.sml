@@ -114,6 +114,24 @@ fun formEthSendTransaction id from to data =
         formJsonRpc id "eth_sendTransaction" [object]
     end
 
+(* formJsonPostReq: string -> string -> string
+ * Onto a message/string, adds a minimal HTTP POST request header.
+ *)
+fun formJsonPostReq hostStr str =
+    let
+        val crlf = String.concat (List.map (String.str o Char.chr) [13, 10])
+    in
+        String.concatWith crlf [
+            "POST / HTTP/1.1",
+            String.concat ["Host: ", hostStr],
+            "User-Agent: curl/7.68.0",
+            "Accept: */*",
+            "Content-Type: application/json",
+            String.concat ["Content-Length: ", Int.toString (String.size str)],
+            "", str
+            ]
+    end
+
 (*** [ABI Encoding](https://docs.soliditylang.org/en/develop/abi-spec.html) ***)
 local
 
