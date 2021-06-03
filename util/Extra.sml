@@ -61,6 +61,20 @@ structure StringExtra = struct
     (* (int -> 'a -> char -> 'a) -> 'a -> string -> 'a *)
     (* Seems to be a typo in the standard library. Should be "List.foldli" *)
     fun foldli f z s = List.foldi f z (String.explode s)
+
+    (* escape : string -> string
+     * Performs C string escaping, taking `"` to `\"` and `\` to `\\`.
+     *)
+    fun escape str =
+        let
+            fun escFn c =
+                case c of
+                  #"\"" => "\\\""
+                | #"\\" => "\\\\"
+                | _ => String.str c
+        in
+            String.concat (List.map escFn (String.explode str))
+        end
 end
 
 structure Word8Extra = struct 

@@ -329,9 +329,9 @@ fun fromFileMany filename =
  *)
 fun jsonWalker nullVal lBraceVal lBracketVal boolFn intFn stringFn nilVal consFn objNilVal objConsFn xjs =
     let
-        val jsonWalker = jsonWalker nullVal lBraceVal lBracketVal boolFn intFn stringFn nilVal consFn objNilVal objConsFn
-        fun listWalker value accum = consFn (jsonWalker value) accum
-        fun objWalker (tag, value) accum = objConsFn tag (jsonWalker value) accum 
+        val walker = jsonWalker nullVal lBraceVal lBracketVal boolFn intFn stringFn nilVal consFn objNilVal objConsFn
+        fun listWalker value accum = consFn (walker value) accum
+        fun objWalker (tag, value) accum = objConsFn tag (walker value) accum 
     in
         case xjs of
           Null => nullVal
@@ -447,4 +447,28 @@ fun lookup key xjs =
             search strjss
         end
     | _ => None
+
+(* toString : json -> string
+ * Converts a json value into (an ugly) string. For a more formatted string,
+ * see `print_json`.
+ *
+ * __Warning__: Does not escape string values properly,
+ * Json.toString (Json.String "\"") will give the string '"""'.
+ *)
+fun toString xjs =
+    let
+        fun keyValFn (str, js) = String.concatWith " : " [str, toString js]
+    in
+        case xjs of
+          Null => "null"
+        | Boolean b => if b then "true" else "false"
+        | Number (Int n) => Int.toString n
+        | String str => String.concat ["\"", str, "\""]
+        | List xjss => String.concat ["[ ",
+                                      String.concatWith ", " (List.map toString xjss),
+                                      " ]"]
+        | AList strjss => String.concat ["{ ",
+                                          String.concatWith ", " (List.map keyValFn strjss),
+                                          " }"]
+    end
 end
