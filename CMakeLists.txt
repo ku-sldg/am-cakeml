@@ -25,6 +25,7 @@ set(standalone_am_src ${cop_src} ${crypto_src} am/CommTypes.sml)
 #set(uav_src ${server_am_src} ${time_src} system/dataports/UavDataportFFI.sml apps/case/Uav.sml)
 
 set(case2_client_src apps/case2/DtuGolden.sml ${server_am_src} apps/case2/Protocol.sml apps/case2/Provision.sml apps/case2/Client.sml)
+set(fake_case2_client_src apps/case2/DtuGolden.sml ${server_am_src} apps/case2/Provision.sml apps/case2/GoldenHashes.sml apps/case2/FakeClient.sml)
 # set(provision_src apps/case2/GoldenHashes.sml ${server_am_src} apps/case2/Protocol.sml apps/case2/Provision.sml)
 set(heli_src ${standalone_am_src} apps/case2/HamrFFI.sml apps/case2/GoldenHashes.sml apps/case2/Heli.sml)
 
@@ -102,6 +103,7 @@ else()
     # build_am_thing("uav_am" ${uav_src})
 
     build_am_exe("client"  ${case2_client_src})
+    build_am_exe("fake_client"  ${fake_case2_client_src})
     #build_am_lib("heli_am" ${heli_src})
 
     # build_am_exe("provision" ${provision_src})
