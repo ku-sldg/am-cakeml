@@ -174,4 +174,5 @@ fun start () = (
     loop ()
 )
 
-val () = start ()
+val () = (start ())
+    handle _ => log Error "Unknown exception"
