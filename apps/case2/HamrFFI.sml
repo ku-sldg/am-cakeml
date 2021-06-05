@@ -49,6 +49,7 @@ structure Api = struct
         fun sendRequest req = #(api_send_AttestationRequest) req emptyBuf
         
         (* () -> string option *)
+(*
         local
             fun getLeadingStr buf = case Word8Array.findi ((op =) nullByte) buf of
                   Some (i, _) =>  Word8Array.substring buf 0 i
@@ -58,6 +59,9 @@ structure Api = struct
                 Option.map (getLeadingStr o ByteString.fromRawString)
                   (getDataEvent att_resp_ffi 2048 "")
         end
+*)
+        fun getResponse () = getDataEvent att_resp_ffi 2048 ""
+
 
         (* string -> () *)
         (* TODO: Add safety rails to limit size of req *)

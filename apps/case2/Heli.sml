@@ -52,7 +52,6 @@ end
 fun parseResp resp = 
     let fun strToJson str = List.hd (fst (Json.parse ([], str)))
      in log Info ("Received response: " ^ resp);
-        log Info ("Response length: " ^ Int.toString (String.size resp));
         Some (jsonToEv (strToJson resp))
     end
     handle _ => None
