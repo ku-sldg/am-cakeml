@@ -61,7 +61,14 @@ structure Api = struct
 
         (* string -> () *)
         (* TODO: Add safety rails to limit size of req *)
-        fun sendTrustedIds trustedIds = #(api_send_TrustedIds) trustedIds emptyBuf
+        fun sendTrustedIds trustedIds = 
+            let val size = String.size trustedIds
+             in if size = 32 then
+                    #(api_send_TrustedIds) trustedIds emptyBuf
+                else 
+                    log Error ("sendTrustedIds expects an 32-byte argument, but it recieved a "
+                              ^ (Int.toString size) ^ "-byte argument")
+            end
 
         (* () -> string option *)
         (* ip address as raw string *)
