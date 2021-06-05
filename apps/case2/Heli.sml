@@ -169,4 +169,9 @@ fun loop () =
     else
         loop ()
 
-val () = loop ()
+fun start () = (
+    Api.pacer_emit ();
+    loop ()
+)
+
+val () = start ()
