@@ -185,7 +185,12 @@ fun decodeBytes enc =
     let
         val length = decodeInt (String.substring enc 0 66)
     in
+        ( (* debugging *)
+            print (String.concat ["Decoding bytes:\n", enc, "\n"]);
+            print (String.concat ["Length: ", Int.toString length, "\n"]);
+            print (String.concat [String.substring enc 66 (2 * length), "\n"]);
         BString.unshow (String.substring enc 66 (2 * length))
+        )
     end
 
 (* encodeIntBytes: int -> BString.bstring -> string
@@ -193,13 +198,13 @@ fun decodeBytes enc =
  * JSON ABI encoded `(uint256, bytes)`.
  *
  * This tuple is encoded as a concatenation of bytestring encodings: the
- * encoding of the integer, encoding the size of the integer in bytes (32),
+ * encoding of the integer, encoding the size of two integers in bytes (64),
  * and encoding the bytestring.
  *)
 fun encodeIntBytes n bs =
     let
         val encInt = encodeInt n
-        val widthEnc = encodeInt 32
+        val widthEnc = encodeInt 64
         val encBytes = encodeBytes bs
     in
         String.concat [encInt, widthEnc, encBytes]
@@ -214,13 +219,14 @@ fun encodeAddress bs =
 
 (******************* Communicating with the Smart Contract *******************)
 local
-    (* Unlocked blockchain user *)
-    val sender = "0x55500e2c661b9b703421b92d15e15d292a9df669"
     (* processResponse: Http.Response -> int -> (string -> 'a) -> 'a option  *)
     fun processResponse (Http.Response _ _ _ _ message) jsonId func =
         let
             val jsonResp = List.hd (fst (Json.parse ([], message)))
-            val respId = Option.getOpt (Option.mapPartial Json.toInt (Json.lookup "id" jsonResp)) ~1
+            val respId =
+                Option.getOpt
+                    (Option.mapPartial Json.toInt (Json.lookup "id" jsonResp))
+                    ~1
         in
             if jsonId = respId
             then Option.mapPartial
@@ -231,30 +237,34 @@ local
             else None
         end
 in
-    (* getHash: string -> int -> int -> string -> int -> BString.bstring option
-     * `getHash host port jsonId recipient hashId`
+    (* getHash: string -> int -> int -> string -> string -> int -> BString.bstring option
+     * `getHash host port jsonId recipient sender hashId`
      *
      * Queries Ethereum client located at host `host` and port number `port`,
      * calling the `getHash` method of our smart contract, located at
-     * `recipient`, using the parameter `hashId`. The `jsonId` parameter is an
-     * arbitrary integer used to identify the response to this particular
-     * request.
+     * `recipient`, from `sender`, using the parameter `hashId`. The `jsonId`
+     * parameter is an arbitrary integer used to identify the response to this
+     * particular request.
      *)
-    fun getHash host port jsonId recipient hashId =
+    fun getHash host port jsonId recipient sender hashId =
         let
             val funSig = "0x6b2fafa9"
             val data = String.concat [funSig, encodeInt hashId]
             val jsonMsg = formEthCallLatest jsonId sender recipient data
+            val jsonStr = Json.convertToString jsonMsg
             val hostPair = ("Host", String.concatWith ":" [host, Int.toString port])
             val contentType = ("Content-Type", "application/json")
+            val contentLen = ("Content-Length", Int.toString (String.size jsonStr))
             val httpReq = Http.Request "POST" "/" "HTTP/1.1"
-                            [hostPair, contentType]
-                            (Some (Json.convertToString jsonMsg))
+                            [hostPair, contentType, contentLen]
+                            (Some jsonStr)
             val httpStr = Http.requestToString httpReq
             val socket = Socket.connect host port
+            val _ = print (String.concat [Http.print_request httpReq, "\n"]) (* debugging *)
             val _ = Socket.output socket httpStr
             val httpRespo = Http.responseFromString (Socket.inputAll socket)
             val _ = Socket.close socket
+            val _ = print (String.concat [Http.print_response (Option.valOf httpRespo), "\n"]) (* debugging *)
             fun respFunc result = Some (decodeBytes result)
         in
             Option.mapPartial
@@ -262,30 +272,34 @@ in
                 httpRespo
         end
     
-    (* setHash: string -> int -> int -> string -> int -> BString.bstring option
-     * `setHash host port jsonId recipient hashId hashValue`
+    (* setHash: string -> int -> int -> string -> string -> int -> BString.bstring -> BString.bstring option
+     * `setHash host port jsonId recipient sender hashId hashValue`
      *
      * Queries Ethereum client located at host `host` and port number `port`,
      * calling the `setHash` method of our smart contract, located at
-     * `recipient`, using the parameters `hashId` and `hashValue`. The `jsonId`
-     * parameter is an arbitrary integer used to identify the response to this
-     * particular request.
+     * `recipient`, from `sender`, using the parameters `hashId` and
+     * `hashValue`. The `jsonId` parameter is an arbitrary integer used to
+     * identify the response to this particular request.
      *)
-    fun setHash host port jsonId recipient hashId hashValue =
+    fun setHash host port jsonId recipient sender hashId hashValue =
         let
             val funSig = "0x6a7fd925"
             val data = String.concat [funSig, encodeIntBytes hashId hashValue]
             val jsonMsg = formEthSendTransaction jsonId sender recipient data
+            val jsonStr = Json.convertToString jsonMsg
             val hostPair = ("Host", String.concatWith ":" [host, Int.toString port])
             val contentType = ("Content-Type", "application/json")
+            val contentLen = ("Content-Length", Int.toString (String.size jsonStr))
             val httpReq = Http.Request "POST" "/" "HTTP/1.1"
-                            [hostPair, contentType]
-                            (Some (Json.convertToString jsonMsg))
+                            [hostPair, contentType, contentLen]
+                            (Some jsonStr)
             val httpStr = Http.requestToString httpReq
             val socket = Socket.connect host port
+            val _ = print (String.concat [Http.print_request httpReq, "\n"]) (* debugging *)
             val _ = Socket.output socket httpStr
             val httpRespo = Http.responseFromString (Socket.inputAll socket)
             val _ = Socket.close socket
+            val _ = print (String.concat [Http.print_response (Option.valOf httpRespo), "\n"]) (* debugging *)
             fun respFunc result =
                 Some (BString.unshow (String.extract result 2 None))
         in
@@ -294,25 +308,27 @@ in
                 httpRespo
         end
     
-    (* addAuthorizedUser: string -> int -> int -> string -> BString.bstring option
-     * `addAuthorizedUser host port jsonId recipient address`
+    (* addAuthorizedUser: string -> int -> int -> string -> string -> BString.bstring option
+     * `addAuthorizedUser host port jsonId recipient sender address`
      *
      * Queries Ethereum client located at host `host` and port number `port`,
      * calling the `addAuthorizedUser` method of our smart contract, located at
-     * `recipient`, using the parameter `address`. The `jsonId` parameter is an
-     * arbitrary integer used to identify the response to this particular
-     * request.
+     * `recipient`, from `sender`, using the parameter `address`. The `jsonId`
+     * parameter is an arbitrary integer used to identify the response to this
+     * particular request.
      *)
-    fun addAuthorizedUser host port jsonId recipient address =
+    fun addAuthorizedUser host port jsonId recipient sender address =
         let
             val funSig = "0x177d2a74"
             val data = String.concat [funSig, encodeAddress address]
             val jsonMsg = formEthSendTransaction jsonId sender recipient data
+            val jsonStr = Json.convertToString jsonMsg
             val hostPair = ("Host", String.concatWith ":" [host, Int.toString port])
             val contentType = ("Content-Type", "application/json")
+            val contentLen = ("Content-Length", Int.toString (String.size jsonStr))
             val httpReq = Http.Request "POST" "/" "HTTP/1.1"
-                            [hostPair, contentType]
-                            (Some (Json.convertToString jsonMsg))
+                            [hostPair, contentType, contentLen]
+                            (Some jsonStr)
             val httpStr = Http.requestToString httpReq
             val socket = Socket.connect host port
             val _ = Socket.output socket httpStr
@@ -326,25 +342,27 @@ in
                 httpRespo
         end
     
-    (* removeAuthorizedUser: string -> int -> int -> string -> BString.bstring option
-     * `removeAuthorizedUser host port jsonId recipient address`
+    (* removeAuthorizedUser: string -> int -> int -> string -> string -> BString.bstring option
+     * `removeAuthorizedUser host port jsonId recipient sender address`
      *
      * Queries Ethereum client located at host `host` and port number `port`,
      * calling the `removeAuthorizedUser` method of our smart contract, located
-     * at `recipient`, using the parameter `address`. The `jsonId` parameter is
-     * an arbitrary integer used to identify the response to this particular
-     * request.
+     * at `recipient`, from `sender`, using the parameter `address`. The
+     * `jsonId` parameter is an arbitrary integer used to identify the response
+     * to this particular request.
      *)
-    fun removeAuthorizedUser host port jsonId recipient address =
+    fun removeAuthorizedUser host port jsonId recipient sender address =
         let
             val funSig = "0x89fabc80"
             val data = String.concat [funSig, encodeAddress address]
             val jsonMsg = formEthSendTransaction jsonId sender recipient data
+            val jsonStr = Json.convertToString jsonMsg
             val hostPair = ("Host", String.concatWith ":" [host, Int.toString port])
             val contentType = ("Content-Type", "application/json")
+            val contentLen = ("Content-Length", Int.toString (String.size jsonStr))
             val httpReq = Http.Request "POST" "/" "HTTP/1.1"
-                            [hostPair, contentType]
-                            (Some (Json.convertToString jsonMsg))
+                            [hostPair, contentType, contentLen]
+                            (Some jsonStr)
             val httpStr = Http.requestToString httpReq
             val socket = Socket.connect host port
             val _ = Socket.output socket httpStr
