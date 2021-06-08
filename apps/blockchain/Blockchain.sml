@@ -223,12 +223,23 @@ fun encodeIntBytes n bs =
         String.concat [encInt, widthEnc, encBytes]
     end
     
-(* encodeAddress: BString.bstring -> string
+(* encodeAddress: string -> string
  * Transforms an Ethereum address (20 bytes) into its Ethereum JSON ABI
  * format (32 bytes, zero-padded on the left/high-end)
  *)
-fun encodeAddress bs =
-    BString.show (BString.concat (BString.nulls 12) bs)
+fun encodeAddress str =
+    (* we're convert to and from a `BString.bstring` in order to check that the
+     * argument is a hexadecimal string. We'd rather through an error from the
+     * program than get an error from the blockchain.
+     *)
+    if String.size str = 42 andalso String.substring str 0 2 = "0x"
+    then
+        let
+            val bs = BString.unshow (String.extract str 2 None)
+        in
+            BString.show (BString.concat (BString.nulls 12) bs)
+        end
+    else raise EthereumExn "Tried to encode an invalid address."
 
 (******************* Communicating with the Smart Contract *******************)
 local
@@ -257,7 +268,8 @@ in
      * calling the `getHash` method of our smart contract, located at
      * `recipient`, from `sender`, using the parameter `hashId`. The `jsonId`
      * parameter is an arbitrary integer used to identify the response to this
-     * particular request.
+     * particular request. Both `recipient` and `sender` must be hexademical
+     * strings prefixed with `0x` and represent 20 bytes.
      *)
     fun getHash host port jsonId recipient sender hashId =
         let
@@ -273,11 +285,9 @@ in
                             (Some jsonStr)
             val httpStr = Http.requestToString httpReq
             val socket = Socket.connect host port
-            val _ = print (String.concat [Http.print_request httpReq, "\n"]) (* debugging *)
             val _ = Socket.output socket httpStr
             val httpRespo = Http.responseFromString (Socket.inputAll socket)
             val _ = Socket.close socket
-            val _ = print (String.concat [Http.print_response (Option.valOf httpRespo), "\n"]) (* debugging *)
             fun respFunc result = Some (decodeBytes result)
         in
             Option.mapPartial
@@ -292,7 +302,9 @@ in
      * calling the `setHash` method of our smart contract, located at
      * `recipient`, from `sender`, using the parameters `hashId` and
      * `hashValue`. The `jsonId` parameter is an arbitrary integer used to
-     * identify the response to this particular request.
+     * identify the response to this particular request. Both `recipient` and
+     * `sender` must be hexadecimal strings prefixed with `0x` and represent
+     * 20 bytes.
      *)
     fun setHash host port jsonId recipient sender hashId hashValue =
         let
@@ -308,11 +320,9 @@ in
                             (Some jsonStr)
             val httpStr = Http.requestToString httpReq
             val socket = Socket.connect host port
-            val _ = print (String.concat [Http.print_request httpReq, "\n"]) (* debugging *)
             val _ = Socket.output socket httpStr
             val httpRespo = Http.responseFromString (Socket.inputAll socket)
             val _ = Socket.close socket
-            val _ = print (String.concat [Http.print_response (Option.valOf httpRespo), "\n"]) (* debugging *)
             fun respFunc result =
                 Some (BString.unshow (String.extract result 2 None))
         in
@@ -321,14 +331,15 @@ in
                 httpRespo
         end
     
-    (* addAuthorizedUser: string -> int -> int -> string -> string -> BString.bstring option
+    (* addAuthorizedUser: string -> int -> int -> string -> string -> string -> BString.bstring option
      * `addAuthorizedUser host port jsonId recipient sender address`
      *
      * Queries Ethereum client located at host `host` and port number `port`,
      * calling the `addAuthorizedUser` method of our smart contract, located at
      * `recipient`, from `sender`, using the parameter `address`. The `jsonId`
      * parameter is an arbitrary integer used to identify the response to this
-     * particular request.
+     * particular request. All three `recipient`, `sender`, and `address` need
+     * to be hexadecimal strings prefixed by `0x` and representing 20 bytes.
      *)
     fun addAuthorizedUser host port jsonId recipient sender address =
         let
@@ -355,14 +366,16 @@ in
                 httpRespo
         end
     
-    (* removeAuthorizedUser: string -> int -> int -> string -> string -> BString.bstring option
+    (* removeAuthorizedUser: string -> int -> int -> string -> string -> string -> BString.bstring option
      * `removeAuthorizedUser host port jsonId recipient sender address`
      *
      * Queries Ethereum client located at host `host` and port number `port`,
      * calling the `removeAuthorizedUser` method of our smart contract, located
      * at `recipient`, from `sender`, using the parameter `address`. The
      * `jsonId` parameter is an arbitrary integer used to identify the response
-     * to this particular request.
+     * to this particular request. All three `recipient`, `sender`, `address`
+     * need to be hexadecimal strings prefixed by `0x` and representing 20
+     * bytes.
      *)
     fun removeAuthorizedUser host port jsonId recipient sender address =
         let
