@@ -171,7 +171,7 @@ fun decodeInt enc =
     then BString.toInt
             BString.BigEndian
             (BString.unshow (String.substring enc 2 64))
-    else raise EthereumExn "Hex string did not start with \"0x\"."
+    else raise EthereumExn "Tried to parse an integer but hex string did not start with \"0x\"."
 
 (* decodeBytes : string -> BString.bstring
  * Transforms an Ethereum JSON ABI encoded string into a ML string
@@ -183,7 +183,7 @@ fun decodeInt enc =
  *)
 fun decodeBytes enc =
     if String.substring enc 0 2 <> "0x"
-    then raise EthereumExn "Hex string did not start with \"0x\"."
+    then raise EthereumExn "Tried to parse a byte string but it did not start with \"0x\"."
     else
         let
             val first = BString.toInt
@@ -198,7 +198,7 @@ fun decodeBytes enc =
             then rest
             else if first = 64 + restLen
                 then BString.concat second rest
-                else raise EthereumExn "Hex string is not properly encoded."
+                else raise EthereumExn "Tried to parse a byte string which is not properly encoded."
         end
     (* let
         val length = decodeInt (String.substring enc 0 66)

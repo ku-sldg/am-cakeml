@@ -1,11 +1,10 @@
 cmake_minimum_required(VERSION 3.10.2)
 
 # This sets our CakeML source to just these two files
-get_files(blockchain_src ../../util/Json.sml blockchain.sml)
-
-# This version would instead add all of the CakeML source files used by linux AMs:
-# get_files(blockchain_src ${server_am_src} blockchain.sml)
+get_files(blockchain_src ../../util/Json.sml ../../util/Extra.sml ../../util/ByteString.sml ../../util/Misc.sml ../../util/Http.sml ../../system/posix/sockets/SocketFFI.sml Blockchain.sml)
+build_posix_am("blockchain_test" ${blockchain_src})
 
 # This will build an executable from your list of CakeML sources
 # (it also links against several C FFI files for posix system calls)
-build_posix_am("blockchain_test" ${blockchain_src})
+get_files(blockchain_c_src ../../system/posix/sockets/socket_ffi.c)
+target_sources(blockchain PRIVATE ${blockchain_c_src})
