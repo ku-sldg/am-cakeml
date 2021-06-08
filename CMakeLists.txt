@@ -78,5 +78,7 @@ endfunction()
 
 file(GLOB appdirs apps/*)
 foreach(appdir ${appdirs})
-    add_subdirectory(${appdir})
+    if(IS_DIRECTORY ${appdir})
+        add_subdirectory(${appdir})
+    endif()
 endforeach()

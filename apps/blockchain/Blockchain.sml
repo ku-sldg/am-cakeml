@@ -182,16 +182,29 @@ fun decodeInt enc =
  * the length parameter is too short.
  *)
 fun decodeBytes enc =
-    let
+    if String.substring enc 0 2 <> "0x"
+    then raise EthereumExn "Hex string did not start with \"0x\"."
+    else
+        let
+            val first = BString.toInt
+                    BString.BigEndian
+                    (BString.unshow (String.substring enc 2 64))
+            val second = BString.unshow (String.substring enc 66 64)
+            val rest = BString.unshow (String.extract enc 130 None)
+            val restLen = BString.length rest
+        in
+            if first = 32 andalso
+                BString.toInt BString.BigEndian second = restLen
+            then rest
+            else if first = 64 + restLen
+                then BString.concat second rest
+                else raise EthereumExn "Hex string is not properly encoded."
+        end
+    (* let
         val length = decodeInt (String.substring enc 0 66)
     in
-        ( (* debugging *)
-            print (String.concat ["Decoding bytes:\n", enc, "\n"]);
-            print (String.concat ["Length: ", Int.toString length, "\n"]);
-            print (String.concat [String.substring enc 66 (2 * length), "\n"]);
         BString.unshow (String.substring enc 66 (2 * length))
-        )
-    end
+    end *)
 
 (* encodeIntBytes: int -> BString.bstring -> string
  * Transforms a tuple of type `(int, BString.bstring)` into an Ethereum
