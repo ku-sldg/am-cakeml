@@ -10,18 +10,15 @@ val term = Att (S O) (Lseq subterm (Asp Sig))
 (* val goldenHash = BString.unshow "7BE9FDA48F4179E611C698A73CFF09FAF72869431EFEE6EAAD14DE0CB44BBF66503F752B7A8EB17083355F3CE6EB7D2806F236B25AF96A24E22B887405C20081" *)
 val pub = BString.unshow "490E2422528F14AC6A48DDB9D72CB30B8345AF2E939003BC7A33A6057F2FFB0101000000000000002DD0B7F53A560000A049D882A37F00000000000000000000"
 
-fun getHashDemo host recipient =
+fun getHashDemo recipient =
     let
         val sender = "0x55500e2c661b9b703421b92d15e15d292a9df669"
         val host = "127.0.0.1"
         val port = 8543
         val jsonId = 2
         val hashId = 1
-        val resulto = getHash host port jsonId recipient sender hashId
     in
-        case resulto of
-          None => Err "Error in retrieving golden hash."
-        | Some goldenHash => Ok goldenHash
+        getHash host port jsonId recipient sender hashId
     end
     handle Socket.Err _ => Err "Socket error in retrieving golden hash."
         | _ => Err "Unknown error in retrieving golden hash."
@@ -31,14 +28,14 @@ fun appraise nonce ev recipient =
       G evSign (U (Id (S O)) [dir] evHash (N (Id O) evNonce Mt)) =>
         if evNonce <> nonce then
             Err "Bad nonce value"
-        else case getHashDemo host recipient of
+        else case getHashDemo recipient of
               Ok goldenHash =>
                 if evHash <> goldenHash then
                     Err "Bad hash value"
                 else if not (Option.valOf (verifySig ev pub)) then
                     Err "Bad signature"
                 else Ok ()
-            | result => result
+            | Err msg => Err msg
     | _ => Err "Unexpected shape of evidence"
 
 fun sendReq addr recipient =

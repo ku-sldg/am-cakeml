@@ -5,14 +5,16 @@ fun setHashDemo recipient goldenHash =
         val port = 8543
         val jsonId = 1
         val hashId = 1
-        val resulto = setHash host port jsonId recipient sender hashId goldenHash
+        val resultr = setHash host port jsonId recipient sender hashId goldenHash
     in
-        case resulto of
-          None => TextIO.print_err "Failed to set golden hash.\n"
-        | Some _ => print "Set hash succeeded.\n"
+        case resultr of
+          Err msg => TextIO.print_err (String.concat [msg, "\n"])
+        | Ok _ => print "Set hash succeeded.\n"
     end
     handle Socket.Err _ =>
             TextIO.print_err "Socket error when trying to set golden hash.\n"
+        | Socket.InvalidFD =>
+            TextIO.print_err "Socket file descriptor error when trying to set golden hash.\n"
         | _ =>
             TextIO.print_err "Unknown error when trying to set golden hash.\n"
 

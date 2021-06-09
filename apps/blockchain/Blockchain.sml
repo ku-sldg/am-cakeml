@@ -253,12 +253,12 @@ local
                     ~1
         in
             if jsonId = respId
-            then Option.mapPartial
-                    func
-                    (Option.mapPartial
-                        Json.toString
-                        (Json.lookup "result" jsonResp))
-            else None
+            then
+                case (Json.lookup "result" jsonResp) of
+                  Some (Json.String result) => func result
+                | Some _ => Err "Error communicating with the blockchain: JSON result field was not a string."
+                | None => Err "Error communicating with the blockchain: JSON result field was not found."
+            else Err "Error communicating with the blockchain: JSON Ids didn't match."
         end
 in
     (* getHash: string -> int -> int -> string -> string -> int -> BString.bstring option
@@ -288,12 +288,15 @@ in
             val _ = Socket.output socket httpStr
             val httpRespo = Http.responseFromString (Socket.inputAll socket)
             val _ = Socket.close socket
-            fun respFunc result = Some (decodeBytes result)
+            fun respFunc result = Ok (decodeBytes result)
         in
-            Option.mapPartial
-                (fn resp => processResponse resp jsonId respFunc)
-                httpRespo
+            case httpRespo of
+              Some resp => processResponse resp jsonId respFunc
+            | None => Err "Error getting hash: failed to parse HTTP response."
         end
+        handle Socket.Err msg => Err (String.concat ["Error getting hash, socket error: ", msg])
+            | Socket.InvalidFD => Err "Error getting hash, socket error: invalid file descriptor."
+            | _ => Err "Error getting hash: unknown error."
     
     (* setHash: string -> int -> int -> string -> string -> int -> BString.bstring -> BString.bstring option
      * `setHash host port jsonId recipient sender hashId hashValue`
@@ -324,12 +327,15 @@ in
             val httpRespo = Http.responseFromString (Socket.inputAll socket)
             val _ = Socket.close socket
             fun respFunc result =
-                Some (BString.unshow (String.extract result 2 None))
+                Ok (BString.unshow (String.extract result 2 None))
         in
-            Option.mapPartial
-                (fn resp => processResponse resp jsonId respFunc)
-                httpRespo
+            case httpRespo of
+              Some resp => processResponse resp jsonId respFunc
+            | None => Err "Error setting hash: failed to parse HTTP response."
         end
+        handle Socket.Err msg => Err (String.concat ["Error setting hash, socket error: ", msg])
+            | Socket.InvalidFD => Err "Error setting hash, socket error: invalid file descriptor."
+            | _ => Err "Error setting hash: unknown error."
     
     (* addAuthorizedUser: string -> int -> int -> string -> string -> string -> BString.bstring option
      * `addAuthorizedUser host port jsonId recipient sender address`
@@ -359,12 +365,15 @@ in
             val httpRespo = Http.responseFromString (Socket.inputAll socket)
             val _ = Socket.close socket
             fun respFunc result =
-                Some (BString.unshow (String.extract result 2 None))
+                Ok (BString.unshow (String.extract result 2 None))
         in
-            Option.mapPartial
-                (fn resp => processResponse resp jsonId respFunc)
-                httpRespo
+            case httpRespo of
+              Some resp => processResponse resp jsonId respFunc
+            | None => Err "Error setting hash: failed to parse HTTP response."
         end
+        handle Socket.Err msg => Err (String.concat ["Error setting hash, socket error: ", msg])
+            | Socket.InvalidFD => Err "Error setting hash, socket error: invalid file descriptor."
+            | _ => Err "Error setting hash: unknown error."
     
     (* removeAuthorizedUser: string -> int -> int -> string -> string -> string -> BString.bstring option
      * `removeAuthorizedUser host port jsonId recipient sender address`
@@ -395,10 +404,13 @@ in
             val httpRespo = Http.responseFromString (Socket.inputAll socket)
             val _ = Socket.close socket
             fun respFunc result =
-                Some (BString.unshow (String.extract result 2 None))
+                Ok (BString.unshow (String.extract result 2 None))
         in
-            Option.mapPartial
-                (fn resp => processResponse resp jsonId respFunc)
-                httpRespo
+            case httpRespo of
+              Some resp => processResponse resp jsonId respFunc
+            | None => Err "Error setting hash: failed to parse HTTP response."
         end
+        handle Socket.Err msg => Err (String.concat ["Error setting hash, socket error: ", msg])
+            | Socket.InvalidFD => Err "Error setting hash, socket error: invalid file descriptor."
+            | _ => Err "Error setting hash: unknown error."
 end

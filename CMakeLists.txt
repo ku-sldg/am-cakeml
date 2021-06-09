@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.19)
+cmake_minimum_required(VERSION 3.10.2)
 # cmake_policy(SET CMP0076 NEW)
 set(CMAKE_USER_MAKE_RULES_OVERRIDE "DefaultConfig.cmake")
 project(CakemlAM C ASM)

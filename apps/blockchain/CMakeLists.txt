@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.19)
+cmake_minimum_required(VERSION 3.10.2)
 
 # This sets our CakeML source to just these two files
 get_files(blockchain_src ${util_src} ../../system/posix/sockets/SocketFFI.sml Blockchain.sml)
