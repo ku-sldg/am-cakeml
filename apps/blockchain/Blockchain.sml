@@ -252,7 +252,7 @@ local
                     (Option.mapPartial Json.toInt (Json.lookup "id" jsonResp))
                     ~1
         in
-            if jsonId = respId
+            if jsonId = respId andalso jsonId >= 0
             then
                 case (Json.lookup "result" jsonResp) of
                   Some (Json.String result) => func result

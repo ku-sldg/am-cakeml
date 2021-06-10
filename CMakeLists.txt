@@ -78,7 +78,7 @@ endfunction()
 
 file(GLOB appdirs apps/*)
 foreach(appdir ${appdirs})
-    if(IS_DIRECTORY ${appdir})
+    if(EXISTS "${appdir}/CMakeLists.txt")
         add_subdirectory(${appdir})
     endif()
 endforeach()
