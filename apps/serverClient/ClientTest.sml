@@ -18,7 +18,7 @@ fun getHashDemo recipient =
         val jsonId = 2
         val hashId = 1
     in
-        getHash host port jsonId recipient sender hashId
+        Blockchain.getHash host port jsonId recipient sender hashId
     end
     handle Socket.Err _ => Err "Socket error in retrieving golden hash."
         | _ => Err "Unknown error in retrieving golden hash."

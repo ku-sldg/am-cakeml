@@ -11,3 +11,4 @@ build_posix_am("setHash" ${setHash_src})
 
 get_files(setHash_c_src ../../system/posix/sockets/socket_ffi.c)
 target_sources(setHash PRIVATE ${setHash_c_src})
+

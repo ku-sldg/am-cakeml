@@ -5,7 +5,8 @@ fun setHashDemo recipient goldenHash =
         val port = 8543
         val jsonId = 1
         val hashId = 1
-        val resultr = setHash host port jsonId recipient sender hashId goldenHash
+        val resultr =
+            Blockchain.setHash host port jsonId recipient sender hashId goldenHash
     in
         case resultr of
           Err msg => TextIO.print_err (String.concat [msg, "\n"])
@@ -21,7 +22,7 @@ fun setHashDemo recipient goldenHash =
 fun main () =
     let
         val errorMsg = String.concat ["usage: ", CommandLine.name (),
-                                        "<dest address> <golden hash>\n"]
+                                        " <dest address> <golden hash>\n"]
     in
         case CommandLine.arguments () of
           [recipient, goldenHash] =>
