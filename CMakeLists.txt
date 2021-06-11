@@ -5,11 +5,20 @@ project(CakemlAM C ASM)
 
 include(CakeMLHelper.cmake)
 
+function(get_real_file file real_name)
+    if(EXISTS ${file})
+        set(${real_name} ${file} PARENT_SCOPE)
+    elseif(EXISTS ${CMAKE_CURRENT_LIST_DIR}/${file})
+        set(${real_name} "${CMAKE_CURRENT_LIST_DIR}/${file}" PARENT_SCOPE)
+    endif()
+endfunction()
+
 # Gets absolute paths, and preserves order
 function(get_files list_name)
     set(get_files_list "")
     foreach (file ${ARGN})
-        file(REAL_PATH ${file} temp)
+#        file(REAL_PATH ${file} temp)
+        get_real_file(${file} temp)
         list(APPEND get_files_list ${temp})
     endforeach()
     set(${list_name} ${get_files_list} PARENT_SCOPE)

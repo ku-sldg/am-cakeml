@@ -447,18 +447,18 @@ fun lookup key xjs =
  *)
 fun convertToString xjs =
     let
-        fun keyValFn (str, js) = String.concat ["\"", str, "\" : ", convertToString js]
+        fun keyValFn (str, js) = String.concat ["\"", str, "\": ", convertToString js]
     in
         case xjs of
           Null => "null"
         | Boolean b => if b then "true" else "false"
         | Number (Int n) => Int.toString n
         | String str => String.concat ["\"", str, "\""]
-        | List xjss => String.concat ["[ ",
+        | List xjss => String.concat ["[",
                                       String.concatWith ", " (List.map convertToString xjss),
-                                      " ]"]
-        | AList strjss => String.concat ["{ ",
+                                      "]"]
+        | AList strjss => String.concat ["{",
                                           String.concatWith ", " (List.map keyValFn strjss),
-                                          " }"]
+                                          "}"]
     end
 end
