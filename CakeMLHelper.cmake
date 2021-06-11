@@ -31,14 +31,16 @@ endif()
 # Compile a list of CakeML source files. Creates a build target for library ${name}
 # Args: name - name of the resulting library
 #       SOURCES - CakeML source files, in order (they'll be concatenated together)
-#       ENTRY_NAME - Name of assembly symbol denoting start of the CakeML code. Defaults to "run" (CAmkES component entry point)
+#       ENTRY_NAME - Name of assembly symbol denoting start of the CakeML code. Defaults to "main"
+#           Note: This only has any effect on older version of the compiler where the entry symbol was baked-in
+#           (as opposed to the current implementation, which defines it in basis_ffi.c)
 function(build_cake name)
     cmake_parse_arguments(
         PARSE_ARGV
         1
         PARSED_ARGS
         ""
-        "SOURCES"
+        "SOURCES;C_SOURCES"
         "ENTRY_NAME"
     )
     if(NOT "${PARSED_ARGS_UNPARSED_ARGUMENTS}" STREQUAL "")
@@ -60,7 +62,7 @@ function(build_cake name)
         DEPENDS ${abs_bin_prefix}.cml
         VERBATIM
     )
-    add_library(${name} STATIC "${abs_bin_prefix}.cake.S")
+    add_library(${name} STATIC "${abs_bin_prefix}.cake.S" "${PARSED_ARGS_C_SOURCES}")
 endfunction()
 
 # Builds a CAmkES component from CakeML and C sourse files.

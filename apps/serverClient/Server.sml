@@ -9,11 +9,11 @@ val priv = BString.unshow "2E5773B2A19A2CB05FEE44650D8DC877B3D806F74C199043657C8
    it returns a raw error message string. In the future, we may want to wrap
    said error messages in JSON as well to make it easier on the client. *)
 fun evalJson s =
-    let val (REQ pl1 pl2 map t ev) = jsonToRequest (strToJson s)
+    let val (REQ pl1 pl2 map t ev) = jsonToRequest (JsonExtra.parse s)
         val am = setMe (serverAm priv emptyNsMap) pl2
         val ev' = evalTerm am ev t
         val response = RES pl2 pl1 ev'
-     in jsonToStr (responseToJson response)
+     in JsonExtra.toString (responseToJson response)
     end
     handle Json.ERR s1 s2 => (TextIO.print_err ("JSON error"^s1^": "^s2^"\n");
                               "Invalid JSON/Copland term")

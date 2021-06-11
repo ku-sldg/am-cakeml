@@ -1,4 +1,4 @@
-(* No dependencies *)
+(* Depends on Json *)
 
 (* Extensions to structures in the standard library *)
 
@@ -102,6 +102,8 @@ end
 
 structure Word8ArrayExtra = struct 
     fun nulls len = Word8Array.array len Word8Extra.null
+
+    val empty = Word8Array.array 0 Word8Extra.null
 end
 
 structure TextIOExtra = struct 
@@ -110,4 +112,12 @@ structure TextIOExtra = struct
 
     (* string -> () *)
     fun printLn_err s = TextIO.print_err (s ^ "\n")
+end
+
+structure JsonExtra = struct 
+    (* string -> Json.json *)
+    fun parse str = List.hd (fst (Json.parse ([], str)))
+
+    (* Json.json -> string *)
+    fun toString js = Json.print_json js 0
 end

@@ -46,6 +46,9 @@ structure FFI = struct
             BString.fromByteArray out 
         end
 
+    (* ffi -> bstring -> () *)
+    fun callNoOut ffi input = (call ffi 0 input; ())
+
     (* ffi -> int -> bstring -> bstring option *)
     fun callOpt ffi len input = 
         let val result = call ffi (len+1) input
