@@ -6,7 +6,7 @@
  *)
 structure Blockchain =
 struct
-    exception EthereumExn string
+    exception Exn string
 
 (***************** [JSON RPC](https://eth.wiki/json-rpc/API) *****************)
     (* formJsonRpc : int -> string -> Json.json list -> Json.json
@@ -141,7 +141,7 @@ struct
     fun encodeInt n =
         if n >= 0
         then BString.show (BString.fromIntLength 32 BString.BigEndian n)
-        else raise EthereumExn "Can only encode non-negative integers"
+        else raise Exn "Can only encode non-negative integers"
 
     (* encodeBytes: BString.bstring -> string
     * Transforms a `BString.bstring` into an Ethereum JSON ABI bytes encoding.
@@ -162,7 +162,7 @@ struct
     * Transforms an Ethereum JSON ABI uint256 into an ML integer.
     * 
     * Raises a `Word8Extra.InvalidHex` exception when `BString.unshow` cannot
-    * parse the input. Raises `EthereumExn` when the encoding does not start
+    * parse the input. Raises `Exn` when the encoding does not start
     * with `"0x"`. Raises an exception through String.substring if input is too
     * short.
     *)
@@ -171,19 +171,19 @@ struct
         then BString.toInt
                 BString.BigEndian
                 (BString.unshow (String.substring enc 2 64))
-        else raise EthereumExn "Tried to parse an integer but hex string did not start with \"0x\"."
+        else raise Exn "Tried to parse an integer but hex string did not start with \"0x\"."
 
     (* decodeBytes : string -> BString.bstring
     * Transforms an Ethereum JSON ABI encoded string into a ML string
     *
-    * Raises `EthereumExn` when the encoding does not start with `"0x"`. Raises
-    * a `Word8Extra.InvalidHex` exception if length or data parameters cannot be
-    * parsed from the input. Raises an exception through `BString.substring` if
-    * the length parameter is too short.
+    * Raises `Exn` when the encoding does not start with `"0x"`.
+    * Raises a `Word8Extra.InvalidHex` exception if length or data parameters
+    * cannot be parsed from the input. Raises an exception through
+    * `BString.substring` if the length parameter is too short.
     *)
     fun decodeBytes enc =
         if String.substring enc 0 2 <> "0x"
-        then raise EthereumExn "Tried to parse a byte string but it did not start with \"0x\"."
+        then raise Exn "Tried to parse a byte string but it did not start with \"0x\"."
         else
             let
                 val first = BString.toInt
@@ -198,7 +198,7 @@ struct
                 then rest
                 else if first = 64 + restLen
                     then BString.concat second rest
-                    else raise EthereumExn "Tried to parse a byte string which is not properly encoded."
+                    else raise Exn "Tried to parse a byte string which is not properly encoded."
             end
         (* let
             val length = decodeInt (String.substring enc 0 66)
@@ -239,7 +239,7 @@ struct
             in
                 BString.show (BString.concat (BString.nulls 12) bs)
             end
-        else raise EthereumExn "Tried to encode an invalid address."
+        else raise Exn "Tried to encode an invalid address."
 
 (******************* Communicating with the Smart Contract *******************)
     local

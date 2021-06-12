@@ -1,10 +1,15 @@
 cmake_minimum_required(VERSION 3.10.2)
 
-# This sets our CakeML source to just these two files
-get_files(blockchain_src ${util_src} ../../system/posix/sockets/SocketFFI.sml Blockchain.sml)
-build_posix_am("blockchain" ${blockchain_src})
+get_files(blockchain_client_src ${server_am_src} Blockchain.sml Client.sml)
+build_posix_am("blockchainClient" ${blockchain_client_src})
 
-# This will build an executable from your list of CakeML sources
-# (it also links against several C FFI files for posix system calls)
-get_files(blockchain_c_src ../../system/posix/sockets/socket_ffi.c)
-target_sources(blockchain PRIVATE ${blockchain_c_src})
+get_files(blockchain_server_src ${server_am_src} Server.sml)
+build_posix_am("blockchainServer" ${blockchain_server_src})
+
+get_files(blockchain_setHash_src ${util_src} ${posix_src} Blockchain.sml SetHash.sml)
+build_posix_am("blockchainSetHash" ${blockchain_setHash_src})
+
+get_files(blockchain_setHash_c_src ../../system/posix/sockets/socket_ffi.c)
+target_sources(blockchainSetHash PRIVATE ${blockchain_setHash_c_src})
+
+add_custom_target(blockchain DEPENDS blockchainServer blockchainClient blockchainSetHash)
