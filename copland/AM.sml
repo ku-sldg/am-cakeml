@@ -5,6 +5,8 @@ type copEval = ev -> term -> ev
 type key = bs
 type usm = arg list -> bs
 
+(* Does am need both key and sign? Sign could just be specialized
+   to `bs -> bs`. *)
 datatype am = Am
     pl                (* me *)
     (pl -> copEval)   (* remote dispatcher *)

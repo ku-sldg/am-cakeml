@@ -1,14 +1,12 @@
-(* Depends on util, copland, HamrStandard *)
+(* Depends on util, copland, HamrStandard, GoldenHashes, Fake/RealCrypto *)
 
 val pub = BString.unshow "490E2422528F14AC6A48DDB9D72CB30B8345AF2E939003BC7A33A6057F2FFB0101000000000000002DD0B7F53A560000A049D882A37F00000000000000000000"
 
 (* Hamr app-specific FFI functions *)
 local 
-    fun sendRequest_ffi     arg out = #(api_send_AttestationRequest)   arg out
-    fun getResponse_ffi     arg out = #(api_get_AttestationResponse)   arg out
-    fun sendTrustedIds_ffi  arg out = #(api_send_TrustedIds)           arg out
-    fun getConnection_ffi   arg out = #(api_get_InitiateAttestation)   arg out
-    fun closeConnection_ffi arg out = #(api_send_TerminateAttestation) arg out
+    fun sendRequest_ffi    arg out = #(api_send_AttestationRequest) arg out
+    fun getResponse_ffi    arg out = #(api_get_AttestationResponse) arg out
+    fun sendTrustedIds_ffi arg out = #(api_send_TrustedIds)         arg out
 in
     (* bstring -> () *)
     fun sendRequest req = FFI.callNoOut sendRequest_ffi req
@@ -26,60 +24,49 @@ in
                            Int.toString length ^
                            "-byte argument, but expected 32 bytes.")
         end
-    (* () -> bstring option *)
-    fun getConnection () = Control.getDataEvent getConnection_ffi 4 BString.empty
-
-    (* () -> () *)
-    fun closeConnection () = FFI.callNoOut closeConnection_ffi BString.empty
 end
 
+val emptyId = BString.nulls 4
 local
-    val emptyId = BString.nulls 8
     val trusted_ids = Array.array 4 emptyId
     val flatten_ids = Array.foldl BString.concat BString.empty
-    
-    val protocol_id = BString.fromIntLength 4 BString.LittleEndian 2
-    fun getId ip = BString.concat protocol_id ip
 in
     (* bstring -> () *)
     (* idempotent *)
-    fun addToWhitelist ip =
-        let val id = getId ip
-         in log Info ("Adding 0x" ^ BString.show id ^ " to the whitelist");
-            if Array.exists ((op =) id) trusted_ids then
-                log Info ("0x" ^ BString.show id ^ " already in the whitelist")
-            else case Array.findi (const ((op =) emptyId)) trusted_ids of
-                  Some (i, _) => Array.update trusted_ids i id
-                | None => (
-                    log Error "No room in the whitelist, overwriting first entry";
-                    Array.update trusted_ids 0 id
-                );
-            sendTrustedIds (flatten_ids trusted_ids)
-        end
+    fun addToWhitelist id = (
+        log Info ("Adding 0x" ^ BString.show id ^ " to the whitelist");
+        if Array.exists ((op =) id) trusted_ids then
+            log Info ("0x" ^ BString.show id ^ " already in the whitelist")
+        else case Array.findi (const ((op =) emptyId)) trusted_ids of
+                Some (i, _) => Array.update trusted_ids i id
+            | None => (
+                log Error "No room in the whitelist, overwriting first entry";
+                Array.update trusted_ids 0 id
+            );
+        sendTrustedIds (flatten_ids trusted_ids)
+    )
 
     (* bstring -> () *)
     (* idempotent *)
-    fun removeFromWhitelist ip =
-        let val id = getId ip
-         in log Info ("Removing 0x" ^ BString.show id ^ " from the whitelist");
-            case Array.findi (const ((op =) id)) trusted_ids of
-                  Some (i, _) => Array.update trusted_ids i emptyId
-                | None => log Info "Connection not in the whitelist";
-            sendTrustedIds (flatten_ids trusted_ids)
-        end
+    fun removeFromWhitelist id = (
+        log Info ("Removing 0x" ^ BString.show id ^ " from the whitelist");
+        case Array.findi (const ((op =) id)) trusted_ids of
+              Some (i, _) => Array.update trusted_ids i emptyId
+            | None => log Info "Connection not in the whitelist";
+        sendTrustedIds (flatten_ids trusted_ids)
+    )
 end
 
 (* bstring -> ev option *)
-fun parseResp resp = (
-    log Info ("Received response: " ^ BString.toString resp);
-    Some (jsonToEv (JsonExtra.parse (BString.toString resp)))
-) handle _ => None
-
-(* Stubbed out crypto. Signature always passes *)
-fun verifySig g pub = 
-    case g of
-          G bs ev => Some True
-        | _ => None
+fun parseResp resp = 
+    let val split = BString.splitAt 4 resp
+        val id    = fst split
+        val evStr = BString.toString (snd split)
+        val strToEv  = jsonToEv o JsonExtra.parse
+     in log Info ("Received id: " ^ BString.show id);
+        log Info ("Received response: " ^ evStr);
+        Some (id, strToEv evStr)
+    end handle _ => None
 
 (* bstring -> ev -> bool *)
 (* true if appraisal succeeds *)
@@ -95,12 +82,6 @@ fun appraise nonce ev = case ev of
               (log Info "Appraisal succeeded"; True)
     | _ => (log Info "Unexpected evidence structure"; False)
 
-local 
-    fun fakeRand_ffi arg out = #(fakeRand) arg out
-in 
-    (* () -> bstring *)
-    fun genNonce () = FFI.call fakeRand_ffi 16 BString.empty
-end
 
 (* () -> bstring *)
 fun sendAttRequest () =
@@ -111,9 +92,8 @@ fun sendAttRequest () =
     end
 
 datatype am_state =
-      NoConnection
-    | SendingRequest  BString.bstring                 (* ip addr *)
-    | GettingResponse BString.bstring BString.bstring (* ip addr, nonce *)
+      SendingRequest
+    | GettingResponse BString.bstring (* nonce *)
 
 local
     (* attestation frequency = (att_len + 1) * pacer frequency *)
@@ -122,57 +102,46 @@ local
     val pacer_count = Ref 0
     fun incr count = count := (!count + 1) mod att_len
 
-    val curr_state = Ref NoConnection
+    val curr_state = Ref SendingRequest
+    val curr_id = Ref emptyId
 
-    fun rmAndClose ip = (
-        removeFromWhitelist ip;
-        closeConnection ();
-        log Info "Closing conection";
-        curr_state := NoConnection;
+    fun reset () = (
+        if !curr_id <> emptyId then 
+            removeFromWhitelist (!curr_id)
+        else ();
+        curr_id := emptyId;
+        curr_state := SendingRequest;
         pacer_count := 0
     )
 in 
     (* () -> () *)
-    fun attestation_step () = (
-        (* log Debug ("Pacer count: " ^ Int.toString (!pacer_count)); *)
-        case !curr_state of
-          NoConnection => (
-              case getConnection () of
-                    Some ip => (
-                        log Info ("Connection received from: 0x" ^ BString.show ip);
-                        curr_state := SendingRequest ip;
-                        attestation_step ()
-                  )
-                  | None => log Info "No connection"
+    fun attestation_step () = case !curr_state of
+          SendingRequest => (
+            if !pacer_count = 0 then 
+                curr_state := GettingResponse (sendAttRequest ())
+            else ();
+            incr pacer_count
           )
-        | SendingRequest ip => (
-              if !pacer_count = 0 then 
-                  curr_state := GettingResponse ip (sendAttRequest ())
-              else ();
-              incr pacer_count
-          )
-        | GettingResponse ip nonce =>
-              case getResponse () of
-                    Some resp => (
-                        log Info ("Received response: " ^ BString.toString resp);
-                        case parseResp resp of
-                            Some ev =>
-                                if appraise nonce ev then (
-                                    addToWhitelist ip;
-                                    curr_state := SendingRequest ip;
-                                    incr pacer_count
-                                ) else rmAndClose ip
-                          | None => (
-                                log Info "Evidence failed to parse";
-                                rmAndClose ip
-                          )
-                    )
-                  | None => 
-                        if !pacer_count = 0 then
-                            rmAndClose ip
-                        else 
+        | GettingResponse nonce => case getResponse () of
+              Some resp => (
+                log Info ("Received response: " ^ BString.toString resp);
+                case parseResp resp of
+                    Some (id, ev) =>
+                        if appraise nonce ev then (
+                            addToWhitelist id;
+                            curr_state := SendingRequest;
                             incr pacer_count
-    )
+                        ) else reset ()
+                    | None => (
+                        log Info "Response failed to parse";
+                        reset ()
+                    )
+            )
+            | None => 
+                if !pacer_count = 0 then
+                    reset ()
+                else 
+                    incr pacer_count
 end
 
 (* Hamr entry point *)

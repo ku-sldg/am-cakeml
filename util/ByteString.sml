@@ -26,6 +26,8 @@ structure BString = struct
     in 
         type bstring = bstring
 
+        datatype endianness = BigEndian | LittleEndian
+
         val empty = Bs ""
         val nullByte = Bs nullCharStr
 
@@ -34,9 +36,20 @@ structure BString = struct
 
         (* word8 list -> bstring *)
         fun implode l = Bs (String.implode (List.map word8ToChar l))
+
         (* bstring -> word8 list *)
         val explode = applyStr (List.map charToWord8 o String.explode)
-        
+ 
+        (* endianness -> word8 list -> bstring *)
+        fun implodeEnd endian = case endian of
+              LittleEndian => implode o List.rev
+            | BigEndian    => implode
+
+        (* endianness -> bstring -> word8 list *)
+        fun explodeEnd endian = case endian of 
+              LittleEndian => List.rev o explode
+            | BigEndian    => explode
+
         (* int -> word8 -> bstring *)
         fun replicate len w = implode (ListExtra.replicate len w)
 
@@ -123,7 +136,11 @@ structure BString = struct
         (* byte_array -> bstring *)
         fun fromByteArray arr = Bs (Word8Array.substring arr 0 (Word8Array.length arr))
 
-        datatype endianness = BigEndian | LittleEndian
+        (* int -> bstring -> bstring * bstring *)
+        fun splitAt i bs =
+            case bs of Bs s =>
+                case StringExtra.splitAt i s of (s1, s2) =>
+                    (Bs s1, Bs s2)
 
         (* endianness -> int -> bstring -> bstring *)
         fun toLength endian toLen bs = 
