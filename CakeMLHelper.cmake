@@ -56,7 +56,7 @@ function(build_cake name)
     add_custom_command(
         OUTPUT ${abs_bin_prefix}.cake.S
         COMMAND ${cakec} ${cakeflag_list} < ${abs_bin_prefix}.cml > ${abs_bin_prefix}.cake.S
-        COMMAND sed -i".orig" "s/cdecl(main)/cdecl(${PARSED_ARGS_ENTRY_NAME})/g" ${abs_bin_prefix}.cake.S
+        COMMAND sed -i.orig "s/cdecl(main)/cdecl(${PARSED_ARGS_ENTRY_NAME})/g" ${abs_bin_prefix}.cake.S
         DEPENDS ${abs_bin_prefix}.cml
         VERBATIM
     )

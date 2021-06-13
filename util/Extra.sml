@@ -16,10 +16,26 @@ structure ListExtra = struct
     fun intersperse a alist = case alist of
           h1 :: h2 :: t => h1 :: a :: (intersperse a (h2 :: t))
         | _ => alist
+    
+    (* span : ('a -> bool) -> 'a list -> ('a list, 'a list)
+     * `span pred xs`
+     * Produces a pair of lists `(ys, zs)` such that `ys` is the largest prefix
+     * of `xs` such that every element in `ys` maps to true by `pred`, and `zs`
+     * is the remainder of the list `xs`.
+     *
+     * `span pred xs = (List.takeWhile pred xs, List.dropWhile pred xs)`
+     *)
+    fun span pred xs =
+        case xs of
+          [] => ([], [])
+        | x::xs' =>
+            if pred x
+            then Pair.map (fn ys => x::ys) id (span pred xs')
+            else ([], xs)
 end
 
 structure OptionExtra = struct 
-    (* 'b -> ('a -> 'b) 'a option -> 'b *)
+    (* 'b -> ('a -> 'b) -> 'a option -> 'b *)
     fun option b f opt = case opt of 
           Some a => f a 
         | None   => b
@@ -61,6 +77,43 @@ structure StringExtra = struct
     (* (int -> 'a -> char -> 'a) -> 'a -> string -> 'a *)
     (* Seems to be a typo in the standard library. Should be "List.foldli" *)
     fun foldli f z s = List.foldi f z (String.explode s)
+
+    (* crlfLines : string -> string list
+     * Takes a string and splits it into a list of substrings at whereever the
+     * character sequence "\r\n" occurs.
+     *)
+    fun crlfLines str =
+        let
+            fun reverse xss ys zss =
+                case xss of
+                  [] => zss
+                | []::xss' => reverse xss' [] (ys::zss)
+                | (x::xs)::xss' => reverse (xs::xss') (x::ys) zss
+            fun walker upcoming seen backwardResults =
+                case upcoming of
+                  [] => reverse (seen::backwardResults) [] []
+                | [c] => reverse ((c::seen)::backwardResults) [] []
+                | c0::c1::upcoming' =>
+                    if Char.ord c0 = 13 andalso c1 = #"\n"
+                    then walker upcoming' [] (seen::backwardResults)
+                    else walker (c1::upcoming') (c0::seen) backwardResults
+        in
+            List.map String.implode (walker (String.explode str) [] [])
+        end
+
+    (* escape : string -> string
+     * Performs C string escaping, taking `"` to `\"` and `\` to `\\`.
+     *)
+    fun escape str =
+        let
+            fun escFn c =
+                case c of
+                  #"\"" => "\\\""
+                | #"\\" => "\\\\"
+                | _ => String.str c
+        in
+            String.concat (List.map escFn (String.explode str))
+        end
 end
 
 structure Word8Extra = struct 
@@ -92,6 +145,7 @@ structure Word8Extra = struct
            |   _  => raise InvalidHex
         val getHalfByte = Array.sub bytes o hexMap
     in
+        (* string -> word *)
         fun fromHex s =
             let val top = String.sub s 0
                 val bot = String.sub s 1
@@ -100,7 +154,8 @@ structure Word8Extra = struct
     end
 end
 
-structure Word8ArrayExtra = struct 
+structure Word8ArrayExtra = struct
+    (* int -> Word8Array *)
     fun nulls len = Word8Array.array len Word8Extra.null
 end
 
