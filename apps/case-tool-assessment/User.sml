@@ -1,7 +1,7 @@
 (* Depends on  util, copland, HamrStandard, GoldenHashes, Fake/RealCrypto *)
 
 val priv = BString.unshow "2E5773B2A19A2CB05FEE44650D8DC877B3D806F74C199043657C805288CD119B"
-val id = BString.fromIntLength 4 BString.LittleEndian 1
+val id = BString.fromIntLength 4 BString.LittleEndian id_num
 
 (* Hamr app-specific FFI functions *)
 local
