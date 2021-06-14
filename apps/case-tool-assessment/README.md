@@ -1,6 +1,6 @@
 # How to build
 
-The build files assume you are using an older version of the CakeML compiler, specifically version 1282. I believe everyone is using the same version, but if not, here are links to this version:
+The build files assume you are using an older version of the CakeML compiler, specifically version 1282. I believe everyone on the CASE projectis using the same version, but if not, here are links to this version:
 - https://cakeml.org/regression/artefacts/1282/cake-x64-32.tar.gz
 - https://cakeml.org/regression/artefacts/1282/cake-x64-64.tar.gz
 
