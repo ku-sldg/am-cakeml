@@ -13,7 +13,7 @@ cmake ..
 ```
 If you need to configure the CMake build parameters, enter `ccmake .`.
 
-Specifically, you may be interested int the parameters `CAKE`, which is the location of the CakeML compiler, and `UserAM_Good`, which toggle whether or not the UserAM reports good or bad evidence.
+Specifically, you may be interested in the parameters `CAKE`, which is the location of the CakeML compiler, and `UserAM_Good`, which toggle whether or not the UserAM reports good or bad evidence.
 
 You may perform additional configuration by directly editing the values in `Config.sml`.
 
