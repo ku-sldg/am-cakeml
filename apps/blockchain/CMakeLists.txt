@@ -13,3 +13,9 @@ get_files(blockchain_setHash_c_src ../../system/posix/sockets/socket_ffi.c)
 target_sources(blockchainSetHash PRIVATE ${blockchain_setHash_c_src})
 
 add_custom_target(blockchain DEPENDS blockchainServer blockchainClient blockchainSetHash)
+
+get_files(blockchain_addUser_src ${util_src} ${posix_src} ../../util/Http.sml Blockchain.sml AddUser.sml)
+build_posix_am("blockchainAddUser" ${blockchain_addUser_src})
+
+get_files(blockchain_removeUser_src ${util_src} ${posix_src} ../../util/Http.sml Blockchain.sml RemoveUser.sml)
+build_posix_am("blockchainRemoveUser" ${blockchain_removeUser_src})

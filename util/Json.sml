@@ -452,7 +452,10 @@ fun convertToString xjs =
         case xjs of
           Null => "null"
         | Boolean b => if b then "true" else "false"
-        | Number (Int n) => Int.toString n
+        | Number (Int n) =>
+            if n >= 0
+            then Int.toString n
+            else String.concat ["-", Int.toString (~n)]
         | String str => String.concat ["\"", str, "\""]
         | List xjss => String.concat ["[",
                                       String.concatWith ", " (List.map convertToString xjss),

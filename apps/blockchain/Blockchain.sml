@@ -256,9 +256,12 @@ struct
                 then
                     case (Json.lookup "result" jsonResp) of
                     Some (Json.String result) => func result
-                    | Some _ => Err "Error communicating with the blockchain: JSON result field was not a string."
-                    | None => Err "Error communicating with the blockchain: JSON result field was not found."
-                else Err "Error communicating with the blockchain: JSON Ids didn't match."
+                    | Some _ => Err (String.concat ["Error communicating with the blockchain: JSON result field was not a string.",
+                                                    Json.convertToString jsonResp])
+                    | None => Err (String.concat ["Error communicating with the blockchain: JSON result field was not found.\n",
+                                    Json.convertToString jsonResp])
+                else Err (String.concat ["Error communicating with the blockchain: JSON Ids didn't match.\n",
+                                            Json.convertToString jsonResp])
             end
     in
         (* getHash: string -> int -> int -> string -> string -> int -> BString.bstring option
