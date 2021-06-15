@@ -50,7 +50,7 @@ function(add_hacl target)
     set_source_files_properties(${hacl_sources} PROPERTIES GENERATED True)
 
     target_include_directories(${target} BEFORE PRIVATE ${hacl_path} ${kremlin_path} ${kremlib_path})
-    target_sources(${target} PRIVATE ${hacl_sources})
+    target_sources(${target} PRIVATE ${CMAKE_SOURCE_DIR}/system/crypto/crypto_ffi.c ${hacl_sources})
     add_dependencies(${target} hacl-star)
 endfunction()
 

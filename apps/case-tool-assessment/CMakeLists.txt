@@ -23,6 +23,12 @@ build_cake("heli_am"
 )
 add_hacl("heli_am")
 
+get_files(fake_heli_c_src ../../system/basis_ffi.c fake_hamr_standard.c fake_heli_hamr.c)
+build_cake("fake_heli_am.cake" SOURCES "${heli_src}")
+add_executable(fake_heli_am ${fake_heli_c_src})
+target_link_libraries(fake_heli_am fake_heli_am.cake)
+add_hacl("fake_heli_am")
+
 # User build
 get_files(user_src_nocrypto Config.sml ${cop_src} HamrStandard.sml ${user_golden} FakeCrypto.sml User.sml)
 get_files(user_c_src_nocrypto fake_crypto_ffi.c)
@@ -39,5 +45,12 @@ build_cake("user_am"
 )
 add_hacl("user_am")
 
+get_files(fake_user_c_src ../../system/basis_ffi.c fake_hamr_standard.c fake_user_hamr.c)
+build_cake("fake_user_am.cake" SOURCES "${user_src}")
+add_executable("fake_user_am" ${fake_user_c_src})
+target_link_libraries(fake_user_am fake_user_am.cake)
+add_hacl("fake_user_am")
+
 add_custom_target(tool_assessment_nocrypto DEPENDS heli_am_nocrypto user_am_nocrypto)
 add_custom_target(tool_assessment DEPENDS heli_am user_am)
+add_custom_target(fake_tool_assessment DEPENDS fake_heli_am fake_user_am)
