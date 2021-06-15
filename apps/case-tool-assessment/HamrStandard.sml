@@ -13,7 +13,7 @@ structure Control = struct
     val getDataEvent = FFI.callOpt
 
     (* ffi -> bstring -> bool *)
-    val getEvent = FFI.callBool
+    fun getEvent ffi input = BString.hd (FFI.call ffi 1 input) <> (Word8.fromInt 0)
 
     local 
         fun receiveInput_ffi arg out = #(api_receiveInput)           arg out
