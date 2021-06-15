@@ -69,12 +69,8 @@ void ffiapi_get_AttestationResponse(unsigned char *parameter, long parameterSize
 
 void ffiapi_send_TrustedIds(unsigned char *parameter, long parameterSizeBytes, unsigned char *output, long outputSizeBytes) {
   printf("Sending trusted id list:");
-  for (int i = 0; i < parameterSizeBytes; i++) {
-      if (i % 8 == 0)
-          printf(",");
-      if (i % 4 == 0)
-          printf(" ");
-      printf("%02x", parameter[i]);
+  for (int i = 0; i < parameterSizeBytes; i+=4) {
+      printf("%i, ", (int32_t)parameter[i]);
   }
   printf("\n");
 }
