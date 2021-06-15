@@ -29,7 +29,8 @@ fun attestWith nonce =
 (* () -> () *)
 fun attestation_step () = (case getRequest () of 
       Some nonce => 
-          let val ev = attestWith nonce
+          let val _ = log Info ("Recieved request: 0x" ^ BString.show nonce)
+              val ev = attestWith nonce
               val resp = BString.concat id
                         (BString.fromString (JsonExtra.toString (evToJson ev)))
            in sendResponsePad resp

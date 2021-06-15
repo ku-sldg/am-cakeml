@@ -1,5 +1,7 @@
+#include <stdio.h>
 #include <stdbool.h>
 #include <assert.h>
+#include <string.h>
 
 #include <unistd.h> // write
 #include <sys/types.h> // getaddrinfo
@@ -54,6 +56,7 @@ void ffiapi_send_AttestationRequest(unsigned char *parameter, long parameterSize
     while(!useram_connected)
         try_connect_useram();
 
+    printf("about to write\n");
     write(useram_fd, (const void*)parameter, 16);
 }
 
@@ -61,6 +64,7 @@ void ffiapi_get_AttestationResponse(unsigned char *parameter, long parameterSize
     assert(outputSizeBytes == 2049);
     assert(useram_connected);
 
+    printf("about to read\n");
     ssize_t n_read = read(useram_fd, ((void *)output)+1, 2048);
     output[0] = n_read > 0;
 }

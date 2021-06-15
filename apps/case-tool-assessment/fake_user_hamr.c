@@ -1,5 +1,7 @@
+#include <stdio.h>
 #include <stdbool.h>
 #include <assert.h>
+#include <string.h>
 
 #include <unistd.h> 
 #include <sys/types.h>
@@ -45,12 +47,16 @@ int get_listener(int qlen, char * port) {
         close(sockfd);
     }
     freeaddrinfo(result);
-    if (!r || sockfd == -1)
+    if (!r || sockfd == -1) {
+        printf("%i\n", sockfd);
+
         return -1;
+    }
 
     // Listen for incoming connections, with a maximum queue length of qlen
-    if (listen(sockfd, qlen))
+    if (listen(sockfd, qlen)) {
         return -1;
+    }
 
     int flags = fcntl(sockfd, F_GETFL);
     fcntl(sockfd, F_SETFL, flags | O_NONBLOCK);
@@ -61,22 +67,25 @@ int get_listener(int qlen, char * port) {
 int get_accept(int sockfd) {
     struct sockaddr_in conn_addr;
     unsigned int conn_addr_len = (unsigned int)(sizeof(struct sockaddr_in));
-    int conn_sockfd = accept4(sockfd, (struct sockaddr *)(&conn_addr), &conn_addr_len, SOCK_NONBLOCK);
+    int conn_sockfd = accept(sockfd, (struct sockaddr *)(&conn_addr), &conn_addr_len);
     return conn_sockfd;
 }
 
 void try_connect_heliam() {
-    if (!listener_open)
+    if (!listener_open) {
         listener_fd = get_listener(1, "5000");
+        assert(listener_fd != -1);
+    }
 
     heliam_fd = get_accept(listener_fd);
-    heliam_connected = true;
+    heliam_connected = heliam_fd >= 0;
 }
 
 void ffiapi_send_AttestationResponse(unsigned char *parameter, long parameterSizeBytes, unsigned char *output, long outputSizeBytes) {
     assert(parameterSizeBytes == 2048);
     assert(heliam_connected);
 
+    // printf("about to write\n");
     write(heliam_fd, (const void*)parameter, 2048);
 }
 
@@ -86,6 +95,11 @@ void ffiapi_get_AttestationRequest(unsigned char *parameter, long parameterSizeB
     while(!heliam_connected)
         try_connect_heliam();
 
+    // printf("about to read\n");
     ssize_t n_read = read(heliam_fd, ((void *)output)+1, 16);
+    if(n_read <= 0)
+        printf("No request\n");
+    else
+        printf("yes request\n");
     output[0] = n_read > 0;
 }
