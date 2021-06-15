@@ -17,12 +17,12 @@ in
     (* bstring -> () *)
     fun sendTrustedIds trustedIds = 
         let val length = BString.length trustedIds
-         in if length = 32 then
+         in if length = 16 then
                 FFI.callNoOut sendTrustedIds_ffi trustedIds
             else
                 log Error ("sendTrustedIds called with a " ^
                            Int.toString length ^
-                           "-byte argument, but expected 32 bytes.")
+                           "-byte argument, but expected 16 bytes.")
         end
 end
 

@@ -10,7 +10,13 @@ fun log lType msg = case lType of
 
 structure Control = struct 
     (* ffi -> int -> bstring -> bstring option *)
-    val getDataEvent = FFI.callOpt
+    fun getDataEvent ffi len input =
+        let val result = FFI.call ffi (len+1) input
+         in if BString.hd result <> (Word8.fromInt 0) then 
+                Some (BString.tl result)
+            else 
+                None
+        end
 
     (* ffi -> bstring -> bool *)
     fun getEvent ffi input = BString.hd (FFI.call ffi 1 input) <> (Word8.fromInt 0)
