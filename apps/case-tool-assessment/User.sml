@@ -9,7 +9,7 @@ local
     fun sendResponse_ffi arg out = #(api_send_AttestationResponse) arg out
 in 
     (* () -> bstring option *)
-    fun getRequest () = Control.getDataEvent getRequest_ffi 8 BString.empty
+    fun getRequest () = Control.getDataEvent getRequest_ffi 16 BString.empty
 
     (* bstring -> () *)
     fun sendResponse resp = FFI.callNoOut sendResponse_ffi resp

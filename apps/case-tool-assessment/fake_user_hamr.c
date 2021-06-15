@@ -81,7 +81,7 @@ void ffiapi_send_AttestationResponse(unsigned char *parameter, long parameterSiz
 }
 
 void ffiapi_get_AttestationRequest(unsigned char *parameter, long parameterSizeBytes, unsigned char *output, long outputSizeBytes) {
-    assert(outputSizeBytes == 16);
+    assert(outputSizeBytes == 17);
 
     while(!heliam_connected)
         try_connect_heliam();
