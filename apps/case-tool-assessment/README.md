@@ -1,6 +1,6 @@
 # How to build
 
-The build files assume you are using an older version of the CakeML compiler, specifically version 1282. I believe everyone is using the same version, but if not, here are links to this version:
+The build files assume you are using an older version of the CakeML compiler, specifically version 1282. I believe everyone on the CASE projectis using the same version, but if not, here are links to this version:
 - https://cakeml.org/regression/artefacts/1282/cake-x64-32.tar.gz
 - https://cakeml.org/regression/artefacts/1282/cake-x64-64.tar.gz
 
@@ -13,7 +13,7 @@ cmake ..
 ```
 If you need to configure the CMake build parameters, enter `ccmake .`.
 
-Specifically, you may be interested int the parameters `CAKE`, which is the location of the CakeML compiler, and `UserAM_Good`, which toggle whether or not the UserAM reports good or bad evidence.
+Specifically, you may be interested in the parameters `CAKE`, which is the location of the CakeML compiler, and `UserAM_Good`, which toggle whether or not the UserAM reports good or bad evidence.
 
 You may perform additional configuration by directly editing the values in `Config.sml`.
 
