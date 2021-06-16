@@ -1,7 +1,7 @@
 (* Depends upon: util, posix, ./Blockchain.sml *)
 fun removeUserDemo recipient address =
     let
-        val sender = "0x55500e2c661b9b703421b92d15e15d292a9df669"
+        val sender = "0xdE497f77e0e2Ae24D27B6108f9400e95A18392B0"
         val host = "127.0.0.1"
         val port = 8543
         val jsonId = 4

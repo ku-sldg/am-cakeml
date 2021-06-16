@@ -200,11 +200,6 @@ struct
                     then BString.concat second rest
                     else raise Exn "Tried to parse a byte string which is not properly encoded."
             end
-        (* let
-            val length = decodeInt (String.substring enc 0 66)
-        in
-            BString.unshow (String.substring enc 66 (2 * length))
-        end *)
 
     (* encodeIntBytes: int -> BString.bstring -> string
     * Transforms a tuple of type `(int, BString.bstring)` into an Ethereum
@@ -243,7 +238,12 @@ struct
 
 (******************* Communicating with the Smart Contract *******************)
     local
-        (* processResponse: Http.Response -> int -> (string -> 'a) -> 'a option  *)
+        (* processResponse: Http.Response -> int -> (string -> ('a, string) result) -> ('a, string) result
+         * `processResponse httpResp jsonId func`
+         * Parses the HTTP response `httpResp` and pulls out the JSON value.
+         * Checks the JSON "id" field matches `jsonId`, and applies the function
+         * `func` to the JSON "result" field.
+         *)
         fun processResponse (Http.Response _ _ _ _ message) jsonId func =
             let
                 val jsonResp = List.hd (fst (Json.parse ([], message)))
