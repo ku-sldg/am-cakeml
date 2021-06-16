@@ -73,6 +73,38 @@ function(build_cake name)
     add_library(${name} STATIC "${abs_bin_prefix}.cake.S" "${PARSED_ARGS_C_SOURCES}")
 endfunction()
 
+function(build_cake_S name)
+    cmake_parse_arguments(
+        PARSE_ARGV
+        1
+        PARSED_ARGS
+        ""
+        "SOURCES"
+        "ENTRY_NAME"
+    )
+    if(NOT "${PARSED_ARGS_UNPARSED_ARGUMENTS}" STREQUAL "")
+        message(FATAL_ERROR "Unknown arguments to build_cake ${PARSED_ARGS_UNPARSED_ARGUMENTS}")
+    endif()
+    if("${PARSED_ARGS_SOURCES}" STREQUAL "")
+        message(FATAL_ERROR "Must provide at least one CakeML source file to build_cake")
+    endif()
+    if("${PARSED_ARGS_ENTRY_NAME}" STREQUAL "")
+        set(PARSED_ARGS_ENTRY_NAME "main")
+    endif()
+
+    cat("${name}.cml" ${PARSED_ARGS_SOURCES})
+    set(abs_bin_prefix "${CMAKE_BINARY_DIR}/${name}")
+    add_custom_command(
+        OUTPUT ${abs_bin_prefix}.S
+        COMMAND ${cakec} ${cakeflag_list} < ${abs_bin_prefix}.cml > ${abs_bin_prefix}.S
+        COMMAND sed -i".orig" "s/cdecl(main)/cdecl(${PARSED_ARGS_ENTRY_NAME})/g" ${abs_bin_prefix}.S
+        DEPENDS ${abs_bin_prefix}.cml
+        VERBATIM
+    )
+    add_custom_target(${name}.cake DEPENDS ${abs_bin_prefix}.S)
+endfunction()
+
+
 # Builds a CAmkES component from CakeML and C sourse files.
 # Args: name - name of the component
 #       CML_SOURCES - CakeML source files, in order (they'll be concatenated together)
