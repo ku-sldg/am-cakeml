@@ -1,5 +1,6 @@
 (* Depends on: util, copland/Instr *)
 
+
 fun stringToSp n =
     case n
     of  "ALL" => ALL
@@ -73,7 +74,7 @@ fun jsonToTerm js = case js of
     and
     getBpar data = case data of
           [ Json.List [ (Json.String sp1), (Json.String sp2)], term1, term2] =>
-            Bpar (stringToSp sp1, stringToSp sp2) (jsonToTerm term1) (jsonToTerm term2)
+            Bpar (stringToSp sp1, stringToSp sp2) (jsonToTerm term1) (jsonToTerm term2) 
         | _ => raise  Json.ERR "getBpar" "unexpected argument list"
 
 

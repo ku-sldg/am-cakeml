@@ -13,6 +13,7 @@ val aspIdToString = idToString
 type arg = string
 fun argToString a = a
 
+
 datatype sp = ALL | NONE
 fun spToString s = case s of
       ALL  => "ALL"
@@ -33,6 +34,7 @@ datatype term =
     | Bseq (sp * sp) term term
     | Bpar (sp * sp) term term
 
+(*
 datatype primInstr =
       Copy
     | Umeas asp_id (arg list)
@@ -41,12 +43,13 @@ datatype primInstr =
 
 datatype instr =
       PrimInstr primInstr
-    | Split sp sp
+    (*| Split sp sp
     | Joins
-    | Joinp
+    | Joinp *)
     | Reqrpy pl term
-    | Besr
-    | Bep (instr list) (instr list)
+    (*| Besr
+    | Bep (instr list) (instr list) *)
+*)
 
 fun aspToString asp = case asp of
       Cpy => "Cpy"
