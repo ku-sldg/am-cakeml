@@ -77,7 +77,42 @@ fun jsonToTerm js = case js of
             Bpar (stringToSp sp1, stringToSp sp2) (jsonToTerm term1) (jsonToTerm term2) 
         | _ => raise  Json.ERR "getBpar" "unexpected argument list"
 
+(* json object to ev object *)
+fun jsonToEvC js =case js of
+      Json.AList js' => fromAList js'
+    | _ =>  raise  Json.ERR "JsonToEvC" "Copland evidenceC does not begin as an AList"
 
+    and
+    fromAList pairs = case pairs of
+          (*[("constructor", constructorVal)] => handleNullConstructor constructorVal *)
+                          [("constructor", constructorVal), ("data", args)] => handleConstructorWithArgs constructorVal args
+                        | [("data", args),  ("constructor", constructorVal)]  => handleConstructorWithArgs constructorVal args
+                        | _ =>  raise  Json.ERR "fromAList" "does not contain just constructor and data pairs"
+
+    (*and
+    handleNullConstructor (Json.String constructor) = case constructor of
+          "Mt" => Mt
+        | _ => raise Json.ERR "handleNullConstructor"  ("Unexpected Null constructor for Copland evidence: " ^constructor) *)
+
+    and
+    handleConstructorWithArgs (Json.String constructor) (Json.List args) = case constructor of
+          "BitsV"  => getBitsV  args
+        | "PairBitsV" => getPairBitsV args
+        |  _ => raise Json.ERR "handleConstructorWithArgs" ("Unexpected constructor for Copland evidence: "^ constructor)
+
+    and
+    getBitsV data = case data of
+          [bs] =>
+          BitsV (jsonStringToBS bs)
+                     | _ => raise Json.ERR "getBitsV" "unexpected argument list"
+                              
+    and
+    getPairBitsV data = case data of
+          [ev1, ev2] => PairBitsV (jsonToEvC ev1) (jsonToEvC ev2)
+        | _ => raise Json.ERR "getPairBitsV" "unexpected argument list"
+
+
+(*
 (* json object to ev object *)
 fun jsonToEv js =case js of
       Json.AList js' => fromAList js'
@@ -136,3 +171,4 @@ fun jsonToEv js =case js of
     getPP data = case data of
           [ev1, ev2] => PP (jsonToEv ev1) (jsonToEv ev2)
         | _ => raise Json.ERR "getPP" "unexpected argument list"
+*)

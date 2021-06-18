@@ -1,7 +1,7 @@
 (* Depends on: util, copland/Instr *)
 
 local type bs = BString.bstring in
-type copEval = ev -> term -> ev
+type copEval = evc -> term -> evc
 type key = bs
 type usm = arg list -> bs
 
@@ -29,7 +29,9 @@ fun setSign     (Am m d u p _ h) s = Am m d u p s h
 fun setHash     (Am m d u p s _) h = Am m d u p s h
 
 fun signEv am priv = sign am priv o encodeEv
+fun signEvC am priv = sign am priv o encodeEvC
 fun genHash am = hash am o encodeEv
+fun genHashC am = hash am o encodeEvC
 
 exception USMexpn string
 fun measureUsm map id args = case Map.lookup map id of

@@ -23,8 +23,8 @@ DDAF35A193617ABACC417349AE20413112E6FA4E89A97EA20A9EEEE64B55D39A2192992A274FC1A8
 *)
 
 fun hashTests () =
-    let val evidence  = H (BString.fromString "abc")
-        val hashTest  = evToString (evalTerm am evidence (Asp Hsh))
+    let val evidence  = BitsV (BString.fromString "abcc") (*H (BString.fromString "abc")*)
+        val hashTest  = evCToString (evalTerm am evidence (Asp Hsh))
         val hashFilev = Meas.hashFile "hashTest.txt"
         val hashFileS = BString.show hashFilev
      in print ("Hash test: "      ^ hashTest  ^ "\n\n" ^

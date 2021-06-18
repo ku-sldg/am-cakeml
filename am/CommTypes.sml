@@ -14,20 +14,20 @@ val emptyNsMap : nsMap = Map.empty nat_compare
    Nameserver mapping,
    Term to execute,
    Initial evidence *)
-datatype requestMessage = REQ pl pl nsMap term ev
+datatype requestMessage = REQ pl pl nsMap term evc
 
 (* To place,
    From place,
    Gathered evidence *)
-datatype responseMessage = RES pl pl ev
+datatype responseMessage = RES pl pl evc
 
 
 fun requestToJson (REQ pl1 pl2 map t ev) = Json.AList
     [("toPlace", placeToJson pl1), ("fromPlace", placeToJson pl2), ("reqNameMap", nsMapToJson map),
-     ("reqTerm", termToJson t), ("reqEv", evToJson ev)]
+     ("reqTerm", termToJson t), ("reqEv", evcToJson ev)]
 
 fun responseToJson (RES pl1 pl2 ev) = Json.AList
-    [("respToPlace", placeToJson pl1), ("respFromPlace", placeToJson pl2), ("respEv", evToJson ev)]
+    [("respToPlace", placeToJson pl1), ("respFromPlace", placeToJson pl2), ("respEv", evcToJson ev)]
 
 fun jsonToRequest js = case js of
           Json.AList js' => fromAList js'
@@ -44,7 +44,7 @@ fun jsonToRequest js = case js of
     and
     getREQ data = case data of
           [Json.Number (Json.Int pl1), Json.Number (Json.Int pl2), Json.AList alist, t, ev] =>
-              REQ (natFromInt pl1) (natFromInt pl2) (toPlAddrMap alist) (jsonToTerm t) (jsonToEv ev)
+              REQ (natFromInt pl1) (natFromInt pl2) (toPlAddrMap alist) (jsonToTerm t) (jsonToEvC ev)
         | _ => raise Json.ERR "getREQ" "unexpected argument list"
 
     and
@@ -71,5 +71,5 @@ fun jsonToResponse js = case js of
     and
     getRES data = case data of
           [Json.Number (Json.Int pl1), Json.Number (Json.Int pl2), ev] =>
-              RES (natFromInt pl1) (natFromInt pl2) (jsonToEv ev)
+              RES (natFromInt pl1) (natFromInt pl2) (jsonToEvC ev)
         | _ => raise Json.ERR "getRES" "unexpected argument list"
