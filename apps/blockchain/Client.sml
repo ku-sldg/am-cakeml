@@ -21,7 +21,6 @@ fun getHashDemo recipient =
         Blockchain.getHash host port jsonId recipient sender hashId
     end
     handle Socket.Err _ => Err "Socket error in retrieving golden hash."
-        | Blockchain.Exn msg => Err (String.concat ["Blockchain error: ", msg])
         | _ => Err "Unknown error in retrieving golden hash."
 
 fun appraise nonce ev recipient =

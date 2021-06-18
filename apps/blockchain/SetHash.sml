@@ -17,8 +17,6 @@ fun setHashDemo recipient goldenHash =
             TextIO.print_err "Socket error when trying to set golden hash.\n"
         | Socket.InvalidFD =>
             TextIO.print_err "Socket file descriptor error when trying to set golden hash.\n"
-        | Blockchain.Exn msg =>
-            TextIO.print_err (String.concat ["Blockchain error: ", msg])
         | _ =>
             TextIO.print_err "Unknown error when trying to set golden hash.\n"
 

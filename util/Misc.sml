@@ -13,7 +13,7 @@ datatype ('a, 'e) result =
     | Err 'e
 
 structure Result = struct
-    exception Result
+    exception Exn
 
     (* 'a -> ('a, 'e) result *)
     fun ok x = Ok x
@@ -24,11 +24,11 @@ structure Result = struct
     (* ('a, 'e) result -> 'a *)
     fun okValOf xr = case xr of
           Ok x => x
-        | Err _ => raise Result
+        | Err _ => raise Exn
 
     (* ('a, 'e) result -> 'e *)
     fun errValOf xr = case xr of
-          Ok _ => raise Result
+          Ok _ => raise Exn
         | Err e => e
 
     (* ('a -> 'c) -> ('b -> 'c) -> ('a, 'b) result -> 'c *)
