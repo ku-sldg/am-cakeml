@@ -32,7 +32,7 @@ get_files(posix_src ${crypto_src} system/posix/sockets/SocketFFI.sml system/posi
 get_files(server_am_src ${cop_src} ${posix_src} am/Measurements.sml am/CommTypes.sml am/ServerAm.sml)
 
 get_files(posix_c_files
-    system/basis_ffi.c system/misc_ffi.c system/crypto/crypto_ffi.c system/posix/sockets/socket_ffi.c
+    system/basis_ffi.c system/crypto/crypto_ffi.c system/posix/sockets/socket_ffi.c
     system/posix/time/time_ffi.c system/posix/meas/meas_ffi.c
 )
 
