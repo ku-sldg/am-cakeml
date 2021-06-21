@@ -234,7 +234,7 @@ struct
             let
                 val data = String.concat [funSig, funParams]
                 val jsonMsg = formEthFunc data
-                val jsonStr = Json.convertToString jsonMsg
+                val jsonStr = Json.stringify jsonMsg
                 val hostPair =
                     ("Host", String.concatWith ":" [host, Int.toString port])
                 val contentType = ("Content-Type", "application/json")
@@ -276,14 +276,14 @@ struct
                     | Some _ =>
                         Err (String.concat [errMsgHeader,
                                         ": JSON result field was not a string.",
-                                        Json.convertToString jsonResp])
+                                        Json.stringify jsonResp])
                     | None =>
                         Err (String.concat [errMsgHeader,
                                         ": JSON result field was not found.\n",
-                                        Json.convertToString jsonResp])
+                                        Json.stringify jsonResp])
                 else Err (String.concat [errMsgHeader,
                                         ": JSON ids didn't match.\n",
-                                        Json.convertToString jsonResp])
+                                        Json.stringify jsonResp])
             end
             handle _ =>
                 Err (String.concat [errMsgHeader, ": JSON did not parse.\n",

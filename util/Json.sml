@@ -438,16 +438,14 @@ fun lookup key xjs =
         end
     | _ => None
 
-(* convertToString : json -> string
+(* stringify : json -> string
  * Converts a json value into (an ugly) string. For a more formatted string,
  * see `print_json`.
- *
- * __Warning__: Does not escape string values properly,
- * Json.toString (Json.String "\"") will give the string '"""'.
  *)
-fun convertToString xjs =
+fun stringify xjs =
     let
-        fun keyValFn (str, js) = String.concat ["\"", str, "\": ", convertToString js]
+        fun keyValFn (str, js) =
+            String.concat ["\"", StringExtra.escape str, "\": ", stringify js]
     in
         case xjs of
           Null => "null"
@@ -456,12 +454,14 @@ fun convertToString xjs =
             if n >= 0
             then Int.toString n
             else String.concat ["-", Int.toString (~n)]
-        | String str => String.concat ["\"", str, "\""]
-        | List xjss => String.concat ["[",
-                                      String.concatWith ", " (List.map convertToString xjss),
-                                      "]"]
-        | AList strjss => String.concat ["{",
-                                          String.concatWith ", " (List.map keyValFn strjss),
-                                          "}"]
+        | String str => String.concat ["\"", StringExtra.escape str, "\""]
+        | List xjss =>
+            String.concat ["[",
+                        String.concatWith ", " (List.map stringify xjss),
+                        "]"]
+        | AList strjss =>
+            String.concat ["{",
+                        String.concatWith ", " (List.map keyValFn strjss),
+                        "}"]
     end
 end
