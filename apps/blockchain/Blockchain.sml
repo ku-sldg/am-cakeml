@@ -335,11 +335,11 @@ struct
          * represent 20 bytes. The transaction hash is returned.
          *)
         fun setHash host port jsonId recipient sender hashId hashValue =
-            case (encodeInt hashId) of
+            case (encodeIntBytes hashId hashValue) of
               Err msg =>
                 Err (String.concat ["Blockchain.setHash: id of the hash failed to encode.\n",
                                 msg])
-            | Ok hashIdEnc =>
+            | Ok paramEnc =>
                 let
                     val funSig = "0x6a7fd925"
                     val formEthFunc =
@@ -349,7 +349,7 @@ struct
                         handle Word8Extra.InvalidHex =>
                             Err "Blockchain.setHash: Error from BString.unshow caught"
                 in
-                    case (sendRequest funSig hashIdEnc formEthFunc host port) of
+                    case (sendRequest funSig paramEnc formEthFunc host port) of
                       Some resp =>
                         processResponse resp jsonId respFunc "Blockchain.setHash"
                     | None =>
