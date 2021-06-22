@@ -37,30 +37,12 @@ fun termToJson term = case term of
     | Bseq p t1 t2 => constructorWithArgs "Bseq" [spPairToJson p, termToJson t1, termToJson t2]
     | Bpar p t1 t2 => constructorWithArgs "Bpar" [spPairToJson p, termToJson t1, termToJson t2]
     |  _ =>  raise  Json.ERR "termToJson" "Unexpected constructor for APDT term: "
-(*
+
 fun evToJson e = case e of
       Mt => noArgConstructor "Mt"
     | U aid args bs ev => constructorWithArgs "U" [idToJson aid, stringListToJsonList args, byteStringToJson bs, evToJson ev]
     | G bs ev => constructorWithArgs "G" [byteStringToJson bs, evToJson ev]
     | H bs => constructorWithArgs "H" [byteStringToJson bs]
-    | N id bs ev => constructorWithArgs "N" [idToJson id, byteStringToJson bs, evToJson ev]
+    | N id bs => constructorWithArgs "N" [idToJson id, byteStringToJson bs]
     | SS ev1 ev2 => constructorWithArgs "SS" [evToJson ev1, evToJson ev2]
     | PP ev1 ev2 => constructorWithArgs "PP" [evToJson ev1, evToJson ev2]
-*)
-
-
-fun evcToJson e =
-    case e of
-        BitsV bs => constructorWithArgs "BitsV" [byteStringToJson bs]
-      | PairBitsV ev1 ev2 => constructorWithArgs "PairBitsV" [evcToJson ev1, evcToJson ev2]
-
-
-                      (*
-      Mt => noArgConstructor "Mt"
-    | U aid args bs ev => constructorWithArgs "U" [idToJson aid, stringListToJsonList args, byteStringToJson bs, evToJson ev]
-    | G bs ev => constructorWithArgs "G" [byteStringToJson bs, evToJson ev]
-    | H bs => constructorWithArgs "H" [byteStringToJson bs]
-    | N id bs ev => constructorWithArgs "N" [idToJson id, byteStringToJson bs, evToJson ev]
-    | SS ev1 ev2 => constructorWithArgs "SS" [evToJson ev1, evToJson ev2]
-    | PP ev1 ev2 => constructorWithArgs "PP" [evToJson ev1, evToJson ev2]
-*)

@@ -34,23 +34,6 @@ datatype term =
     | Bseq (sp * sp) term term
     | Bpar (sp * sp) term term
 
-(*
-datatype primInstr =
-      Copy
-    | Umeas asp_id (arg list)
-    | Sign
-    | Hash
-
-datatype instr =
-      PrimInstr primInstr
-    (*| Split sp sp
-    | Joins
-    | Joinp *)
-    | Reqrpy pl term
-    (*| Besr
-    | Bep (instr list) (instr list) *)
-*)
-
 fun aspToString asp = case asp of
       Cpy => "Cpy"
     | Sig => "Sig"
@@ -79,37 +62,10 @@ datatype ev =
     | U asp_id (arg list) bs ev
     | G bs ev
     | H bs
-    | N n_id bs ev
+    | N n_id bs
     | SS ev ev
     | PP ev ev
 end
-
-local type bs = BString.bstring in
-datatype evc =
-         BitsV bs
-       | PairBitsV evc evc
-end
-
-fun evCToString e = concatWith " "
-    let fun parens e = "(" ^ evCToString e ^ ")"
-    in case e of
-           BitsV bs => ["BitsV", BString.show bs]
-         | PairBitsV ev1 ev2 => ["PairBitsV", parens ev1, parens ev2]
-    end
-
-
-    (*
-
-           
-          Mt           => ["Mt"]
-        | U i al bs ev => ["U", aspIdToString i, listToString al argToString, BString.show bs, parens ev]
-        | G bs ev      => ["G", BString.show bs, parens ev]
-        | H bs         => ["H", BString.show bs]
-        | N i bs ev    => ["N", nIdToString i, BString.show bs, parens ev]
-        | SS ev1 ev2   => ["SS", parens ev1, parens ev2]
-        | PP ev1 ev2   => ["PP", parens ev1, parens ev2]
-    end
-*)
 
 fun evToString e = concatWith " "
     let fun parens e = "(" ^ evToString e ^ ")"
@@ -118,7 +74,7 @@ fun evToString e = concatWith " "
         | U i al bs ev => ["U", aspIdToString i, listToString al argToString, BString.show bs, parens ev]
         | G bs ev      => ["G", BString.show bs, parens ev]
         | H bs         => ["H", BString.show bs]
-        | N i bs ev    => ["N", nIdToString i, BString.show bs, parens ev]
+        | N i bs       => ["N", nIdToString i, BString.show bs]
         | SS ev1 ev2   => ["SS", parens ev1, parens ev2]
         | PP ev1 ev2   => ["PP", parens ev1, parens ev2]
     end
@@ -130,47 +86,8 @@ val encodeEv =
         | U _ _ bs e => bs :: evList e
         | G bs e     => bs :: evList e
         | H bs       => [bs]
-        | N _ bs e   => bs :: evList e
+        | N _ bs     => [bs]
         | SS e1 e2   => evList e1 @ evList e2
         | PP e1 e2   => evList e1 @ evList e2
      in BString.concatList o evList
     end
-
-(*
-local type bs = BString.bstring in
-datatype evc =
-         BitsV bs
-       | PairBitsV evc evc
-end
-*)
-
-     
-(* evc -> bstring *)
-val encodeEvC =
-    let fun evList ev =
-            case ev of
-                BitsV bs => bs
-              | PairBitsV e1 e2 => BString.concat (evList e1) (evList e2)
-    in evList
-    end
-
-(*        
-(* evc -> bstring *)
-val encodeEvC =
-    let fun evList ev =
-            case ev of
-                BitsV bs => [bs]
-              | PairBitsV e1 e2 => evList e1 @ evList e2
-    in BString.concatList o evList
-    end
-*)
-        (*
-          Mt         => [BString.empty]
-        | U _ _ bs e => bs :: evList e
-        | G bs e     => bs :: evList e
-        | H bs       => [bs]
-        | N _ bs e   => bs :: evList e
-        | SS e1 e2   => evList e1 @ evList e2
-        | PP e1 e2   => evList e1 @ evList e2
-     in BString.concatList o evList
-    end *)
