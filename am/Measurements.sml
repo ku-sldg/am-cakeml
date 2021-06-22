@@ -7,6 +7,11 @@ fun verifySig g pub =
       of G bs ev => Some (Crypto.sigCheck pub bs (encodeEv ev))
        | _ => None
 
+
+(* bstring -> evc -> bstring -> bool *)
+fun verifySigRaw bs ev pub =
+    (Crypto.sigCheck pub bs (encodeEvC ev))
+                  
 (* () -> bstring *)
 (* fun genNonce () = Crypto.urand 16 *)
 
