@@ -39,10 +39,10 @@ fun excludeNNterms t =
 
                
 
-(* This function diverges significantly from the Coq implementation.
+(* This function diverges from the Coq implementation.
    It may prove necessary to rewrite it in the original's monadic style. *)
-(* am -> ev -> instr list -> ev*)
-fun evalVm am e t = (*(BitsV BString.empty)*)
+(* am -> ev -> term -> ev*)
+fun evalVm am e t =
                         
     case t of
         Asp a => primEv am a e

@@ -11,7 +11,7 @@ val goldenHash = BString.unshow "7BE9FDA48F4179E611C698A73CFF09FAF72869431EFEE6E
 val pub = BString.unshow "490E2422528F14AC6A48DDB9D72CB30B8345AF2E939003BC7A33A6057F2FFB0101000000000000002DD0B7F53A560000A049D882A37F00000000000000000000"
 
 fun appraise nonce ev = case ev of
-      G evSign (U (Id (S O)) [dir] evHash (N (Id O) evNonce Mt)) =>
+      G evSign (U (Id (S O)) [dir] evHash (N (Id O) evNonce)) =>
           if evNonce <> nonce then
               Err "Bad nonce value"
           else if evHash <> goldenHash then
@@ -24,10 +24,10 @@ fun appraise nonce ev = case ev of
 fun sendReq addr =
     let val am    = serverAm BString.empty (Map.insert emptyNsMap (S O) addr)
         val nonce = Random.random (Random.seed (Meas.urand 32)) 16
-        val ev    = evalTerm am (N (Id O) nonce Mt) term
+        val ev    = evalTerm am (N (Id O) nonce) term
      in print ("Evaluating term:\n" ^ termToString term ^ "\n\nNonce:\n" ^
                BString.show nonce ^ "\n\nEvidence recieved:\n" ^
-               evToString ev ^ "\n\nAppraisal " ^ (
+               evToString ev ^ "\n\nAppppraisal " ^ (
                case appraise nonce ev of
                       Ok ()   => "succeeded (expected nonce and hash value; signature verified).\n"
                     | Err msg => "failed: " ^ msg ^ "\n")

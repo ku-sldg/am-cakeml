@@ -26,7 +26,7 @@ fun getHashDemo recipient =
 
 fun appraise nonce ev recipient =
     case ev of
-      G evSign (U (Id (S O)) [dir] evHash (N (Id O) evNonce Mt)) =>
+      G evSign (U (Id (S O)) [dir] evHash (N (Id O) evNonce)) =>
         if evNonce <> nonce
         then Err "Bad nonce value"
         else
@@ -43,7 +43,7 @@ fun appraise nonce ev recipient =
 fun sendReq addr recipient =
     let val am    = serverAm BString.empty (Map.insert emptyNsMap (S O) addr)
         val nonce = Random.random (Random.seed (Meas.urand 32)) 16
-        val ev    = evalTerm am (N (Id O) nonce Mt) term
+        val ev    = evalTerm am (N (Id O) nonce) term
      in print (String.concat ["Evaluating term:\n", termToString term,
                 "\n\nNonce:\n", BString.show nonce, "\n\nEvidence recieved:\n",
                 evToString ev, "\n\nAppraisal ", 
