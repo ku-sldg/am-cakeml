@@ -1,6 +1,3 @@
-(* Dependencies:
- * * Extra.sml
- *)
 structure Http =
 struct
     val crlf = String.concat [String.str (Char.chr 13), "\n"]
@@ -46,45 +43,58 @@ struct
             in
                 String.concatWith nl [reqLine, headerLines, "", msg]
             end
-        (* toplineFromStrings : string list -> ((string * string * string) option) * (string list)
-         * From a list of lines from an HTTP preamble, parse out the top line of
-         * the message and seperate it from the header lines.
+        (* toplineParser: (string * string * string, char) parser
+         * Parse the topline of an HTTP query.
          *)
-        fun toplineFromStrings strs =
-            case strs of
-              [] => (None, [])
-            | top::strs' =>
-                case (String.fields (op = #" ") top) of
-                  [first, second, third] => (Some (first, second, third), strs')
-                | _ => (None, strs')
-        (* headerFromString : string -> (string * string) option
-         * From an HTTP header line, parse out the field name and value.
+        val toplineParser =
+            Parser.bind
+                (Parser.map
+                    String.implode
+                    (Parser.manyTill Parser.anyChar (Parser.char #" ")))
+                (fn first =>
+                    Parser.bind
+                        (Parser.map
+                            String.implode
+                            (Parser.manyTill Parser.anyChar (Parser.char #" ")))
+                        (fn second =>
+                            Parser.map
+                                (fn thirds => (first, second, String.implode thirds))
+                                (Parser.manyTill Parser.anyChar Parser.crlf)))
+        (* headerParser: (string * string, char) parser
+         * Parses a header line of an HTTP query
          *)
-        fun headerFromString header =
-            case (String.fields (op = #":") header) of
-              [] => None
-            | field::values => Some (field, snd (String.split (op = #" ") (String.concatWith ":" values)))
-        (* httpFromString : string -> (string * string * string * ((string * string) list) * string) option
-         * From a string, parse out an entire HTTP message.
+        val headerParser =
+            Parser.bind
+                (Parser.map
+                    String.implode
+                    (Parser.manyTill
+                        Parser.anyChar
+                        (Parser.seq
+                            (Parser.char #":")
+                            (Parser.many (Parser.char #" ")))))
+                (fn field =>
+                    Parser.map
+                        (fn values => (field, String.implode values))
+                        (Parser.manyTill Parser.anyChar Parser.crlf))
+        (* httpParser: (string * string * string * (string * string) list * string, char) parser
+         * Parses an HTTP query.
          *)
-        fun httpFromString str =
-            let
-                val (preamble, msgs) =
-                    Pair.map id List.tl (ListExtra.span (op <> "") (StringExtra.crlfLines str))
-                val message = String.concatWith crlf msgs
-                val (topo, headers) = toplineFromStrings preamble
-                fun accumHeaders header accumo =
-                    case (headerFromString header, accumo) of
-                      (_, None) => None
-                    | (None, _) => None
-                    | (Some (field, value), Some accum) => Some ((field, value)::accum)
-            in
-                case (topo, List.foldr accumHeaders (Some []) headers) of
-                  (None, _) => None
-                | (_, None) => None
-                | (Some (first, second, third), Some hdrPairs) =>
-                    Some (first, second, third, hdrPairs, message)
-            end
+        val httpParser =
+            Parser.bind
+                toplineParser
+                (fn (first, second, third) =>
+                    Parser.bind
+                        (Parser.manyTill
+                            headerParser
+                            (Parser.choice [Parser.crlf, Parser.return #"\n" Parser.eof]))
+                        (fn headers =>
+                            Parser.map
+                                (fn messages =>
+                                    (first, second, third, headers, String.implode messages))
+                                (Parser.choice [
+                                    Parser.return [] Parser.eof,
+                                    Parser.many Parser.anyChar
+                                ])))
     in
         (* requestToString: request -> string
         * Properly formats an HTTP request as a string with newlines being
@@ -105,34 +115,40 @@ struct
         *)
         val print_response = generalResponseToString "\n"
 
-        (* responseFromString : string -> response option
+        (* responseFromString : string -> (response, string) result
          * Parses an HTTP response from a string.
          *)
         fun responseFromString str =
-            case (httpFromString str) of
-              None => None
-            | Some (version, statusCode, statusPhrase, headerPairs, message) =>
-                Some (Response version statusCode statusPhrase headerPairs message)
-        (* requestFromString : string -> request option
+            case (Parser.result (Parser.parse httpParser str)) of
+              Err msg => Err msg
+            | Ok (version, statusCode, statusPhrase, headerPairs, message) =>
+                Ok (Response version statusCode statusPhrase headerPairs message)
+        (* requestFromString : string -> (request, string) result
          * Parses out an HTTP request from a string.
          *)
         fun requestFromString str =
-            case (httpFromString str) of
-              None => None
-            | Some (verb, url, version, headerPairs, message) =>
+            case (Parser.result (Parser.parse httpParser str)) of
+              Err msg => Err msg
+            | Ok (verb, url, version, headerPairs, message) =>
                 if message = ""
-                then Some (Request verb url version headerPairs None)
-                else Some (Request verb url version headerPairs (Some message))
+                then Ok (Request verb url version headerPairs None)
+                else Ok (Request verb url version headerPairs (Some message))
     end
 end
-(* brief code for testing
-val req1 = Http.Request "GET" "/" "HTTP/1.1" [("Host", "127.0.0.1:8543")] None
+(* testing code
+val req1 = Http.Request "GET" "/" "HTTP/1.1" [("Host", "127.0.0.1:8543"), ("Content-Length", "0")] None
 val req1Str = Http.requestToString req1
-val req2 = Http.Request "GET" "/" "HTTP/1.1" [("Host", "127.0.0.1:8543")] (Some "null")
+val req2 = Http.Request "GET" "/" "HTTP/1.1" [("Host", "127.0.0.1:8543"), ("Content-Length", "4")] (Some "null")
 val req2Str = Http.requestToString req2
+exception Exn string
+fun okValOf xr =
+    case xr of
+      Ok x => x
+    | Err msg => raise Exn msg
 val _ =
-    print (String.concat [Http.print_request req1, "\n"]);
+    (print (String.concat [Http.print_request req1, "\n"]);
     print (String.concat [Http.print_request req2, "\n"]);
-    print (String.concat [Http.print_request (Option.valOf (Http.requestFromString req1Str)), "\n"]);
-    print (String.concat [Http.print_request (Option.valOf (Http.requestFromString req2Str)), "\n"]);
-*)
+    print (String.concat [Http.print_request (okValOf (Http.requestFromString req1Str)), "\n"]);
+    print (String.concat [Http.print_request (okValOf (Http.requestFromString req2Str)), "\n"]))
+    handle Exn msg =>
+            TextIO.print_err (String.concat [msg, "\n"]) *)

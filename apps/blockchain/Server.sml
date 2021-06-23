@@ -1,4 +1,4 @@
-(* Depends on: util, copland, system/sockets, am/Measurementsm am/CommTypes,
+(* Depends on: util, copland, system/sockets, am/Measurements, am/CommTypes,
    am/ServerAm *)
 
 val priv = BString.unshow "2E5773B2A19A2CB05FEE44650D8DC877B3D806F74C199043657C805288CD119B"
@@ -15,9 +15,12 @@ fun evalJson s =
         val response = RES pl2 pl1 ev'
      in jsonToStr (responseToJson response)
     end
-    handle Json.ERR s1 s2 => (TextIO.print_err ("JSON error"^s1^": "^s2^"\n");
-                              "Invalid JSON/Copland term")
-         | USMexpn s => (TextIO.print_err ("USM error: "^s^"\n"); "USM failure")
+    handle Json.Exn s1 s2 =>
+            (TextIO.print_err (String.concat ["JSON error ", s1, ": ", s2, "\n"]);
+            "Invalid JSON/Copland term")
+        | USMexpn s =>
+            (TextIO.print_err (String.concat ["USM error: ", s, "\n"]);
+            "USM failure")
 
 fun respondToMsg client = Socket.output client (evalJson (Socket.inputAll client))
 

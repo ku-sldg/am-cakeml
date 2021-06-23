@@ -29,21 +29,13 @@ and write to this mapping.
 
 ## Running ##
 
-1. Navigate to `./apps/tests/` and launch the server from here in the
-   background with `../../build/apps/blockchain/blockchainServer 5000 5 &`. This
-   starts the server on port 5000, with a queue length of 5 (the maximum number
-   of queued incoming connections). The client is hard coded to expect the
-   server to be on port 5000.
-2. Go back to `./build/` and run
-   `blockchainSetHash <contract address> 7BE9FD...C20081`. The contract address
-   is the address of the contract on the blockchain (prefixed with `0x`), and
-   the hex string is the
-   [golden hash value found at line 10 of `Client.sml`](Client.sml#L10).
-   For example `blockchainSetHash 0xfeedface 7BE9FD...C20081`.
-3. Run the client `blockchainClient <server ip address> <contract address>`, for
-   example `blockchainClient 127.0.0.1 0xfeedface`.
-4. What you should see:
+1. Go to `./apps/blockchain/` and run the `test.sh` script, passing to it the 
+   contract's address, e.g. `./test.sh 0xfeedface`.
+2. What you should see:
    ```shell
+   Starting the server...done.
+   Set hash succeeded.
+   Press enter to launch the client.
    Evaluating term:
    Att 1 (Lseq (Asp (Aspc Id 1 [testDir] )) (Asp Sig))
 
@@ -51,7 +43,7 @@ and write to this mapping.
    <nonce>
 
    Evidence recieved:
-   G <signature> (U Id 1 [testDir] 7BE9FD...C20081 (N Id 0 <none> (Mt)))
+   G <signature> (U Id 1 [testDir] <golden hash> (N Id 0 <none> (Mt)))
 
    Appraisal succeeded (expected nonce and hash value; signature verified).
    ```

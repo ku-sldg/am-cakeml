@@ -1,8 +1,8 @@
 (* Depends on copland/AM, am/Measurements, util/Json,
    copland/json/CoplandToJson, copland/json/JsonToCopland *)
 
-fun strToJson str = List.hd (fst (Json.parse ([], str)))
-fun jsonToStr js  = Json.print_json js 0
+fun strToJson str = Result.okValOf (Json.parse str)
+fun jsonToStr js  = Json.stringify js
 
 fun serverSend fd = Socket.output fd o jsonToStr o requestToJson
 val serverRcv     = jsonToResponse o strToJson o Socket.inputAll

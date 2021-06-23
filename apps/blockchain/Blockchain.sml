@@ -13,7 +13,7 @@ struct
      * using method `method`, with parameters `params`.
      *)
     fun formJsonRpc id method params =
-        Json.fromAList [("jsonrpc", Json.fromString "2.0"),
+        Json.fromPairList [("jsonrpc", Json.fromString "2.0"),
             ("id", Json.fromInt id),
             ("method", Json.fromString method),
             ("params", Json.fromList params)]
@@ -56,7 +56,7 @@ struct
     fun formEthCallGeneric id from to data quantTag =
         let
             val object =
-                Json.fromAList [("from", Json.fromString from),
+                Json.fromPairList [("from", Json.fromString from),
                                 ("to", Json.fromString to),
                                 ("data", Json.fromString data)]
         in
@@ -110,7 +110,7 @@ struct
     fun formEthSendTransaction id from to data =
         let
             val object =
-                Json.fromAList [("from", Json.fromString from),
+                Json.fromPairList [("from", Json.fromString from),
                                 ("to", Json.fromString to),
                                 ("data", Json.fromString data)]
         in
@@ -247,10 +247,10 @@ struct
                 val httpReqStr = Http.requestToString httpReq
                 val socket = Socket.connect host port
                 val _ = Socket.output socket httpReqStr
-                val httpRespo = Http.responseFromString (Socket.inputAll socket)
+                val httpRespr = Http.responseFromString (Socket.inputAll socket)
                 val _ = Socket.close socket
             in
-                httpRespo
+                httpRespr
             end
         (* processResponse: Http.Response -> int -> (string -> ('a, string) result) -> string -> ('a, string) result
          * `processResponse httpResp jsonId func errMsgHeader`
@@ -261,7 +261,7 @@ struct
          *)
         fun processResponse (Http.Response _ _ _ _ message) jsonId func errMsgHeader =
             let
-                val jsonResp = List.hd (fst (Json.parse ([], message)))
+                val jsonResp = Result.okValOf (Json.parse message)
                 val respId =
                     Option.getOpt
                         (Option.mapPartial
@@ -272,7 +272,7 @@ struct
                 if jsonId = respId andalso jsonId >= 0
                 then
                     case (Json.lookup "result" jsonResp) of
-                      Some (Json.String result) => func result
+                      Some (Json.JsonString result) => func result
                     | Some _ =>
                         Err (String.concat [errMsgHeader,
                                         ": JSON result field was not a string.",
@@ -285,7 +285,7 @@ struct
                                         ": JSON ids didn't match.\n",
                                         Json.stringify jsonResp])
             end
-            handle _ =>
+            handle Result.Exn =>
                 Err (String.concat [errMsgHeader, ": JSON did not parse.\n",
                                 message])
     in
@@ -311,10 +311,10 @@ struct
                     val formEthFunc = formEthCallLatest jsonId sender recipient
                 in
                     case (sendRequest funSig hashIdEnc formEthFunc host port) of
-                      Some resp =>
+                      Ok resp =>
                         processResponse resp jsonId decodeBytes "Blockchain.getHash"
-                    | None =>
-                        Err "Blockchain.getHash: failed to parse HTTP response."
+                    | Err msg =>
+                        Err (String.concat ["Blockchain.getHash: failed to parse HTTP response.\n", msg, "\n"])
                 end
                 handle Socket.Err msg =>
                         Err (String.concat ["Blockchain.getHash, socket error: ",
@@ -350,10 +350,10 @@ struct
                             Err "Blockchain.setHash: Error from BString.unshow caught"
                 in
                     case (sendRequest funSig paramEnc formEthFunc host port) of
-                      Some resp =>
+                      Ok resp =>
                         processResponse resp jsonId respFunc "Blockchain.setHash"
-                    | None =>
-                        Err "Blockchain.setHash: failed to parse HTTP response."
+                    | Err msg =>
+                        Err (String.concat ["Blockchain.setHash: failed to parse HTTP response.\n", msg, "\n"])
                 end
                 handle Socket.Err msg =>
                         Err (String.concat ["Blockchain.setHash, socket error: ",
@@ -389,10 +389,10 @@ struct
                             Err "Blockchain.addAuthorizedUser: Error from BString.unshow caught."
                 in
                     case (sendRequest funSig addEnc formEthFunc host port) of
-                      Some resp =>
+                      Ok resp =>
                         processResponse resp jsonId respFunc "Blockchain.addAuthorizedUser"
-                    | None =>
-                        Err "Blockchain.addAuthorizedUser: failed to parse HTTP response."
+                    | Err msg =>
+                        Err (String.concat ["Blockchain.addAuthorizedUser: failed to parse HTTP response.\n", msg, "\n"])
                 end
                 handle Socket.Err msg =>
                         Err (String.concat ["Blockchain.addAuthorizedUser, socket error: ",
@@ -429,10 +429,10 @@ struct
                             Err "Blockchain.removeAuthorizedUser: Error from BString.unshow caught"
                 in
                     case (sendRequest funSig addEnc formEthFunc host port) of
-                      Some resp =>
+                      Ok resp =>
                         processResponse resp jsonId respFunc "Blockchain.removeAuthorizedUser"
-                    | None =>
-                        Err "Blockchain.removeAuthorizedUser: failed to parse HTTP response."
+                    | Err msg =>
+                        Err (String.concat ["Blockchain.removeAuthorizedUser: failed to parse HTTP response.\n", msg, "\n"])
                 end
                 handle Socket.Err msg =>
                         Err (String.concat ["Blockchain.removeAuthorizedUser, socket error: ",
