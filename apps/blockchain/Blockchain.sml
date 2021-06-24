@@ -272,7 +272,7 @@ struct
                 if jsonId = respId andalso jsonId >= 0
                 then
                     case (Json.lookup "result" jsonResp) of
-                      Some (Json.JsonString result) => func result
+                      Some (Json.String result) => func result
                     | Some _ =>
                         Err (String.concat [errMsgHeader,
                                         ": JSON result field was not a string.",

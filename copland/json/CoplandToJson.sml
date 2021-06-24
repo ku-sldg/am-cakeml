@@ -26,7 +26,7 @@ fun noArgConstructor cName =
 
 fun constructorWithArgs cName arglist =
     Json.fromPairList [("constructor", stringToJson cName),
-                        ("data", Json.JsonArray arglist)]
+                        ("data", Json.Array arglist)]
 
 fun aspToJson asp = case asp of
       Cpy => noArgConstructor "Cpy"

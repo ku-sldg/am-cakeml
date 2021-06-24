@@ -43,13 +43,13 @@ fun jsonToRequest js = case (Json.toMap js) of
 
     and
     getREQ data = case data of
-          [Json.JsonInt pl1, Json.JsonInt pl2, Json.JsonObject alist, t, ev] =>
+          [Json.Int pl1, Json.Int pl2, Json.Object alist, t, ev] =>
               REQ (natFromInt pl1) (natFromInt pl2) (toPlAddrMap (Map.toAscList alist)) (jsonToTerm t) (jsonToEv ev)
         | _ => raise Json.Exn "getREQ" "unexpected argument list"
 
     and
     toPlAddrMap alist =
-        let fun unjasonify (s, Json.JsonString s') =
+        let fun unjasonify (s, Json.String s') =
                 case Int.fromString s
                 of Some i => (natFromInt i, s')
                 | None =>
@@ -71,6 +71,6 @@ fun jsonToResponse js = case (Json.toMap js) of
 
     and
     getRES data = case data of
-          [Json.JsonInt pl1, Json.JsonInt pl2, ev] =>
+          [Json.Int pl1, Json.Int pl2, ev] =>
               RES (natFromInt pl1) (natFromInt pl2) (jsonToEv ev)
         | _ => raise Json.Exn "getRES" "unexpected argument list"

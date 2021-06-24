@@ -1,29 +1,29 @@
 structure Json =
 struct
     datatype json =
-          JsonNull
-        | JsonInt int
-        | JsonFloat Word64.word
-        | JsonBool bool
-        | JsonString string
-        | JsonArray (json list)
-        | JsonObject ((string, json) map)
+          Null
+        | Int int
+        | Float Word64.word
+        | Bool bool
+        | String string
+        | Array (json list)
+        | Object ((string, json) map)
     local
         (* trueParser: (json, char) parser
          * Parses the JSON boolean literal `true`.
          *)
         val trueParser =
-            Parser.map (const (JsonBool True)) (Parser.string "true")
+            Parser.map (const (Bool True)) (Parser.string "true")
         (* falseParser: (json, char) parser
          * Parses the JSON boolean literal `false`.
          *)
         val falseParser =
-            Parser.map (const (JsonBool False)) (Parser.string "false")
+            Parser.map (const (Bool False)) (Parser.string "false")
         (* nullParser: (json, char) parser
          * Parses the JSON object literal `null`.
          *)
         val nullParser =
-            Parser.map (const JsonNull) (Parser.string "null")
+            Parser.map (const Null) (Parser.string "null")
         (* signParser: (char, char) parser
          * Parses an optional numeric sign '+' or '-', defaulting to '+'.
          *)
@@ -109,11 +109,11 @@ struct
                 fun toJson numr =
                     case numr of
                       Ok doubleStr =>
-                        Ok (JsonFloat (Double.fromString doubleStr))
+                        Ok (Float (Double.fromString doubleStr))
                     | Err intStr =>
                         case Int.fromString intStr of
                           None => Err "Error reading integer."
-                        | Some n => Ok (JsonInt n)
+                        | Some n => Ok (Int n)
             in
                 Parser.bindResult toJson
                     (Parser.bind (Parser.option #"+" (Parser.char #"-"))
@@ -206,7 +206,7 @@ struct
          * Parses a JSON string literal.
          *)
         val stringParser =
-            Parser.map (fn str => JsonString str) stringParserHelper
+            Parser.map (fn str => String str) stringParserHelper
         (* jsonParser: (json, char) parser
          * Parses a JSON value.
          *)
@@ -226,7 +226,7 @@ struct
          * Parses a JSON array literal.
          *)
         and arrayParser stream =
-            Parser.map (fn jsons => JsonArray jsons)
+            Parser.map (fn jsons => Array jsons)
                 (Parser.between
                     (Parser.seq (Parser.char #"[") Parser.spaces)
                     (Parser.char #"]")
@@ -247,7 +247,7 @@ struct
          *)
         and objParser stream =
             Parser.map
-                (fn strJsons => JsonObject (Map.fromList String.compare strJsons))
+                (fn strJsons => Object (Map.fromList String.compare strJsons))
                 (Parser.between
                     (Parser.seq (Parser.char #"{") Parser.spaces)
                     (Parser.char #"}")
@@ -312,21 +312,21 @@ struct
                 String.concat (List.map escFn (String.explode str))
         in
             case xJson of
-            JsonNull => "null"
-            | JsonBool b => if b then "true" else "false"
-            | JsonInt n =>
+            Null => "null"
+            | Bool b => if b then "true" else "false"
+            | Int n =>
                 if n >= 0
                 then Int.toString n
                 else String.concat ["-", Int.toString (~n)]
-            | JsonFloat r => Double.toString r
-            | JsonString str => String.concat ["\"", escapeString str, "\""]
-            | JsonArray jsons =>
+            | Float r => Double.toString r
+            | String str => String.concat ["\"", escapeString str, "\""]
+            | Array jsons =>
                 let
                     val body = String.concatWith ", " (List.map stringify jsons)
                 in
                     String.concat ["[", body, "]"]
                 end
-            | JsonObject strJsons =>
+            | Object strJsons =>
                 let
                     val fields =
                         List.map
@@ -342,76 +342,76 @@ struct
     (* null: json
      * JSON `null` value.
      *)
-    val null = JsonNull
+    val null = Null
     (* fromBool: bool -> json
      * Converts a boolean to its corresponding JSON value
      *)
-    fun fromBool b = JsonBool b
+    fun fromBool b = Bool b
     (* fromInt: int -> json
      * Converts an integer to its corresponding JSON value.
      *)
-    fun fromInt n = JsonInt n
+    fun fromInt n = Int n
     (* fromDouble: Word64.word -> json
      * Converts a double to its corresponding JSON value.
      *)
-    fun fromDouble r = JsonFloat r
+    fun fromDouble r = Float r
     (* fromString: string -> json
      * Converts a string to its corresponding JSON value.
      *)
-    fun fromString str = JsonString str
+    fun fromString str = String str
     (* fromList: json list -> json
      * Converts a list of JSON values
      *)
-    fun fromList xs = JsonArray xs
+    fun fromList xs = Array xs
     (* fromMap: (string. json) map -> json
      * Converts a string to json mapping into a JSON value.
      *)
-    fun fromMap xm = JsonObject xm
+    fun fromMap xm = Object xm
     (* fromPairList: (string * json) list -> json
      * Converts a list of pairs of strings and json values into a JSON value.
      *)
-    fun fromPairList xys = JsonObject (Map.fromList String.compare xys)
+    fun fromPairList xys = Object (Map.fromList String.compare xys)
     (* isNull: json -> bool
      * Determines whether the JSON value is a null.
      *)
     fun isNull xJson =
         case xJson of
-          JsonNull => True
+          Null => True
         | _ => False
     (* toBool: json -> bool option
      * Tries to convert a JSON to a boolean.
      *)
     fun toBool xJson =
         case xJson of
-          JsonBool b => Some b
+          Bool b => Some b
         | _ => None
     (* toInt: json -> int option
      * Tries to convert a JSON to a integer.
      *)
     fun toInt xJson =
         case xJson of
-          JsonInt n => Some n
+          Int n => Some n
         | _ => None
     (* toDouble: json -> Word64.word option
      * Tries to convert a JSON to a double.
      *)
     fun toDouble xJson =
         case xJson of
-          JsonFloat d => Some d
+          Float d => Some d
         | _ => None
     (* toList: json -> (json list) option
      * Tries to convert a JSON to a list of JSON values.
      *)
     fun toList xJson =
         case xJson of
-          JsonArray xJsons => Some xJsons
+          Array xJsons => Some xJsons
         | _ => None
     (* toMap: json -> ((string, json) map) option
      * Tries to convert a JSON to a mapping from strings to JSON values
      *)
     fun toMap xJson =
         case xJson of
-          JsonObject xJsonm => Some xJsonm
+          Object xJsonm => Some xJsonm
         | _ => None
     (* lookup: string -> json -> json option
      * `lookup str json`
@@ -419,7 +419,7 @@ struct
      *)
     fun lookup key xJson =
         case xJson of
-          JsonObject xJsonm => Map.lookup xJsonm key
+          Object xJsonm => Map.lookup xJsonm key
         | _ => None
     (* walk: 'a -> (bool -> 'a) -> (int -> 'a) -> (Word64.word -> 'a) ->
      *       (string -> 'a) -> 'a -> (json -> 'a -> 'a) ->
@@ -430,18 +430,18 @@ struct
     fun walk nullValue boolFunc intFunc doubleFunc stringFunc arrayValue
             arrayWalker objValue objWalker json =
         case json of
-          JsonNull => nullValue
-        | JsonBool b => boolFunc b
-        | JsonInt n => intFunc n
-        | JsonFloat d => doubleFunc d
-        | JsonString str => stringFunc str
-        | JsonArray jsons => List.foldr arrayWalker arrayValue jsons
-        | JsonObject strJsons => Map.foldrWithKey objWalker objValue strJsons
+          Null => nullValue
+        | Bool b => boolFunc b
+        | Int n => intFunc n
+        | Float d => doubleFunc d
+        | String str => stringFunc str
+        | Array jsons => List.foldr arrayWalker arrayValue jsons
+        | Object strJsons => Map.foldrWithKey objWalker objValue strJsons
     
     exception Exn string string
 end
 
-(* val emptyObject = Json.JsonObject (Map.empty String.compare)
+(* val emptyObject = Json.Object (Map.empty String.compare)
 val jsonNulls = ["null", " null", "  null", "null ", "\nnull\n"]
 val jsonBools = ["true", "false"]
 val jsonInts = ["0", "-1", "2"]
