@@ -26,27 +26,51 @@ fun checkSig e p bs =
     then (BString.fromInt BString.LittleEndian 1)
     else (BString.fromInt BString.LittleEndian 0)
 
-        
 (* evt -> pl -> BString.bstring -> BString.bstring *)
 fun checkHash et p bs = BString.empty
 
-(* evc -> evc *)
-fun build_app_comp e = case e of
+(* asp_id -> arg list -> pl -> BString.bstring *)
+fun getASPgoldenHash i args p = BString.empty
+
+                                    
+(* pl -> (BString.bstring -> BString.bstring) *)
+fun getHashFun p = Crypto.hash (* TODO: map to hash function for each place *)
+                                    
+                                    
+exception EvShapeexpn string
+(* evt -> pl -> BString.bstring list *)
+fun evtList et p = case et of
+      Mtt           => [BString.empty]
+    | Ut i al et'   => (getASPgoldenHash i al p) :: (evtList et' p)
+    | Gt p' et'     =>
+      raise EvShapeexpn "cannot rebuildHash with Gt evidence"
+    | Ht p' et'     => [(getHashFun p') (BString.concatList (evtList et' p'))]
+    | Nt i          => [BString.empty]
+    | SSt ev1 ev2   => evtList ev1 p @ evtList ev2 p
+    | PPt ev1 ev2   => evtList ev1 p @ evtList ev2 p
+                       
+
+(* evt -> pl -> BString.bstring -> BString.bstring *)
+fun rebuildHash et p = (*BString.empty*)
+    BString.concatList (evtList et p)
+
+(* app -> evc -> evc *)
+fun build_app_comp app e = case e of
       Mtc => Mtc
     | Uc i args bs e' =>
-      Uc i args (checkASP i args bs) (build_app_comp e')
+      Uc i args (checkASP i args bs) (build_app_comp app e')
     | Gc p bs e' =>
-      Gc p (checkSig e' p bs) (build_app_comp e')
+      Gc p (checkSig e' p bs) (build_app_comp app e')
     | Hc p bs et =>
       Hc p (checkHash et p bs) et
     | Nc n_id bs =>
-      Nc n_id bs (* TODO: check nonce *)
+      Nc n_id (checkNonce app n_id bs)
     | SSc e1 e2 =>
-      SSc (build_app_comp e1) (build_app_comp e2)
+      SSc (build_app_comp app e1) (build_app_comp app e2)
     | PPc e1 e2 =>
-      PPc (build_app_comp e1) (build_app_comp e2)
+      PPc (build_app_comp app e1) (build_app_comp app e2)
 
-exception EvShapeexpn string
+(*exception EvShapeexpn string*)
 (* ev -> evt -> evc *)          
 fun reconstruct_ev e et =
     case (e,et) of
@@ -65,9 +89,9 @@ fun reconstruct_ev e et =
         PPc (reconstruct_ev e1 e1t) (reconstruct_ev e2 e2t)
       | _  => raise EvShapeexpn "evidence shape mismatch when reconstructing evidence in reconstruct_ev"
 
-(* term -> pl -> evt -> ev -> evc *)                    
-fun appraise_gen t p et e =
-    build_app_comp (reconstruct_ev e (eval t p et))
+(* app -> term -> pl -> evt -> ev -> evc *)                    
+fun appraise_gen app t p et e =
+    build_app_comp app (reconstruct_ev e (eval t p et))
                                     
 fun appraise nonce ev = case ev of
       G evSign (U (Id (S O)) [dir] evHash (N (Id O) evNonce)) =>
@@ -82,12 +106,13 @@ fun appraise nonce ev = case ev of
 
 fun sendReq addr =
     let val am    = serverAm BString.empty (Map.insert emptyNsMap (S O) addr)
-        val nonce = Random.random (Random.seed (Meas.urand 32)) 16
-        val ev    = evalTerm am (N (Id O) nonce) term
+        (*val nonce = Random.random (Random.seed (Meas.urand 32)) 16 *)
+        val (nonce_ev, app') = newNonce empty_app
+        val ev    = evalTerm am (*(N (Id (S O)) nonce)*)nonce_ev term
      in print ("Evaluating term:\n" ^ termToString term ^ "\n\nNonce:\n" ^
-               BString.show nonce ^ "\n\nEvidence recieved:\n" ^
+               evToString nonce_ev(*BString.show nonce*) ^ "\n\nEvidence recieved:\n" ^
                evToString ev ^ "\n\nAppppraisal Result: \n" ^
-               evcToString (appraise_gen term O (Nt (Id O)) ev) ^ "\n\n"
+               evcToString (appraise_gen app' term O (Nt (Id O)) ev) ^ "\n\n"
               )
               
 

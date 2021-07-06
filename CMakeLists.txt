@@ -24,13 +24,15 @@ function(get_files list_name)
     set(${list_name} ${get_files_list} PARENT_SCOPE)
 endfunction()
 
-get_files(util_src util/Extra.sml util/ByteString.sml util/Misc.sml util/CoqDefaults.sml util/Json.sml)
-get_files(cop_src ${util_src} copland/Instr.sml copland/AM.sml copland/VM.sml
-    copland/json/CoplandToJson.sml copland/json/JsonToCopland.sml)
-get_files(crypto_src system/crypto/CryptoFFI.sml system/crypto/Random.sml)
+get_files(util_src util/Extra.sml util/ByteString.sml util/Misc.sml
+util/CoqDefaults.sml util/Json.sml)
+get_files(crypto_src system/crypto/CryptoFFI.sml
+system/crypto/Random.sml)
 get_files(posix_src ${crypto_src} system/posix/sockets/SocketFFI.sml system/posix/time/TimeFFI.sml system/posix/meas/MeasFFI.sml)
-get_files(server_am_src ${cop_src} ${posix_src} am/Measurements.sml am/CommTypes.sml am/ServerAm.sml)
-
+get_files(cop_src ${util_src} ${posix_src} copland/Instr.sml copland/AM.sml
+copland/APP.sml copland/VM.sml
+    copland/json/CoplandToJson.sml copland/json/JsonToCopland.sml)
+get_files(server_am_src ${cop_src} am/Measurements.sml am/CommTypes.sml am/ServerAm.sml)
 get_files(posix_c_files
     system/basis_ffi.c system/crypto/crypto_ffi.c system/posix/sockets/socket_ffi.c
     system/posix/time/time_ffi.c system/posix/meas/meas_ffi.c
