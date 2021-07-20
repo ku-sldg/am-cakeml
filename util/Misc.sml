@@ -48,8 +48,8 @@ structure Result = struct
     (* (('a, 'e) result, 'e) result -> ('a, 'e) result *)
     fun join res = result id err res
 
-    (* ('a -> ('b, 'e) result) -> ('a, 'e) result -> ('b, 'e) result *)
-    fun bind f = result f err
+    (* ('a, 'e) result -> ('a -> ('b, 'e) result) -> ('b, 'e) result *)
+    fun bind xr f = result f err xr
 
     (* ('a -> unit) -> ('a, 'e) result -> unit *)
     fun app f = result f (const ())

@@ -399,6 +399,13 @@ struct
         case xJson of
           Float d => Some d
         | _ => None
+    (* toString: json -> string option
+     * Tries to convert a JSON value to a string.
+     *)
+    fun toString json =
+        case json of
+          String str => Some str
+        | _ => None
     (* toList: json -> (json list) option
      * Tries to convert a JSON to a list of JSON values.
      *)

@@ -175,5 +175,8 @@ structure BString = struct
 
         (* int -> endian -> int -> bstring *)
         fun fromIntLength len endian = toLength endian len o fromInt endian
+
+        (* compare: bstring -> bstring -> ordering *)
+        fun compare bs1 bs2 = String.compare (toString bs1) (toString bs2)
     end
 end
