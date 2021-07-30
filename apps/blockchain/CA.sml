@@ -70,10 +70,17 @@ struct
                     Option.map
                         (fn pub => Crypto.generateDHSecret encryptKey pub)
                         (lookupPublicKey id)
+                val encrypto = 
+                    Option.map
+                        (fn secret => Crypto.encrypt secret nonce 0 sign)
+                        secreto
             in
-                Option.map
-                    (fn secret => Crypto.encrypt secret nonce 0 sign)
-                    secreto
+                TextIO.print_list ["==> Received alias: ", BString.show alias,
+                                    "\n    Signature: ", BString.show sign,
+                                    "\n    Encrypted signature: ",
+                                    OptionExtra.option "" BString.show encrypto,
+                                    "\n"];
+                encrypto
             end
             handle Crypto.Err _ => None
     end

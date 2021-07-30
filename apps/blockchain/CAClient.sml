@@ -140,7 +140,7 @@ struct
                     (Option.mapPartial
                         (Json.toString)
                         (Json.lookup "result" x))
-            val encryptedSignedKey =
+            val encryptedSignedKeyr =
                 case sendToCA port outJson of
                   Err msg =>
                     Err (String.concat ["Error validating alias:\n", msg])
@@ -153,7 +153,11 @@ struct
                     | Some result => Ok result
             val secret = Crypto.generateDHSecret privateKey caEncryptKey
         in
-            Result.bind encryptedSignedKey
+            TextIO.print_list
+                ["<== Encrypted signature: ",
+                Result.result BString.show (fn msg => msg) encryptedSignedKeyr,
+                "\n"];
+            Result.bind encryptedSignedKeyr
                 (fn bs => Ok (Crypto.decrypt secret nonce 0 bs))
         end
         handle Crypto.Err m =>
@@ -174,26 +178,34 @@ struct
     fun demo port =
         let
             val unitr = addPublicKey port
+            val _ = print "<== Added client public key to CA's list.\n"
             val caEncryptr = Result.bind unitr (fn _ => getCAEncryptionKey port)
+            val _ = print "    Got CA's public encryption key.\n"
             val aliasPublicKey =
                 Crypto.generateEncryptionPublicKey aliasPrivateKey
+            val _ = TextIO.print_list
+                    ["    Computed alias: ", BString.show aliasPublicKey, "\n"]
             val nonce = BString.nulls 12
             val signr =
                 Result.bind caEncryptr
                     (fn caEncrypt =>
                         validateAlias port nonce aliasPublicKey caEncrypt)
+            val _ = TextIO.print_list
+                        ["    Signature: ",
+                        Result.result BString.show (fn msg => msg) signr,
+                        "\n"]
             val resultr =
                 Result.bind signr
                     (fn signat =>
                         Result.map
                             (fn key => (signat, key))
                             (getCASigningKey port))
+            val _ = print "    Got CA's public signing key.\n"
         in
             case resultr of
               Ok (signat, key) =>
-                TextIO.print_list ["alias: ", BString.show aliasPublicKey, "\n",
-                    "signature: ", BString.show signat, "\n",
-                    "Signature check: ",
+                TextIO.print_list
+                    ["    Signature check: ",
                     Bool.toString (Crypto.sigCheck key signat aliasPublicKey),
                     "\n"]
             | Err msg =>
