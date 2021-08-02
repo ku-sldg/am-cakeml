@@ -29,8 +29,9 @@ and write to this mapping.
 
 ## Running ##
 
-1. Go to `./apps/blockchain/` and run the `test.sh` script, passing to it the 
-   contract's address, e.g. `./test.sh 0xfeedface`.
+1. Go to the projects root directory, then head to `./build/apps/blockchain/`
+   and run the `test.sh` script, passing to it the contract's address, e.g.
+   `./test.sh 0xfeedface`.
 2. What you should see:
    ```shell
    Starting the server...done.
@@ -47,3 +48,45 @@ and write to this mapping.
 
    Appraisal succeeded (expected nonce and hash value; signature verified).
    ```
+
+# A Certificate Authority for Key Authorization #
+
+An example of a key authorization protocol where the server/CA certifies a key
+for the client by signing the key and encrypting it with the client's public
+key. The client sends a request in the form of their own public identifier and
+the key to be authorized, receives the encrypted signature from the CA,
+decrypts it, and now has the signature to pass along with the key to any third
+party.
+
+## Building for Unix-like OSes ##
+
+1. Go to the home directory for the project
+   [am-cakeml](https://github.com/ku-sldg/am-cakeml/) and make the `./build/`
+   directory with `mkdir build`.
+2. Move into this new directory, `cd build`, and run `cmake ..` in order to
+   generate the required Makefiles.
+3. Build the blockchain example with `make blockchainCAAll`. The generated
+   binaries will be places into `./build/`.
+   * This will run two separate makes: `make blockchainCA` to build the
+     CA and `make blockchainCAClient` to make the client demo.
+
+## Running ##
+
+1. Go to the projects root directory, then head to `./build/apps/blockchain/`.
+2. Run `./blockchainCA 5001 5 &` to start the server listening on port 5001 with
+   at most 5 concurrent connections.
+3. Run `./blockchainCAClient 5001` to run the client demo.
+4. You should see an output like the following:
+   ```shell
+   <== Added client public key to CAs list.
+       Got CAs public encryption key.
+       Computed alias: 1444B1...000000
+   ==> Received alias: 1444B1...000000
+       Signature: D80137...A2B30D
+       Encrypted signature: BD4E26...019CC1
+   <== Encrypted signature: BD4E26...019CC1
+       Signature: D80137...A2B30D
+       Got CAs public signing key.
+       Signature check: True
+   ```
+
