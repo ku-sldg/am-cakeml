@@ -13,7 +13,6 @@
 
 #define FFI_SUCCESS 0
 #define FFI_FAILURE 1
-#define ffi_assert(cond) {if (!(cond)) { a[0] = FFI_FAILURE; return; }}
 
 // TODO: remove ffi_asserts. They don't clean up (close fd and munmap)
 
@@ -30,10 +29,17 @@ void ffiwriteDataport(const uint8_t * c, const long clen, uint8_t * a, const lon
     // Same thing in emitDataport
     // int fd = open(name, O_WRONLY);
     int fd = open(name, O_RDWR);
-    ffi_assert(fd >= 0);
+    if (fd == -1) {
+        a[0] = FFI_FAILURE;
+        return;
+    }
 
     void * dataport = mmap(NULL, length, PROT_WRITE, MAP_SHARED, fd, getpagesize());
-    ffi_assert(dataport != (void *)(-1));
+    if (dataport == (void *)(-1)) {
+        close(fd);
+        a[0] = FFI_FAILURE;
+        return;
+    }
 
     memcpy(dataport, msg, length);
 
@@ -50,10 +56,17 @@ void ffireadDataport(const uint8_t * c, const long clen, uint8_t * a, const long
     const char * name = (const char *)c;
 
     int fd = open(name, O_RDONLY);
-    ffi_assert(fd >= 0);
+    if (fd == -1) {
+        a[0] = FFI_FAILURE;
+        return;
+    }
 
     void * dataport = mmap(NULL, alen-1, PROT_READ, MAP_SHARED, fd, getpagesize());
-    ffi_assert(dataport != (void *)(-1));
+    if (dataport == (void *)(-1)) {
+        close(fd);
+        a[0] = FFI_FAILURE;
+        return;
+    }
 
     memcpy((void *)(a+1), dataport, alen-1);
 
@@ -70,11 +83,18 @@ void ffiwaitDataport(const uint8_t * c, const long clen, uint8_t * a, const long
     const char * name = (const char *)c;
 
     int fd = open(name, O_RDONLY);
-    ffi_assert(fd >= 0);
+    if (fd == -1) {
+        a[0] = FFI_FAILURE;
+        return;
+    }
 
     int val;
     int result = read(fd, &val, sizeof(int));
-    ffi_assert(result == sizeof(int));
+    if (result != sizeof(int)) {
+        close(fd);
+        a[0] = FFI_FAILURE;
+        return;
+    }
 
     memcpy((void *)a+1, (const void *)(&val), sizeof(int));
     a[0] = FFI_SUCCESS;
@@ -91,10 +111,17 @@ void ffiemitDataport(const uint8_t * c, const long clen, uint8_t * a, const long
 
     // int fd = open(name, O_WRONLY);
     int fd = open(name, O_RDWR);
-    ffi_assert(fd >= 0);
+    if (fd == -1) {
+        a[0] = FFI_FAILURE;
+        return;
+    }
 
     void * dataport = mmap(NULL, 1, PROT_WRITE, MAP_SHARED, fd, 0);
-    ffi_assert(dataport != (void *)(-1));
+    if (dataport == (void *)(-1)) {
+        close(fd);
+        a[0] = FFI_FAILURE;
+        return;
+    }
 
     *((uint8_t *)dataport) = 1;
 

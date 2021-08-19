@@ -151,7 +151,7 @@ structure BString = struct
         fun xor endian bs1 bs2 = 
             let val len = max (length bs1) (length bs2)
                 val padded_bs1 = toLength endian len bs1
-                val padded_bs2 = toLength endian len bs1
+                val padded_bs2 = toLength endian len bs2
              in implode (ListExtra.zipWith Word8.xorb (explode padded_bs1) (explode padded_bs2))
             end
 

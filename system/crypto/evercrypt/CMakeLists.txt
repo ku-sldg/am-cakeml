@@ -24,14 +24,12 @@ if("${target_arch_lower}" STREQUAL "native")
     add_definitions(${comp_defns})
 # If building for arm, you'll want to add the c flags "-mfpu=neon" and "-mfloat-abi=hard"
 elseif("${target_arch_lower}" STREQUAL "armv7")
+    # Make sure whole-project is hard-float
     add_definitions(-DIS_ARM_7 -DBROKEN_INTRINSICS -DIS_NOT_X64 -DKRML_VERIFIED_UINT128)
     add_definitions(-DLib_IntVector_Intrinsics_vec256="void *")
 elseif("${target_arch_lower}" STREQUAL "armv8")
-    add_definitions(-DIS_ARM_8 -DBROKEN_INTRINSICS -DIS_NOT_X64 -DKRML_VERIFIED_UINT128)
-    add_definitions(-DLib_IntVector_Intrinsics_vec256="void *")
-elseif("${target_arch_lower}" STREQUAL "armv8")
     # TODO: get arm8 values
-    add_definitions(-DIS_ARM_7 -DBROKEN_INTRINSICS IS_NOT_X64 -DKRML_VERIFIED_UINT128)
+    add_definitions(-DIS_ARM_8 -DBROKEN_INTRINSICS -DIS_NOT_X64 -DKRML_VERIFIED_UINT128)
     add_definitions(-DLib_IntVector_Intrinsics_vec256="void *")
 elseif("${target_arch_lower}" STREQUAL "other")
     message(WARNING "TARGET_ARCH value \"other\" implies cross-compilation to an unspecified target. The relevant CMake variables will need to be configured manually.")
