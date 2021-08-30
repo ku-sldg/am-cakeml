@@ -43,7 +43,7 @@ and write to this mapping.
    Nonce:
    <nonce>
 
-   Evidence recieved:
+   Evidence received:
    G <signature> (U Id 1 [testDir] <golden hash> (N Id 0 <none> (Mt)))
 
    Appraisal succeeded (expected nonce and hash value; signature verified).
@@ -89,4 +89,3 @@ party.
        Got CAs public signing key.
        Signature check: True
    ```
-
