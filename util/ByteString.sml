@@ -53,7 +53,10 @@ structure BString = struct
         val rev = mapStr StringExtra.rev
 
         (* int -> int -> bstring -> bstring *)
-        fun substring i j = mapStr (fn s => String.substring s i j)
+        fun substring bs i j = mapStr (fn s => String.substring s i j) bs
+
+        (* int -> int option -> bstring -> bstring *)
+        fun extract bs i jo = mapStr (fn s => String.extract s i jo) bs
 
         (* bstring -> bstring -> bstring *)
         fun concat bs1 bs2 = case (bs1, bs2) of (Bs s1, Bs s2) => Bs (s1 ^ s2)
@@ -129,11 +132,11 @@ structure BString = struct
         fun toLength endian toLen bs = 
             let val bsLen = length bs
                 fun toLengthLittle () = case Int.compare toLen bsLen of 
-                      Less    => substring 0 toLen bs
+                      Less    => substring bs 0 toLen
                     | Equal   => bs
                     | Greater => concat bs (nulls (toLen - bsLen))
                 fun toLengthBig () = case Int.compare toLen bsLen of 
-                      Less    => substring (bsLen - toLen - 1) (bsLen - 1) bs
+                      Less    => substring bs (bsLen - toLen - 1) (bsLen - 1)
                     | Equal   => bs
                     | Greater => concat (nulls (toLen - bsLen)) bs
              in case endian of 

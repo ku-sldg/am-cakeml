@@ -199,7 +199,7 @@ struct
     fun encodeIntBytes n bs =
         let
             val encIntr = encodeInt n
-            val widthEnc = Result.okValOf (encodeInt 64)
+            val widthEnc = Result.okValOf (encodeInt 64) (* 2 * 32 *)
             val encBytes = encodeBytes bs
         in
             case encIntr of
@@ -229,218 +229,228 @@ struct
         else Err "Blockchain.encodeAddress: Tried to encode an invalid address."
 
 (******************* Communicating with the Smart Contract *******************)
-    local
-        fun sendRequest funSig funParams formEthFunc host port =
+    (* sendRequest: string -> string -> (string -> Json.json) -> string -> string ->
+     *   (Http.Response, string) result
+     * `sendRequest funSig funParams formEthFunc host port`
+     * Builds and sends a HTTP request to `host:port` where the body of the
+     * request is built using the expression
+     * `Json.stringify (formEthFunc (funSig ^ funParams))`. Returns the
+     * HTTP response upon success, and an error message otherwise. This
+     * along with `processResponse` are the main workhorses of the API calls
+     * that communicate with the blockchain.
+     *)
+    fun sendRequest funSig funParams formEthFunc host port =
+        let
+            val data = String.concat [funSig, funParams]
+            val jsonMsg = formEthFunc data
+            val jsonStr = Json.stringify jsonMsg
+            val hostPair =
+                ("Host", String.concatWith ":" [host, Int.toString port])
+            val contentType = ("Content-Type", "application/json")
+            val contentLen =
+                ("Content-Length", Int.toString (String.size jsonStr))
+            val httpReq =
+                Http.Request "POST" "/" "HTTP/1.1"
+                    [hostPair, contentType, contentLen]
+                    (Some jsonStr)
+            val httpReqStr = Http.requestToString httpReq
+            val socket = Socket.connect host port
+            val _ = Socket.output socket httpReqStr
+            val httpRespr = Http.responseFromString (Socket.inputAll socket)
+            val _ = Socket.close socket
+        in
+            httpRespr
+        end
+    (* processResponse: Http.Response -> int -> (string -> ('a, string) result) ->
+     *   string -> ('a, string) result
+     * `processResponse httpResp jsonId func errMsgHeader`
+     * Parses the HTTP response `httpResp` and pulls out the JSON value.
+     * Checks the JSON "id" field matches `jsonId`, and applies the function
+     * `func` to the JSON "result" field. Prepends `errMsgHeader` and any
+     * error message that is returned. This along with `sendRequest` are the
+     * main workhorses of the API calls that communicate with the blockchain.
+     *)
+    fun processResponse (Http.Response _ _ _ _ message) jsonId func errMsgHeader =
+        let
+            val jsonResp = Result.okValOf (Json.parse message)
+            val respId =
+                Option.getOpt
+                    (Option.mapPartial
+                        Json.toInt
+                        (Json.lookup "id" jsonResp))
+                    ~1
+        in
+            if jsonId = respId andalso jsonId >= 0
+            then
+                case (Json.lookup "result" jsonResp) of
+                  Some (Json.String result) => func result
+                | Some _ =>
+                    Err (String.concat [errMsgHeader,
+                                    ": JSON result field was not a string.",
+                                    Json.stringify jsonResp])
+                | None =>
+                    Err (String.concat [errMsgHeader,
+                                    ": JSON result field was not found.\n",
+                                    Json.stringify jsonResp])
+            else Err (String.concat [errMsgHeader,
+                                    ": JSON ids didn't match.\n",
+                                    Json.stringify jsonResp])
+        end
+        handle Result.Exn =>
+            Err (String.concat [errMsgHeader, ": JSON did not parse.\n",
+                            message])
+
+    (* getHash: string -> int -> int -> string -> string -> int -> (BString.bstring, string) result
+        * `getHash host port jsonId recipient sender hashId`
+        *
+        * Queries Ethereum client located at host `host` and port number
+        * `port`, calling the `getHash` method of our smart contract, located
+        * at `recipient`, from `sender`, using the parameter `hashId`. The
+        * `jsonId` parameter is an arbitrary integer used to identify the
+        * response to this particular request. Both `recipient` and `sender`
+        * must be hexademical strings prefixed with `0x` and represent 20
+        * bytes.
+        *)
+    fun getHash host port jsonId recipient sender hashId =
+        case (encodeInt hashId) of
+          Err msg =>
+            Err (String.concat ["Blockchain.getHash: id of the hash failed to encode.\n",
+                            msg])
+        | Ok hashIdEnc =>
             let
-                val data = String.concat [funSig, funParams]
-                val jsonMsg = formEthFunc data
-                val jsonStr = Json.stringify jsonMsg
-                val hostPair =
-                    ("Host", String.concatWith ":" [host, Int.toString port])
-                val contentType = ("Content-Type", "application/json")
-                val contentLen =
-                    ("Content-Length", Int.toString (String.size jsonStr))
-                val httpReq =
-                    Http.Request "POST" "/" "HTTP/1.1"
-                        [hostPair, contentType, contentLen]
-                        (Some jsonStr)
-                val httpReqStr = Http.requestToString httpReq
-                val socket = Socket.connect host port
-                val _ = Socket.output socket httpReqStr
-                val httpRespr = Http.responseFromString (Socket.inputAll socket)
-                val _ = Socket.close socket
+                val funSig = "0x6b2fafa9"
+                val formEthFunc = formEthCallLatest jsonId sender recipient
             in
-                httpRespr
+                case (sendRequest funSig hashIdEnc formEthFunc host port) of
+                  Ok resp =>
+                    processResponse resp jsonId decodeBytes "Blockchain.getHash"
+                | Err msg =>
+                    Err (String.concat ["Blockchain.getHash: failed to parse HTTP response.\n", msg, "\n"])
             end
-        (* processResponse: Http.Response -> int -> (string -> ('a, string) result) -> string -> ('a, string) result
-         * `processResponse httpResp jsonId func errMsgHeader`
-         * Parses the HTTP response `httpResp` and pulls out the JSON value.
-         * Checks the JSON "id" field matches `jsonId`, and applies the function
-         * `func` to the JSON "result" field. Prepends `errMsgHeader` and any
-         * error message that is returned.
-         *)
-        fun processResponse (Http.Response _ _ _ _ message) jsonId func errMsgHeader =
+            handle Socket.Err msg =>
+                  Err (String.concat ["Blockchain.getHash, socket error: ",
+                                    msg])
+                | Socket.InvalidFD =>
+                    Err "Blockchain.getHash, socket error: invalid file descriptor."
+                | _ => Err "Blockchain.getHash: unknown error."
+    
+    (* setHash: string -> int -> int -> string -> string -> int -> BString.bstring -> (BString.bstring, string) result
+        * `setHash host port jsonId recipient sender hashId hashValue`
+        *
+        * Queries Ethereum client located at host `host` and port number
+        * `port`, calling the `setHash` method of our smart contract, located
+        * at `recipient`, from `sender`, using the parameters `hashId` and
+        * `hashValue`. The `jsonId` parameter is an arbitrary integer used to
+        * identify the response to this particular request. Both `recipient`
+        * and `sender` must be hexadecimal strings prefixed with `0x` and
+        * represent 20 bytes. The transaction hash is returned.
+        *)
+    fun setHash host port jsonId recipient sender hashId hashValue =
+        case (encodeIntBytes hashId hashValue) of
+          Err msg =>
+            Err (String.concat ["Blockchain.setHash: id of the hash failed to encode.\n",
+                            msg])
+        | Ok paramEnc =>
             let
-                val jsonResp = Result.okValOf (Json.parse message)
-                val respId =
-                    Option.getOpt
-                        (Option.mapPartial
-                            Json.toInt
-                            (Json.lookup "id" jsonResp))
-                        ~1
+                val funSig = "0x6a7fd925"
+                val formEthFunc =
+                    formEthSendTransaction jsonId sender recipient
+                fun respFunc result =
+                    Ok (BString.unshow (String.extract result 2 None))
+                    handle Word8Extra.InvalidHex =>
+                        Err "Blockchain.setHash: Error from BString.unshow caught"
             in
-                if jsonId = respId andalso jsonId >= 0
-                then
-                    case (Json.lookup "result" jsonResp) of
-                      Some (Json.String result) => func result
-                    | Some _ =>
-                        Err (String.concat [errMsgHeader,
-                                        ": JSON result field was not a string.",
-                                        Json.stringify jsonResp])
-                    | None =>
-                        Err (String.concat [errMsgHeader,
-                                        ": JSON result field was not found.\n",
-                                        Json.stringify jsonResp])
-                else Err (String.concat [errMsgHeader,
-                                        ": JSON ids didn't match.\n",
-                                        Json.stringify jsonResp])
+                case (sendRequest funSig paramEnc formEthFunc host port) of
+                  Ok resp =>
+                    processResponse resp jsonId respFunc "Blockchain.setHash"
+                | Err msg =>
+                    Err (String.concat ["Blockchain.setHash: failed to parse HTTP response.\n", msg, "\n"])
             end
-            handle Result.Exn =>
-                Err (String.concat [errMsgHeader, ": JSON did not parse.\n",
-                                message])
-    in
-        (* getHash: string -> int -> int -> string -> string -> int -> (BString.bstring, string) result
-         * `getHash host port jsonId recipient sender hashId`
-         *
-         * Queries Ethereum client located at host `host` and port number
-         * `port`, calling the `getHash` method of our smart contract, located
-         * at `recipient`, from `sender`, using the parameter `hashId`. The
-         * `jsonId` parameter is an arbitrary integer used to identify the
-         * response to this particular request. Both `recipient` and `sender`
-         * must be hexademical strings prefixed with `0x` and represent 20
-         * bytes.
-         *)
-        fun getHash host port jsonId recipient sender hashId =
-            case (encodeInt hashId) of
-              Err msg =>
-                Err (String.concat ["Blockchain.getHash: id of the hash failed to encode.\n",
-                                msg])
-            | Ok hashIdEnc =>
-                let
-                    val funSig = "0x6b2fafa9"
-                    val formEthFunc = formEthCallLatest jsonId sender recipient
-                in
-                    case (sendRequest funSig hashIdEnc formEthFunc host port) of
-                      Ok resp =>
-                        processResponse resp jsonId decodeBytes "Blockchain.getHash"
-                    | Err msg =>
-                        Err (String.concat ["Blockchain.getHash: failed to parse HTTP response.\n", msg, "\n"])
-                end
-                handle Socket.Err msg =>
-                        Err (String.concat ["Blockchain.getHash, socket error: ",
-                                        msg])
-                    | Socket.InvalidFD =>
-                        Err "Blockchain.getHash, socket error: invalid file descriptor."
-                    | _ => Err "Blockchain.getHash: unknown error."
-        
-        (* setHash: string -> int -> int -> string -> string -> int -> BString.bstring -> (BString.bstring, string) result
-         * `setHash host port jsonId recipient sender hashId hashValue`
-         *
-         * Queries Ethereum client located at host `host` and port number
-         * `port`, calling the `setHash` method of our smart contract, located
-         * at `recipient`, from `sender`, using the parameters `hashId` and
-         * `hashValue`. The `jsonId` parameter is an arbitrary integer used to
-         * identify the response to this particular request. Both `recipient`
-         * and `sender` must be hexadecimal strings prefixed with `0x` and
-         * represent 20 bytes. The transaction hash is returned.
-         *)
-        fun setHash host port jsonId recipient sender hashId hashValue =
-            case (encodeIntBytes hashId hashValue) of
-              Err msg =>
-                Err (String.concat ["Blockchain.setHash: id of the hash failed to encode.\n",
-                                msg])
-            | Ok paramEnc =>
-                let
-                    val funSig = "0x6a7fd925"
-                    val formEthFunc =
-                        formEthSendTransaction jsonId sender recipient
-                    fun respFunc result =
-                        Ok (BString.unshow (String.extract result 2 None))
-                        handle Word8Extra.InvalidHex =>
-                            Err "Blockchain.setHash: Error from BString.unshow caught"
-                in
-                    case (sendRequest funSig paramEnc formEthFunc host port) of
-                      Ok resp =>
-                        processResponse resp jsonId respFunc "Blockchain.setHash"
-                    | Err msg =>
-                        Err (String.concat ["Blockchain.setHash: failed to parse HTTP response.\n", msg, "\n"])
-                end
-                handle Socket.Err msg =>
-                        Err (String.concat ["Blockchain.setHash, socket error: ",
-                                        msg])
-                    | Socket.InvalidFD =>
-                        Err "Blockchain.setHash, socket error: invalid file descriptor."
-                    | _ => Err "Blockchain.setHash: unknown error."
-        
-        (* addAuthorizedUser: string -> int -> int -> string -> string -> string -> (BString.bstring, string) result
-         * `addAuthorizedUser host port jsonId recipient sender address`
-         *
-         * Queries Ethereum client located at host `host` and port number
-         * `port`, calling the `addAuthorizedUser` method of our smart contract,
-         * located at `recipient`, from `sender`, using the parameter `address`.
-         * The  `jsonId` parameter is an arbitrary integer used to identify the
-         * response to this particular request. All three `recipient`, `sender`,
-         * and `address` need to be hexadecimal strings prefixed by `0x` and
-         * representing 20 bytes. The transaction hash is returned.
-         *)
-        fun addAuthorizedUser host port jsonId recipient sender address =
-            case (encodeAddress address) of
-              Err msg =>
-                Err (String.concat ["Blockchain.addAuthorizedUser: user's address failed to encode.\n",
-                                msg])
-            | Ok addEnc =>
-                let
-                    val funSig = "0x177d2a74"
-                    val formEthFunc =
-                        formEthSendTransaction jsonId sender recipient
-                    fun respFunc result =
-                        Ok (BString.unshow (String.extract result 2 None))
-                        handle Word8Extra.InvalidHex =>
-                            Err "Blockchain.addAuthorizedUser: Error from BString.unshow caught."
-                in
-                    case (sendRequest funSig addEnc formEthFunc host port) of
-                      Ok resp =>
-                        processResponse resp jsonId respFunc "Blockchain.addAuthorizedUser"
-                    | Err msg =>
-                        Err (String.concat ["Blockchain.addAuthorizedUser: failed to parse HTTP response.\n", msg, "\n"])
-                end
-                handle Socket.Err msg =>
-                        Err (String.concat ["Blockchain.addAuthorizedUser, socket error: ",
-                                        msg])
-                    | Socket.InvalidFD =>
-                        Err "Blockchain.addAuthorizedUser, socket error: invalid file descriptor."
-                    | _ => Err "Blockchain.addAuthorizedUser: unknown error."
-        
-        (* removeAuthorizedUser: string -> int -> int -> string -> string -> string -> (BString.bstring, string) result
-         * `removeAuthorizedUser host port jsonId recipient sender address`
-         *
-         * Queries Ethereum client located at host `host` and port number
-         * `port`, calling the `removeAuthorizedUser` method of our smart
-         * contract, located at `recipient`, from `sender`, using the parameter
-         * `address`. The `jsonId` parameter is an arbitrary integer used to
-         * identify the response to this particular request. All three
-         * `recipient`, `sender`, `address` need to be hexadecimal strings
-         * prefixed by `0x` and representing 20 bytes. The transaction hash is
-         * returned.
-         *)
-        fun removeAuthorizedUser host port jsonId recipient sender address =
-            case (encodeAddress address) of
-              Err msg =>
-                Err (String.concat ["Blockchain.removeAuthorizedUser: user's address failed to encode.\n",
-                                msg])
-            | Ok addEnc =>
-                let
-                    val funSig = "0x89fabc80"
-                    val formEthFunc =
-                        formEthSendTransaction jsonId sender recipient
-                    fun respFunc result =
-                        Ok (BString.unshow (String.extract result 2 None))
-                        handle Word8Extra.InvalidHex =>
-                            Err "Blockchain.removeAuthorizedUser: Error from BString.unshow caught"
-                in
-                    case (sendRequest funSig addEnc formEthFunc host port) of
-                      Ok resp =>
-                        processResponse resp jsonId respFunc "Blockchain.removeAuthorizedUser"
-                    | Err msg =>
-                        Err (String.concat ["Blockchain.removeAuthorizedUser: failed to parse HTTP response.\n", msg, "\n"])
-                end
-                handle Socket.Err msg =>
-                        Err (String.concat ["Blockchain.removeAuthorizedUser, socket error: ",
-                                        msg])
-                    | Socket.InvalidFD =>
-                        Err "Blockchain.removeAuthorizedUser, socket error: invalid file descriptor."
-                    | _ => Err "Blockchain.removeAuthorizedUser: unknown error."
-    end
+            handle Socket.Err msg =>
+                  Err (String.concat ["Blockchain.setHash, socket error: ",
+                                    msg])
+                | Socket.InvalidFD =>
+                    Err "Blockchain.setHash, socket error: invalid file descriptor."
+                | _ => Err "Blockchain.setHash: unknown error."
+    
+    (* addAuthorizedUser: string -> int -> int -> string -> string -> string -> (BString.bstring, string) result
+        * `addAuthorizedUser host port jsonId recipient sender address`
+        *
+        * Queries Ethereum client located at host `host` and port number
+        * `port`, calling the `addAuthorizedUser` method of our smart contract,
+        * located at `recipient`, from `sender`, using the parameter `address`.
+        * The  `jsonId` parameter is an arbitrary integer used to identify the
+        * response to this particular request. All three `recipient`, `sender`,
+        * and `address` need to be hexadecimal strings prefixed by `0x` and
+        * representing 20 bytes. The transaction hash is returned.
+        *)
+    fun addAuthorizedUser host port jsonId recipient sender address =
+        case (encodeAddress address) of
+          Err msg =>
+            Err (String.concat ["Blockchain.addAuthorizedUser: user's address failed to encode.\n",
+                            msg])
+        | Ok addEnc =>
+            let
+                val funSig = "0x177d2a74"
+                val formEthFunc =
+                    formEthSendTransaction jsonId sender recipient
+                fun respFunc result =
+                    Ok (BString.unshow (String.extract result 2 None))
+                    handle Word8Extra.InvalidHex =>
+                        Err "Blockchain.addAuthorizedUser: Error from BString.unshow caught."
+            in
+                case (sendRequest funSig addEnc formEthFunc host port) of
+                    Ok resp =>
+                    processResponse resp jsonId respFunc "Blockchain.addAuthorizedUser"
+                | Err msg =>
+                    Err (String.concat ["Blockchain.addAuthorizedUser: failed to parse HTTP response.\n", msg, "\n"])
+            end
+            handle Socket.Err msg =>
+                    Err (String.concat ["Blockchain.addAuthorizedUser, socket error: ",
+                                    msg])
+                | Socket.InvalidFD =>
+                    Err "Blockchain.addAuthorizedUser, socket error: invalid file descriptor."
+                | _ => Err "Blockchain.addAuthorizedUser: unknown error."
+    
+    (* removeAuthorizedUser: string -> int -> int -> string -> string -> string -> (BString.bstring, string) result
+        * `removeAuthorizedUser host port jsonId recipient sender address`
+        *
+        * Queries Ethereum client located at host `host` and port number
+        * `port`, calling the `removeAuthorizedUser` method of our smart
+        * contract, located at `recipient`, from `sender`, using the parameter
+        * `address`. The `jsonId` parameter is an arbitrary integer used to
+        * identify the response to this particular request. All three
+        * `recipient`, `sender`, `address` need to be hexadecimal strings
+        * prefixed by `0x` and representing 20 bytes. The transaction hash is
+        * returned.
+        *)
+    fun removeAuthorizedUser host port jsonId recipient sender address =
+        case (encodeAddress address) of
+          Err msg =>
+            Err (String.concat ["Blockchain.removeAuthorizedUser: user's address failed to encode.\n",
+                            msg])
+        | Ok addEnc =>
+            let
+                val funSig = "0x89fabc80"
+                val formEthFunc =
+                    formEthSendTransaction jsonId sender recipient
+                fun respFunc result =
+                    Ok (BString.unshow (String.extract result 2 None))
+                    handle Word8Extra.InvalidHex =>
+                        Err "Blockchain.removeAuthorizedUser: Error from BString.unshow caught"
+            in
+                case (sendRequest funSig addEnc formEthFunc host port) of
+                  Ok resp =>
+                    processResponse resp jsonId respFunc "Blockchain.removeAuthorizedUser"
+                | Err msg =>
+                    Err (String.concat ["Blockchain.removeAuthorizedUser: failed to parse HTTP response.\n", msg, "\n"])
+            end
+            handle Socket.Err msg =>
+                  Err (String.concat ["Blockchain.removeAuthorizedUser, socket error: ",
+                                    msg])
+                | Socket.InvalidFD =>
+                    Err "Blockchain.removeAuthorizedUser, socket error: invalid file descriptor."
+                | _ => Err "Blockchain.removeAuthorizedUser: unknown error."
 end
 (* testing code
 fun main () =
