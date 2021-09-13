@@ -363,7 +363,7 @@ struct
      * Converts a list of JSON values
      *)
     fun fromList xs = Array xs
-    (* fromMap: (string. json) map -> json
+    (* fromMap: (string, json) map -> json
      * Converts a string to json mapping into a JSON value.
      *)
     fun fromMap xm = Object xm
@@ -427,6 +427,11 @@ struct
     fun lookup key xJson =
         case xJson of
           Object xJsonm => Map.lookup xJsonm key
+        | _ => None
+    
+    fun insert xJson key value =
+        case xJson of
+          Object xJsonm => Some (Object (Map.insert xJsonm key value))
         | _ => None
     (* walk: 'a -> (bool -> 'a) -> (int -> 'a) -> (Word64.word -> 'a) ->
      *       (string -> 'a) -> 'a -> (json -> 'a -> 'a) ->

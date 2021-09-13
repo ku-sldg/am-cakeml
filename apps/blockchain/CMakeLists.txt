@@ -27,5 +27,5 @@ add_custom_target(blockchainCAAll DEPENDS blockchainCA blockchainCAClient)
 
 add_custom_target(blockchainAll DEPENDS blockchain blockchainAddUser blockchainRemoveUser blockchainCAAll)
 
-get_files(health_record_src ${util_src} ${posix_src} ../../util/Http.sml Blockchain.sml HealthRecord.sml)
+get_files(health_record_src ${util_src} ${server_am_src} ${posix_src} ../../util/Http.sml Blockchain.sml HealthRecord.sml)
 build_posix_am("healthRecord" ${health_record_src})

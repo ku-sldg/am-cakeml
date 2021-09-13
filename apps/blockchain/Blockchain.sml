@@ -181,7 +181,7 @@ struct
                 then Ok rest
                 else if first = 64 + restLen
                     then Ok (BString.concat second rest)
-                    else Err "Blockchain.decodeBytes: Byte string which is not properly encoded."
+                    else Err "Blockchain.decodeBytes: Byte string is not properly encoded."
             end
             handle Word8Extra.InvalidHex =>
                 Err "Blockchain.decodeBytes: Error from BString.unshow caught."
@@ -282,15 +282,11 @@ struct
         in
             if jsonId = respId andalso jsonId >= 0
             then
-                case (Json.lookup "result" jsonResp) of
-                  Some (Json.String result) => func result
-                | Some _ =>
-                    Err (String.concat [errMsgHeader,
-                                    ": JSON result field was not a string.",
-                                    Json.stringify jsonResp])
+                case (Option.mapPartial Json.toString (Json.lookup "result" jsonResp)) of
+                  Some result => func result
                 | None =>
                     Err (String.concat [errMsgHeader,
-                                    ": JSON result field was not found.\n",
+                                    ": JSON result field was either not found or not a string.\n",
                                     Json.stringify jsonResp])
             else Err (String.concat [errMsgHeader,
                                     ": JSON ids didn't match.\n",
@@ -319,7 +315,8 @@ struct
         | Ok hashIdEnc =>
             let
                 val funSig = "0x6b2fafa9"
-                val formEthFunc = formEthCallLatest jsonId sender recipient
+                fun formEthFunc data =
+                    formEthCallLatest jsonId sender recipient data
             in
                 case (sendRequest funSig hashIdEnc formEthFunc host port) of
                   Ok resp =>
@@ -353,8 +350,8 @@ struct
         | Ok paramEnc =>
             let
                 val funSig = "0x6a7fd925"
-                val formEthFunc =
-                    formEthSendTransaction jsonId sender recipient
+                fun formEthFunc data =
+                    formEthSendTransaction jsonId sender recipient data
                 fun respFunc result =
                     Ok (BString.unshow (String.extract result 2 None))
                     handle Word8Extra.InvalidHex =>
@@ -392,8 +389,8 @@ struct
         | Ok addEnc =>
             let
                 val funSig = "0x177d2a74"
-                val formEthFunc =
-                    formEthSendTransaction jsonId sender recipient
+                fun formEthFunc data =
+                    formEthSendTransaction jsonId sender recipient data
                 fun respFunc result =
                     Ok (BString.unshow (String.extract result 2 None))
                     handle Word8Extra.InvalidHex =>
@@ -432,8 +429,8 @@ struct
         | Ok addEnc =>
             let
                 val funSig = "0x89fabc80"
-                val formEthFunc =
-                    formEthSendTransaction jsonId sender recipient
+                fun formEthFunc data =
+                    formEthSendTransaction jsonId sender recipient data
                 fun respFunc result =
                     Ok (BString.unshow (String.extract result 2 None))
                     handle Word8Extra.InvalidHex =>
@@ -452,6 +449,7 @@ struct
                     Err "Blockchain.removeAuthorizedUser, socket error: invalid file descriptor."
                 | _ => Err "Blockchain.removeAuthorizedUser: unknown error."
 end
+
 (* testing code
 fun main () =
     let
