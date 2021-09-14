@@ -143,22 +143,49 @@ struct
                     suffix]
         end
 
-    (* decodeInt : string -> (int, string) result
+    (* decodeInt: int BinaryParser.parser
+     * Transforms an Ethereum JSON ABI uint(256) into a CakeML integer.
+     *)
+    fun decodeInt stream =
+        BinaryParser.fixedInt 32 BString.BigEndian stream
+    (* (* decodeInt : string -> (int, string) result
      * Transforms an Ethereum JSON ABI uint256 into an ML integer.
      * 
      * Returns an error when the encoding does not start with `"0x"`, does not
      * represent 32 bytes, or cannot be parsed by `BString.unshow`.
      *)
-    fun decodeInt enc =
+    fun decodeInt enc = 
         if String.size enc = 66 andalso String.substring enc 0 2 = "0x"
         then Ok (BString.toInt
                 BString.BigEndian
                 (BString.unshow (String.substring enc 2 64)))
             handle Word8Extra.InvalidHex =>
                 Err "Blockchain.decodeInt: Error from BString.unshow caught."
-        else Err "Blockchain.decodeInt: Hex string either did not start with \"0x\" or did not represent 32 bytes."
+        else Err "Blockchain.decodeInt: Hex string either did not start with \"0x\" or did not represent 32 bytes." *)
 
-    (* decodeBytes : string -> (BString.bstring, string) result
+    (* decodeBytes: BString.bstring BinaryParser.parser
+     * Transforms an arbitrary length Ethereum byte string into a
+     * BString.bstring.
+     *)
+    fun decodeBytes stream =
+        let
+            fun mainParser m = 
+                BinaryParser.bind
+                    (BinaryParser.any m)
+                    (fn bs =>
+                        BinaryParser.return bs (BinaryParser.endingNulls 32))
+        in
+            BinaryParser.bind
+                decodeInt
+                (fn m =>
+                    if m = 32
+                    then BinaryParser.choice [
+                            BinaryParser.bind decodeInt (fn n => mainParser n),
+                            mainParser 32]
+                    else mainParser m)
+                stream
+        end
+    (* (* decodeBytes : string -> (BString.bstring, string) result
      * Transforms an Ethereum JSON ABI encoded string into a ML string.
      *
      * Returns an error when the encoding does not start with `"0x"`, is too
@@ -184,7 +211,7 @@ struct
                     else Err "Blockchain.decodeBytes: Byte string is not properly encoded."
             end
             handle Word8Extra.InvalidHex =>
-                Err "Blockchain.decodeBytes: Error from BString.unshow caught."
+                Err "Blockchain.decodeBytes: Error from BString.unshow caught." *)
 
     (* encodeIntBytes: int -> BString.bstring -> (string, string) result
      * Transforms a tuple of type `(int, BString.bstring)` into an Ethereum
@@ -317,10 +344,11 @@ struct
                 val funSig = "0x6b2fafa9"
                 fun formEthFunc data =
                     formEthCallLatest jsonId sender recipient data
+                val decoder = BinaryParser.parseWithPrefix decodeBytes "0x"
             in
                 case (sendRequest funSig hashIdEnc formEthFunc host port) of
                   Ok resp =>
-                    processResponse resp jsonId decodeBytes "Blockchain.getHash"
+                    processResponse resp jsonId decoder "Blockchain.getHash"
                 | Err msg =>
                     Err (String.concat ["Blockchain.getHash: failed to parse HTTP response.\n", msg, "\n"])
             end

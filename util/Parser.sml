@@ -23,7 +23,7 @@ struct
      * A simple parser that successfully returns `x` without consuming any
      * input.
      *)
-    fun return x (cs, line, col) = (Ok x, cs, line, col)
+    (* fun return x (cs, line, col) = (Ok x, cs, line, col) *)
     (* fail: string -> ('a, 'b) parser
      * `fail err`
      * A simple parser that fails, returning `err`, without consuming any input.
@@ -243,8 +243,7 @@ struct
      *)
     fun choice ps (cs, line, col) =
         case ps of
-          [] => (Err "No parser alteratives given", cs, line, col)
-        | [p] => p (cs, line, col)
+          [] => (Err "No more parsers to try", cs, line, col)
         | p::ps' =>
             case p (cs, line, col) of
               (Ok x, cs', line', col') =>

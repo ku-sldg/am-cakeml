@@ -201,10 +201,50 @@ struct
      * `decodeString enc`
      * Decodes arbitrary length strings from Ethereum ABI format.
      *)
-    fun decodeString enc =
-        Result.map BString.toString (Blockchain.decodeBytes enc)
+    fun decodeString stream =
+        BinaryParser.map BString.toString Blockchain.decodeBytes stream
     
-    (* decodeStringArray: string -> (string list, string) result
+    fun decodeStringArray stream =
+        let
+            val stringParser =
+                BinaryParser.bind
+                    Blockchain.decodeInt
+                    (fn strLen =>
+                        BinaryParser.map
+                            BString.toString
+                            (BinaryParser.bind
+                                (BinaryParser.any strLen)
+                                (fn bs =>
+                                    BinaryParser.return
+                                        bs
+                                        (BinaryParser.leftoverNulls 32))))
+            fun mainParser arrLen =
+                BinaryParser.resetPos 0 (BinaryParser.bind
+                    (BinaryParser.count arrLen Blockchain.decodeInt)
+                    (fn strOffsets =>
+                        BinaryParser.bind
+                            (BinaryParser.seqs
+                                (List.map
+                                    (fn strOffset =>
+                                        BinaryParser.at strOffset stringParser)
+                                    strOffsets))
+                        (fn strs =>
+                            BinaryParser.return strs BinaryParser.empty)))
+        in
+            BinaryParser.bind
+                Blockchain.decodeInt
+                (fn n =>
+                    if n = 32
+                    then BinaryParser.choice [
+                            BinaryParser.bind
+                                Blockchain.decodeInt
+                                (fn arrLen => mainParser arrLen),
+                            mainParser 32
+                        ]
+                    else mainParser n)
+                stream
+        end
+    (* (* decodeStringArray: string -> (string list, string) result
      * `decodeStringArray enc`
      * Decodes an array of arbitrary length strings from Ethereum ABI format.
      *)
@@ -218,7 +258,7 @@ struct
                         val start = 32 * n
                         val lenOffset =
                             BString.toInt BString.BigEndian
-                                (BString.substring bs start 32)
+                                (BString.substring bs start 32) - start
                         val length =
                             BString.toInt BString.BigEndian
                                 (BString.substring bs lenOffset 32)
@@ -250,7 +290,7 @@ struct
                     | Ok result => Ok result
             end
             handle
-                Word8Extra.InvalidHex => Err "HealthRecord.decodeStringArray: invalid hex")
+                Word8Extra.InvalidHex => Err "HealthRecord.decodeStringArray: invalid hex") *)
     
     (* addRecord: string -> int -> int -> string -> string -> BString.bstring ->
         BString.bstring -> Json.json -> (BString.bstring, string) result
@@ -270,8 +310,8 @@ struct
                 encodeBytesBytesString appraiserId targetId (Json.stringify record)
             fun formEthFunc data =
                 Blockchain.formEthSendTransaction jsonId sender recipient data
-            fun respFunc result =
-                Ok (BString.unshow (String.extract result 2 None))
+            fun respFunc resp =
+                Ok (BString.unshow (String.extract resp 2 None))
                 handle Word8Extra.InvalidHex =>
                     Err "HealthRecord.addRecord: Error from BString.unshow caught."
         in
@@ -306,8 +346,9 @@ struct
             val argsEnc = encodeBytesBytes appraiserId targetId
             fun formEthFunc data =
                 Blockchain.formEthCallLatest jsonId sender recipient data
-            fun respFunc result =
-                Result.bind (decodeString result) (fn resultStr => Json.parse resultStr)
+            val decoder = BinaryParser.parseWithPrefix decodeString "0x"
+            fun respFunc resp =
+                Result.bind (decoder resp) Json.parse
         in
             case (Blockchain.sendRequest funSig argsEnc formEthFunc host port) of
               Ok resp =>
@@ -342,10 +383,11 @@ struct
                 Blockchain.formEthCallLatest jsonId sender recipient data
             fun stringToHR str =
                 Result.bind (Json.parse str) fromJson
-            fun respFunc result =
+            val decoder = BinaryParser.parseWithPrefix decodeStringArray "0x"
+            fun respFunc resp =
                 Result.bind
-                    (decodeStringArray result)
-                    (fn resultStrs => Ok (List.map stringToHR resultStrs))
+                    (decoder resp)
+                    (fn respStrs => Ok (List.map stringToHR respStrs))
         in
             case (Blockchain.sendRequest funSig argsEnc formEthFunc host port) of
               Ok resp =>
@@ -362,7 +404,7 @@ struct
             | _ => Err "HealthRecord.getAllRecords: unknown error"
 end
 
-(* testing code *)
+(* testing code
 fun test_decodeStringArray () =
     let
         val bs = String.concat ["0x",
@@ -382,11 +424,11 @@ fun test_decodeStringArray () =
               [] => ""
             | x::xs' => List.foldl (listToString_aux toString) (toString x) xs'
     in
-        case HealthRecord.decodeStringArray bs of
+        case BinaryParser.parseWithPrefix HealthRecord.decodeStringArray "0x" bs of
           Err err => TextIO.print_list [err, "\n"]
-        | Ok strs => TextIO.print_list [listToString id strs, "\n"]
+        | Ok strs => TextIO.print_list ["[", listToString id strs, "]\n"]
     end
 
 val _ =
     test_decodeStringArray ()
-(**)
+*)

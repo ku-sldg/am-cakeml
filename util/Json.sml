@@ -118,25 +118,25 @@ struct
                 Parser.bindResult toJson
                     (Parser.bind (Parser.option #"+" (Parser.char #"-"))
                         (fn signChar =>
-                            (Parser.choice [
+                            (Parser.label "Error reading a JSON number" (Parser.choice [
                                 Parser.bind intPartParser
                                     (fn intPart =>
                                         Parser.option (Err (signFunc signChar intPart))
                                             (fracPartParser (signFunc signChar intPart))),
-                                    Parser.map
-                                        (fn fracPart =>
-                                            Ok (signFunc signChar fracPart))
-                                        (Parser.seq (Parser.char #".")
-                                            (Parser.bind
-                                                (Parser.map String.implode (Parser.many1 Parser.digit))
-                                                (fn fracPart =>
-                                                    let
-                                                        val mantissa = String.concat [".", fracPart]
-                                                    in
-                                                        Parser.option mantissa
-                                                                (exponPartParser mantissa)
-                                                    end)))
-                            ])))
+                                Parser.map
+                                    (fn fracPart =>
+                                        Ok (signFunc signChar fracPart))
+                                    (Parser.seq (Parser.char #".")
+                                        (Parser.bind
+                                            (Parser.map String.implode (Parser.many1 Parser.digit))
+                                            (fn fracPart =>
+                                                let
+                                                    val mantissa = String.concat [".", fracPart]
+                                                in
+                                                    Parser.option mantissa
+                                                            (exponPartParser mantissa)
+                                                end)))
+                            ]))))
             end
         (* quoteParser: (char, char) parser
          * Parses the '"' character.
