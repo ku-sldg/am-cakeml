@@ -2,7 +2,7 @@ structure Parser =
 struct
     type 'a stream = 'a list * int * int
     type ('a, 'b) parser = ('b stream) -> ('a, string) result * 'b list * int * int
-    (* parse: ('a, 'b) parser -> string -> ('a, string) result * 'b list * int * int
+    (* parse: ('a, char) parser -> string -> ('a, string) result * char list * int * int
      * `parse p str`
      * Runs the parser `p` over the string `str`.
      *)
@@ -18,19 +18,57 @@ struct
         | Err msg =>
             Err (String.concat ["Line ", Int.toString line, ", Column ",
                                         Int.toString col, ": ", msg])
+    (* bind: ('a, 'b) parser -> ('a -> ('c, 'b) parser) -> ('c, 'b) parser
+     * `bind p funcp`
+     * Runs the parser `p` and upon success, applies `funcp` to the result and
+     * continue to parse.
+     *)
+    fun bind p funcp stream =
+        case p stream of
+          (Ok x, cs', line', col') => funcp x (cs', line', col')
+        | (Err msg, cs', line', col') => (Err msg, cs', line', col')
+    (* bindResult: ('a -> ('b, string) result) -> ('a, 'c) parser -> ('b, 'c) parser
+     * `bindResult func p`
+     * Runs the parser `p` and upon success, applies `func` to the result.
+     *)
+    fun bindResult func p stream =
+        case p stream of
+          (Ok x, cs', line', col') => (func x, cs', line', col')
+        | (Err err, cs', line', col') =>
+            (Err err, cs', line', col')
+    (* map: ('a -> 'b) -> ('a, 'c) parser -> ('b, 'c) parser
+     * `map func p`
+     * Runs parser `p` and upon success, applies `func` to the result.
+     *)
+    fun map func p stream =
+        case p stream of
+          (Ok x, cs', line', col') =>
+            (Ok (func x), cs', line', col')
+        | (Err err, cs', line', col') =>
+            (Err err, cs', line', col')
+    (* mapErr: (string -> string) -> ('a, 'b) parser -> ('a, 'b) parser
+     * `mapErr func p`
+     * Runs parser `p` and upon failure, applies `func` to the error message.
+     *)
+    (* fun mapErr func p stream =
+        case p stream of
+          (Ok x, cs', line', col') =>
+            (Ok x, cs', line', col')
+        | (Err err, cs', line', col') =>
+            (Err (func err), cs', line', col') *)
     (* return: 'a -> ('a, 'b) parser
      * `return x`
      * A simple parser that successfully returns `x` without consuming any
      * input.
      *)
     (* fun return x (cs, line, col) = (Ok x, cs, line, col) *)
-    (* fail: string -> ('a, 'b) parser
+    (* fail: 'b -> ('a, 'b) parser
      * `fail err`
      * A simple parser that fails, returning `err`, without consuming any input.
      *)
     (* fun fail err (cs, line, col) = (Err err, cs, line, col) *)
-    (* eof: (unit, 'a) parser
-     * `eof (cs, line, col)`
+    (* eof: (unit, string) parser
+     * `eof`
      * A simple parser that succeeds exactly when there is no more input.
      *)
     fun eof (cs, line, col) =
@@ -42,11 +80,11 @@ struct
      * Runs parser `p1` and then, upon success, runs parser `p2`, discarding the
      * previous results.
      *)
-    fun seq p1 p2 stream =
-        case p1 stream of
-          (Ok _, cs', line', col') => p2 (cs', line', col')
-        | (Err err, cs', line', col') => (Err err, cs', line', col')
-    (* satisfy: ('b -> bool) -> ('a, 'b) parser
+    fun seq p1 p2 stream = bind p1 (fn _ => p2) stream
+        (* case p1 stream of
+          (Ok _, cs, line, col) => p2 (cs, line, col)
+        | (Err msg, cs, line, col) => (Err msg, cs, line, col) *)
+    (* satisfy: (char -> bool) -> (char, char) parser
      * `satisfy pred`
      * A simple parser that succeeds exactly when `pred` returns true on the
      * next element in the stream. Does not consume input upon failure.
@@ -122,88 +160,66 @@ struct
      * the stream. Does not consume input upon failure.
      *)
     val anyChar = label "Expected any character." (satisfy (const True))
-    local
-        (* isDigit: char -> bool *)
-        fun isDigit c = Char.<= #"0" c andalso Char.<= c #"9"
-        (* isOctal: char -> bool *)
-        fun isOctal c = Char.<= #"0" c andalso Char.<= c #"7"
-        (* isHex: char -> bool *)
-        fun isHex c = (Char.<= #"0" c andalso Char.<= c #"9") orelse
-            (Char.<= #"a" c andalso Char.<= c #"f") orelse
-            (Char.<= #"A" c andalso Char.<= c #"F")
-        (* isLower: char -> bool*)
-        fun isLower c = Char.<= #"a" c andalso Char.<= c #"z"
-        (* isUpper: char -> bool *)
-        fun isUpper c = Char.<= #"A" c andalso Char.<= c #"Z"
-        (* isAlpha: char -> bool
-         * Only handles ASCII alphabet characters
-         *)
-        fun isAlpha c = isLower c orelse isUpper c
-        (* isAlphaNum: char -> bool
-         * Only handles ASCII alphanumeric characters
-         *)
-        fun isAlphaNum c = isAlpha c orelse isDigit c
-        (* isSpace: char -> bool
-         * Only handles ASCII whitespace characters
-         *)
-        fun isSpace c =
-            let
-                val ascii = Char.ord c
-            in
-                c = #" " orelse (9 <= ascii andalso ascii <= 13)
-            end
-    in
-        (* digit: (char, char) Parser
-         * A simple parser that succeeds upon seeing a digit, '0'..'9'. Does not
-         * consume input upon failure.
-         *)
-        val digit = 
-            label "Expected a digit." (satisfy isDigit)
-        (* octalDigit: (char, char) Parser
-         * A simple parser that succeeds upon seeing an octal numeral, '0'..'7'.
-         * Does not consume input upon failure.
-         *)
-        val octalDigit = 
-            label "Expected an octal digit." (satisfy isOctal)
-        (* hexDigit: (char, char) Parser
-         * A simple parser that succeeds upon seeing a hexadecimal numeral,
-         * '0'..'9' or 'a'..'f' or 'A'..'F'. Does not consume input upon
-         * failure.
-         *)
-        val hexDigit = 
-            label "Expected a hexidecimal digit." (satisfy isHex)
-        (* lower: (char, char) Parser
-         * A simple parser that succeeds upon seeing a lowercase ASCII
-         * character, 'a'..'z'. Does not consume input upon failure.
-         *)
-        val lower = 
-            label "Expected a lower-case ascii character." (satisfy isLower)
-        (* upper: (char, char) Parser
-         * A simple parser that succeeds upon seeing an uppercase ASCII
-         * character, 'A'..'Z'. Does not consume input upon failure.
-         *)
-        val upper = 
-            label "Expected an upper-case ascii character." (satisfy isUpper)
-        (* letter: (char, char) Parser
-         * A simple parser that succeeds upon seeing an ASCII alphabet
-         * character, 'a'..'z' or 'A'..'Z'. Does not consume input upon failure.
-         *)
-        val letter = 
-            label "Expected an ascii alphabet character." (satisfy isAlpha)
-        (* alphaNum: (char, char) Parser
-         * A simple parser that succeeds upon seeing an ASCII digit or alphabet
-         * character: 'a'..'z', 'A'..'Z', or '0'..'9'. Does not consume input
-         * upon failure.
-         *)
-        val alphaNum = 
-            label "Expected an ascii alphanumeric character." (satisfy isAlphaNum)
-        (* space: (char, char) Parser
-         * A simple parser that succeeds upon seeing any ASCII whitespace
-         * characters. Does not consume input upon failure.
-         *)
-        val space = 
-            label "Expected an ascii whitespace character." (satisfy isSpace)
-    end
+    (* digit: (char, char) Parser
+     * A simple parser that succeeds upon seeing a digit, '0'..'9'. Does not
+     * consume input upon failure.
+     *)
+    val digit = 
+        label "Expected a digit." (satisfy StringExtra.isDigit)
+    (* octalDigit: (char, char) Parser
+     * A simple parser that succeeds upon seeing an octal numeral, '0'..'7'.
+     * Does not consume input upon failure.
+     *)
+    val octalDigit = 
+        label "Expected an octal digit." (satisfy StringExtra.isOctal)
+    (* hexDigit: (char, char) Parser
+     * A simple parser that succeeds upon seeing a hexadecimal numeral,
+     * '0'..'9' or 'a'..'f' or 'A'..'F'. Does not consume input upon
+     * failure.
+     *)
+    val hexDigit = 
+        label "Expected a hexidecimal digit." (satisfy StringExtra.isHex)
+    (* lower: (char, char) Parser
+     * A simple parser that succeeds upon seeing a lowercase ASCII
+     * character, 'a'..'z'. Does not consume input upon failure.
+     *)
+    val lower = 
+        label
+            "Expected a lower-case ascii character."
+            (satisfy StringExtra.isLower)
+    (* upper: (char, char) Parser
+     * A simple parser that succeeds upon seeing an uppercase ASCII
+     * character, 'A'..'Z'. Does not consume input upon failure.
+     *)
+    val upper = 
+        label
+            "Expected an upper-case ascii character."
+            (satisfy StringExtra.isUpper)
+    (* letter: (char, char) Parser
+     * A simple parser that succeeds upon seeing an ASCII alphabet
+     * character, 'a'..'z' or 'A'..'Z'. Does not consume input upon failure.
+     *)
+    val letter = 
+        label
+            "Expected an ascii alphabet character."
+            (satisfy StringExtra.isAlpha)
+    (* alphaNum: (char, char) Parser
+     * A simple parser that succeeds upon seeing an ASCII digit or alphabet
+     * character: 'a'..'z', 'A'..'Z', or '0'..'9'. Does not consume input
+     * upon failure.
+     *)
+    val alphaNum = 
+        label
+            "Expected an ascii alphanumeric character."
+            (satisfy StringExtra.isAlphaNum)
+    (* space: (char, char) Parser
+     * A simple parser that succeeds upon seeing any ASCII whitespace
+     * characters. Does not consume input upon failure.
+     *)
+    val space = 
+        label
+            "Expected an ascii whitespace character."
+            (satisfy StringExtra.isSpace)
     (* string: string -> (string, char) parser
      * `string str`
      * A parser that succeeds when the characters of `str` are the characters
@@ -235,7 +251,7 @@ struct
     val crlf =
         label "Expected a carriage return followed by a line feed."
             (return #"\n" (string (String.concat [String.str (Char.chr 13), "\n"])))
-    (* choice: ('a, 'b) parser list -> ('a, 'b) parser
+    (* choice: (('a, 'b) parser) list -> ('a, 'b) parser
      * `choice ps`
      * A parser that tries one parser after another until one succeeds or one
      * fails and consumes input. Should the next parser to try fails and
@@ -290,8 +306,8 @@ struct
      * Tries parser `p` one or more times. As long as `p` succeeds, `many1 p`
      * will continue to consume input.
      *)
-    fun many1 p stream =
-        case p stream of
+    fun many1 p stream = bind p (fn x => map (fn xs => x::xs) (many p)) stream
+        (* case p stream of
           (Ok x, cs', line', col') =>
             let
                 val (Ok xs, cs'', line'', col'') =
@@ -299,7 +315,7 @@ struct
             in
                 (Ok (x::xs), cs'', line'', col'')
             end
-        | (Err err, cs', line', col') => (Err err, cs', line', col')
+        | (Err err, cs', line', col') => (Err err, cs', line', col') *)
     (* skipMany: ('a, 'b) parser -> (unit, 'b) parser
      * `skipMany p`
      * Tries parser `p` zero or more times, discarding the results. As long as
@@ -321,11 +337,11 @@ struct
      * `p` fails and does not consume input. Should `p` fail and consume input,
      * then so does this function.
      *)
-    (* fun skipMany1 p stream =
-        case p stream of
+    (* fun skipMany1 p stream = bind p (fn _ => skipMany p) stream
+        (* case p stream of
           (Ok _, cs', line', col') => skipMany p (cs', line', col')
         | (Err err, cs', line', col') =>
-            (Err err, cs', line', col') *)
+            (Err err, cs', line', col') *) *)
     (* spaces: (unit, char) parser
      * `spaces = skipMany space`
      * Skips zero or more ASCII whitespace characters. Does not consume input
@@ -341,7 +357,10 @@ struct
         if n <= 0
         then (Ok [], cs, line, col)
         else
-            case p (cs, line, col) of
+            bind p
+                (fn x => map (fn xs => x::xs) (count (n - 1) p))
+                (cs, line, col)
+            (* case p (cs, line, col) of
               (Ok x, cs', line', col') =>
                 let
                     val (xsr, cs'', line'', col'') =
@@ -351,14 +370,15 @@ struct
                       Ok xs => (Ok (x::xs), cs'', line'', col'')
                     | Err err => (Err err, cs'', line'', col'')
                 end
-            | (Err err, cs', line', col') => (Err err, cs', line', col')
+            | (Err err, cs', line', col') => (Err err, cs', line', col') *)
     (* between: ('a, 'b) parser -> ('c, 'b) parser -> ('d, 'b) parser -> ('d, 'b) parser
      * `between open close p`
      * Runs parser `open`, then runs `p`, then `close` keeping only the result
      * of `p` upon success.
      *)
     fun between openp closep p stream =
-        case openp stream of
+        bind openp (fn _ => bind p (fn x => return x closep)) stream
+        (* case openp stream of
           (Err err, cs', line', col') =>
             (Err err, cs', line', col')
         | (Ok _, cs', line', col') =>
@@ -370,7 +390,7 @@ struct
                   (Err err, cs''', line''', col''') =>
                     (Err err, cs''', line''', col''')
                 | (Ok _, cs''', line''', col''') =>
-                    (Ok x, cs''', line''', col''')
+                    (Ok x, cs''', line''', col''') *)
     (* option: 'a -> ('a, 'b) parser -> ('a, 'b) parser
      * `option x p`
      * Runs parser `p` and succeeds returning `x` should `p` fail and not
@@ -410,12 +430,13 @@ struct
               (Err _, _, _, _) =>
                 (Ok [x], cs', line', col')
             | (Ok _, cs'', line'', col'') =>
-                let
+                map (fn xs => x::xs) (sepBy p sepp) (cs'', line'', col'')
+                (* let
                     val (Ok xs, cs''', line''', col''') =
                         sepBy p sepp (cs'', line'', col'')
                 in
                     (Ok (x::xs), cs''', line''', col''')
-                end
+                end *)
     (* sepBy1: ('a, 'b) parser -> ('c, 'b) parser -> ('a list, 'b) parser
      * `sepBy1 p sep`
      * Runs one or more iterations of `p` separated by iterations of `sep` and
@@ -429,12 +450,13 @@ struct
               (Err _, _, _, _) =>
                 (Ok [x], cs', line', col')
             | (Ok _, cs'', line'', col'') =>
-                let
+                map (fn xs => x::xs) (sepBy p sepp) (cs'', line'', col'')
+                (* let
                     val (Ok xs, cs''', line''', col''') =
                         sepBy p sepp (cs'', line'', col'')
                 in
                     (Ok (x::xs), cs''', line''', col''')
-                end *)
+                end *) *)
     (* endBy: ('a, 'b) parser -> ('c, 'b) parser -> ('a list, 'b) parser
      * `endBy p sep`
      * Runs zero or more iterations of `p` where each iteration ends with `sep`,
@@ -449,14 +471,15 @@ struct
               (Err err, cs'', line'', col'') =>
                 (Err err, cs'', line'', col'')
             | (Ok _, cs'', line'', col'') =>
-                let
+                map (fn xs => x::xs) (endBy p sepp) (cs'', line'', col'')
+                (* let
                     val (xsr, cs''', line''', col''') =
                         endBy p sepp (cs'', line'', col'')
                 in
                     case xsr of
                       Ok xs => (Ok (x::xs), cs''', line''', col''')
                     | Err err => (Err err, cs'', line'', col'')
-                end *)
+                end *) *)
     (* endBy1: ('a, 'b) parser -> ('c, 'b) parser -> ('a, 'b) parser
      * `endBy1 p sep`
      * Runs one or more iterations of `p` where each iteration ends with `sep`,
@@ -470,14 +493,15 @@ struct
               (Err err, cs'', line'', col'') =>
                 (Err err, cs'', line'', col'')
             | (Ok _, cs'', line'', col'') =>
-                let
+                map (fn xs => x::xs) (endBy p sepp) (cs'', line'', col'')
+                (* let
                     val (xsr, cs''', line''', col''') =
                         endBy p sepp (cs'', line'', col'')
                 in
                     case xsr of
                       Ok xs => (Ok (x::xs), cs''', line''', col''')
                     | Err err => (Err err, cs'', line'', col'')
-                end *)
+                end *) *)
     (* sepEndBy: ('a, 'b) parser -> ('c, 'b) parser -> ('a list, 'b) parser
      * `sepEndBy p sep`
      * Runs zero or more iterations of `p` interspersed with `sep` and an
@@ -492,12 +516,13 @@ struct
               (Err _, _, _, _) =>
                 (Ok [x], cs', line', col')
             | (Ok _, cs'', line'', col'') =>
-                let
+                map (fn xs => x::xs) (sepEndBy p sepp) (cs'', line'', col'')
+                (* let
                     val (Ok xs, cs''', line''', col''') =
                         sepEndBy p sepp (cs'', line'', col'')
                 in
                     (Ok (x::xs), cs''', line''', col''')
-                end *)
+                end *) *)
     (* sepEndBy1: ('a, 'b) parser -> ('c, 'b) parser -> ('a, 'b) parser
      * `sepEndBy1 p sep`
      * Runs one or more iterations of `p` interspersed with `sep` and an
@@ -510,12 +535,13 @@ struct
         | (Ok x, cs', line', col') =>
             case sepp (cs', line', col') of
               (Ok _, cs'', line'', col'') =>
-                let
+                map (fn xs => x::xs) (sepEndBy p sepp) (cs'', line'', col'')
+                (* let
                     val (Ok xs, cs''', line''', col''') =
                         sepEndBy p sepp (cs'', line'', col'')
                 in
                     (Ok (x::xs), cs''', line''', col''')
-                end
+                end *)
             | (Err _, _, _, _) =>
                 (Ok [x], cs', line', col') *)
     (* manyTill: ('a, 'b) parser -> ('c, 'b) parser -> ('a list, 'b) parser
@@ -532,50 +558,13 @@ struct
               (Err err, cs', line', col') =>
                 (Err err, cs', line', col')
             | (Ok x, cs', line', col') =>
-                let
+                map (fn xs => x::xs) (manyTill p endp) (cs', line', col')
+                (* let
                     val (xsr, cs'', line'', col'') =
                         manyTill p endp (cs', line', col')
                 in
                     case xsr of
                       Ok xs => (Ok (x::xs), cs'', line'', col'')
                     | Err err => (Err err, cs'', line'', col'')
-                end
-    (* bindResult: ('a -> ('b, string) result) -> ('a, 'c) parser -> ('b, 'c) parser
-     * `bindResult func p`
-     * Runs the parser `p` and upon success, applies `func` to the result.
-     *)
-    fun bindResult func p stream =
-        case p stream of
-          (Ok x, cs', line', col') => (func x, cs', line', col')
-        | (Err err, cs', line', col') =>
-            (Err err, cs', line', col')
-    (* bind: ('a, 'b) parser -> ('a -> ('c, 'b) parser) -> ('c, 'b) parser
-     * `bind p funcp`
-     * Runs the parser `p` and upon success, applies `funcp` to the result and
-     * continue to parse.
-     *)
-    fun bind p funcp stream =
-        case p stream of
-          (Ok x, cs', line', col') => funcp x (cs', line', col')
-        | (Err msg, cs', line', col') => (Err msg, cs', line', col')
-    (* map: ('a -> 'b) -> ('a, 'c) parser -> ('b, 'c) parser
-     * `map func p`
-     * Runs parser `p` and upon success, applies `func` to the result.
-     *)
-    fun map func p stream =
-        case p stream of
-          (Ok x, cs', line', col') =>
-            (Ok (func x), cs', line', col')
-        | (Err err, cs', line', col') =>
-            (Err err, cs', line', col')
-    (* mapErr: (string -> string) -> ('a, 'b) parser -> ('a, 'b) parser
-     * `mapErr func p`
-     * Runs parser `p` and upon failure, applies `func` to the error message.
-     *)
-    (* fun mapErr func p stream =
-        case p stream of
-          (Ok x, cs', line', col') =>
-            (Ok x, cs', line', col')
-        | (Err err, cs', line', col') =>
-            (Err (func err), cs', line', col') *)
+                end *)
 end

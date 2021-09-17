@@ -101,6 +101,35 @@ structure StringExtra = struct
             List.map String.implode (walker (String.explode str) [] [])
         end
 
+    (* isDigit: char -> bool *)
+    fun isDigit c = Char.<= #"0" c andalso Char.<= c #"9"
+    (* isOctal: char -> bool *)
+    fun isOctal c = Char.<= #"0" c andalso Char.<= c #"7"
+    (* isHex: char -> bool *)
+    fun isHex c = (Char.<= #"0" c andalso Char.<= c #"9") orelse
+        (Char.<= #"a" c andalso Char.<= c #"f") orelse
+        (Char.<= #"A" c andalso Char.<= c #"F")
+    (* isLower: char -> bool*)
+    fun isLower c = Char.<= #"a" c andalso Char.<= c #"z"
+    (* isUpper: char -> bool *)
+    fun isUpper c = Char.<= #"A" c andalso Char.<= c #"Z"
+    (* isAlpha: char -> bool
+        * Only handles ASCII alphabet characters
+        *)
+    fun isAlpha c = isLower c orelse isUpper c
+    (* isAlphaNum: char -> bool
+        * Only handles ASCII alphanumeric characters
+        *)
+    fun isAlphaNum c = isAlpha c orelse isDigit c
+    (* isSpace: char -> bool
+        * Only handles ASCII whitespace characters
+        *)
+    fun isSpace c =
+        let
+            val ascii = Char.ord c
+        in
+            c = #" " orelse (9 <= ascii andalso ascii <= 13)
+        end
     (* escape : string -> string
      * Performs C string escaping, taking `"` to `\"` and `\` to `\\`.
      *)

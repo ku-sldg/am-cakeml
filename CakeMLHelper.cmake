@@ -54,16 +54,16 @@ function(build_cake name)
     cat("${name}.cml" ${PARSED_ARGS_SOURCES})
     set(abs_bin_prefix "${CMAKE_BINARY_DIR}/${name}")
     add_custom_command(
-        OUTPUT ${abs_bin_prefix}.cake.S
-        COMMAND ${cakec} ${cakeflag_list} < ${abs_bin_prefix}.cml > ${abs_bin_prefix}.cake.S
-        COMMAND sed -i.orig "s/cdecl(main)/cdecl(${PARSED_ARGS_ENTRY_NAME})/g" ${abs_bin_prefix}.cake.S
+        OUTPUT ${abs_bin_prefix}.S
+        COMMAND ${cakec} ${cakeflag_list} < ${abs_bin_prefix}.cml > ${abs_bin_prefix}.S
+        COMMAND sed -i.orig "s/cdecl(main)/cdecl(${PARSED_ARGS_ENTRY_NAME})/g" ${abs_bin_prefix}.S
         DEPENDS ${abs_bin_prefix}.cml
         VERBATIM
     )
-    add_library(${name} STATIC "${abs_bin_prefix}.cake.S")
+    add_library(${name} STATIC "${abs_bin_prefix}.S")
 endfunction()
 
-# Builds a CAmkES component from CakeML and C sourse files.
+# Builds a CAmkES component from CakeML and C source files.
 # Args: name - name of the component
 #       CML_SOURCES - CakeML source files, in order (they'll be concatenated together)
 #       C_SOURCES - C source files
