@@ -13,7 +13,7 @@ val privKey = BString.unshow "9FF1145A05AB74B449F39D9A505CB2A4706597C214C2356254
 val sender = "0xdE497f77e0e2Ae24D27B6108f9400e95A18392B0"
 val blockchainHost = "127.0.0.1"
 val blockchainPort = 8543
-val freshnessLimit = 5000
+val freshnessLimit = 3000000
 
 fun getHashDemo goldenHashRecipient =
     let
@@ -81,12 +81,13 @@ fun healthRecordDemo addr goldenHashRecipient healthRecordRecipient =
     in
         case allRecords of
           Err msg =>
-            TextIO.print_err (String.concat ["Error getting health records: ", msg])
+            TextIO.print_err
+                (String.concat ["Error getting health records: ", msg, "\n"])
         | Ok records =>
             case filterHealthRecords records of
               _::_ =>
                 TextIO.print_list ["Found a record with freshness at most ",
-                    Int.toString freshnessLimit, " ms."]
+                    Int.toString freshnessLimit, " ms.\n"]
             | [] =>
                 case sendReq addr goldenHashRecipient of
                   Err msg => TextIO.print_err msg
@@ -116,8 +117,10 @@ fun healthRecordDemo addr goldenHashRecipient healthRecordRecipient =
 fun main () =
     let
         val name  = CommandLine.name ()
-        val usage = String.concat
-                    ["Usage: ", name, " <server ip> <smart contract address> <smart contract address>\n"]
+        val usage =
+            String.concat
+                ["Usage: ", name,
+                " <server ip> <smart contract address> <smart contract address>\n"]
     in
         case CommandLine.arguments () of
           [addr, goldenHashRecipient, healthRecordRecipient] =>

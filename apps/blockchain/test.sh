@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 # $1 is the address of the smart contract
-if [-z "$1"] || [-z "$2"];
+if [ -z "$1" ] || [ -z "$2" ];
 then
 	echo "$0 <contract address> <contract address>"
 	exit 1
@@ -17,6 +17,8 @@ then
 	# '7BE9FDA4...05C20081' is the golden hash value
 	./blockchainSetHash $1 ${goldenHash}
 	read -p "Press enter to launch the client" dummy
+	./blockchainClient 127.0.0.1 $1 $2
+	read -p "Press enter to relaunch client" dummy
 	./blockchainClient 127.0.0.1 $1 $2
 	kill ${SERVER_PID}
 	exit $?

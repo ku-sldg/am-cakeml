@@ -165,16 +165,22 @@ struct
     fun encodeBytesBytesString bs1 bs2 str =
         let
             val bs1Offset = 96 (* 3 * 32 *)
-            val bs2Offset = bs1Offset + BString.length bs1
-            val strOffset = bs2Offset + BString.length bs2
+            val bs1Len = BString.length bs1
+            val bs2Offset = bs1Offset + 32 + bs1Len
+            val bs2Len = BString.length bs2
+            val strOffset = bs2Offset + 32 + bs2Len
+            val strLen = String.size str
             val toIntABI = BString.fromIntLength 32 BString.BigEndian
         in
             BString.show (BString.concatList [
                 toIntABI bs1Offset,
                 toIntABI bs2Offset,
                 toIntABI strOffset,
+                toIntABI bs1Len,
                 bs1,
+                toIntABI bs2Len,
                 bs2,
+                toIntABI strLen,
                 BString.fromString str
             ])
         end
@@ -186,13 +192,17 @@ struct
     fun encodeBytesBytes bs1 bs2 =
         let
             val bs1Offset = 64 (* 2 * 32 *)
-            val bs2Offset = bs1Offset + BString.length bs1
+            val bs1Len = BString.length bs1
+            val bs2Offset = bs1Offset + 32 + bs1Len
+            val bs2Len = BString.length bs2
             val toIntABI = BString.fromIntLength 32 BString.BigEndian
         in
             BString.show (BString.concatList [
                 toIntABI bs1Offset,
                 toIntABI bs2Offset,
+                toIntABI bs1Len,
                 bs1,
+                toIntABI bs2Len,
                 bs2
             ])
         end
@@ -321,7 +331,7 @@ struct
             | Err msg =>
                 Err (String.concat [
                     "HealthRecord.addRecord: failed to parse HTTP response.\n",
-                    msg, "\n"])
+                    msg])
         end
         handle Socket.Err msg =>
                 Err (String.concat ["HealthRecord.addRecord, socket error: ", msg])
@@ -356,7 +366,7 @@ struct
             | Err msg =>
                 Err (String.concat [
                     "HealthRecord.getRecentRecord: failed to parse HTTP response.\n",
-                    msg, "\n"])
+                    msg])
         end
         handle Socket.Err msg =>
                 Err (String.concat ["HealthRecord.getRecentRecord, socket error: ", msg])
@@ -395,7 +405,7 @@ struct
             | Err msg =>
                 Err (String.concat [
                     "HealthRecord.getAllRecords: failed to parse HTTP response.\n",
-                    msg, "\n"])
+                    msg])
         end
         handle Socket.Err msg =>
                 Err (String.concat ["HealthRecord.getAllRecords, socket error: ", msg])
