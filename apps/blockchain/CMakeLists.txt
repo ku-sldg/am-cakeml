@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10.2)
 
-get_files(blockchain_client_src ${server_am_src} ../../util/BinaryParser.sml ../../util/Http.sml Blockchain.sml Client.sml)
+get_files(blockchain_client_src ${server_am_src} ../../util/BinaryParser.sml ../../util/Http.sml Blockchain.sml HealthRecord.sml Client.sml)
 build_posix_am("blockchainClient" ${blockchain_client_src})
 
 get_files(blockchain_server_src ${server_am_src} Server.sml)
@@ -26,6 +26,3 @@ build_posix_am("blockchainCAClient" ${blockchain_CA_client_src})
 add_custom_target(blockchainCAAll DEPENDS blockchainCA blockchainCAClient)
 
 add_custom_target(blockchainAll DEPENDS blockchain blockchainAddUser blockchainRemoveUser blockchainCAAll)
-
-get_files(health_record_src ${server_am_src} ../../util/BinaryParser.sml ../../util/Http.sml Blockchain.sml HealthRecord.sml)
-build_posix_am("healthRecord" ${health_record_src})
