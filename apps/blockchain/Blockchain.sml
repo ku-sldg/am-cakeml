@@ -297,9 +297,11 @@ struct
      * error message that is returned. This along with `sendRequest` are the
      * main workhorses of the API calls that communicate with the blockchain.
      *)
-    fun processResponse (Http.Response _ _ _ _ message) jsonId func errMsgHeader =
+    fun processResponse response jsonId func errMsgHeader =
         let
-            val jsonResp = Result.okValOf (Json.parse message)
+            val respMsg =
+                Http.responseExtractMessage response (String.concatWith "\n")
+            val jsonResp = Result.okValOf (Result.bind respMsg Json.parse)
             val respId =
                 Option.getOpt
                     (Option.mapPartial
@@ -321,7 +323,7 @@ struct
         end
         handle Result.Exn =>
             Err (String.concat [errMsgHeader, ": JSON did not parse.\n",
-                            message])
+                            Http.print_response response])
 
     (* getHash: string -> int -> int -> string -> string -> int -> (BString.bstring, string) result
         * `getHash host port jsonId recipient sender hashId`
