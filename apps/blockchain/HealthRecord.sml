@@ -315,17 +315,17 @@ struct
      *)
     fun addRecord host port jsonId recipient sender appraiserId targetId record =
         let
-            val funSig = "0xec2eb5a4"
-            val argsEnc =
-                encodeBytesBytesString appraiserId targetId (Json.stringify record)
             fun formEthFunc data =
                 Blockchain.formEthSendTransaction jsonId sender recipient data
+            val argsEnc =
+                encodeBytesBytesString appraiserId targetId (Json.stringify record)
+            val message = formEthFunc ("0xec2eb5a4" ^ argsEnc)
             fun respFunc resp =
                 Ok (BString.unshow (String.extract resp 2 None))
                 handle Word8Extra.InvalidHex =>
                     Err "HealthRecord.addRecord: Error from BString.unshow caught."
         in
-            case (Blockchain.sendRequest funSig argsEnc formEthFunc host port) of
+            case (Blockchain.sendRequest host port message) of
               Ok resp =>
                 Blockchain.processResponse resp jsonId respFunc "HealthRecord.addRecord"
             | Err msg =>
@@ -352,15 +352,15 @@ struct
      *)
     fun getRecentRecord host port jsonId recipient sender appraiserId targetId =
         let
-            val funSig = "0x973edffe"
-            val argsEnc = encodeBytesBytes appraiserId targetId
             fun formEthFunc data =
                 Blockchain.formEthCallLatest jsonId sender recipient data
+            val argsEnc = encodeBytesBytes appraiserId targetId
+            val message = formEthFunc ("0x973edffe" ^ argsEnc)
             val decoder = BinaryParser.parseWithPrefix decodeString "0x"
             fun respFunc resp =
                 Result.bind (decoder resp) Json.parse
         in
-            case (Blockchain.sendRequest funSig argsEnc formEthFunc host port) of
+            case (Blockchain.sendRequest host port message) of
               Ok resp =>
                 Blockchain.processResponse resp jsonId respFunc "HealthRecord.getRecentRecord"
             | Err msg =>
@@ -387,10 +387,10 @@ struct
      *)
     fun getAllRecords host port jsonId recipient sender appraiserId targetId =
         let
-            val funSig = "0x2317c148"
-            val argsEnc = encodeBytesBytes appraiserId targetId
             fun formEthFunc data =
                 Blockchain.formEthCallLatest jsonId sender recipient data
+            val argsEnc = encodeBytesBytes appraiserId targetId
+            val message = formEthFunc ("0x2317c148" ^ argsEnc)
             fun stringToHR str =
                 Result.bind (Json.parse str) fromJson
             val decoder = BinaryParser.parseWithPrefix decodeStringArray "0x"
@@ -399,7 +399,7 @@ struct
                     (decoder resp)
                     (fn respStrs => Ok (List.map stringToHR respStrs))
         in
-            case (Blockchain.sendRequest funSig argsEnc formEthFunc host port) of
+            case (Blockchain.sendRequest host port message) of
               Ok resp =>
                 Blockchain.processResponse resp jsonId respFunc "HealthRecord.getAllRecords"
             | Err msg =>

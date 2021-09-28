@@ -121,7 +121,7 @@ structure BString = struct
                 val arr = Word8Array.array len Word8Extra.null
              in Word8Array.copyVec s 0 len arr 0;
                 arr
-            end 
+            end
 
         (* byte_array -> bstring *)
         fun fromByteArray arr = Bs (Word8Array.substring arr 0 (Word8Array.length arr))

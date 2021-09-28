@@ -17,12 +17,12 @@ build_posix_am("blockchainAddUser" ${blockchain_addUser_src})
 get_files(blockchain_removeUser_src ${util_src} ${posix_src} ../../util/BinaryParser.sml ../../util/Http.sml Blockchain.sml RemoveUser.sml)
 build_posix_am("blockchainRemoveUser" ${blockchain_removeUser_src})
 
-get_files(blockchain_CA_src ${util_src} ${posix_src} CA.sml)
-build_posix_am("blockchainCA" ${blockchain_CA_src})
+get_files(CA_src ${util_src} ${posix_src} CA.sml)
+build_posix_am("CA" ${CA_src})
 
-get_files(blockchain_CA_client_src ${util_src} ${posix_src} CAClient.sml)
-build_posix_am("blockchainCAClient" ${blockchain_CA_client_src})
+get_files(CA_client_src ${util_src} ${posix_src} CAClient.sml)
+build_posix_am("CAClient" ${CA_client_src})
 
-add_custom_target(blockchainCAAll DEPENDS blockchainCA blockchainCAClient)
+add_custom_target(CAAll DEPENDS CA CAClient)
 
-add_custom_target(blockchainAll DEPENDS blockchain blockchainAddUser blockchainRemoveUser blockchainCAAll)
+add_custom_target(blockchainAll DEPENDS blockchain blockchainAddUser blockchainRemoveUser)

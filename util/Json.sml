@@ -255,44 +255,28 @@ struct
                         keyValParser
                         (Parser.seq (Parser.char #",") Parser.spaces)))
                 stream
-        (* errorMessage: int -> int -> string
-         * `errorMessage line col msg`
-         * Utility error message creator combining the given line and column
-         * information with the given error message body.
+        (* parseSingleton: (json, char) parser
+         * Parses exactly one JSON object.
          *)
-        fun errorMessage cs line col msg = 
-            String.concat ["Error at line ", Int.toString line, " column ",
-                            Int.toString col, ": ", msg,
-                            "\nRemainder of input: ", String.implode cs]
+        val parseSingleton =
+            Parser.bind jsonParser
+                (fn js => Parser.return js Parser.eof)
+        (* parseMultiple: (json list, char) parser
+         * Parsers zero or more JSON objects.
+         *)
+        val parseMultiple =
+            Parser.bind (Parser.many jsonParser)
+                (fn jss => Parser.return jss Parser.eof)
     in
         (* parse: string -> (json, string) result
          * Parses a JSON value from the given string. Expects exactly one JSON
          * value.
          *)
-        fun parse str = 
-            case (Parser.parse jsonParser str) of
-              (Ok json, [], _, _) => Ok json
-            | (Ok _, cs, line, col) =>
-                Err (errorMessage cs line col "Expected end of input.")
-            | (Err msg, cs, line, col) =>
-                Err (errorMessage cs line col msg)
+        fun parse str = Parser.parse parseSingleton str
         (* parseMany: string -> (json list, string) result
          * Parses one or more JSON values from the given string.
          *)
-        fun parseMany str =
-            let
-                fun aux stream =
-                    case (jsonParser stream) of
-                      (Err msg, cs, line, col) =>
-                        Err (errorMessage cs line col msg)
-                    | (Ok json, [], line, col) => Ok ([json])
-                    | (Ok json, c::cs, line, col) =>
-                        case (aux (c::cs, line, col)) of
-                          Ok jsons => Ok (json::jsons)
-                        | Err msg => Err msg
-            in
-                aux (String.explode str, 1, 1)
-            end
+        fun parseMany str = Parser.parse parseMultiple str
     end
     (* stringify: json -> string
      * Converts the given JSON value to its string representation.
@@ -301,7 +285,7 @@ struct
         let
             fun escFn c =
                 case Char.ord c of
-                8 => "\\b"
+                   8 => "\\b"
                 |  9 => "\\t"
                 | 10 => "\\n"
                 | 12 => "\\f"
@@ -322,7 +306,7 @@ struct
             | String str => String.concat ["\"", escapeString str, "\""]
             | Array jsons =>
                 let
-                    val body = String.concatWith ", " (List.map stringify jsons)
+                    val body = String.concatWith "," (List.map stringify jsons)
                 in
                     String.concat ["[", body, "]"]
                 end
@@ -332,9 +316,9 @@ struct
                         List.map
                             (fn (str, json) =>
                                 String.concat ["\"", escapeString str,
-                                                "\": ", stringify json])
+                                                "\":", stringify json])
                             (Map.toAscList strJsons)
-                    val body = String.concatWith ", " fields
+                    val body = String.concatWith "," fields
                 in
                     String.concat ["{", body, "}"]
                 end
@@ -433,23 +417,6 @@ struct
         case xJson of
           Object xJsonm => Some (Object (Map.insert xJsonm key value))
         | _ => None
-    (* walk: 'a -> (bool -> 'a) -> (int -> 'a) -> (Word64.word -> 'a) ->
-     *       (string -> 'a) -> 'a -> (json -> 'a -> 'a) ->
-     *       'a -> (string -> json -> 'a -> 'a) -> json -> 'a
-     * `walk nullValue boolFunc intFunc doubleFunc stringFunc arrayValue arrayWalker objValue objWalker json`
-     * Walks the JSON value `json` converting to an arbitrary type.
-     *)
-    fun walk nullValue boolFunc intFunc doubleFunc stringFunc arrayValue
-            arrayWalker objValue objWalker json =
-        case json of
-          Null => nullValue
-        | Bool b => boolFunc b
-        | Int n => intFunc n
-        | Float d => doubleFunc d
-        | String str => stringFunc str
-        | Array jsons => List.foldr arrayWalker arrayValue jsons
-        | Object strJsons => Map.foldrWithKey objWalker objValue strJsons
-    
     exception Exn string string
 end
 

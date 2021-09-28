@@ -16,9 +16,9 @@ then
 	cd ../../build/apps/blockchain/
 	# '7BE9FDA4...05C20081' is the golden hash value
 	./blockchainSetHash $1 ${goldenHash}
-	read -p "Press enter to launch the client" dummy
+	read -p "Press enter to launch the client." dummy
 	./blockchainClient 127.0.0.1 $1 $2
-	read -p "Press enter to relaunch client" dummy
+	read -p "Press enter to relaunch client." dummy
 	./blockchainClient 127.0.0.1 $1 $2
 	kill ${SERVER_PID}
 	exit $?

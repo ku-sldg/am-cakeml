@@ -28,7 +28,7 @@ structure Crypto = struct
                 FFI.call ffi_signMsg signLen (BString.concat priv msg)
 
 
-        (* bstring -> bstring -> bstring -> bstring *)
+        (* bstring -> bstring -> bstring -> bool *)
         fun sigCheck pub sign msg = 
             if BString.length pub <> signLen then
                 raise (Err "Wrong public key size, Error in sigCheck FFI")

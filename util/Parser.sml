@@ -2,22 +2,16 @@ structure Parser =
 struct
     type 'a stream = 'a list * int * int
     type ('a, 'b) parser = ('b stream) -> ('a, string) result * 'b list * int * int
-    (* parse: ('a, char) parser -> string -> ('a, string) result * char list * int * int
+    (* parse: ('a, char) parser -> string -> ('a, string) result
      * `parse p str`
      * Runs the parser `p` over the string `str`.
      *)
-    fun parse p str = p (String.explode str, 1, 1)
-    (* result: ('a, string) result * 'b * int * int -> ('a, string result)
-     * `result (xr, _, line, col)`
-     * Returns the result of the parser, adding line and column information to
-     * any error message.
-     *)
-    fun result (xr, _, line, col) =
-        case xr of
-          Ok x => Ok x
-        | Err msg =>
-            Err (String.concat ["Line ", Int.toString line, ", Column ",
-                                        Int.toString col, ": ", msg])
+    fun parse p str =
+        case p (String.explode str, 1, 1) of
+          (Ok x, _, _, _) => Ok x
+        | (Err msg, _, line, col) =>
+            Err (String.concat ["Error on line ", Int.toString line,
+                " and column ", Int.toString col, ": ", msg])
     (* bind: ('a, 'b) parser -> ('a -> ('c, 'b) parser) -> ('c, 'b) parser
      * `bind p funcp`
      * Runs the parser `p` and upon success, applies `funcp` to the result and
@@ -165,20 +159,20 @@ struct
      * consume input upon failure.
      *)
     val digit = 
-        label "Expected a digit." (satisfy StringExtra.isDigit)
+        label "Expected a digit." (satisfy CharExtra.isDigit)
     (* octalDigit: (char, char) Parser
      * A simple parser that succeeds upon seeing an octal numeral, '0'..'7'.
      * Does not consume input upon failure.
      *)
     val octalDigit = 
-        label "Expected an octal digit." (satisfy StringExtra.isOctal)
+        label "Expected an octal digit." (satisfy CharExtra.isOctal)
     (* hexDigit: (char, char) Parser
      * A simple parser that succeeds upon seeing a hexadecimal numeral,
      * '0'..'9' or 'a'..'f' or 'A'..'F'. Does not consume input upon
      * failure.
      *)
     val hexDigit = 
-        label "Expected a hexidecimal digit." (satisfy StringExtra.isHex)
+        label "Expected a hexidecimal digit." (satisfy CharExtra.isHex)
     (* lower: (char, char) Parser
      * A simple parser that succeeds upon seeing a lowercase ASCII
      * character, 'a'..'z'. Does not consume input upon failure.
@@ -186,7 +180,7 @@ struct
     val lower = 
         label
             "Expected a lower-case ascii character."
-            (satisfy StringExtra.isLower)
+            (satisfy CharExtra.isLower)
     (* upper: (char, char) Parser
      * A simple parser that succeeds upon seeing an uppercase ASCII
      * character, 'A'..'Z'. Does not consume input upon failure.
@@ -194,7 +188,7 @@ struct
     val upper = 
         label
             "Expected an upper-case ascii character."
-            (satisfy StringExtra.isUpper)
+            (satisfy CharExtra.isUpper)
     (* letter: (char, char) Parser
      * A simple parser that succeeds upon seeing an ASCII alphabet
      * character, 'a'..'z' or 'A'..'Z'. Does not consume input upon failure.
@@ -202,7 +196,7 @@ struct
     val letter = 
         label
             "Expected an ascii alphabet character."
-            (satisfy StringExtra.isAlpha)
+            (satisfy CharExtra.isAlpha)
     (* alphaNum: (char, char) Parser
      * A simple parser that succeeds upon seeing an ASCII digit or alphabet
      * character: 'a'..'z', 'A'..'Z', or '0'..'9'. Does not consume input
@@ -211,7 +205,7 @@ struct
     val alphaNum = 
         label
             "Expected an ascii alphanumeric character."
-            (satisfy StringExtra.isAlphaNum)
+            (satisfy CharExtra.isAlphaNum)
     (* space: (char, char) Parser
      * A simple parser that succeeds upon seeing any ASCII whitespace
      * characters. Does not consume input upon failure.
@@ -219,7 +213,7 @@ struct
     val space = 
         label
             "Expected an ascii whitespace character."
-            (satisfy StringExtra.isSpace)
+            (satisfy CharExtra.isSpace)
     (* string: string -> (string, char) parser
      * `string str`
      * A parser that succeeds when the characters of `str` are the characters

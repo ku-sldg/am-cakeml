@@ -6,8 +6,8 @@ Note that some parameters for the private Ethereum blockchain are hard coded
 into the source code: the IP address and port (127.0.0.1:8543) of the
 [geth](https://geth.ethereum.org/) RPC server and the public key address for the
 unlocked admin account who will be the sender of the RPC requests
-(`0x55500e...`). These values can be found in the functions
-[`getHashDemo` on line 13 of `Client.sml`](Client.sml#L13) and
+(`0xdE497f77...`). These values can be found in the functions
+[line 18 of `Client.sml`](Client.sml#L18) and
 [`setHashDemo` on line 2 of `SetHash.sml`](SetHash.sml#L2). Change these as
 needed. On the private Ethereum blockchain, there should be a contract with at
 least two methods `getHash(uint256): bytes` and `setHash(uint256, bytes): void`
@@ -30,23 +30,16 @@ and write to this mapping.
 ## Running ##
 
 1. Go to the projects root directory, then head to `./build/apps/blockchain/`
-   and run the `test.sh` script, passing to it the contract's address, e.g.
-   `./test.sh 0xfeedface`.
+   and run the `test.sh` script, passing to it the contracts' addresses, e.g.
+   `./test.sh 0xfeedface 0xdeadbeef`.
 2. What you should see:
    ```shell
    Starting the server...done.
    Set hash succeeded.
    Press enter to launch the client.
-   Evaluating term:
-   Att 1 (Lseq (Asp (Aspc Id 1 [testDir] )) (Asp Sig))
-
-   Nonce:
-   <nonce>
-
-   Evidence received:
-   G <signature> (U Id 1 [testDir] <golden hash> (N Id 0 <none> (Mt)))
-
-   Appraisal succeeded (expected nonce and hash value; signature verified).
+   Added health record successfully.
+   Press enter to relaunch the client.
+   Found a record with freshness at most 3600000000 µs.
    ```
 
 # A Certificate Authority for Key Authorization #
@@ -65,10 +58,10 @@ party.
    directory with `mkdir build`.
 2. Move into this new directory, `cd build`, and run `cmake ..` in order to
    generate the required Makefiles.
-3. Build the blockchain example with `make blockchainCAAll`. The generated
+3. Build the blockchain example with `make CAAll`. The generated
    binaries will be places into `./build/`.
-   * This will run two separate makes: `make blockchainCA` to build the
-     CA and `make blockchainCAClient` to make the client demo.
+   * This will run two separate makes: `make CA` to build the
+     CA and `make CAClient` to make the client demo.
 
 ## Running ##
 

@@ -1,7 +1,5 @@
 structure Http =
 struct
-    val crlf = String.concat [String.str (Char.chr 13), "\n"]
-
     (* Request verb url httpVersion headers message *)
     datatype request = Request string string string ((string * string) list) (string option)
     (* Response httpVersion statusCode respPhrase headers message *)
@@ -24,7 +22,7 @@ struct
         fun generalRequestToString nl (Request verb url version headers msgo) =
             let
                 val reqLine = toplineToString verb url version
-                val headerLines = String.concatWith crlf (List.map headerToString headers)
+                val headerLines = String.concatWith nl (List.map headerToString headers)
             in
                 case msgo of
                   Some msg  =>
@@ -39,7 +37,7 @@ struct
         fun generalResponseToString nl (Response verb url version headers msg) =
             let
                 val reqLine = toplineToString verb url version
-                val headerLines = String.concatWith crlf (List.map headerToString headers)
+                val headerLines = String.concatWith nl (List.map headerToString headers)
             in
                 String.concatWith nl [reqLine, headerLines, "", msg]
             end
@@ -114,14 +112,14 @@ struct
                                 (fn msgChars =>
                                     Parser.return (String.implode msgChars) Parser.crlf)
                         end))
-                (Parser.string (String.concat ["0", crlf, crlf]))
+                (Parser.string (String.concat ["0", CharExtra.crlf, CharExtra.crlf]))
 
     in
         (* requestToString: request -> string
         * Properly formats an HTTP request as a string with newlines being
         * "\r\n".
         *)
-        val requestToString = generalRequestToString crlf
+        val requestToString = generalRequestToString CharExtra.crlf
         (* print_request: request -> string
         * Formats an HTTP request as a string with newlines begin "\n".
         *)
@@ -130,7 +128,7 @@ struct
         * Properly formats an HTTP response as a string with newlines being
         * "\r\n".
         *)
-        val responseToString = generalResponseToString crlf
+        val responseToString = generalResponseToString CharExtra.crlf
         (* print_response: response -> string
         * Formats an HTTP response as a string with newlines begin "\n".
         *)
@@ -140,7 +138,7 @@ struct
          * Parses an HTTP response from a string.
          *)
         fun responseFromString str =
-            case (Parser.result (Parser.parse httpParser str)) of
+            case (Parser.parse httpParser str) of
               Err msg => Err msg
             | Ok (version, statusCode, statusPhrase, headers, message) =>
                 Ok (Response version statusCode statusPhrase headers message)
@@ -149,7 +147,7 @@ struct
          * Parses out an HTTP request from a string.
          *)
         fun requestFromString str =
-            case (Parser.result (Parser.parse httpParser str)) of
+            case (Parser.parse httpParser str) of
               Err msg => Err msg
             | Ok (verb, url, version, headerPairs, message) =>
                 if message = ""
@@ -157,6 +155,7 @@ struct
                 else Ok (Request verb url version headerPairs (Some message))
         
         (* responseExtractMessage: response -> (string list -> 'a) -> ('a, string) result
+         * Primarily used to read a chunked HTTP message.
          *)
         fun responseExtractMessage (Response _ _ _ headers message) chunkFunc =
             if Alist.every
@@ -168,7 +167,7 @@ struct
             else
                 Result.map 
                     chunkFunc
-                    (Parser.result (Parser.parse dechunk message))
+                    (Parser.parse dechunk message)
     end
 end
 (* testing code

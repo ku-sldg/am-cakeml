@@ -256,21 +256,25 @@ struct
         else Err "Blockchain.encodeAddress: Tried to encode an invalid address."
 
 (******************* Communicating with the Smart Contract *******************)
-    (* sendRequest: string -> string -> (string -> Json.json) -> string -> string ->
-     *   (Http.Response, string) result
-     * `sendRequest funSig funParams formEthFunc host port`
+    (* sendRequest: string -> int -> Json.json -> (Http.Response, string) result
+     * `sendRequest host port message`
      * Builds and sends a HTTP request to `host:port` where the body of the
-     * request is built using the expression
-     * `Json.stringify (formEthFunc (funSig ^ funParams))`. Returns the
-     * HTTP response upon success, and an error message otherwise. This
+     * request is built using the expression `Json.stringify message`. Returns
+     * the HTTP response upon success, and an error message otherwise. This
      * along with `processResponse` are the main workhorses of the API calls
      * that communicate with the blockchain.
      *)
-    fun sendRequest funSig funParams formEthFunc host port =
+    fun sendRequest host port message =
         let
-            val data = String.concat [funSig, funParams]
-            val jsonMsg = formEthFunc data
-            val jsonStr = Json.stringify jsonMsg
+            fun inputAll_aux socket str =
+                let
+                    val input = Socket.inputAll socket
+                in
+                    if input = ""
+                    then str
+                    else inputAll_aux socket (str ^ input)
+                end
+            val jsonStr = Json.stringify message
             val hostPair =
                 ("Host", String.concatWith ":" [host, Int.toString port])
             val contentType = ("Content-Type", "application/json")
@@ -283,7 +287,8 @@ struct
             val httpReqStr = Http.requestToString httpReq
             val socket = Socket.connect host port
             val _ = Socket.output socket httpReqStr
-            val httpRespr = Http.responseFromString (Socket.inputAll socket)
+            val input = inputAll_aux socket ""
+            val httpRespr = Http.responseFromString input
             val _ = Socket.close socket
         in
             httpRespr
@@ -343,12 +348,12 @@ struct
                             msg])
         | Ok hashIdEnc =>
             let
-                val funSig = "0x6b2fafa9"
                 fun formEthFunc data =
                     formEthCallLatest jsonId sender recipient data
+                val message = formEthFunc ("0x6b2fafa9" ^ hashIdEnc)
                 val decoder = BinaryParser.parseWithPrefix decodeBytes "0x"
             in
-                case (sendRequest funSig hashIdEnc formEthFunc host port) of
+                case (sendRequest host port message) of
                   Ok resp =>
                     processResponse resp jsonId decoder "Blockchain.getHash"
                 | Err msg =>
@@ -379,15 +384,15 @@ struct
                             msg])
         | Ok paramEnc =>
             let
-                val funSig = "0x6a7fd925"
                 fun formEthFunc data =
                     formEthSendTransaction jsonId sender recipient data
+                val message = formEthFunc ("0x6a7fd925" ^ paramEnc)
                 fun respFunc result =
                     Ok (BString.unshow (String.extract result 2 None))
                     handle Word8Extra.InvalidHex =>
                         Err "Blockchain.setHash: Error from BString.unshow caught"
             in
-                case (sendRequest funSig paramEnc formEthFunc host port) of
+                case (sendRequest host port message) of
                   Ok resp =>
                     processResponse resp jsonId respFunc "Blockchain.setHash"
                 | Err msg =>
@@ -418,15 +423,15 @@ struct
                             msg])
         | Ok addEnc =>
             let
-                val funSig = "0x177d2a74"
                 fun formEthFunc data =
                     formEthSendTransaction jsonId sender recipient data
+                val message = formEthFunc ("0x177d2a74" ^ addEnc)
                 fun respFunc result =
                     Ok (BString.unshow (String.extract result 2 None))
                     handle Word8Extra.InvalidHex =>
                         Err "Blockchain.addAuthorizedUser: Error from BString.unshow caught."
             in
-                case (sendRequest funSig addEnc formEthFunc host port) of
+                case (sendRequest host port message) of
                     Ok resp =>
                     processResponse resp jsonId respFunc "Blockchain.addAuthorizedUser"
                 | Err msg =>
@@ -458,15 +463,15 @@ struct
                             msg])
         | Ok addEnc =>
             let
-                val funSig = "0x89fabc80"
                 fun formEthFunc data =
                     formEthSendTransaction jsonId sender recipient data
+                val message = formEthFunc ("0x89fabc80" ^ addEnc)
                 fun respFunc result =
                     Ok (BString.unshow (String.extract result 2 None))
                     handle Word8Extra.InvalidHex =>
                         Err "Blockchain.removeAuthorizedUser: Error from BString.unshow caught"
             in
-                case (sendRequest funSig addEnc formEthFunc host port) of
+                case (sendRequest host port message) of
                   Ok resp =>
                     processResponse resp jsonId respFunc "Blockchain.removeAuthorizedUser"
                 | Err msg =>
