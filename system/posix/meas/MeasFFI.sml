@@ -9,6 +9,8 @@ structure Meas = struct
         fun ffi_hashRegion x y = #(hashRegion) x y
         fun ffi_readDir    x y = #(readDir)    x y
         fun ffi_urand      x y = #(urand)      x y
+        fun ffi_newProc    x y = #(newProc)    x y
+        fun ffi_childTerminated x y = #(childTerminated) x y
     in
         (* int -> bstring *)
         fun urand len = case FFI.callOpt ffi_urand len BString.empty of 
@@ -74,5 +76,22 @@ structure Meas = struct
         (* string -> (string * entryType) list *)
         (* version of readDir that filters out the "." and ".." entries *)
         val readDirNoDot = List.filter (fn (n,t) => n <> "." andalso n <> "..") o readDir
+
+        (* string -> [string] -> bstring *)
+        (* Warning! Doesn't detect when program fails to launch (i.e. if file doesn't exist) *)
+        fun newProc filepath args = 
+            let val dataLen = 12
+                val command = FFI.nullSeparated (filepath :: args)
+                val cbstring = BString.fromString o BString.toCString
+             in case FFI.callOpt ffi_newProc dataLen command of 
+                  None => raise (Err "newProc FFI failure, could not fork")
+                | Some pid => cbstring pid
+            end
+
+        (* TODO: variant of newProc which drops privileges. May need to specify desired user/group *)
+
+        (* bstring -> bool *)
+        val childTerminated = FFI.callBool ffi_childTerminated
+
     end
 end

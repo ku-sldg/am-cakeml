@@ -266,9 +266,9 @@ structure MapExtra = struct
 end
 
 structure JsonExtra = struct 
-    (* Json.json -> string *)
+    (* string -> Json.json *)
     fun fromString str = List.hd (fst (Json.parse ([], str)))
 
-    (* string -> Json.json *)
+    (* Json.json -> string *)
     fun toString js  = Json.print_json js 0
 end

@@ -125,6 +125,9 @@ structure FFI = struct
     (* ffi -> bstring -> bool *)
     fun callBool ffi input = BString.hd (call ffi 1 input) = success
 
+    (* ffi -> bstring -> () *)
+    fun callUnit ffi input = ((call ffi 0 input); ())
+
     local 
         val wbuf = Word8ArrayExtra.nulls 2
     in
@@ -195,6 +198,9 @@ structure BiMap = struct
         fun fromList lord rord = List.foldr (flip (uncurry o insert)) (empty lord rord)
     end
 end
+
+(* 'a ref -> ('a -> 'a) -> unit *)
+fun updateRef r f = r := f (!r)
 
 (* bool -> (() -> ()) -> () *)
 fun when cond io = if cond then io () else ()

@@ -93,6 +93,9 @@ structure BString = struct
         (* (word8 -> bool) -> bstring -> bstring list *)
         fun tokens f = List.map fromString o applyStr (String.tokens (f o charToWord8))
 
+        (* (word8 -> bool) -> bstring -> bstring list *)
+        fun fields f = List.map fromString o applyStr (String.fields (f o charToWord8))
+
         (* bstring -> string *)
         val show = String.concat o List.map Word8Extra.toHex o explode
 
@@ -194,7 +197,5 @@ structure BString = struct
 
         (* bstring -> int *)
         fun w22n bs = Marshalling.w22n (toByteArray bs) 0
-    end
-
     end
 end
