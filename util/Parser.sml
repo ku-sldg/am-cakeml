@@ -50,17 +50,17 @@ struct
             (Ok x, cs', line', col')
         | (Err err, cs', line', col') =>
             (Err (func err), cs', line', col') *)
-    (* return: 'a -> ('a, 'b) parser
-     * `return x`
+    (* pure: 'a -> ('a, 'b) parser
+     * `pure x`
      * A simple parser that successfully returns `x` without consuming any
      * input.
      *)
-    (* fun return x (cs, line, col) = (Ok x, cs, line, col) *)
+    fun pure x (cs, line, col) = (Ok x, cs, line, col)
     (* fail: 'b -> ('a, 'b) parser
      * `fail err`
      * A simple parser that fails, returning `err`, without consuming any input.
      *)
-    (* fun fail err (cs, line, col) = (Err err, cs, line, col) *)
+    fun fail err (cs, line, col) = (Err err, cs, line, col)
     (* eof: (unit, string) parser
      * `eof`
      * A simple parser that succeeds exactly when there is no more input.
@@ -474,7 +474,7 @@ struct
                       Ok xs => (Ok (x::xs), cs''', line''', col''')
                     | Err err => (Err err, cs'', line'', col'')
                 end *) *)
-    (* endBy1: ('a, 'b) parser -> ('c, 'b) parser -> ('a, 'b) parser
+    (* endBy1: ('a, 'b) parser -> ('c, 'b) parser -> ('a list, 'b) parser
      * `endBy1 p sep`
      * Runs one or more iterations of `p` where each iteration ends with `sep`,
      * and only the results of `p` are retained.
@@ -502,7 +502,7 @@ struct
      * optional instance of `sep` at the end. Only the results of `p` are
      * retained. Does not consume input upon failure.
      *)
-    (* fun sepEndBy p sepp (cs, line, col) =
+    fun sepEndBy p sepp (cs, line, col) =
         case p (cs, line, col) of
           (Err _, _, _, _) => (Ok [], cs, line, col)
         | (Ok x, cs', line', col') =>
@@ -511,13 +511,7 @@ struct
                 (Ok [x], cs', line', col')
             | (Ok _, cs'', line'', col'') =>
                 map (fn xs => x::xs) (sepEndBy p sepp) (cs'', line'', col'')
-                (* let
-                    val (Ok xs, cs''', line''', col''') =
-                        sepEndBy p sepp (cs'', line'', col'')
-                in
-                    (Ok (x::xs), cs''', line''', col''')
-                end *) *)
-    (* sepEndBy1: ('a, 'b) parser -> ('c, 'b) parser -> ('a, 'b) parser
+    (* sepEndBy1: ('a, 'b) parser -> ('c, 'b) parser -> ('a list, 'b) parser
      * `sepEndBy1 p sep`
      * Runs one or more iterations of `p` interspersed with `sep` and an
      * optional instance of `sep` at the end. Only the results of `p` are
