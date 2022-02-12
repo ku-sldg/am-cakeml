@@ -274,7 +274,7 @@ struct
          *)
         fun parse str = Parser.parse parseSingleton str
         (* parseMany: string -> (json list, string) result
-         * Parses one or more JSON values from the given string.
+         * Parses zero or more JSON values from the given string.
          *)
         fun parseMany str = Parser.parse parseMultiple str
     end

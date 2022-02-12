@@ -1,5 +1,8 @@
-(* util/Parsing.sml
- * util/Extra.sml
+(* util/Extra.sml
+ * util/ByteString.sml
+ * util/Misc.sml
+ * util/Parsing.sml
+ * copland/CoqDefaults.sml
  * copland/Instr.sml
  *)
 (* term    ::= WS asp
@@ -14,18 +17,18 @@
  * STRING  ::= '"' [^"] '"'
  * WS      ::= [ \t\r\n]*
  *)
-(* numeralP :: (int, string) parser *)
+(* numeralP :: (nat, string) parser *)
 val numeralP =
     Parser.bindResult
         (fn numStr =>
             OptionExtra.option
                 (Err "failed to parse an integer")
-                (fn x => Ok x)
-                (Int.fromString numStr))
+                (fn x => Ok (natFromInt x))
+                (Int.fromString (String.implode numStr)))
         (Parser.many1 Parser.digit)
 (* identifierP :: (id, string) parser *)
 val identifierP =
-    Parser.map (fn x => Id x) numeral
+    Parser.map (fn x => Id x) numeralP
 (* stringP :: (string, string) parser *)
 val stringP =
     Parser.map
@@ -42,11 +45,11 @@ val aspcP =
     Parser.bind
         identifierP
         (fn identifier =>
-            Parser.bind
+            Parser.map
+                (fn args => Aspc identifier args)
                 (Parser.seq
                     Parser.spaces
-                    (Parser.sepEndBy stringP Parser.spaces))
-                (fn args => Aspc identifier args))
+                    (Parser.sepBy stringP Parser.spaces)))
 (* allP, noneP, spP :: (sp, string) parser *)
 val allP = Parser.return ALL (Parser.char #"+")
 val noneP = Parser.return NONE (Parser.char #"-")
@@ -72,7 +75,7 @@ val bseqP =
 val bparP =
     splitOpP #"~" (fn lsp => fn rsp => fn x => fn y => Bpar (lsp, rsp) x y)
 val lseqP = Parser.return (fn x => fn y => Lseq x y) (Parser.string "->")
-val infixOpP = Parser.choice [lseqP, bseqP, bparP]
+val infixOpP = Parser.choice [lseqP, Parser.try bseqP, bparP]
 (* aspP :: (term, string) parser *)
 val aspP =
     Parser.map
@@ -86,36 +89,55 @@ fun termP stream =
         Parser.spaces
         Parser.spaces
         (Parser.choice [
-            aspP,
             Parser.between
                 (Parser.char #"(")
                 (Parser.char #")")
-                termP,
+                (Parser.bind
+                    termP
+                    (fn lterm =>
+                        Parser.bind
+                            infixOpP
+                            (fn infixOp =>
+                                Parser.map
+                                    (fn rterm =>
+                                        infixOp lterm rterm)
+                                    termP))),
             atP,
-            Parser.bind
-                termP
-                (fn lterm =>
-                    Parser.bind
-                        infixOpP
-                        (fn infixOp =>
-                            Parser.map
-                                (fn rterm =>
-                                    infixOp lterm rterm)
-                                termP))
+            aspP
         ])
         stream
 and atP stream =
     Parser.seq
-        Parser.spaces
-        (Parser.seq
-            (Parser.char #"@")
-            (Parser.bind
-                (Parser.seq Parser.spaces numeralP)
-                (fn pl =>
-                    Parser.seq
-                        Parser.spaces
-                        (Parser.char #"[")
-                        (Parser.map
-                            (fn term => Att pl term)
-                            termP))))
-val test = ()
+        (Parser.char #"@")
+        (Parser.bind
+            (Parser.seq Parser.spaces numeralP)
+            (fn pl =>
+                Parser.between
+                    (Parser.seq Parser.spaces (Parser.char #"["))
+                    (Parser.seq (Parser.char #"]") Parser.spaces)
+                    (Parser.map
+                        (fn term => Att pl term)
+                        termP)))
+        stream
+
+fun parseTerm str =
+    Parser.parse
+        (Parser.bind termP (fn term => Parser.return term Parser.eof))
+        str
+
+(* Testing *)
+(* 
+val asps = ["_", " !", "# ", " 1 \"\" ", "2 \"hello\" \"world\""]
+val infixes = ["(_ -> !)", " (_ +<+ # )", "( ! - ~ - #) "]
+val ats = ["@ 0 [_]", " @ 0 [ # ] "]
+val testStrings = List.concat [asps, infixes, ats]
+fun testString str =
+    case parseTerm str of
+      Err msg =>
+        print (String.concatWith "\n"
+            ["Error parsing string:", str, msg, ""])
+    | Ok term => print (String.concatWith "\n" [termToString term, ""])
+fun main () =
+    List.app testString testStrings
+val _ = main ()
+*)
