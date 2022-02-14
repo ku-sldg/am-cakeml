@@ -8,6 +8,7 @@
 #include <unistd.h>
 
 #include "Hacl_Ed25519.h"
+#include "Hacl_Curve25519_51.h"
 
 #define PRIV_LEN 32
 #define PUB_LEN  64
@@ -46,7 +47,12 @@ int main(void) {
     uint8_t pub[PUB_LEN];
     Hacl_Ed25519_secret_to_public((uint8_t *)pub, priv);
 
-    printf("Public key (hexadecimal):\n");
+    printf("Public signing key (hexadecimal):\n");
+    print_bytes(pub, PUB_LEN);
+    printf("\n");
+
+    Hacl_Curve25519_51_secret_to_public(pub, priv);
+    printf("Public encryption key (hexadecimal):\n");
     print_bytes(pub, PUB_LEN);
     printf("\n");
 

@@ -1,464 +1,466 @@
-(*---------------------------------------------------------------------------*)
-(* Type of Json expressions plus parser. Does not yet handle floating point  *)
-(* numbers, or utf-8 strings.                                                *)
-(*---------------------------------------------------------------------------*)
-
 structure Json =
 struct
-
-(* type substring = String.substring *)
-
-exception ERR string string
-
-fun eRR_MESG pair = print (fst pair^": "^snd pair)
-
-datatype number
-   = Int int
-   (* | Float of real (* Not totally sure about exact representation desired *) *) (* There are no floating points in CakeML *)
-
-datatype json
-    = Null
-    | LBRACK  (* stack symbol only *)
-    | LBRACE  (* stack symbol only *)
-    | Boolean bool
-    | Number number     (* ints and floats *)
-    | String string     (* should be unicode strings, per JSON spec *)
-    | List (json list)
-    | AList ((string * json) list)
-
-fun print_json js t =
-    case js
-    of LBRACK => "LBRACK"
-    | LBRACE => "LBRACE"
-    | Boolean b => String.concat ["\"", if b then "true" else "false", "\""]
-    | Number (Int n) => Int.toString n
-    | String s => String.concat ["\"",s,"\""]
-    | List js' => String.concat ["[\n", print_json_list js' (t + 1), "]"]
-    | AList js' => String.concat ["{\n", print_json_alist js' (t + 1), "\n}"]
-
-and print_json_list js t =
-	case js
-    of [] => ""
-    | [j] => print_json j t
-    | (j::js') => String.concat [print_json j t, ", ", print_json_list js' t]
-
-and print_json_alist js t =
-	let
-		val spacing = String.concat (List.tabulate t (fn x => "  "))
-	in
-		case js
-        of [] => ""
-        | [(s,j)] => String.concat [spacing, "\"", s, "\" : ", print_json j t, ""]
-        | ((s,j)::js') => String.concat [spacing, "\"", s, "\" : "
-                                        , print_json j t, ",\n", print_json_alist js' t]
-    end
-
-
-(*---------------------------------------------------------------------------*)
-(* Lexer                                                                     *)
-(*---------------------------------------------------------------------------*)
-
-
-datatype lexeme
-    = Lbrace
-    | Rbrace
-    | Lbrack
-    | Rbrack
-    | Colon
-    | Comma
-    | NullLit
-    | BoolLit bool
-    | NumLit number
-    | StringLit string
-
-fun isEmpty s = s = ""
-
-fun isDigit c = let val x = Char.ord c in x > 47 andalso x < 58 end
-
-fun isAlpha c = let val x = Char.ord c in (x > 64 andalso x < 91) orelse (x > 96 andalso x < 123) end
-
-fun getc strm =
-    let
-        val lstr = String.explode strm
+    datatype json =
+          Null
+        | Int int
+        | Float Word64.word
+        | Bool bool
+        | String string
+        | Array (json list)
+        | Object ((string, json) map)
+    local
+        (* trueParser: (json, char) parser
+         * Parses the JSON boolean literal `true`.
+         *)
+        val trueParser =
+            Parser.map (const (Bool True)) (Parser.string "true")
+        (* falseParser: (json, char) parser
+         * Parses the JSON boolean literal `false`.
+         *)
+        val falseParser =
+            Parser.map (const (Bool False)) (Parser.string "false")
+        (* nullParser: (json, char) parser
+         * Parses the JSON object literal `null`.
+         *)
+        val nullParser =
+            Parser.map (const Null) (Parser.string "null")
+        (* signParser: (char, char) parser
+         * Parses an optional numeric sign '+' or '-', defaulting to '+'.
+         *)
+        val signParser =
+            Parser.option #"+" (Parser.oneOf [#"+", #"-"])
+        (* signFunc: char -> string -> string
+         * `signFunc c str`
+         * If `c` is '+', then return `str`. Otherwise return `"-" ^ str`.
+         *)
+        fun signFunc signChr numStr =
+            if signChr = #"+" then numStr else String.concat ["-", numStr]
+        (* digit1_9 : (string, char) parser
+         * Parses a non-zero decimal digit and turns it into a string.
+         *)
+        val digit1_9 =
+            Parser.map
+                String.str
+                (Parser.satisfy (fn c => Char.<= #"1" c andalso Char.<= c #"9"))
+        (* intPartParser: (string, char) parser
+         * Parses the unsigned integer part of a number which has no leading
+         * zeros.
+         *)
+        val intPartParser =
+            Parser.label
+                "Error parsing integer part of a JSON number."
+                (Parser.choice [
+                    Parser.bind
+                        digit1_9
+                        (fn d =>
+                            Parser.map
+                                (fn ds => String.concat [d, String.implode ds])
+                                (Parser.many Parser.digit)),
+                    Parser.map String.str (Parser.char #"0")
+                ])
+        (* exponPartParser: string -> (string, char) parser
+         * Takes the mantissa part of a number, and returns a parser that
+         * consumes an optional exponential part.
+         *)
+        fun exponPartParser mantissa =
+            Parser.label "Error parsing exponential part of a JSON number"
+                (Parser.map
+                    (fn expon => String.concat [mantissa, "e", expon])
+                    (Parser.seq
+                        (Parser.oneOf [#"e", #"E"])
+                        (Parser.bind signParser
+                            (fn signChar =>
+                                Parser.map
+                                    (fn exponChars =>
+                                        signFunc signChar (String.implode exponChars))
+                                    (Parser.many1 Parser.digit)))))
+        (* fracPartParser: string -> ((string, string) result, char) parser
+         * Parses the fractional part and exponential part of a number, i.e.
+         * the part starting with '.' or 'e'/'E'. The given string is the
+         * integer part of the number. The result returned upon a successful
+         * parse is either a string representation of a float wrapped as an Ok
+         * value or an a string representation of an integer wrapped as an Err
+         * value.
+         *)
+        fun fracPartParser intPart =
+            Parser.label "Error parsing fractional part of a JSON number."
+                (Parser.map
+                    (fn number => Ok number)
+                    (Parser.choice [
+                        Parser.seq (Parser.char #".")
+                            (Parser.bind
+                                (Parser.map String.implode (Parser.many Parser.digit))
+                                (fn fracPart =>
+                                    let
+                                        val mantissa = String.concat [intPart, ".", fracPart]
+                                    in
+                                        Parser.option mantissa
+                                            (exponPartParser mantissa)
+                                    end)),
+                        exponPartParser intPart
+                    ]))
+        (* numberParser: (json, char) parser
+         * Parses a JSON number value without backtracking by first consuming
+         * any integer part and then splitting into a result datatype depending
+         * upon the occurrence of '.', 'e', or 'E'.
+         *)
+        val numberParser =
+            let
+                fun toJson numr =
+                    case numr of
+                      Ok doubleStr =>
+                        Ok (Float (Double.fromString doubleStr))
+                    | Err intStr =>
+                        case Int.fromString intStr of
+                          None => Err "Error reading integer."
+                        | Some n => Ok (Int n)
+            in
+                Parser.bindResult toJson
+                    (Parser.bind (Parser.option #"+" (Parser.char #"-"))
+                        (fn signChar =>
+                            (Parser.label "Error reading a JSON number" (Parser.choice [
+                                Parser.bind intPartParser
+                                    (fn intPart =>
+                                        Parser.option (Err (signFunc signChar intPart))
+                                            (fracPartParser (signFunc signChar intPart))),
+                                Parser.map
+                                    (fn fracPart =>
+                                        Ok (signFunc signChar fracPart))
+                                    (Parser.seq (Parser.char #".")
+                                        (Parser.bind
+                                            (Parser.map String.implode (Parser.many1 Parser.digit))
+                                            (fn fracPart =>
+                                                let
+                                                    val mantissa = String.concat [".", fracPart]
+                                                in
+                                                    Parser.option mantissa
+                                                            (exponPartParser mantissa)
+                                                end)))
+                            ]))))
+            end
+        (* quoteParser: (char, char) parser
+         * Parses the '"' character.
+         *)
+        val quoteParser = Parser.char #"\""
+        (* backslash: char; the '/' character *)
+        val backslash = Char.chr 92
+        (* bslashParser: (char, char) parser
+         * Parses the backslash character.
+         *)
+        val bslashParser = Parser.char backslash
+        (* hexits4: (string, char) parser
+         * Parses four hexadecimal numerals.
+         *)
+        val hexits4 =
+            Parser.label
+                "Error parsing hex numerals of control character in a JSON string value."
+                (Parser.map String.implode (Parser.count 4 Parser.hexDigit))
+        (* controlCharParser: (string, char) parser
+         * Parses control characters from JSON string literals.
+         *)
+        val controlCharParser =
+            Parser.label
+                "Error parsing control character in a JSON string value."
+                (Parser.seq bslashParser 
+                    (Parser.choice [
+                        Parser.map (const "\"") quoteParser,
+                        Parser.map (const (String.str backslash)) bslashParser,
+                        Parser.map (const "/") (Parser.char #"/"),
+                        Parser.map
+                            (const (String.str (Char.chr 8)))
+                            (Parser.char #"b"),
+                        Parser.map
+                            (const (String.str (Char.chr 9)))
+                            (Parser.char #"t"),
+                        Parser.map 
+                            (const (String.str (Char.chr 10)))
+                            (Parser.char #"n"),
+                        Parser.map 
+                            (const (String.str (Char.chr 12)))
+                            (Parser.char #"f"),
+                        Parser.map 
+                            (const (String.str (Char.chr 13)))
+                            (Parser.char #"r"),
+                        Parser.map
+                            (fn hexits => String.concat ["\\u", hexits])
+                            (Parser.seq (Parser.char #"u") hexits4)
+                    ]))
+        (* stringCharParser: (string, char) parser
+         * Parses a character in a JSON string literal
+         *)
+        val stringCharParser =
+            Parser.label
+                "Error parsing character in a JSON string value."
+                (Parser.choice [
+                    Parser.map String.str (Parser.noneOf [#"\"", backslash]),
+                    controlCharParser
+                ])
+        (* stringParserHelper: (string, char) parser
+         * Parses a JSON string.
+         *)
+        val stringParserHelper =
+            Parser.map (fn strs => String.concat strs)
+                (Parser.between quoteParser quoteParser
+                    (Parser.many stringCharParser))
+        (* stringParser: (json, char) parser
+         * Parses a JSON string literal.
+         *)
+        val stringParser =
+            Parser.map (fn str => String str) stringParserHelper
+        (* jsonParser: (json, char) parser
+         * Parses a JSON value.
+         *)
+        fun jsonParser stream =
+            Parser.label "Error parsing JSON value."
+                (Parser.seq (Parser.spaces)
+                    (Parser.bind
+                        (Parser.choice [
+                            trueParser, falseParser, nullParser,
+                            Parser.label "Error parsing JSON number value." numberParser,
+                            Parser.label "Error parsing JSON string value." stringParser,
+                            Parser.label "Error parsing JSON array value." arrayParser,
+                            Parser.label "Error parsing JSON object value." objParser])
+                        (fn json => Parser.return json Parser.spaces)))
+                stream
+        (* arrayParser: (json, char) parser
+         * Parses a JSON array literal.
+         *)
+        and arrayParser stream =
+            Parser.map (fn jsons => Array jsons)
+                (Parser.between
+                    (Parser.seq (Parser.char #"[") Parser.spaces)
+                    (Parser.char #"]")
+                    (Parser.sepBy jsonParser (Parser.char #",")))
+                stream
+        (* keyValParser: ((string, json), string) parser
+         * Parses a JSON key-value pair.
+         *)
+        and keyValParser stream =
+            Parser.bind stringParserHelper
+                (fn key => Parser.seq
+                            (Parser.seq Parser.spaces (Parser.char #":"))
+                            (Parser.map (fn value => (key, value))
+                                jsonParser))
+                stream
+        (* objParser: (json, char) parser
+         * Parses a JSON object literal.
+         *)
+        and objParser stream =
+            Parser.map
+                (fn strJsons => Object (Map.fromList String.compare strJsons))
+                (Parser.between
+                    (Parser.seq (Parser.char #"{") Parser.spaces)
+                    (Parser.char #"}")
+                    (Parser.sepBy
+                        keyValParser
+                        (Parser.seq (Parser.char #",") Parser.spaces)))
+                stream
+        (* parseSingleton: (json, char) parser
+         * Parses exactly one JSON object.
+         *)
+        val parseSingleton =
+            Parser.bind jsonParser
+                (fn js => Parser.return js Parser.eof)
+        (* parseMultiple: (json list, char) parser
+         * Parsers zero or more JSON objects.
+         *)
+        val parseMultiple =
+            Parser.bind (Parser.many jsonParser)
+                (fn jss => Parser.return jss Parser.eof)
     in
-        case lstr
-        of [] => None
-        | x::xs => Some (x, String.implode xs)
+        (* parse: string -> (json, string) result
+         * Parses a JSON value from the given string. Expects exactly one JSON
+         * value.
+         *)
+        fun parse str = Parser.parse parseSingleton str
+        (* parseMany: string -> (json list, string) result
+         * Parses zero or more JSON values from the given string.
+         *)
+        fun parseMany str = Parser.parse parseMultiple str
     end
-
-fun takeWhile prop ss =
-    let
-        val (ls, ss') = String.split prop ss
-    in
-        if isEmpty ls
-        then None
-        else Some (ls, ss')
-    end
-
-fun compose f opt =
-    case opt of
-      None => None
-    | Some (x,y) => f x y
-
-fun getNum ss =
-    let fun toInt s =
-            if s = ""
-            then None
-            else if String.sub s 0 = #"-"
-                then (case Int.fromString (String.extract s 1 None)
-                        of Some i => Some (Int.~(i))
-                        |  None => None)
-                else Int.fromString s
-    in compose
-            (fn s => fn ss' =>
-                case toInt s
-                of Some i => Some (NumLit (Int i),ss')
-                |  None => None)
-            (takeWhile (fn c => isDigit c orelse c = #"-") ss)
-    end
-
-
-fun getKeyword ss =
-    compose (fn s => fn ss' =>
-            case s
-            of "null"  => Some (NullLit,ss')
-            | "true"  => Some (BoolLit True, ss')
-            | "false" => Some (BoolLit False, ss')
-            |  _  => None)
-        (takeWhile isAlpha ss);
-
-fun getString strm list =
-    case getc strm
-    of None => raise ERR "lex (in getString)" "end of input, looking for \""
-    | Some (#"\"",strm') => Some (StringLit (String.implode(List.rev list)), strm')
-    | Some (#"\\",strm') => (* backslashed chars possible *)
-        (case getc strm'
-        of None => raise ERR "lex (in getString)" "unexpected end of input"
-            | Some (ch,strm'') => getString strm'' (ch :: #"\\"::list)
-        )
-    | Some (ch,strm') =>  getString strm' (ch :: list)
-
-fun lex strm =
-    case getc strm
-    of None => None
-    | Some (#"{",strm') => Some (Lbrace,strm')
-    | Some (#"}",strm') => Some (Rbrace,strm')
-    | Some (#"[",strm') => Some (Lbrack,strm')
-    | Some (#"]",strm') => Some (Rbrack,strm')
-    | Some (#",",strm') => Some (Comma,strm')
-    | Some (#":",strm') => Some (Colon,strm')
-    | Some (#"n",strm') => getKeyword strm  (* null *)
-    | Some (#"t",strm') => getKeyword strm  (* True *)
-    | Some (#"f",strm') => getKeyword strm  (* False *)
-    | Some (#"\"",strm') => getString strm' []
-    | Some (ch,strm') =>
-        if Char.isSpace ch
-        then lex strm'
-        else if isDigit ch orelse ch = #"-"
-            then getNum strm
-            else raise ERR "lex"
-                    ("unexpected character starts remaining input:\n" ^ strm)
-
-fun lexemes ss =
-    (case lex ss
-    of None => []
-        | Some(l,ss') => l::lexemes ss')
-    handle ERR f s =>
-        (eRR_MESG ("lexemes",f^": "^s);
-            []);
-
-
-(* let _ = lexemes "null [ \"foo\" : \"bar\" ]" *)
-(* lexemes "{ \"foo\" : 12, \"bar\" : 13  }"; *)
-(* lexemes "[True,False, null, 123, -23, \"foo\"] "; *)
-
-
-(* --------------------------------------------------------------------------- *)
-(* Parsing *)
-(* --------------------------------------------------------------------------- *)
-
-fun pARSE_ERR s ss =
-    let
-        val estring = String.concat ["Json parser failed!\n   ", s
-                                    ,"\n   Remaining input: ", ss, ".\n"]
-    in
-        raise ERR "PARSE_ERR" estring
-    end
-
-fun toList (xs, ss) acc = case xs
-                    of LBRACK::t => (List acc::t,ss)
-                    |  h::t => toList (t,ss) (h::acc)
-                    |  [] =>
-                    raise pARSE_ERR "toList: empty stack when trying to build a compound" ss
-
-fun toAList (xs, ss) acc = case xs
-                    of LBRACE::t => (AList acc::t,ss)
-                    | j::(String s)::t => toAList (t,ss) ((s,j)::acc)
-                    | _::_::_ =>
-                        raise pARSE_ERR "toAList: expected string literal in key-value pair" ss
-                    | [_] =>
-                        raise pARSE_ERR "toAList: unexpected key-value pair structure" ss
-                    | [] =>
-                        raise pARSE_ERR "toAList: empty stack when trying to build an object" ss
-
-(*---------------------------------------------------------------------------*)
-(* The main parsing loop. Returns the final stack and the remaining input.   *)
-(* The stack should be of length 1, and it will have a json element. The     *)
-(* remaining input should be empty, or consist of whitespace.                *)
-(*---------------------------------------------------------------------------*)
-fun dropl f s =
-    let
-        val (_, s') = String.split f s
-    in
-        s'
-    end
-
-fun parse (stk, ss) =
-        case lex ss
-        of None => (List.rev stk, dropl Char.isSpace ss)
-        | Some (NullLit,ss')     => (Null::stk,ss')
-        | Some (BoolLit b,ss')   => (Boolean b::stk,ss')
-        | Some (NumLit i,ss')    => (Number i::stk,ss')
-        | Some (StringLit s,ss') => (String s::stk,ss')
-        | Some (Lbrack,ss') => parse_list (LBRACK::stk,ss')
-        | Some (Lbrace,ss') => parse_alist (LBRACE::stk,ss')
-        | Some _  => raise pARSE_ERR "unexpected lexeme" ss
-    and
-    parse_list (stk, ss) = (* list --> eps | elt (, elts)* *)
-        case lex ss
-            of None => raise pARSE_ERR "parse_list: unexpected end of input" ss
-            | Some (Rbrack,ss') => toList (stk,ss') []
-            | Some _ => elts (stk,ss)
-    and
-    parse_alist (stk, ss) = (* alist --> eps | strLit : val (, strLit : val)* *)
-        case lex ss
-            of None => raise pARSE_ERR "parse_alist: unexpected end of input" ss
-            | Some (Rbrace,ss') => toAList (stk,ss') []
-            | Some (StringLit _,_) => bindings (stk,ss)
-            | _ => raise pARSE_ERR "parse_alist: unexpected lexeme" ss
-    and
-    elts (stk, ss) =
-        let val (stk',ss') = parse (stk,ss)
-        in case lex ss'
-            of Some (Comma,ss'') => elts (stk',ss'')
-                | Some (Rbrack,ss'') => toList (stk',ss'') []
-                | Some _ => raise pARSE_ERR "parse_list: unexpected lexeme" ss'
-                | None => raise pARSE_ERR "parse_list: unexpected end of input" ss'
-        end
-    and
-    bindings (stk, ss) =
-        case lex ss
-            of Some (StringLit s,ss') =>
-            (case lex ss'
-                of Some (Colon, ss'') =>
-                    let val (stk',ss3) = parse (String s::stk,ss'')
-                    in case lex ss3
-                        of Some (Comma,ss4) => bindings (stk',ss4)
-                            | Some (Rbrace,ss4) => toAList (stk',ss4) []
-                        | _ => raise pARSE_ERR "parse_alist: unexpected lexeme" ss3
-                    end
-                    | _ => raise pARSE_ERR
-                                        "parse_alist: expect a colon after a string literal" ss'
-            )
-            | _ => raise pARSE_ERR "parse_alist: expected a key-value pair" ss
-
-fun parseMany p =
-    let
-        val (bs, ss') = parse p
-    in
-        if (isEmpty ss')
-        then bs
-        else case bs
-                of [] => parseMany ([], ss')
-                | [al]  => al::(parseMany ([], ss'))
-                | als => List.concat [als, (parseMany ([], ss'))]
-    end
-
-(* simple tests. *)
-(* val _ = parse ([], "") *)
-(* val _ = print "I did not fail\n" *)
-(* val _ = parse ([], "     ") *)
-(* val _ = print "I also did not fail\n" *)
-(* val _ = parse ([], "[1, 23, 4]"); *)
-(* parse ([], "{\"foo\" : 1, \"bar\" : 2}"); *)
-(* parse ([], "{\"foo\" : [1, 23, 4], \"bar\" : 2}"); *)
-
-(*---------------------------------------------------------------------------*)
-(* Wrapped-up versions ready to use on a variety of types (substrings,       *)
-(* strings, and files). These return (json list * substring)                 *)
-(*---------------------------------------------------------------------------*)
-
-(* fun fromSubstring ss = parse ([], ss); *)
-(* We don't have substring *)
-(* val fromString = fromSubstring o Substring.full; *)
-
-fun fromFile filename =
-    let
-        val istrm = TextIO.openIn filename
-        val ss = TextIO.inputAll istrm
-        val _ = TextIO.closeIn istrm
-    in
-        parse ([], ss)
-    end
-
-fun fromFileMany filename =
-    let
-        val istrm = TextIO.openIn filename
-        val ss = TextIO.inputAll istrm
-        val _ = TextIO.closeIn istrm
-    in
-        ((parseMany ([], ss)), "")
-    end
-
-(********************************* Utilities *********************************)
-(* jsonWalker : 'a -> 'a -> 'a -> (bool -> 'a) -> (int -> 'a) -> (string -> 'a) ->
- *              'a -> ('a -> 'a -> 'a) -> 'a -> (string -> 'a -> 'a -> 'a) ->
- *              json -> 'a
- *
- * Walks an entire `json` value to build another, arbitrary type.
- *)
-fun jsonWalker nullVal lBraceVal lBracketVal boolFn intFn stringFn nilVal consFn objNilVal objConsFn xjs =
-    let
-        val walker = jsonWalker nullVal lBraceVal lBracketVal boolFn intFn stringFn nilVal consFn objNilVal objConsFn
-        fun listWalker value accum = consFn (walker value) accum
-        fun objWalker (tag, value) accum = objConsFn tag (walker value) accum 
-    in
-        case xjs of
-          Null => nullVal
-        | LBRACE => lBraceVal
-        | LBRACK => lBracketVal
-        | Boolean b => boolFn b
-        | Number (Int n) => intFn n
-        | String str => stringFn str
-        | List jss => List.foldr listWalker nilVal jss
-        | AList strjss => List.foldr objWalker objNilVal strjss
-    end
-
-(* isNull : json -> bool
- * Determines whether a JSON value is `null`.
- *)
-fun isNull xjs =
-    case xjs of
-      Null => True
-    | _ => False
-(* isBoolean : json -> bool
- * Determines whether a JSON value is a boolean.
- *)
-fun isBoolean xjs =
-    case xjs of
-      Boolean _ => True
-    | _ => False
-(* isInt : json -> bool
- * Determines whether a JSON value is an integer.
- *)
-fun isInt xjs =
-    case xjs of
-      Number (Int _) => True
-    | _ => False
-(* isString : json -> bool
- * Determines whether a JSON value is a string.
- *)
-fun isString xjs =
-    case xjs of
-      String _ => True
-    | _ => False
-(* isList : json -> bool
- * Determines whether a JSON value is a list.
- *)
-fun isList xjs =
-    case xjs of
-      List _ => True
-    | _ => False
-(* isAList : json -> bool
- * Determines whether a JSON value is an object.
- *)
-fun isAList xjs =
-    case xjs of
-      AList _ => True
-    | _ => False
-(* toBoolean : json -> bool option
- * fromBoolean : bool -> json
- * Converts json to and from a boolean.
- *)
-fun fromBoolean b = Boolean b
-fun toBoolean xjs =
-    case xjs of
-      Boolean b => Some b
-    | _ => None
-(* toInt : json -> int option
- * fromInt : bool -> json
- * Converts json to and from an integer.
- *)
-fun fromInt n = Number (Int n)
-fun toInt xjs =
-    case xjs of
-      Number (Int n) => Some n
-    | _ => None
-(* toString : json -> string option
- * fromString : string -> json
- * Converts json to and from a string.
- *)
-fun fromString str = String str
-fun toString xjs =
-    case xjs of
-      String str => Some str
-    | _ => None
-(* toList : json -> (json list) option
- * fromList : json list -> json
- * Converts json to and from a list of json values.
- *)
-fun fromList jss = List jss
-fun toList xjs =
-    case xjs of
-      List jss => Some jss
-    | _ => None
-(* toAList : json -> ((string * json) list) option
- * fromAList : (string * json) list -> json
- * Converts json to and from a list of string, json pairs.
- *)
-fun fromAList xys = AList xys
-fun toAList xjs =
-    case xjs of
-      AList xys => Some xys
-    | _ => None
-
-(* lookup : string -> json -> option json
- * Looks up to see if `key` is a key in the json value `xjs`.
- *)
-fun lookup key xjs =
-    case xjs of
-      AList strjss => (* Map.lookup (Map.fromList String.compare strjss) key *)
+    (* stringify: json -> string
+     * Converts the given JSON value to its string representation.
+     *)
+    fun stringify xJson =
         let
-            fun search xys =
-                case xys of
-                  [] => None
-                | (x, y)::xys' => if x = key then Some y else search xys'
+            fun escFn c =
+                case Char.ord c of
+                   8 => "\\b"
+                |  9 => "\\t"
+                | 10 => "\\n"
+                | 12 => "\\f"
+                | 13 => "\\r"
+                | 34 => "\\\""
+                | _ => String.str c
+            fun escapeString str =
+                String.concat (List.map escFn (String.explode str))
         in
-            search strjss
+            case xJson of
+            Null => "null"
+            | Bool b => if b then "true" else "false"
+            | Int n =>
+                if n >= 0
+                then Int.toString n
+                else String.concat ["-", Int.toString (~n)]
+            | Float r => Double.toString r
+            | String str => String.concat ["\"", escapeString str, "\""]
+            | Array jsons =>
+                let
+                    val body = String.concatWith "," (List.map stringify jsons)
+                in
+                    String.concat ["[", body, "]"]
+                end
+            | Object strJsons =>
+                let
+                    val fields =
+                        List.map
+                            (fn (str, json) =>
+                                String.concat ["\"", escapeString str,
+                                                "\":", stringify json])
+                            (Map.toAscList strJsons)
+                    val body = String.concatWith "," fields
+                in
+                    String.concat ["{", body, "}"]
+                end
         end
-    | _ => None
-
-(* convertToString : json -> string
- * Converts a json value into (an ugly) string. For a more formatted string,
- * see `print_json`.
- *
- * __Warning__: Does not escape string values properly,
- * Json.toString (Json.String "\"") will give the string '"""'.
- *)
-fun convertToString xjs =
-    let
-        fun keyValFn (str, js) = String.concat ["\"", str, "\": ", convertToString js]
-    in
-        case xjs of
-          Null => "null"
-        | Boolean b => if b then "true" else "false"
-        | Number (Int n) => Int.toString n
-        | String str => String.concat ["\"", str, "\""]
-        | List xjss => String.concat ["[",
-                                      String.concatWith ", " (List.map convertToString xjss),
-                                      "]"]
-        | AList strjss => String.concat ["{",
-                                          String.concatWith ", " (List.map keyValFn strjss),
-                                          "}"]
-    end
+    (* null: json
+     * JSON `null` value.
+     *)
+    val null = Null
+    (* fromBool: bool -> json
+     * Converts a boolean to its corresponding JSON value
+     *)
+    fun fromBool b = Bool b
+    (* fromInt: int -> json
+     * Converts an integer to its corresponding JSON value.
+     *)
+    fun fromInt n = Int n
+    (* fromDouble: Word64.word -> json
+     * Converts a double to its corresponding JSON value.
+     *)
+    fun fromDouble r = Float r
+    (* fromString: string -> json
+     * Converts a string to its corresponding JSON value.
+     *)
+    fun fromString str = String str
+    (* fromList: json list -> json
+     * Converts a list of JSON values
+     *)
+    fun fromList xs = Array xs
+    (* fromMap: (string, json) map -> json
+     * Converts a string to json mapping into a JSON value.
+     *)
+    fun fromMap xm = Object xm
+    (* fromPairList: (string * json) list -> json
+     * Converts a list of pairs of strings and json values into a JSON value.
+     *)
+    fun fromPairList xys = Object (Map.fromList String.compare xys)
+    (* isNull: json -> bool
+     * Determines whether the JSON value is a null.
+     *)
+    fun isNull xJson =
+        case xJson of
+          Null => True
+        | _ => False
+    (* toBool: json -> bool option
+     * Tries to convert a JSON to a boolean.
+     *)
+    fun toBool xJson =
+        case xJson of
+          Bool b => Some b
+        | _ => None
+    (* toInt: json -> int option
+     * Tries to convert a JSON to a integer.
+     *)
+    fun toInt xJson =
+        case xJson of
+          Int n => Some n
+        | _ => None
+    (* toDouble: json -> Word64.word option
+     * Tries to convert a JSON to a double.
+     *)
+    fun toDouble xJson =
+        case xJson of
+          Float d => Some d
+        | _ => None
+    (* toString: json -> string option
+     * Tries to convert a JSON value to a string.
+     *)
+    fun toString json =
+        case json of
+          String str => Some str
+        | _ => None
+    (* toList: json -> (json list) option
+     * Tries to convert a JSON to a list of JSON values.
+     *)
+    fun toList xJson =
+        case xJson of
+          Array xJsons => Some xJsons
+        | _ => None
+    (* toMap: json -> ((string, json) map) option
+     * Tries to convert a JSON to a mapping from strings to JSON values
+     *)
+    fun toMap xJson =
+        case xJson of
+          Object xJsonm => Some xJsonm
+        | _ => None
+    (* lookup: string -> json -> json option
+     * `lookup str json`
+     * Tries to lookup the key `str` in the JSON value `json`.
+     *)
+    fun lookup key xJson =
+        case xJson of
+          Object xJsonm => Map.lookup xJsonm key
+        | _ => None
+    
+    fun insert xJson key value =
+        case xJson of
+          Object xJsonm => Some (Object (Map.insert xJsonm key value))
+        | _ => None
+    exception Exn string string
 end
+
+(* val emptyObject = Json.Object (Map.empty String.compare)
+val jsonNulls = ["null", " null", "  null", "null ", "\nnull\n"]
+val jsonBools = ["true", "false"]
+val jsonInts = ["0", "-1", "2"]
+val jsonFloats = ["0.0", "1.", "-.1", "2e2", "3.14e-2", "4.5E+6"]
+val jsonStrings = ["\"hello\"", "\"\\\\\"", "\"\n\"", "\"\\t\"", "\"\\u0000\"", "\"😈\""]
+val jsonArrays = ["[]", "[ ]", "[ 0 , null, []]"]
+val jsonObjs = ["{}", "{ }", "{ \"id\" : 1, \"result\": {} }"]
+fun parseValidJson xStr xJson =
+    case Json.parse xStr of
+      Err msg => print
+                    (String.concatWith "\n"
+                        ["Error parsing the following string:", xStr, msg, ""])
+    | Ok yJson =>
+        if xJson = yJson
+        then print (String.concatWith "\n"
+                        ["Parsed the following string correctly.",
+                        Json.stringify xJson, ""])
+        else print (String.concatWith "\n"
+                        ["Parsed the following string incorrectly.", xStr,
+                        " was parsed as ", Json.stringify yJson,
+                        " but expected ", Json.stringify xJson, ""])
+fun parseValidJsons strs jsons =
+    case (strs, jsons) of
+      ([], []) => ()
+    | ([], json::jsons') => print "Not enough strings to parse.\n"
+    | (str::strs', []) => print "Too many strings to parse.\n"
+    | (str::strs', json::jsons') =>
+        (parseValidJson str json; parseValidJsons strs' jsons')
+fun main () =
+    (parseValidJsons jsonNulls (List.genlist (const Json.null) 5);
+    parseValidJsons jsonBools (List.map Json.fromBool [True, False]);
+    parseValidJsons jsonInts (List.map Json.fromInt [0, ~1, 2]);
+    parseValidJsons jsonFloats (List.map (Json.fromDouble o Double.fromString) jsonFloats);
+    parseValidJsons jsonStrings (List.map Json.fromString
+                                    ["hello", String.str (Char.chr 92),
+                                    String.str (Char.chr 10),
+                                    String.str (Char.chr 9),
+                                    "\\u0000", "😈"]);
+    parseValidJson "[]" (Json.fromList []);
+    parseValidJsons jsonArrays ([Json.fromList [], Json.fromList [], Json.fromList [Json.fromInt 0, Json.null, Json.fromList []]]);
+    parseValidJsons jsonObjs ([emptyObject, emptyObject, Json.fromPairList [("id", Json.fromInt 1), ("result", emptyObject)]]))
+
+val _ = main () *)

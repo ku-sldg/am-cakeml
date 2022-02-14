@@ -1,28 +1,32 @@
 (* Depends on: util, copland/Instr *)
 
-fun intToJson n = Json.Number (Json.Int n)
+fun intToJson n = Json.fromInt n
 
-fun stringToJson s = Json.String s
+fun stringToJson s = Json.fromString s
 
-fun stringListToJsonList args  =  Json.List (List.map stringToJson args)
+fun stringListToJsonList args  =  Json.fromList (List.map stringToJson args)
 
-fun byteStringToJson bs = Json.String (BString.show bs)
+fun byteStringToJson bs = Json.fromString (BString.show bs)
 
-fun idToJson (Id a) = Json.Number (Json.Int (natToInt a))
+fun idToJson (Id a) = Json.fromInt (natToInt a)
 
-fun placeToJson pl = Json.Number (Json.Int (natToInt pl))
+fun placeToJson pl = Json.fromInt (natToInt pl)
 
-fun spPairToJson (sp1, sp2) = Json.List [ Json.String  (spToString sp1), Json.String (spToString sp2)]
+fun spPairToJson (sp1, sp2) =
+    Json.fromList
+        [Json.fromString  (spToString sp1), Json.fromString (spToString sp2)]
 
 fun nsMapToJson map =
-    let fun jsonify (pl, addr) = (plToString pl, Json.String addr)
-     in Json.AList (List.map jsonify (Map.toAscList map))
+    let fun jsonify (pl, addr) = (plToString pl, Json.fromString addr)
+    in Json.fromPairList (List.map jsonify (Map.toAscList map))
     end
 
-fun noArgConstructor cName = Json.AList [("constructor", stringToJson cName )]
+fun noArgConstructor cName =
+    Json.fromPairList [("constructor", stringToJson cName )]
 
-fun constructorWithArgs cName arglist = Json.AList [("constructor", stringToJson cName),
-                                                    ("data", Json.List arglist)]
+fun constructorWithArgs cName arglist =
+    Json.fromPairList [("constructor", stringToJson cName),
+                        ("data", Json.Array arglist)]
 
 fun aspToJson asp = case asp of
       Cpy => noArgConstructor "Cpy"
@@ -36,7 +40,7 @@ fun termToJson term = case term of
     | Lseq t1 t2   => constructorWithArgs "Lseq" [termToJson t1, termToJson t2]
     | Bseq p t1 t2 => constructorWithArgs "Bseq" [spPairToJson p, termToJson t1, termToJson t2]
     | Bpar p t1 t2 => constructorWithArgs "Bpar" [spPairToJson p, termToJson t1, termToJson t2]
-    |  _ =>  raise  Json.ERR "termToJson" "Unexpected constructor for APDT term: "
+    |  _ => raise  Json.Exn "termToJson" "Unexpected constructor for APDT term: "
 
 fun evToJson e = case e of
       Mt => noArgConstructor "Mt"

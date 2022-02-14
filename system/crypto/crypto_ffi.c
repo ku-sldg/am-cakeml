@@ -7,6 +7,7 @@
 #include "Hacl_Hash.h"
 #include "Hacl_Ed25519.h"
 #include "Hacl_Chacha20_Vec32.h"
+#include "Hacl_Curve25519_51.h"
 
 #define FFI_SUCCESS 0
 #define FFI_FAILURE 1
@@ -18,14 +19,14 @@
 
 // Arguments: message to be hashed in c
 // Returns: hash in a
-void ffisha512(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
+void ffisha512(uint8_t * c, const long clen, uint8_t * a, const long alen) {
     assert(alen >= 64);
     Hacl_Hash_SHA2_hash_512(c, clen, a);
 }
 
 // Argument `c` should be the private key followed by the message (no delimiter)
 // Returns signature
-void ffisignMsg(const uint8_t * c, const long clen, uint8_t * sig, const long sigLen) {
+void ffisignMsg(uint8_t * c, const long clen, uint8_t * sig, const long sigLen) {
     assert(clen >= PRIV_LEN);
     assert(sigLen >= SIG_LEN);
     uint8_t * priv = c;
@@ -35,7 +36,7 @@ void ffisignMsg(const uint8_t * c, const long clen, uint8_t * sig, const long si
 
 // Argument `c` should be the public key, then signature, then message (no delimiters)
 // Returns success if the signature is valid
-void ffisigCheck(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
+void ffisigCheck(uint8_t * c, const long clen, uint8_t * a, const long alen) {
     assert(clen >= PUB_LEN + SIG_LEN);
     assert(alen >= 1);
 
@@ -46,6 +47,14 @@ void ffisigCheck(const uint8_t * c, const long clen, uint8_t * a, const long ale
     uint32_t msgLen = (uint32_t)(clen - (PUB_LEN + SIG_LEN));
 
     a[0] = Hacl_Ed25519_verify(pub, msgLen, msg, sig) ? FFI_SUCCESS : FFI_FAILURE;
+}
+
+// Argument `c` should be the private signing key
+// Returns via `a` the corresponding public signing key
+void ffisignSecretToPublic(uint8_t *c, const long clen, uint8_t *a, const long alen) {
+    assert(clen >= PRIV_LEN);
+    assert(alen >= SIG_LEN);
+    Hacl_Ed25519_secret_to_public(a, c);
 }
 
 // Arguments: key in c
@@ -80,7 +89,7 @@ void ffisigCheck(const uint8_t * c, const long clen, uint8_t * a, const long ale
 // }
 
 // c is [key (32 bytes), nonce (12 bytes), count (4 bytes), text ...]
-void ffichacha20_encrypt(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
+void ffichacha20_encrypt(uint8_t * c, const long clen, uint8_t * a, const long alen) {
     uint32_t len = (uint32_t)(clen - 48);
 
     assert(clen > 48);
@@ -96,7 +105,7 @@ void ffichacha20_encrypt(const uint8_t * c, const long clen, uint8_t * a, const 
 }
 
 // c is [key (32 bytes), nonce (12 bytes), count (4 bytes), text ...]
-void ffichacha20_decrypt(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
+void ffichacha20_decrypt(uint8_t * c, const long clen, uint8_t * a, const long alen) {
     uint32_t len = (uint32_t)(clen - 48);
 
     assert(clen > 48);
@@ -109,4 +118,24 @@ void ffichacha20_decrypt(const uint8_t * c, const long clen, uint8_t * a, const 
     uint8_t * cipher = c + 48;
 
     Hacl_Chacha20_Vec32_chacha20_decrypt_32(len, a, cipher, key, nonce, ctr);
+}
+
+// Argument `in` is a private encryption key followed by a public encryption key.
+// Returns via `out` the ECDH common secret between the two key pairs.
+void fficurve25519_ecdh(uint8_t *in, const long inLen, uint8_t *out,
+                        const long outLen) {
+    assert(inLen >= PUB_LEN + PRIV_LEN);
+    assert(outLen >= PRIV_LEN);
+    uint8_t *priv = in;
+    uint8_t *pub = in + PRIV_LEN;
+    Hacl_Curve25519_51_ecdh(out, priv, pub);
+}
+
+// Argument `in` is a private encryption key.
+// Returns via `out` the corresponding public key.
+void fficurve25519_secretToPublic(uint8_t *in, const long inLen,
+                                    uint8_t *out, const long outLen) {
+    assert(inLen >= PRIV_LEN);
+    assert(outLen >= PUB_LEN);
+    Hacl_Curve25519_51_secret_to_public(out, in);
 }

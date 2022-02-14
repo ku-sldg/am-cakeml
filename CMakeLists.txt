@@ -24,7 +24,7 @@ function(get_files list_name)
     set(${list_name} ${get_files_list} PARENT_SCOPE)
 endfunction()
 
-get_files(util_src util/Extra.sml util/ByteString.sml util/Misc.sml util/CoqDefaults.sml util/Json.sml)
+get_files(util_src util/Extra.sml util/ByteString.sml util/Misc.sml util/CoqDefaults.sml util/Parser.sml util/Json.sml)
 get_files(cop_src ${util_src} copland/Instr.sml copland/AM.sml copland/VM.sml
     copland/json/CoplandToJson.sml copland/json/JsonToCopland.sml)
 get_files(crypto_src system/crypto/CryptoFFI.sml system/crypto/Random.sml)

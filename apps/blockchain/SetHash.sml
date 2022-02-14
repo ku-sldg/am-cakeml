@@ -1,7 +1,7 @@
 (* Depends upon: util, posix, ./Blockchain.sml *)
 fun setHashDemo recipient goldenHash =
     let
-        val sender = "0x55500e2c661b9b703421b92d15e15d292a9df669"
+        val sender = "0xdE497f77e0e2Ae24D27B6108f9400e95A18392B0"
         val host = "127.0.0.1"
         val port = 8543
         val jsonId = 1
@@ -17,15 +17,13 @@ fun setHashDemo recipient goldenHash =
             TextIO.print_err "Socket error when trying to set golden hash.\n"
         | Socket.InvalidFD =>
             TextIO.print_err "Socket file descriptor error when trying to set golden hash.\n"
-        | Blockchain.Exn msg =>
-            TextIO.print_err (String.concat ["Blockchain error: ", msg])
         | _ =>
             TextIO.print_err "Unknown error when trying to set golden hash.\n"
 
 fun main () =
     let
         val errorMsg = String.concat ["usage: ", CommandLine.name (),
-                                        " <dest address> <golden hash>\n"]
+                                        " <contract address> <golden hash>\n"]
     in
         case CommandLine.arguments () of
           [recipient, goldenHash] =>

@@ -26,7 +26,7 @@ fun sendReq addr =
         val nonce = Random.random (Random.seed (Meas.urand 32)) 16
         val ev    = evalTerm am (N (Id O) nonce Mt) term
      in print ("Evaluating term:\n" ^ termToString term ^ "\n\nNonce:\n" ^
-               BString.show nonce ^ "\n\nEvidence recieved:\n" ^
+               BString.show nonce ^ "\n\nEvidence received:\n" ^
                evToString ev ^ "\n\nAppraisal " ^ (
                case appraise nonce ev of
                       Ok ()   => "succeeded (expected nonce and hash value; signature verified).\n"

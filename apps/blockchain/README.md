@@ -6,8 +6,8 @@ Note that some parameters for the private Ethereum blockchain are hard coded
 into the source code: the IP address and port (127.0.0.1:8543) of the
 [geth](https://geth.ethereum.org/) RPC server and the public key address for the
 unlocked admin account who will be the sender of the RPC requests
-(`0x55500e...`). These values can be found in the functions
-[`getHashDemo` on line 13 of `Client.sml`](Client.sml#L13) and
+(`0xdE497f77...`). These values can be found in the functions
+[line 18 of `Client.sml`](Client.sml#L18) and
 [`setHashDemo` on line 2 of `SetHash.sml`](SetHash.sml#L2). Change these as
 needed. On the private Ethereum blockchain, there should be a contract with at
 least two methods `getHash(uint256): bytes` and `setHash(uint256, bytes): void`
@@ -29,29 +29,56 @@ and write to this mapping.
 
 ## Running ##
 
-1. Navigate to `./apps/tests/` and launch the server from here in the
-   background with `../../build/apps/blockchain/blockchainServer 5000 5 &`. This
-   starts the server on port 5000, with a queue length of 5 (the maximum number
-   of queued incoming connections). The client is hard coded to expect the
-   server to be on port 5000.
-2. Go back to `./build/` and run
-   `blockchainSetHash <contract address> 7BE9FD...C20081`. The contract address
-   is the address of the contract on the blockchain (prefixed with `0x`), and
-   the hex string is the
-   [golden hash value found at line 10 of `Client.sml`](Client.sml#L10).
-   For example `blockchainSetHash 0xfeedface 7BE9FD...C20081`.
-3. Run the client `blockchainClient <server ip address> <contract address>`, for
-   example `blockchainClient 127.0.0.1 0xfeedface`.
-4. What you should see:
+1. Go to the projects root directory, then head to `./build/apps/blockchain/`
+   and run the `test.sh` script, passing to it the contracts' addresses, e.g.
+   `./test.sh 0xfeedface 0xdeadbeef`.
+2. What you should see:
    ```shell
-   Evaluating term:
-   Att 1 (Lseq (Asp (Aspc Id 1 [testDir] )) (Asp Sig))
+   Starting the server...done.
+   Set hash succeeded.
+   Press enter to launch the client.
+   Added health record successfully.
+   Press enter to relaunch the client.
+   Found a record with freshness at most 3600000000 µs.
+   ```
 
-   Nonce:
-   <nonce>
+# A Certificate Authority for Key Authorization #
 
-   Evidence recieved:
-   G <signature> (U Id 1 [testDir] 7BE9FD...C20081 (N Id 0 <none> (Mt)))
+An example of a key authorization protocol where the server/CA certifies a key
+for the client by signing the key and encrypting it with the client's public
+key. The client sends a request in the form of their own public identifier and
+the key to be authorized, receives the encrypted signature from the CA,
+decrypts it, and now has the signature to pass along with the key to any third
+party.
 
-   Appraisal succeeded (expected nonce and hash value; signature verified).
+## Building for Unix-like OSes ##
+
+1. Go to the home directory for the project
+   [am-cakeml](https://github.com/ku-sldg/am-cakeml/) and make the `./build/`
+   directory with `mkdir build`.
+2. Move into this new directory, `cd build`, and run `cmake ..` in order to
+   generate the required Makefiles.
+3. Build the blockchain example with `make CAAll`. The generated
+   binaries will be places into `./build/`.
+   * This will run two separate makes: `make CA` to build the
+     CA and `make CAClient` to make the client demo.
+
+## Running ##
+
+1. Go to the projects root directory, then head to `./build/apps/blockchain/`.
+2. Run `./blockchainCA 5001 5 &` to start the server listening on port 5001 with
+   at most 5 concurrent connections.
+3. Run `./blockchainCAClient 5001` to run the client demo.
+4. You should see an output like the following:
+   ```shell
+   <== Added client public key to CAs list.
+       Got CAs public encryption key.
+       Computed alias: 1444B1...000000
+   ==> Received alias: 1444B1...000000
+       Signature: D80137...A2B30D
+       Encrypted signature: BD4E26...019CC1
+   <== Encrypted signature: BD4E26...019CC1
+       Signature: D80137...A2B30D
+       Got CAs public signing key.
+       Signature check: True
    ```
