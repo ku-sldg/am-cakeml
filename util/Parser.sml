@@ -563,4 +563,7 @@ struct
                       Ok xs => (Ok (x::xs), cs'', line'', col'')
                     | Err err => (Err err, cs'', line'', col'')
                 end *)
+
+    (* ('a, 'c) parser -> ('b, 'c) parser -> ('a, 'c) parser *)
+    fun followedBy p q = bind p (fn a => return a q)
 end

@@ -25,7 +25,7 @@ local
     val bind_ = Parser.seq
 
     (* ('a, char) parser -> ('a, char) parser *)
-    fun token p = bind p (fn a => bind_ Parser.spaces (pure a))
+    fun token p = Parser.followedBy p Parser.spaces
 
     (* (string, char) parser *)
     fun symbol s = token (Parser.string s)
@@ -33,7 +33,6 @@ local
     (* ('a, char) parser -> ('a, char) parser *)
     fun parens p = Parser.between (symbol "(") (symbol ")") p
 in
-
     (* numeralP :: (nat, char) parser *)
     val numeralP = token (
         Parser.bindResult
@@ -112,8 +111,7 @@ in
     (* string -> (term, string) result *)
     val parseTerm = Parser.parse (
         bind_ Parser.spaces (
-        Parser.bind termP (fn term =>
-        Parser.return term Parser.eof
-        ))
+        Parser.followedBy termP Parser.eof
+        )
     )
 end
