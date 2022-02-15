@@ -33,13 +33,6 @@ endif()
 set(hacl_sources ${hacl_path}/Hacl_Hash.c ${hacl_path}/Hacl_Ed25519.c ${hacl_path}/Hacl_Curve25519_51.c ${hacl_path}/Hacl_Chacha20_Vec32.c ${hacl_path}/Hacl_Chacha20.c)
 set_source_files_properties(${hacl_sources} PROPERTIES GENERATED True)
 
-# Small standalone executable to generate keys for Ed25519
-# add_executable(keyGen EXCLUDE_FROM_ALL
-#     key_gen.c ${hacl_path}/Hacl_Hash.c ${hacl_path}/Hacl_Ed25519.c ${hacl_path}/Hacl_Curve25519_51.c
-# )
-# target_include_directories(keyGen BEFORE PRIVATE ${hacl_path} ${kremlin_path} ${kremlib_path})
-# add_dependencies(keyGen hacl-star)
-
 function(add_hacl target)
     # For some reason these are not in scope unless defined in the function
     set(hacl_release_dir "${CMAKE_BINARY_DIR}/system/crypto/hacl-star/dist") # Better way to reference crypto binary dir?

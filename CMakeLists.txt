@@ -17,12 +17,13 @@ endfunction()
 function(get_files list_name)
     set(get_files_list "")
     foreach (file ${ARGN})
-#        file(REAL_PATH ${file} temp)
         get_real_file(${file} temp)
         list(APPEND get_files_list ${temp})
     endforeach()
     set(${list_name} ${get_files_list} PARENT_SCOPE)
 endfunction()
+
+set(BASIS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/system/basis_ffi.c" CACHE PATH "Filepath of basis_ffi.c to use (associated with the compiler version).")
 
 get_files(util_src util/Extra.sml util/ByteString.sml util/Misc.sml util/CoqDefaults.sml util/Parser.sml util/Json.sml util/Ini.sml)
 get_files(cop_src ${util_src} copland/Instr.sml copland/AM.sml copland/VM.sml
@@ -32,7 +33,7 @@ get_files(posix_src ${crypto_src} system/posix/sockets/SocketFFI.sml system/posi
 get_files(server_am_src ${cop_src} ${posix_src} am/Measurements.sml am/CommTypes.sml am/ServerAm.sml)
 
 get_files(posix_c_files
-    system/basis_ffi.c system/crypto/crypto_ffi.c system/posix/sockets/socket_ffi.c
+    ${BASIS_FILE} system/crypto/crypto_ffi.c system/posix/sockets/socket_ffi.c
     system/posix/time/time_ffi.c system/posix/meas/meas_ffi.c
 )
 
@@ -49,23 +50,16 @@ if(NOT (${target_os_lower} STREQUAL "linux" OR ${target_os_lower} STREQUAL "maco
 endif()
 
 # Arch Config
-set(TARGET_ARCH "native" CACHE STRING "Options: \"native\", \"armv7\", or \"other\".")
+set(TARGET_ARCH "native" CACHE STRING "Options: \"native\", \"armv7\", \"armv8\", or \"other\".")
 string(TOLOWER ${TARGET_ARCH} target_arch_lower)
-if("${target_arch_lower}" STREQUAL "armv7")
-    set(CMAKE_C_FLAGS "-mfloat-abi=hard ${CMAKE_C_FLAGS}")
-    find_program (arm-hf-gcc arm-linux-gnueabihf-gcc)
-    if("${arm-hf-gcc}" STREQUAL "arm-hf-gcc-NOTFOUND")
-        message(WARNING "Cross-compiling to the armv7 architecture requires hard-float support. Please ensure your C compiler supports this.")
-    else()
-        set(CMAKE_C_COMPILER ${arm-hf-gcc})
-    endif()
-    unset(arm-hf-gcc)
-elseif(NOT(("${target_arch_lower}" STREQUAL "native") OR ("${target_arch_lower}" STREQUAL "other")))
-    message(FATAL_ERROR "TARGET_ARCH value \"${TARGET_ARCH}\" is invalid. Please select from: \"native\", \"armv7\", or \"other\".")
+if(NOT(("${target_arch_lower}" STREQUAL "armv7") OR ("${target_arch_lower}" STREQUAL "armv8")
+    OR ("${target_arch_lower}" STREQUAL "native") OR ("${target_arch_lower}" STREQUAL "other")))
+    message(FATAL_ERROR "TARGET_ARCH value \"${TARGET_ARCH}\" is invalid. Please select from: \"native\", \"armv7\", \"armv8\", or \"other\".")
 endif()
 
-string(COMPARE NOTEQUAL "${target_arch_lower}" "native" default_static_linking)
-set(STATIC_LINKING default_static_linking CACHE BOOL "")
+# string(COMPARE NOTEQUAL "${target_arch_lower}" "native" default_static_linking)
+# set(STATIC_LINKING default_static_linking CACHE BOOL "")
+set(STATIC_LINKING OFF CACHE BOOL "")
 
 mark_as_advanced(FORCE CMAKE_INSTALL_PREFIX)
 mark_as_advanced(CLEAR
