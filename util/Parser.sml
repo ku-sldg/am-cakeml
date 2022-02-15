@@ -566,4 +566,11 @@ struct
 
     (* ('a, 'c) parser -> ('b, 'c) parser -> ('a, 'c) parser *)
     fun followedBy p q = bind p (fn a => return a q)
+
+    (* ('a, char) parser -> ('a, char) parser *)
+    (* Token-based parsing consumes all whitespace after parsing *)
+    fun token p = followedBy p spaces
+
+    (* (string, char) parser *)
+    fun symbol s = token (string s)
 end

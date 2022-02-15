@@ -5,12 +5,6 @@ local
     val bind  = Parser.bind
     val bind_ = Parser.seq
 
-    (* ('a, char) parser -> ('a, char) parser *)
-    fun token p = bind p (fn a => bind_ Parser.spaces (pure a))
-
-    (* (string, char) parser *)
-    fun symbol s = token (Parser.string s)
-
     (* (char, char) parser *)
     val identChar = Parser.choice [Parser.alphaNum, Parser.char #"_", Parser.char #"-", Parser.char #"'"]
 
@@ -22,14 +16,14 @@ local
         ))
 
     (* (string, char) parser *)
-    val identifier = token ident
+    val identifier = Parser.token ident
 
     (* (char, char) parser -> (string, char) parser *)
     fun implodeMany p = Parser.map String.implode (Parser.many p)
 in
     (* ((), char) parser *)
-    val commentP = token (
-        bind_ (symbol ";") (
+    val commentP = Parser.token (
+        bind_ (Parser.symbol ";") (
         bind_ (Parser.many (Parser.notChar #"\n")) (
         pure ()
         ))
@@ -38,14 +32,14 @@ in
     (* (string * string, char) parser *)
     val keyValP = 
         bind  identifier (fn k =>
-        bind_ (symbol "=") (
-        bind  (token (implodeMany (Parser.notChar #"\n"))) (fn v =>
+        bind_ (Parser.symbol "=") (
+        bind  (Parser.token (implodeMany (Parser.notChar #"\n"))) (fn v =>
         pure (k, StringExtra.dropWhileEnd Char.isSpace v)
         )))
 
     (* (string, char) parser *)
-    val sectionP = token (
-        Parser.between (symbol "[") (symbol "]")
+    val sectionP = Parser.token (
+        Parser.between (Parser.symbol "[") (Parser.symbol "]")
             (implodeMany (Parser.notChar #"]")))
 
     (* ((string * string) list, char) parser *)

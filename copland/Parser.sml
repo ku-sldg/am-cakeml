@@ -25,16 +25,10 @@ local
     val bind_ = Parser.seq
 
     (* ('a, char) parser -> ('a, char) parser *)
-    fun token p = Parser.followedBy p Parser.spaces
-
-    (* (string, char) parser *)
-    fun symbol s = token (Parser.string s)
-
-    (* ('a, char) parser -> ('a, char) parser *)
-    fun parens p = Parser.between (symbol "(") (symbol ")") p
+    fun parens p = Parser.between (Parser.symbol "(") (Parser.symbol ")") p
 in
     (* numeralP :: (nat, char) parser *)
-    val numeralP = token (
+    val numeralP = Parser.token (
         Parser.bindResult
             (fn numStr =>
                 OptionExtra.option
@@ -50,13 +44,13 @@ in
     (* stringP :: (string, char) parser *)
     val stringP =
         Parser.map String.implode
-            (Parser.between (Parser.char #"\"") (symbol "\"")
+            (Parser.between (Parser.char #"\"") (Parser.symbol "\"")
                 (Parser.many (Parser.notChar #"\"")))
 
     (* copyP, signP, hashP, aspcP :: (asp, char) parser *)
-    val copyP = Parser.return Cpy (symbol "_")
-    val signP = Parser.return Sig (symbol "!")
-    val hashP = Parser.return Hsh (symbol "#")
+    val copyP = Parser.return Cpy (Parser.symbol "_")
+    val signP = Parser.return Sig (Parser.symbol "!")
+    val hashP = Parser.return Hsh (Parser.symbol "#")
     val aspcP = 
         bind identifierP (fn ident =>
         bind (Parser.many stringP) (fn args =>
@@ -64,13 +58,13 @@ in
         ))
 
    (* allP, noneP, spP :: (sp, char) parser *)
-    val allP = Parser.return ALL (symbol "+")
-    val noneP = Parser.return NONE (symbol "-")
+    val allP = Parser.return ALL (Parser.symbol "+")
+    val noneP = Parser.return NONE (Parser.symbol "-")
     val spP = Parser.choice [allP, noneP]
 
     (* (sp -> sp -> term -> term -> term, char) parser *)
-    val bseqP = Parser.return (fn lsp => fn rsp => fn x => fn y => Bseq (lsp, rsp) x y) (symbol "<")
-    val bparP = Parser.return (fn lsp => fn rsp => fn x => fn y => Bpar (lsp, rsp) x y) (symbol "~")
+    val bseqP = Parser.return (fn lsp => fn rsp => fn x => fn y => Bseq (lsp, rsp) x y) (Parser.symbol "<")
+    val bparP = Parser.return (fn lsp => fn rsp => fn x => fn y => Bpar (lsp, rsp) x y) (Parser.symbol "~")
 
     (* (term -> term -> term, char) parser *)
     val splitOpP = 
@@ -79,7 +73,7 @@ in
         bind spP (fn r =>
         pure (splitOp l r)
         )))
-    val lseqP = Parser.return (fn x => fn y => Lseq x y) (symbol "->")
+    val lseqP = Parser.return (fn x => fn y => Lseq x y) (Parser.symbol "->")
     val infixOpP = Parser.choice [lseqP, splitOpP]
 
     (* aspP :: (asp, char) parser *)
@@ -90,9 +84,9 @@ in
 
     (* (term, char) parser -> (term, char) parser *)
     fun atP subP = 
-        bind_ (symbol "@") (
+        bind_ (Parser.symbol "@") (
         bind  numeralP (fn pl =>
-        bind  (Parser.between (symbol "[") (symbol "]") subP) (fn t =>
+        bind  (Parser.between (Parser.symbol "[") (Parser.symbol "]") subP) (fn t =>
         pure (Att pl t)
         )))
 
