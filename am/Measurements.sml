@@ -10,14 +10,6 @@ fun verifySig g pub =
 (* () -> bstring *)
 (* fun genNonce () = Crypto.urand 16 *)
 
-(* Meas *)
-(* string -> string *)
-fun readFile filename =
-    let val fd = TextIO.openIn filename
-        val text = TextIO.inputAll fd
-     in TextIO.closeIn fd;
-        text
-    end
 
 (* bstring list -> bstring *)
 (* Hashes a group of bytestrings in an order-agnostic way (by xor-ing them together) *)
@@ -59,7 +51,7 @@ fun getMaps pid =
             | _ => None
             handle _ => None
         fun parseMaps str = List.mapPartial parseLine (lines str)
-     in parseMaps (readFile ("/proc/" ^ pid ^ "/maps"))
+     in parseMaps (TextIOExtra.readFile ("/proc/" ^ pid ^ "/maps"))
     end
 
 fun measProc pid = 
@@ -73,7 +65,7 @@ fun measProc pid =
 fun findProc name = 
     let fun getProcDir (n,t) = if t = Meas.Dir andalso Option.isSome (Int.fromString n) then Some n else None
         val procDirs = List.mapPartial getProcDir (Meas.readDirNoDot "/proc")
-        fun getStat procDir = Some (readFile ("/proc/" ^ procDir ^ "/stat")) handle _ => None
+        fun getStat procDir = Some (TextIOExtra.readFile ("/proc/" ^ procDir ^ "/stat")) handle _ => None
         val stats = List.mapPartial getStat procDirs
         fun parseStat stat = case String.tokens (op = #" ") stat of
               (pid :: name' :: _) => (pid, name')

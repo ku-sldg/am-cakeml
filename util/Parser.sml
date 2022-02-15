@@ -121,6 +121,14 @@ struct
     fun char inc =
         label (String.concat ["Expected to see character '", String.str inc, "'."])
             (satisfy (op = inc))
+    (* notChar: char -> (char, char) parser
+     * `notChar c`
+     * Returns a simple parser that expects the next character in the stream to
+     * not be `c`. Does not consume input upon failure.
+     *)
+    fun notChar inc =
+        label (String.concat ["Expected not to see character '", String.str inc, "'."])
+            (satisfy (op <> inc))
     (* newline: (char, char) parser
      * Parses a line feed character. Does not consume input upon failure.
      *)
@@ -555,4 +563,7 @@ struct
                       Ok xs => (Ok (x::xs), cs'', line'', col'')
                     | Err err => (Err err, cs'', line'', col'')
                 end *)
+
+    (* ('a, 'c) parser -> ('b, 'c) parser -> ('a, 'c) parser *)
+    fun followedBy p q = bind p (fn a => return a q)
 end

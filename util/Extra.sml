@@ -32,6 +32,14 @@ structure ListExtra = struct
             if pred x
             then Pair.map (fn ys => x::ys) id (span pred xs')
             else ([], xs)
+
+    (* filterSome : 'a option list -> 'a list
+     * Like `List.mapPartial`, but without the map
+     *)
+    fun filterSome xs = case xs of 
+          (Some x) :: xs' => x :: (filterSome xs')
+        | None :: xs' => filterSome xs'
+        | [] => []
 end
 
 structure OptionExtra = struct 
@@ -39,6 +47,9 @@ structure OptionExtra = struct
     fun option b f opt = case opt of 
           Some a => f a 
         | None   => b
+
+    (* 'a -> 'a option *)
+    fun some x = Some x
 end
 
 structure CharExtra = struct 
@@ -144,6 +155,14 @@ structure StringExtra = struct
         in
             String.concat (List.map escFn (String.explode str))
         end
+
+    (* (char -> bool) -> string -> string *)
+    fun dropWhileEnd f s = 
+        let val idx = String.size s - 1
+         in if f (String.sub s idx)
+                then dropWhileEnd f (String.substring s 0 idx)
+                else s
+        end
 end
 
 structure Word8Extra = struct 
@@ -195,4 +214,26 @@ structure TextIOExtra = struct
 
     (* string -> () *)
     fun printLn_err s = TextIO.print_err (s ^ "\n")
+
+    (* string -> string *)
+    fun readFile filename =
+        let val fd = TextIO.openIn filename
+            val text = TextIO.inputAll fd
+        in TextIO.closeIn fd;
+            text
+        end
+end
+
+structure MapExtra = struct
+    (* ('a -> 'a -> ordering) -> 'a -> 'b -> ('a, 'b) map *)
+    fun singleton cmp k v = Map.insert (Map.empty cmp) k v
+
+    (* ('a -> 'a -> ordering) -> ('b -> 'a) -> ('b, 'c) map -> ('a, 'c) map *)
+    fun mapKey cmp f m = Map.fromList cmp (List.map (Pair.map f id) (Map.toAscList m))
+
+    (* ('a -> 'a -> ordering) -> ('a -> 'b -> bool) -> ('a, 'b) map -> ('a, 'b) map *)
+    fun filter cmp f m = Map.fromList cmp (List.filter (uncurry f) (Map.toAscList m))
+
+    (* ('a -> 'a -> ordering) -> ('b -> 'c -> ('a * 'd) option) -> ('b, 'c) map -> ('a, 'd) map *)
+    fun mapPartial cmp f m = Map.fromList cmp (List.mapPartial (uncurry f) (Map.toAscList m))
 end
