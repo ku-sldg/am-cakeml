@@ -76,6 +76,12 @@ structure Result = struct
         | (Ok _, Err _) => Less
         | (Err _, Ok _) => Greater
         | (Err ex, Err ey) => errord ex ey
+
+    (* 'a option -> 'e -> ('a, 'e) result *)
+    fun fromOption opt e = OptionExtra.option (Err e) ok opt
+
+    (* ('a, 'e) result -> 'a option *)
+    fun toOption r = result OptionExtra.some (const None) r
 end
 
 structure FFI = struct 
