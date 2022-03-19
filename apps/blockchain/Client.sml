@@ -88,8 +88,10 @@ fun filterHealthRecords records =
             case record of
               Err _ => False
             | Ok hr => 
+                let freshness = HealthRecord.checkFreshness hr in
                 HealthRecord.getPhrase hr = term andalso
-                HealthRecord.checkFreshness hr < freshnessLimit
+                freshness < freshnessLimit andalso 0 < freshness andalso
+                HealthRecord.checkSignature signPub hr
     in
         List.map Result.okValOf (List.filter filter records)
     end
