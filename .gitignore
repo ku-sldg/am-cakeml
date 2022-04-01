@@ -16,3 +16,4 @@ CMakeCache.txt
 
 # Editor stuff
 /.vscode
+*.code-workspace
