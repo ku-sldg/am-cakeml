@@ -386,7 +386,7 @@ struct
             let
                 fun formEthFunc data =
                     formEthSendTransaction jsonId sender recipient data
-                val message = formEthFunc ("0x6a7fd925" ^ paramEnc)
+                val message = formEthFunc ("0xff4fd97c" ^ paramEnc)
                 fun respFunc result =
                     Ok (BString.unshow (String.extract result 2 None))
                     handle Word8Extra.InvalidHex =>
