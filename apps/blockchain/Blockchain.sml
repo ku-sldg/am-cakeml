@@ -266,6 +266,7 @@ struct
      *)
     fun sendRequest host port message =
         let
+            (* This seemed to be needed at some time. Not any more. *)
             fun inputAll_aux socket str =
                 let
                     val input = Socket.inputAll socket
@@ -287,7 +288,7 @@ struct
             val httpReqStr = Http.requestToString httpReq
             val socket = Socket.connect host port
             val _ = Socket.output socket httpReqStr
-            val input = inputAll_aux socket ""
+            val input = Socket.inputAll socket
             val httpRespr = Http.responseFromString input
             val _ = Socket.close socket
         in
@@ -320,10 +321,10 @@ struct
                   Some result => func result
                 | None =>
                     Err (String.concat [errMsgHeader,
-                                    ": JSON result field was either not found or not a string.\n",
+                                    ": JSON `result` field was either not found or not a string.\n",
                                     Json.stringify jsonResp])
             else Err (String.concat [errMsgHeader,
-                                    ": JSON ids didn't match.\n",
+                                    ": JSON `id`s didn't match.\n",
                                     Json.stringify jsonResp])
         end
         handle Result.Exn =>
@@ -386,7 +387,7 @@ struct
             let
                 fun formEthFunc data =
                     formEthSendTransaction jsonId sender recipient data
-                val message = formEthFunc ("0xff4fd97c" ^ paramEnc)
+                val message = formEthFunc ("0x6a7fd925" ^ paramEnc)
                 fun respFunc result =
                     Ok (BString.unshow (String.extract result 2 None))
                     handle Word8Extra.InvalidHex =>

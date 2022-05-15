@@ -80,9 +80,16 @@ fun filterHealthRecords signingKey records =
             case record of
               Err _ => False
             | Ok hr => 
-                let val freshness = HealthRecord.checkFreshness hr in
+                let val freshness = HealthRecord.checkFreshness hr val _ = (print (Int.toString freshness); print "\n") in
+                    (* if HealthRecord.getPhrase hr <> term
+                    then (print "Term didn't match.\n"; False)
+                    else if HealthRecord.checkSignature signingKey hr = False
+                        then (print "Signature didn't match.\n"; False)
+                        else if 0 <= freshness andalso freshness < freshnessLimit
+                            then True
+                            else (print "Record wasn't fresh enough.\n"; False) *)
                     HealthRecord.getPhrase hr = term andalso
-                    freshness < freshnessLimit andalso 0 < freshness andalso
+                    freshness < freshnessLimit andalso 0 <= freshness andalso
                     HealthRecord.checkSignature signingKey hr
                 end
     in
@@ -99,7 +106,7 @@ fun healthRecordDemo globalMap =
         val jsonId = 3
         val blockchainIPo = Map.lookup globalMap "blockchain.ip"
         val blockchainPorto = Option.mapPartial Int.fromString (Map.lookup globalMap "blockchain.port")
-        val privateKeyo = Option.map BString.unshow (Map.lookup globalMap "client.privateKey")
+        val privateKeyo = Option.map BString.unshow (Map.lookup globalMap "place.1.privateKey")
         val ido =
             Option.map
                 (fn key => Crypto.hash (Crypto.generateEncryptionPublicKey key))
@@ -149,7 +156,7 @@ fun healthRecordDemo globalMap =
                         userAddress)
             in
                 case filterHealthRecords signingKey records of
-                _::_ =>
+                  _::_ =>
                     TextIO.print_list ["Found a record with freshness at most ",
                         Int.toString freshnessLimit, " µs.\n"]
                 | [] =>
