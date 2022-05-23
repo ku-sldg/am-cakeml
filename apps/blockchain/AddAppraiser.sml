@@ -1,17 +1,12 @@
 (* Depends upon: util, posix, ./Blockchain.sml *)
-(* Writes a golden hash value to the blockchain. *)
-fun setHashDemo globalConfig =
+(* This will add an appraiser so that they may write health records.
+ *)
+fun addAppraiserDemo globalConfig =
     let
         val recipientr =
             Result.fromOption
                 (Map.lookup globalConfig "blockchain.goldenHashContract")
                 "error looking up golden hash contract address"
-        val goldenHashValuer =
-            Result.fromOption
-                (Option.map
-                    BString.unshow
-                    (Map.lookup globalConfig "blockchain.goldenHashValue"))
-                "error looking up golden hash value"
         val senderr =
             Result.fromOption
                 (Map.lookup globalConfig "blockchain.userAddress")
@@ -26,7 +21,15 @@ fun setHashDemo globalConfig =
                     Int.fromString
                     (Map.lookup globalConfig "blockchain.port"))
                 "error looking up blockchain port number"
-        val jsonId = 1
+        val privateKeyo = Option.map BString.unshow (Map.lookup globalConfig "place.1.privateKey")
+        val appraiserIdr =
+            Result.fromOption
+                (Option.map
+                    (fn key =>
+                        Crypto.hash (Crypto.generateEncryptionPublicKey key))
+                    privateKeyo)
+                "error looking up appraiser id"
+        val jsonId = 4
         val hashId = 1
         val resultr =
             Result.bind hostr
@@ -37,23 +40,25 @@ fun setHashDemo globalConfig =
                                 (fn recipient =>
                                     Result.bind senderr
                                         (fn sender =>
-                                            Result.bind goldenHashValuer
-                                                (fn goldenHashValue =>
-                                                    Blockchain.setHash
-                                                        host port jsonId
-                                                        recipient sender hashId
-                                                        goldenHashValue)))))
+                                            Result.bind appraiserIdr
+                                                (fn appraiserId =>
+                                                    HealthRecord.addAppraiser
+                                                        host port
+                                                        jsonId
+                                                        recipient
+                                                        sender
+                                                        appraiserId)))))
     in
         case resultr of
           Err msg => TextIO.print_err (String.concat [msg, "\n"])
-        | Ok _ => print "Set hash succeeded.\n"
+        | Ok _ => print "Added appraiser succeeded.\n"
     end
     handle Socket.Err _ =>
-            TextIO.print_err "Socket error when trying to set golden hash.\n"
+            TextIO.print_err "Socket error when trying to add authorized user.\n"
         | Socket.InvalidFD =>
-            TextIO.print_err "Socket file descriptor error when trying to set golden hash.\n"
+            TextIO.print_err "Socket file descriptor error when trying to add authorized user.\n"
         | _ =>
-            TextIO.print_err "Unknown error when trying to set golden hash.\n"
+            TextIO.print_err "Unknown error when trying to add authorized user.\n"
 
 fun main () =
     let
@@ -63,12 +68,9 @@ fun main () =
         case CommandLine.arguments () of
           [iniFilename] =>
             (case parseIniFile iniFilename of
-              Ok config =>
-                setHashDemo config
-            | Err msg =>
-                TextIO.print_err (String.concat ["Error parsing ini file: ", msg, "\n"]))
+              Ok config => addAppraiserDemo config
+            | Err msg => TextIO.print_err (String.concat ["Error parsing ini file: ", msg, "\n"]))
         | _ =>
             TextIO.print_err errorMsg
     end
-
 val _ = main ()

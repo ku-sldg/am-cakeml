@@ -1,7 +1,8 @@
 (* Depends upon: util, posix, ./Blockchain.sml *)
-(* Adds a user to the list of those with permission to write golden hash
- * values. *)
-fun addUserDemo globalConfig address =
+(* This will clear all the health records for a given appraiser and a given
+ * client.
+ *)
+fun clearHealthRecordsDemo globalConfig =
     let
         val recipientr =
             Result.fromOption
@@ -21,6 +22,22 @@ fun addUserDemo globalConfig address =
                     Int.fromString
                     (Map.lookup globalConfig "blockchain.port"))
                 "error looking up blockchain port number"
+        val privateKeyo = Option.map BString.unshow (Map.lookup globalConfig "place.1.privateKey")
+        val appraiserIdr =
+            Result.fromOption
+                (Option.map
+                    (fn key =>
+                        Crypto.hash (Crypto.generateEncryptionPublicKey key))
+                    privateKeyo)
+                "error looking up appraiser id"
+        val signingKeyo =
+            Option.map
+                BString.unshow
+                (Map.lookup globalConfig "place.1.signingKey")
+        val targetIdr =
+            Result.fromOption
+                (Option.map Crypto.hash signingKeyo)
+                "error looking up target id"
         val jsonId = 4
         val hashId = 1
         val resultr =
@@ -32,13 +49,21 @@ fun addUserDemo globalConfig address =
                                 (fn recipient =>
                                     Result.bind senderr
                                         (fn sender =>
-                                            Blockchain.addAuthorizedUser
-                                                host port jsonId recipient
-                                                sender address))))
+                                            Result.bind appraiserIdr
+                                                (fn appraiserId =>
+                                                    Result.bind targetIdr
+                                                        (fn targetId =>
+                                                            HealthRecord.clearRecords
+                                                                host port
+                                                                jsonId
+                                                                recipient
+                                                                sender
+                                                                appraiserId
+                                                                targetId))))))
     in
         case resultr of
           Err msg => TextIO.print_err (String.concat [msg, "\n"])
-        | Ok _ => print "Add user succeeded.\n"
+        | Ok _ => print "Cleared health records.\n"
     end
     handle Socket.Err _ =>
             TextIO.print_err "Socket error when trying to add authorized user.\n"
@@ -50,12 +75,12 @@ fun addUserDemo globalConfig address =
 fun main () =
     let
         val errorMsg = String.concat ["usage: ", CommandLine.name (),
-                                        " <ini config file> <user address>\n"]
+                                        " <ini config file>\n"]
     in
         case CommandLine.arguments () of
-          [iniFilename, address] =>
+          [iniFilename] =>
             (case parseIniFile iniFilename of
-              Ok config => addUserDemo config address
+              Ok config => clearHealthRecordsDemo config
             | Err msg => TextIO.print_err (String.concat ["Error parsing ini file: ", msg, "\n"]))
         | _ =>
             TextIO.print_err errorMsg

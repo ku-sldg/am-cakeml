@@ -1,4 +1,6 @@
 (* Depends upon: util, posix, ./Blockchain.sml *)
+(* Removes a user from the list of those with permission to write golden hash
+ * values. *)
 fun removeUserDemo globalConfig address =
     let
         val recipientr =
