@@ -5,8 +5,8 @@ fun removeAppraiserDemo globalConfig =
     let
         val recipientr =
             Result.fromOption
-                (Map.lookup globalConfig "blockchain.goldenHashContract")
-                "error looking up golden hash contract address"
+                (Map.lookup globalConfig "blockchain.healthRecordContract")
+                "error looking up health record contract address"
         val senderr =
             Result.fromOption
                 (Map.lookup globalConfig "blockchain.userAddress")
