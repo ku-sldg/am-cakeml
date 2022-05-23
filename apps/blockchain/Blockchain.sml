@@ -148,20 +148,6 @@ struct
      *)
     fun decodeInt stream =
         BinaryParser.fixedInt 32 BString.BigEndian stream
-    (* (* decodeInt : string -> (int, string) result
-     * Transforms an Ethereum JSON ABI uint256 into an ML integer.
-     * 
-     * Returns an error when the encoding does not start with `"0x"`, does not
-     * represent 32 bytes, or cannot be parsed by `BString.unshow`.
-     *)
-    fun decodeInt enc = 
-        if String.size enc = 66 andalso String.substring enc 0 2 = "0x"
-        then Ok (BString.toInt
-                BString.BigEndian
-                (BString.unshow (String.substring enc 2 64)))
-            handle Word8Extra.InvalidHex =>
-                Err "Blockchain.decodeInt: Error from BString.unshow caught."
-        else Err "Blockchain.decodeInt: Hex string either did not start with \"0x\" or did not represent 32 bytes." *)
 
     (* decodeBytes: BString.bstring BinaryParser.parser
      * Transforms an arbitrary length Ethereum byte string into a
@@ -185,33 +171,6 @@ struct
                     else mainParser m)
                 stream
         end
-    (* (* decodeBytes : string -> (BString.bstring, string) result
-     * Transforms an Ethereum JSON ABI encoded string into a ML string.
-     *
-     * Returns an error when the encoding does not start with `"0x"`, is too
-     * short, or `BString.unshow` throws an exception.
-     *)
-    fun decodeBytes enc =
-        if String.size enc < 130 andalso String.substring enc 0 2 <> "0x"
-        then Err "Blockchain.decodeBytes: Byte string either did not start with \"0x\" or was not long enough."
-        else
-            let
-                val first = BString.toInt
-                        BString.BigEndian
-                        (BString.unshow (String.substring enc 2 64))
-                val second = BString.unshow (String.substring enc 66 64)
-                val rest = BString.unshow (String.extract enc 130 None)
-                val restLen = BString.length rest
-            in
-                if first = 32 andalso
-                    BString.toInt BString.BigEndian second = restLen
-                then Ok rest
-                else if first = 64 + restLen
-                    then Ok (BString.concat second rest)
-                    else Err "Blockchain.decodeBytes: Byte string is not properly encoded."
-            end
-            handle Word8Extra.InvalidHex =>
-                Err "Blockchain.decodeBytes: Error from BString.unshow caught." *)
 
     (* encodeIntBytes: int -> BString.bstring -> (string, string) result
      * Transforms a tuple of type `(int, BString.bstring)` into an Ethereum

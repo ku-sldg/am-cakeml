@@ -70,8 +70,10 @@ fun printHealthRecordsDemo globalConfig =
                                                                 targetId))))))
     in
         case resultr of
-          Err msg => TextIO.print_err (String.concat [msg, "\n"])
-        | Ok hrecordrs => print (Json.stringify (toJson hrecordrs))
+          Err msg =>
+            TextIO.print_err (String.concat [msg, "\n"])
+        | Ok hrecordrs =>
+            print (String.concat [Json.stringify (toJson hrecordrs), "\n"])
     end
     handle Socket.Err _ =>
             TextIO.print_err "Socket error when trying to add authorized user.\n"
