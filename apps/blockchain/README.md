@@ -82,3 +82,9 @@ party.
        Got CAs public signing key.
        Signature check: True
    ```
+
+## Further Reading ##
+
+* [Solidity Contract ABI](https://docs.soliditylang.org/en/v0.8.13/abi-spec.html)
+* [Ethereum JSON RPC API](https://eth.wiki/json-rpc/API)
+* [Ethereum ABI Encoder/Decoder](https://adibas03.github.io/online-ethereum-abi-encoder-decoder/#/)
