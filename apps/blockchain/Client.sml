@@ -106,13 +106,15 @@ fun healthRecordDemo globalMap =
         val jsonId = 3
         val blockchainIPo = Map.lookup globalMap "blockchain.ip"
         val blockchainPorto = Option.mapPartial Int.fromString (Map.lookup globalMap "blockchain.port")
+        val place1hosto = Map.lookup globalMap "place.1.host"
+        val place1porto = Option.mapPartial Int.fromString (Map.lookup globalMap "place.1.port")
         val privateKeyo = Option.map BString.unshow (Map.lookup globalMap "place.1.privateKey")
         val ido =
             Option.map
                 (fn key => Crypto.hash (Crypto.generateEncryptionPublicKey key))
                 privateKeyo
         val signingKeyo = Option.map BString.unshow (Map.lookup globalMap "place.1.signingKey")
-        val serverIdo = Option.map Crypto.hash signingKeyo
+        val serverIdo = ido
         val goldenHashContracto =
             Map.lookup globalMap "blockchain.goldenHashContract"
         val healthRecordContracto =
@@ -120,14 +122,16 @@ fun healthRecordDemo globalMap =
         val userAddresso =
             Map.lookup globalMap "blockchain.userAddress"
         val allRecords =
-            case (blockchainIPo, blockchainPorto, userAddresso, ido, serverIdo, healthRecordContracto) of
-              (None, _, _, _, _, _) => Err "error looking up blockchain's ip address"
-            | (_, None, _, _, _, _) => Err "error looking up blockchain's port number"
-            | (_, _, None, _, _, _) => Err "error looking up blockchain user address"
-            | (_, _, _, None, _, _) => Err "error looking up client's private key"
-            | (_, _, _, _, None, _) => Err "error looking up server's signing key"
-            | (_, _, _, _, _, None) => Err "error looking up health record contract address"
-            | (Some blockchainIP, Some blockchainPort, Some userAddress, Some id, Some serverId, Some healthRecordContract) =>
+            case (blockchainIPo, blockchainPorto, userAddresso, ido, serverIdo, healthRecordContracto, place1hosto, place1porto) of
+              (None, _, _, _, _, _, _, _) => Err "error looking up blockchain's ip address"
+            | (_, None, _, _, _, _, _, _) => Err "error looking up blockchain's port number"
+            | (_, _, None, _, _, _, _, _) => Err "error looking up blockchain user address"
+            | (_, _, _, None, _, _, _, _) => Err "error looking up client's private key"
+            | (_, _, _, _, None, _, _, _) => Err "error looking up server's key"
+            | (_, _, _, _, _, None, _, _) => Err "error looking up health record contract address"
+            | (_, _, _, _, _, _, None, _) => Err "error looking up place.1's host address"
+            | (_, _, _, _, _, _, _, None) => Err "error looking up place.1's port number"
+            | (Some blockchainIP, Some blockchainPort, Some userAddress, Some id, Some serverId, Some healthRecordContract, Some _, Some _) =>
                 HealthRecord.getAllRecords blockchainIP blockchainPort jsonId
                     healthRecordContract userAddress id serverId
         val amr = iniServerAm globalMap
@@ -150,6 +154,8 @@ fun healthRecordDemo globalMap =
                 val serverId = Option.valOf serverIdo
                 val signingKey = Option.valOf signingKeyo
                 val healthRecordContract = Option.valOf healthRecordContracto
+                val host = Option.valOf place1hosto
+                val port = Option.valOf place1porto
                 val goldenHashContract =
                     (blockchainIP, blockchainPort,
                         goldenHashContractAddress,
@@ -167,7 +173,8 @@ fun healthRecordDemo globalMap =
                             val healthRecordNotSigned =
                                 HealthRecord.healthRecord id
                                     term (Json.fromBool True) None
-                                    serverId (timestamp ())
+                                    serverId (HealthRecord.TcpIp host port)
+                                    (timestamp ())
                             val healthRecordSignedJSON =
                                 HealthRecord.signAndToJson
                                     privateKey

@@ -42,10 +42,7 @@ fun printHealthRecordsDemo globalConfig =
             Option.map
                 BString.unshow
                 (Map.lookup globalConfig "place.1.signingKey")
-        val targetIdr =
-            Result.fromOption
-                (Option.map Crypto.hash signingKeyo)
-                "error looking up target id"
+        val targetIdr = appraiserIdr
         val jsonId = 4
         val hashId = 1
         val resultr =

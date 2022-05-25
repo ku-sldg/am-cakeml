@@ -9,6 +9,33 @@
  *)
 structure HealthRecord =
 struct
+    datatype connType =
+        TcpIp string int
+    
+    fun connTypeToJson conn =
+        case conn of
+          TcpIp host port =>
+            Json.fromPairList [
+                ("type", Json.fromString "tcp/ip"),
+                ("host", Json.fromString host),
+                ("port", Json.fromInt port)
+            ]
+    
+    fun connTypeFromJson json =
+        case (Option.mapPartial Json.toString (Json.lookup "type" json)) of
+          None => Err "Connection type missing"
+        | Some conn =>
+            if conn = "tcp/ip"
+            then
+                case (Option.mapPartial Json.toString (Json.lookup "host" json)) of
+                  None => Err "TCP/IP host missing"
+                | Some host =>
+                    case (Option.mapPartial Json.toInt (Json.lookup "port" json)) of
+                      None => Err "TCP/IP port missing"
+                    | Some port =>
+                        Ok (TcpIp host port)
+            else Err "Unsupported communication type"
+
     (* HealthRecord appraiserId phrase result signature targetId timestamp
      * - appraiserId: BString.bstring
      *   The id (hash of the public key) for the appraiser
@@ -24,19 +51,21 @@ struct
      *   UNIX timestamp of the appraisal
      *)
     datatype healthRecord =
-        HealthRecordC BString.bstring term Json.json (BString.bstring option) BString.bstring int
+        HealthRecordC BString.bstring term Json.json (BString.bstring option)
+            BString.bstring connType int
     
-    fun healthRecord appraiserId phrase result signatureo targetId timestamp =
-        HealthRecordC appraiserId phrase result signatureo targetId timestamp
+    fun healthRecord appraiserId phrase result signatureo targetId conn timestamp =
+        HealthRecordC appraiserId phrase result signatureo targetId conn timestamp
     (* getX: HealthRecord.healthRecord -> T
      * Gets attribute `X`, of type `T`, from the health record
      *)
-    fun getAppraiserId (HealthRecordC appraiserId _ _ _ _ _) = appraiserId
-    fun getPhrase (HealthRecordC _ phrase _ _ _ _) = phrase
-    fun getResult (HealthRecordC _ _ result _ _ _ ) = result
-    fun getSignature (HealthRecordC _ _ _ signature_ _ _) = signature_
-    fun getTargetId (HealthRecordC _ _ _ _ targetId _) = targetId
-    fun getTimestamp (HealthRecordC _ _ _ _ _ timestamp) = timestamp
+    fun getAppraiserId (HealthRecordC appraiserId _ _ _ _ _ _) = appraiserId
+    fun getPhrase (HealthRecordC _ phrase _ _ _ _ _) = phrase
+    fun getResult (HealthRecordC _ _ result _ _ _ _) = result
+    fun getSignature (HealthRecordC _ _ _ signature_ _ _ _) = signature_
+    fun getTargetId (HealthRecordC _ _ _ _ targetId _ _) = targetId
+    fun getConnection (HealthRecordC _ _ _ _ _ connection _) = connection
+    fun getTimestamp (HealthRecordC _ _ _ _ _ _ timestamp) = timestamp
 
     (* isSigned: HealthRecord.healthRecord -> bool
      * Returns `true` if and only if the health record has a non-`None`
@@ -56,6 +85,7 @@ struct
                 ("phrase", termToJson (getPhrase hr)),
                 ("result", getResult hr),
                 ("targetId", Json.fromString (BString.show (getTargetId hr))),
+                ("connection", connTypeToJson (getConnection hr)),
                 ("timestamp", Json.fromInt (getTimestamp hr))
             ]
         in
@@ -84,16 +114,22 @@ struct
                     case (Option.mapPartial Json.toString (Json.lookup "targetId" json)) of
                       None => Err "Health record missing target id"
                     | Some targetId =>
-                        case (Option.mapPartial Json.toInt (Json.lookup "timestamp" json)) of
-                          None => Err "Health record missing timestamp"
-                        | Some timestamp =>
-                            let
-                                val signatureStro = Option.mapPartial Json.toString (Json.lookup "signature" json)
-                                val signatureo = Option.map BString.unshow signatureStro
-                            in
-                                Ok (healthRecord (BString.unshow appraiserId) phrase
-                                    result signatureo (BString.unshow targetId) timestamp)
-                            end
+                        case (Json.lookup "connection" json) of
+                          None => Err "Health record missing connection"
+                        | Some connJson =>
+                            case connTypeFromJson connJson of
+                              Err msg => Err ("Health record: " ^ msg)
+                            | Ok connection =>
+                                case (Option.mapPartial Json.toInt (Json.lookup "timestamp" json)) of
+                                None => Err "Health record missing timestamp"
+                                | Some timestamp =>
+                                    let
+                                        val signatureStro = Option.mapPartial Json.toString (Json.lookup "signature" json)
+                                        val signatureo = Option.map BString.unshow signatureStro
+                                    in
+                                        Ok (healthRecord (BString.unshow appraiserId) phrase
+                                            result signatureo (BString.unshow targetId) connection timestamp)
+                                    end
             handle Json.Exn msg1 msg2 => Err (String.concat [msg1, ": ", msg2])
                 | Word8Extra.InvalidHex => Err "A health record's byte string has an odd length."
     
@@ -141,8 +177,8 @@ struct
      *)
     fun checkSignature pubKey hr =
         let
-            fun clearSig (HealthRecordC appraiserId phrase result _ targetId timestamp) =
-                HealthRecordC appraiserId phrase result None targetId timestamp
+            fun clearSig (HealthRecordC appraiserId phrase result _ targetId connection timestamp) =
+                HealthRecordC appraiserId phrase result None targetId connection timestamp
             val hrClearedBs =
                 BString.fromString (Json.stringify (toJson (clearSig hr)))
             fun checkSig signatureBs =
