@@ -24,10 +24,8 @@ fun removeAppraiserDemo globalConfig =
         val privateKeyo = Option.map BString.unshow (Map.lookup globalConfig "place.1.privateKey")
         val appraiserIdr =
             Result.fromOption
-                (Option.map
-                    (fn key =>
-                        Crypto.hash (Crypto.generateEncryptionPublicKey key))
-                    privateKeyo)
+                (Option.map BString.unshow
+                    (Map.lookup globalConfig "appraiserId"))
                 "error looking up appraiser id"
         val jsonId = 4
         val hashId = 1
