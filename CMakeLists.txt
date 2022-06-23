@@ -28,12 +28,12 @@ set(BASIS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/system/basis_ffi.c" CACHE PATH "File
 get_files(util_src util/Extra.sml util/ByteString.sml util/Misc.sml util/CoqDefaults.sml util/Parser.sml util/Json.sml util/Ini.sml)
 get_files(cop_src ${util_src} copland/Instr.sml copland/AM.sml copland/VM.sml
     copland/json/CoplandToJson.sml copland/json/JsonToCopland.sml copland/Parser.sml)
-get_files(crypto_src system/crypto/CryptoFFI.sml system/crypto/Random.sml)
+get_files(crypto_src system/crypto/evercrypt/CryptoFFI.sml system/crypto/evercrypt/Random.sml)
 get_files(posix_src ${crypto_src} system/posix/sockets/SocketFFI.sml system/posix/time/TimeFFI.sml system/posix/meas/MeasFFI.sml)
 get_files(server_am_src ${cop_src} ${posix_src} am/Measurements.sml am/CommTypes.sml am/ServerAm.sml)
 
 get_files(posix_c_files
-    ${BASIS_FILE} system/crypto/crypto_ffi.c system/posix/sockets/socket_ffi.c
+    ${BASIS_FILE} system/crypto/evercrypt/crypto_ffi.c system/posix/sockets/socket_ffi.c
     system/posix/time/time_ffi.c system/posix/meas/meas_ffi.c
 )
 
@@ -67,7 +67,7 @@ mark_as_advanced(CLEAR
     CMAKE_C_FLAGS_RELEASE CMAKE_EXE_LINKER_FLAGS CMAKE_VERBOSE_MAKEFILE
 )
 
-add_subdirectory(system/crypto)
+add_subdirectory(system/crypto/evercrypt)
 
 function(build_posix_am name)
     build_cake("${name}.cake" SOURCES "${ARGN}")
