@@ -38,11 +38,12 @@ typedef struct Connection {
 } Connection_t;
 
 // This array needs to be edited to match the particular CAmkES component
-#define CONNS_LEN 1
+#define CONNS_LEN 2
 Connection_t conns[CONNS_LEN];
 
 void ffiinitDataports(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
     conns[0] = (Connection_t){.data = am_dp, .length = 4096, .wait = &ready_wait, .emit = &done_emit};
+    conns[1] = (Connection_t){.data = ms_dp, .length = 4096, .wait = &ms_ready_wait, .emit = &ms_done_emit};
 }
 
 void ffiwriteDataport(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
