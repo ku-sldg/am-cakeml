@@ -95,15 +95,15 @@ structure FFI = struct
     fun call ffi len input = 
         let val out = Word8ArrayExtra.nulls len 
         in ffi (BString.toString input) out;
-            BString.fromByteArray out 
+            BString.fromByteArray out
         end
 
     (* ffi -> int -> bstring -> bstring option *)
     fun callOpt ffi len input = 
         let val result = call ffi (len+1) input
-         in if BString.hd result = success then 
+         in if BString.hd result = success then
                 Some (BString.tl result)
-            else 
+            else
                 None
         end
 

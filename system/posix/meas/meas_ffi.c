@@ -17,7 +17,7 @@
 #include <unistd.h>
 #include <sys/mman.h>
 
-#include "Hacl_Hash.h"
+// #include "Hacl_Hash.h"
 
 #define FFI_SUCCESS 0
 #define FFI_FAILURE 1
@@ -82,7 +82,8 @@ void ffifileHash(const uint8_t * c, const long clen, uint8_t * a, const long ale
     void * file = mapFileContents(filename, &file_size);
     ffi_assert(file != NULL || file_size == 0);
 
-    Hacl_Hash_SHA2_hash_512((uint8_t *)file, (uint32_t)file_size, a+1);
+    // Hacl_Hash_SHA2_hash_512((uint8_t *)file, (uint32_t)file_size, a+1);
+    sha512((uint8_t *)file, (uint32_t)file_size, a+1);
 
     munmap(file, file_size);
     a[0] = FFI_SUCCESS;
@@ -112,7 +113,8 @@ int hash_region(char * pid, long addr, size_t len, uint8_t * hash) {
         return 0;
     }
 
-    Hacl_Hash_SHA2_hash_512((uint8_t *)region, len, hash);
+    // Hacl_Hash_SHA2_hash_512((uint8_t *)region, len, hash);
+    sha512((uint8_t *)region, len, hash);
 
     free(region);
     return 1;

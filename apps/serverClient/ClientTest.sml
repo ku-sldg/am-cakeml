@@ -1,6 +1,6 @@
 (* Depends on: util, copland, am/Measurements, am/ServerAm *)
 
-val dir = "testDir" 
+val dir = "testDir"
 
 val subterm = (Asp (Aspc (Id (S O)) [dir]))
 val term = Att (S O) (Lseq subterm (Asp Sig))

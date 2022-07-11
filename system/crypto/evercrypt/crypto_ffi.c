@@ -17,6 +17,11 @@
 #define PUB_LEN  64
 #define SIG_LEN  64
 
+// Created for ./system/posix/meas/meas_ffi.c to make use of
+int sha512(const unsigned char *data, const size_t data_len, unsigned char *digest) {
+    Hacl_Hash_SHA2_hash_512(data, data_len, digest);
+}
+
 // Arguments: message to be hashed in c
 // Returns: hash in a
 void ffisha512(uint8_t * c, const long clen, uint8_t * a, const long alen) {
