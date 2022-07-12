@@ -23,6 +23,7 @@ fun clearHealthRecordsDemo globalConfig =
                     (Map.lookup globalConfig "blockchain.port"))
                 "error looking up blockchain port number"
         val privateKeyo = Option.map BString.unshow (Map.lookup globalConfig "place.1.privateKey")
+        (* Evercrypt
         val appraiserIdr =
             Result.fromOption
                 (Option.map
@@ -30,10 +31,15 @@ fun clearHealthRecordsDemo globalConfig =
                         Crypto.hash (Crypto.generateEncryptionPublicKey key))
                     privateKeyo)
                 "error looking up appraiser id"
+         *)
         val signingKeyo =
             Option.map
                 BString.unshow
                 (Map.lookup globalConfig "place.1.signingKey")
+        val appraiserIdr =
+            Result.fromOption
+                (Option.map Crypto.hash signingKeyo)
+                "error looking up appraiser id"
         val targetIdr = appraiserIdr
         val jsonId = 4
         val hashId = 1

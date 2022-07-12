@@ -109,11 +109,15 @@ fun healthRecordDemo globalMap =
         val place1hosto = Map.lookup globalMap "place.1.host"
         val place1porto = Option.mapPartial Int.fromString (Map.lookup globalMap "place.1.port")
         val privateKeyo = Option.map BString.unshow (Map.lookup globalMap "place.1.privateKey")
+        (* Evercrypt
         val ido =
             Option.map
                 (fn key => Crypto.hash (Crypto.generateEncryptionPublicKey key))
                 privateKeyo
+         *)
         val signingKeyo = Option.map BString.unshow (Map.lookup globalMap "place.1.signingKey")
+        val ido =
+            Option.map Crypto.hash signingKeyo
         val serverIdo = ido
         val goldenHashContracto =
             Map.lookup globalMap "blockchain.goldenHashContract"

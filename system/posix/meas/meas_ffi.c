@@ -18,6 +18,7 @@
 #include <sys/mman.h>
 
 // #include "Hacl_Hash.h"
+int sha512(const unsigned char *, size_t, unsigned char *);
 
 #define FFI_SUCCESS 0
 #define FFI_FAILURE 1

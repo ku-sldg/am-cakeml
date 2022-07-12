@@ -14,14 +14,6 @@
 #define HASH_LEN 64
 #define SIG_LEN 256
 
-int print_byte_string(uint8_t *bs, size_t bs_len) {
-    printf("0x");
-    for (size_t k = 0; k < bs_len; k++) {
-        printf("%02x", bs[k]);
-    }
-    return 0;
-}
-
 int sha512(const unsigned char *data, size_t dataLen, unsigned char *hash) {
     int result = -1;
     if (data == NULL || dataLen == 0 || hash == NULL) {
