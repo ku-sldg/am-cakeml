@@ -17,7 +17,7 @@
 #include <unistd.h>
 #include <sys/mman.h>
 
-// #include "Hacl_Hash.h"
+// External call to sha512 in `./system/crypto/openssl/crypto_ffi.c`.
 int sha512(const unsigned char *, size_t, unsigned char *);
 
 #define FFI_SUCCESS 0
