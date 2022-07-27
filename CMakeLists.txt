@@ -30,10 +30,13 @@ get_files(cop_src ${util_src} copland/Instr.sml copland/AM.sml copland/VM.sml
     copland/json/CoplandToJson.sml copland/json/JsonToCopland.sml copland/Parser.sml)
 get_files(crypto_src system/crypto/openssl/CryptoFFI.sml system/crypto/openssl/Random.sml)
 get_files(crypto_src_hacl system/crypto/evercrypt/CryptoFFI.sml system/crypto/evercrypt/Random.sml)
+get_files(crypto_src_tpm system/crypto/tpm/CryptoFFI.sml system/crypto/tpm/Random.sml)
 get_files(posix_src ${crypto_src} system/posix/sockets/SocketFFI.sml system/posix/time/TimeFFI.sml system/posix/meas/MeasFFI.sml)
 get_files(posix_src_hacl ${crypto_src_hacl} system/posix/sockets/SocketFFI.sml system/posix/time/TimeFFI.sml system/posix/meas/MeasFFI.sml)
+get_files(posix_src_tpm ${crypto_src_tpm} system/posix/sockets/SocketFFI.sml system/posix/time/TimeFFI.sml system/posix/meas/MeasFFI.sml)
 get_files(server_am_src ${cop_src} ${posix_src} am/Measurements.sml am/CommTypes.sml am/ServerAm.sml)
 get_files(server_am_src_hacl ${cop_src} ${posix_src_hacl} am/Measurements.sml am/CommTypes.sml am/ServerAm.sml)
+get_files(server_am_src_tpm ${cop_src} ${posix_src_tpm} am/Measurements.sml am/CommTypes.sml am/ServerAm.sml)
 
 get_files(posix_c_files
     ${BASIS_FILE}
@@ -42,10 +45,16 @@ get_files(posix_c_files
     system/posix/time/time_ffi.c
     system/posix/meas/meas_ffi.c
 )
-
 get_files(posix_c_files_hacl
     ${BASIS_FILE}
     system/crypto/evercrypt/crypto_ffi.c
+    system/posix/sockets/socket_ffi.c
+    system/posix/time/time_ffi.c
+    system/posix/meas/meas_ffi.c
+)
+get_files(posix_c_files_tpm
+    ${BASIS_FILE}
+    system/crypto/tpm/crypto_ffi.c
     system/posix/sockets/socket_ffi.c
     system/posix/time/time_ffi.c
     system/posix/meas/meas_ffi.c
@@ -83,6 +92,7 @@ mark_as_advanced(CLEAR
 
 add_subdirectory(system/crypto/evercrypt)
 add_subdirectory(system/crypto/openssl)
+add_subdirectory(system/crypto/tpm)
 
 function(build_posix_am name)
     build_cake("${name}.cake" SOURCES "${ARGN}")
@@ -101,6 +111,17 @@ function(build_posix_am_hacl name)
     add_hacl(${name})
     if(${STATIC_LINKING})
         set(link_flags "-static-libgcc -static")
+    endif()
+    target_link_libraries(${name} "${name}.cake" ${link_flags})
+endfunction()
+
+function(build_posix_am_tpm name)
+    build_cake("${name}.cake" SOURCES "${ARGN}")
+    add_executable(${name} ${posix_c_files_tpm})
+    if(${STATIC_LINKING})
+        set(link_flags "-static-libgcc -static -lcrypto")
+    else()
+        set(link_flags "-lcrypto")
     endif()
     target_link_libraries(${name} "${name}.cake" ${link_flags})
 endfunction()
