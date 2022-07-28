@@ -1,28 +1,29 @@
-#include <assert.h> // for assert
-#include <stdlib.h> // for size_t and NULL
-#include <stdint.h> // for uint8_t
-#include <stdio.h> // for printf
-#include <string.h> // for memcpy
+#include <assert.h> /* for assert */
+#include <stdlib.h> /* for size_t and NULL */
+#include <stdint.h> /* for uint8_t */
+#include <stdio.h> /* for printf */
+#include <string.h> /* for memcpy */
+#include <stdbool.h> /* for bool */
 #include <openssl/evp.h>
 #include <openssl/err.h>
 #include <openssl/rand.h>
 
 #define FFI_SUCCESS 0
 #define FFI_FAILURE 1
-// #define PRIV_KEY_MIN_LEN 1216 // to 1219
 #define PUB_KEY_LEN 270
+/* private RSA keys do not have a fixed length */
 #define HASH_LEN 64
 #define SIG_LEN 256
 
-int sha512(const unsigned char *data, size_t dataLen, unsigned char *hash) {
+bool sha512(uint8_t const *data, size_t dataLen, uint8_t *hash) {
     /* https://wiki.openssl.org/index.php/EVP_Message_Digests
      * Computes the SHA-512 digest of `data` which has `dataLen` length and
      * stores the results in `hash` which must be sufficiently large (64
      * characters/bytes). This function is not called directly by CakeML, but
      * is needed by `./system/posix/meas/meas_ffi.c`. So do not delete/move
-     * this. Returns `0` upon success and `-1` on failure.
+     * this. Returns `true` upon success and `false` on failure.
      */
-    int result = -1;
+    bool result = false;
     if (data == NULL || dataLen == 0 || hash == NULL) {
         return result;
     }
@@ -40,12 +41,12 @@ int sha512(const unsigned char *data, size_t dataLen, unsigned char *hash) {
         printf("EVP_DigestUpdate failed, error 0x%lx\n", ERR_get_error());
         goto err;
     }
-    unsigned int *hashLen = NULL;
+    uint32_t *hashLen = NULL;
     if (EVP_DigestFinal_ex(mdCtx, hash, hashLen) != 1) {
         printf("EVP_DigestFinal_ex failed, error 0x%lx\n", ERR_get_error());
         goto err;
     }
-    result = 0;
+    result = true;
 
 err:
     // Cleanup
@@ -56,31 +57,31 @@ err:
     return result;
 }
 
-void ffisha512(uint8_t *in, const long in_len, uint8_t *out, const long out_len) {
+void ffisha512(uint8_t *const in, uint64_t const in_len, uint8_t *const out, uint64_t const out_len) {
     /* Called directly by CakeML. Incoming data is contained in `in` and has
      * length `in_len`. Outgoing data is stored in `out` which has length
      * `out_len`.
      */
-    const unsigned long digestLen = EVP_MD_size(EVP_sha512());
+    uint64_t const digestLen = EVP_MD_size(EVP_sha512());
     assert(out_len >= digestLen);
-    unsigned char *msg = (unsigned char *)OPENSSL_malloc(in_len);
+    uint8_t *msg = (uint8_t *)OPENSSL_malloc(in_len);
     memcpy(msg, in, in_len);
-    unsigned char *md = (unsigned char *)OPENSSL_malloc(digestLen);
-    assert(sha512(msg, in_len, md) == 0);
+    uint8_t *md = (uint8_t *)OPENSSL_malloc(digestLen);
+    assert(sha512(msg, in_len, md));
     memcpy(out, md, digestLen);
     OPENSSL_free(md);
     OPENSSL_free(msg);
 }
 
-int digestSign(const unsigned char *msg, const size_t msg_len, unsigned char **sig, size_t *sig_len, EVP_PKEY *pkey) {
+bool digestSign(uint8_t const *msg, size_t const msg_len, uint8_t **sig, size_t *sig_len, EVP_PKEY *pkey) {
     /* https://wiki.openssl.org/index.php/EVP_Signing_and_Verifying
      * Message to be signed is contained in `msg` and has length `msg_len`.
      * Signature will be stored in `*sig` and its length will be written to
      * `sig_len`. The private key is held in `pkey`. This function is not called
      * directly by CakeML but is called by `ffisignMsg` which is called by
-     * CakeML. Returns `0` upon success and `-1` on failure.
+     * CakeML. Returns `true` upon success and `false` on failure.
      */
-    int result = -1;
+    bool result = false;
     if (msg == NULL || msg_len == 0 || sig == NULL || pkey == NULL) {
         goto err;
     }
@@ -109,7 +110,7 @@ int digestSign(const unsigned char *msg, const size_t msg_len, unsigned char **s
         printf("EVP_DigestSignFinal failed (1), error 0x%lx\n", ERR_get_error());
         goto err;
     }
-    *sig = (unsigned char *)OPENSSL_malloc(*sig_len);
+    *sig = (uint8_t *)OPENSSL_malloc(*sig_len);
     if (*sig == NULL) {
         printf("OPENSSL_malloc failed, error 0x%lx\n", ERR_get_error());
         goto err;
@@ -119,11 +120,11 @@ int digestSign(const unsigned char *msg, const size_t msg_len, unsigned char **s
         printf("EVP_DigestSignFinal failed (2), error 0x%lx\n", ERR_get_error());
         goto err;
     }
-    result = 0;
+    result = true;
 
 err:
     // Cleanup
-    if (result != 0 && sig != NULL) {
+    if (result != true && sig != NULL) {
         OPENSSL_free(*sig);
     }
     if (mdCtx != NULL) {
@@ -133,10 +134,10 @@ err:
     return result;
 }
 
-int convert_private_key(const unsigned char *priv, const size_t priv_len, EVP_PKEY **pkey) {
+bool convert_private_key(uint8_t const *priv, size_t const priv_len, EVP_PKEY **pkey) {
     /* Takes a private key in raw DER format `priv` which is `priv_len` in
      * length and parses the key into a useable `EVP_PKEY` format stored at
-     * `*pkey`. Returns `0` upon success and `-1` on failure.
+     * `*pkey`. Returns `true` upon success and `false` on failure.
      */
     if (priv == NULL || priv_len == 0 || pkey == NULL) {
         printf("Uninitialized paramters.\n");
@@ -149,16 +150,16 @@ int convert_private_key(const unsigned char *priv, const size_t priv_len, EVP_PK
         if (pkey == NULL) {
             printf("\tpkey is null.\n");
         }
-        return -1;
+        return false;
     }
     if (d2i_PrivateKey(EVP_PKEY_RSA, pkey, &priv, priv_len) == NULL) {
         printf("Error recovering private key, error code 0x%lx.\n", ERR_get_error());
-        return -1;
+        return false;
     }
-    return 0;
+    return true;
 }
 
-void ffisignMsg(uint8_t *in, const long in_len, uint8_t *out, const long out_len) {
+void ffisignMsg(uint8_t *const in, uint64_t const in_len, uint8_t *const out, uint64_t const out_len) {
     /* Creates a signature for a message stored in `in` from a key which is
      * also stored in `in` and stores the signature in `out` which must have a
      * length of `out_len`. Called directly by CakeML.
@@ -170,21 +171,21 @@ void ffisignMsg(uint8_t *in, const long in_len, uint8_t *out, const long out_len
      * | 2..key_len + 1 | The raw private key in DER format, is length `key_len` |
      * | key_len + 2..in_len - 1 | The remainder is the message to be signed |
      */
-    const uint8_t pkey_len_prefix_len = 2;
+    uint8_t const pkey_len_prefix_len = 2;
     assert(in_len > pkey_len_prefix_len);
     assert(out_len >= SIG_LEN);
-    const size_t priv_len = ((*in) << 8) | (*(in + 1));
-    unsigned char *priv = (unsigned char *)OPENSSL_malloc(priv_len);
+    size_t const priv_len = ((*in) << 8) | (*(in + 1));
+    uint8_t *priv = (uint8_t *)OPENSSL_malloc(priv_len);
     assert(in_len >= pkey_len_prefix_len + priv_len);
     memcpy(priv, in + pkey_len_prefix_len, priv_len);
     EVP_PKEY *pkey = NULL;
-    assert(convert_private_key(priv, priv_len, &pkey) == 0);
+    assert(convert_private_key(priv, priv_len, &pkey));
     const size_t msg_len = in_len - priv_len - pkey_len_prefix_len;
-    unsigned char *msg = (unsigned char *)OPENSSL_malloc(msg_len);
+    uint8_t *msg = (uint8_t *)OPENSSL_malloc(msg_len);
     memcpy(msg, in + pkey_len_prefix_len + priv_len, msg_len);
-    unsigned char *sig = NULL;
+    uint8_t *sig = NULL;
     size_t sig_len = 0;
-    assert(digestSign(msg, msg_len, &sig, &sig_len, pkey) == 0);
+    assert(digestSign(msg, msg_len, &sig, &sig_len, pkey));
     assert(sig_len == SIG_LEN);
     memcpy(out, sig, SIG_LEN);
     OPENSSL_free(sig);
@@ -193,15 +194,16 @@ void ffisignMsg(uint8_t *in, const long in_len, uint8_t *out, const long out_len
     OPENSSL_free(pkey);
 }
 
-int digestVerify(const unsigned char *msg, const size_t msg_len, const unsigned char *sig, const size_t sig_len, EVP_PKEY *key) {
+bool digestVerify(uint8_t const *msg, size_t const msg_len, uint8_t const *sig, const size_t sig_len, EVP_PKEY *key, bool *verified) {
     /* https://wiki.openssl.org/index.php/EVP_Signing_and_Verifying
      * Takes a message `msg`, of length `msg_len`, and a signature `sig`, of
-     * length `sig_len`, and verifies the pair with the public key `key`.
-     * Returns `1` upon a successful verification, `0` on a failed
-     * verification, and `-1` on an error. Not directly called by CakeML but is
+     * length `sig_len`, verifies the pair with the public key `key`, and stores
+     * the status of verification in `verified`.
+     * Returns `true` if `verified` contains the accurate result of
+     * verification, `false` on an error. Not directly called by CakeML but is
      * the primary function call in `ffisigCheck` which is called by CakeML.
      */
-    int result = -1;
+    bool result = false;
     if (msg == NULL || msg_len == 0 || sig == NULL || sig_len == 0 || key == NULL) {
         goto err;
     }
@@ -218,11 +220,13 @@ int digestVerify(const unsigned char *msg, const size_t msg_len, const unsigned 
         printf("EVP_DigestVerifyUpdate failed, error 0x%lx\n", ERR_get_error());
         goto err;
     }
-    const int rc = EVP_DigestVerifyFinal(mdCtx, sig, sig_len);
+    uint32_t const rc = EVP_DigestVerifyFinal(mdCtx, sig, sig_len);
     if (rc == 1) {
-        result = 1;
+        result = true;
+        *verified = true;
     } else if (rc == 0) {
-        result = 0;
+        result = true;
+        *verified = false;
     }
 
 err:
@@ -234,7 +238,7 @@ err:
     return result;
 }
 
-int convert_public_key(const unsigned char *pub, const size_t pub_len, EVP_PKEY **pkey) {
+bool convert_public_key(uint8_t const *pub, size_t const pub_len, EVP_PKEY **pkey) {
     /* Converts a raw public key, `pub` with length `pub_len`, into a more
      * useable `EVP_PKEY` stored in `*pkey`. Returns `0` upon success and `-1`
      * on failure.
@@ -245,16 +249,16 @@ int convert_public_key(const unsigned char *pub, const size_t pub_len, EVP_PKEY 
      */
     if (pub == NULL || pub_len == 0 || pkey == NULL) {
         printf("Uninitialized paramters.\n");
-        return -1;
+        return false;
     }
     if (d2i_PublicKey(EVP_PKEY_RSA, pkey, &pub, pub_len) == NULL) {
         printf("Error recovering public key, error code 0x%lx.\n", ERR_get_error());
-        return -1;
+        return false;
     }
-    return 0;
+    return true;
 }
 
-void ffisigCheck(uint8_t *in, const long in_len, uint8_t *out, const long out_len) {
+void ffisigCheck(uint8_t *const in, uint64_t const in_len, uint8_t *const out, uint64_t const out_len) {
     /* Takes an RSA public key, a signature, and a message, all three of which
      * are stored in `in`, and verifies the triple. `out` must be at least 1
      * byte wide, making `out_len >= 1`, and will contain either the value
@@ -269,21 +273,24 @@ void ffisigCheck(uint8_t *in, const long in_len, uint8_t *out, const long out_le
      */
     assert(in_len >= PUB_KEY_LEN + SIG_LEN);
     assert(out_len >= 1);
-    unsigned char *pub = OPENSSL_malloc(PUB_KEY_LEN);
+    uint8_t *pub = (uint8_t *)OPENSSL_malloc(PUB_KEY_LEN);
     memcpy(pub, in, PUB_KEY_LEN);
     EVP_PKEY *pub_key = NULL;
-    assert(convert_public_key(pub, PUB_KEY_LEN, &pub_key) == 0);
-    unsigned char *sig = OPENSSL_malloc(SIG_LEN);
+    assert(convert_public_key(pub, PUB_KEY_LEN, &pub_key));
+    uint8_t *sig = (uint8_t *)OPENSSL_malloc(SIG_LEN);
     memcpy(sig, in + PUB_KEY_LEN, SIG_LEN);
     const size_t msg_len = in_len - PUB_KEY_LEN - SIG_LEN;
-    unsigned char *msg = OPENSSL_malloc(msg_len);
+    uint8_t *msg = (uint8_t *)OPENSSL_malloc(msg_len);
     memcpy(msg, in + PUB_KEY_LEN + SIG_LEN, msg_len);
-    out[0] = digestVerify(msg, msg_len, sig, SIG_LEN, pub_key) == 1
-            ? FFI_SUCCESS
-            : FFI_FAILURE;
+    bool verified = false;
+    assert(digestVerify(msg, msg_len, sig, SIG_LEN, pub_key, &verified));
+    out[0] = verified ? FFI_SUCCESS : FFI_FAILURE;
+    OPENSSL_free(pub);
+    OPENSSL_free(sig);
+    OPENSSL_free(msg);
 }
 
-void ffirandomBytes(uint8_t *c, const long c_len, uint8_t *a, const long a_len) {
+void ffirandomBytes(uint8_t *const c, uint64_t const c_len, uint8_t *const a, uint64_t const a_len) {
     /* Takes a byte-string `c` and produces an equally long pseudo-random
      * byte-string stored inside `a`. Called directly by CakeML.
      */
