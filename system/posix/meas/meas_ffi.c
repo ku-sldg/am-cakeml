@@ -18,7 +18,7 @@
 #include <sys/mman.h>
 
 // External call to sha512 in `./system/crypto/openssl/crypto_ffi.c`.
-int sha512(const unsigned char *, size_t, unsigned char *);
+bool sha512(uint8_t const *, size_t const, uint8_t *);
 
 #define FFI_SUCCESS 0
 #define FFI_FAILURE 1
@@ -84,7 +84,7 @@ void ffifileHash(const uint8_t * c, const long clen, uint8_t * a, const long ale
     ffi_assert(file != NULL || file_size == 0);
 
     // Hacl_Hash_SHA2_hash_512((uint8_t *)file, (uint32_t)file_size, a+1);
-    sha512((uint8_t *)file, (uint32_t)file_size, a+1);
+    sha512((uint8_t *)file, file_size, a+1);
 
     munmap(file, file_size);
     a[0] = FFI_SUCCESS;
