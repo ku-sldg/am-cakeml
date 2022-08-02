@@ -12,8 +12,9 @@ void ffisignMsg(    const uint8_t* in,
 
     int rc;
 
-    char input[in_len];
-    strcpy(input, in);
+    //char input[in_len];
+    //strcpy(input, in);
+    char input[] = "sign -h";
 
     char* tpmArgv[50];
     int tpmArgc = 0;

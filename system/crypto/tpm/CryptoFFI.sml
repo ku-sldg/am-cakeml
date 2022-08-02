@@ -12,6 +12,6 @@ structure Crypto = struct
 
 
 fun signMsg keyHandle filename = 
-    FFI.call ffi_signMsg signLen "sign -hk 80000001 -halg sha512 -salg rsa -if msg1 -os sig.bin -pwdk sarahSign"
+    FFI.call ffi_signMsg signLen (BString.concatList [keyHandle, filename])
 
 
