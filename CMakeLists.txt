@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 3.10.2)
-# cmake_policy(SET CMP0076 NEW)
 set(CMAKE_USER_MAKE_RULES_OVERRIDE "DefaultConfig.cmake")
 project(CakemlAM C ASM)
 
@@ -118,6 +117,7 @@ endfunction()
 function(build_posix_am_tpm name)
     build_cake("${name}.cake" SOURCES "${ARGN}")
     add_executable(${name} ${posix_c_files_tpm})
+    add_tpm(${name})
     if(${STATIC_LINKING})
         set(link_flags "-static-libgcc -static -lcrypto")
     else()
