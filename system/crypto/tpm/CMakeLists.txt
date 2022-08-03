@@ -7,7 +7,7 @@ ExternalProject_Add(tpm-tss
     GIT_PROGRESS True
     SOURCE_DIR ${CMAKE_BINARY_DIR}/tpm-tss
     CONFIGURE_COMMAND ""
-    BUILD_COMMAND "cd am-utils && make -f makefileTssFFI"
+    BUILD_COMMAND ""
     INSTALL_COMMAND ""
 )
 
@@ -17,7 +17,6 @@ set(tpm_path "${tpm_release_dir}/am-utils")
 function(add_tpm target)
     set(tpm_release_dir "${CMAKE_BINARY_DIR}/tpm-tss")
     set(tpm_path "${tpm_release_dir}/am-utils")
-    target_include_directories(${target} BEFORE PRIVATE ${tpm_path})
     set(tss_headers
         ${tpm_path}/tssauth.h
         ${tpm_path}/tssccattributes.h
@@ -72,6 +71,10 @@ function(add_tpm target)
     set_source_files_properties(${tss_files} PROPERTIES GENERATED True)
     set_source_files_properties(${tss_util_files} PROPERTIES GENERATED True)
     target_sources(${target} PRIVATE ${tss_headers} ${tss_files} ${tss_util_files})
-    add_compile_options(-DTPM_POSIX -Wl,-z,now -Wl,-rpath,${tpm_path} -L${tpm_path} -libmtss -libmtssutils)
+    add_compile_definitions(-DTPM_POSIX)
+    add_compile_options(-Wl,-z,now)
+    add_compile_options(-Wl,-rpath,${tpm_path})
+    add_compile_options(-L${tpm_path} -libmtss -libmtssutils)
+    target_include_directories(${target} BEFORE PRIVATE ${tpm_path})
     add_dependencies(${target} tpm-tss)
 endfunction()
