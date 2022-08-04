@@ -9,6 +9,33 @@
  *)
 structure HealthRecord =
 struct
+    datatype connType =
+        TcpIp string int
+    
+    fun connTypeToJson conn =
+        case conn of
+          TcpIp host port =>
+            Json.fromPairList [
+                ("type", Json.fromString "tcp/ip"),
+                ("host", Json.fromString host),
+                ("port", Json.fromInt port)
+            ]
+    
+    fun connTypeFromJson json =
+        case (Option.mapPartial Json.toString (Json.lookup "type" json)) of
+          None => Err "Connection type missing"
+        | Some conn =>
+            if conn = "tcp/ip"
+            then
+                case (Option.mapPartial Json.toString (Json.lookup "host" json)) of
+                  None => Err "TCP/IP host missing"
+                | Some host =>
+                    case (Option.mapPartial Json.toInt (Json.lookup "port" json)) of
+                      None => Err "TCP/IP port missing"
+                    | Some port =>
+                        Ok (TcpIp host port)
+            else Err "Unsupported communication type"
+
     (* HealthRecord appraiserId phrase result signature targetId timestamp
      * - appraiserId: BString.bstring
      *   The id (hash of the public key) for the appraiser
@@ -24,19 +51,21 @@ struct
      *   UNIX timestamp of the appraisal
      *)
     datatype healthRecord =
-        HealthRecordC BString.bstring term Json.json (BString.bstring option) BString.bstring int
+        HealthRecordC BString.bstring term Json.json (BString.bstring option)
+            BString.bstring connType int
     
-    fun healthRecord appraiserId phrase result signatureo targetId timestamp =
-        HealthRecordC appraiserId phrase result signatureo targetId timestamp
+    fun healthRecord appraiserId phrase result signatureo targetId conn timestamp =
+        HealthRecordC appraiserId phrase result signatureo targetId conn timestamp
     (* getX: HealthRecord.healthRecord -> T
      * Gets attribute `X`, of type `T`, from the health record
      *)
-    fun getAppraiserId (HealthRecordC appraiserId _ _ _ _ _) = appraiserId
-    fun getPhrase (HealthRecordC _ phrase _ _ _ _) = phrase
-    fun getResult (HealthRecordC _ _ result _ _ _ ) = result
-    fun getSignature (HealthRecordC _ _ _ signature_ _ _) = signature_
-    fun getTargetId (HealthRecordC _ _ _ _ targetId _) = targetId
-    fun getTimestamp (HealthRecordC _ _ _ _ _ timestamp) = timestamp
+    fun getAppraiserId (HealthRecordC appraiserId _ _ _ _ _ _) = appraiserId
+    fun getPhrase (HealthRecordC _ phrase _ _ _ _ _) = phrase
+    fun getResult (HealthRecordC _ _ result _ _ _ _) = result
+    fun getSignature (HealthRecordC _ _ _ signature_ _ _ _) = signature_
+    fun getTargetId (HealthRecordC _ _ _ _ targetId _ _) = targetId
+    fun getConnection (HealthRecordC _ _ _ _ _ connection _) = connection
+    fun getTimestamp (HealthRecordC _ _ _ _ _ _ timestamp) = timestamp
 
     (* isSigned: HealthRecord.healthRecord -> bool
      * Returns `true` if and only if the health record has a non-`None`
@@ -56,6 +85,7 @@ struct
                 ("phrase", termToJson (getPhrase hr)),
                 ("result", getResult hr),
                 ("targetId", Json.fromString (BString.show (getTargetId hr))),
+                ("connection", connTypeToJson (getConnection hr)),
                 ("timestamp", Json.fromInt (getTimestamp hr))
             ]
         in
@@ -84,16 +114,22 @@ struct
                     case (Option.mapPartial Json.toString (Json.lookup "targetId" json)) of
                       None => Err "Health record missing target id"
                     | Some targetId =>
-                        case (Option.mapPartial Json.toInt (Json.lookup "timestamp" json)) of
-                          None => Err "Health record missing timestamp"
-                        | Some timestamp =>
-                            let
-                                val signatureStro = Option.mapPartial Json.toString (Json.lookup "signature" json)
-                                val signatureo = Option.map BString.unshow signatureStro
-                            in
-                                Ok (healthRecord (BString.unshow appraiserId) phrase
-                                    result signatureo (BString.unshow targetId) timestamp)
-                            end
+                        case (Json.lookup "connection" json) of
+                          None => Err "Health record missing connection"
+                        | Some connJson =>
+                            case connTypeFromJson connJson of
+                              Err msg => Err ("Health record: " ^ msg)
+                            | Ok connection =>
+                                case (Option.mapPartial Json.toInt (Json.lookup "timestamp" json)) of
+                                None => Err "Health record missing timestamp"
+                                | Some timestamp =>
+                                    let
+                                        val signatureStro = Option.mapPartial Json.toString (Json.lookup "signature" json)
+                                        val signatureo = Option.map BString.unshow signatureStro
+                                    in
+                                        Ok (healthRecord (BString.unshow appraiserId) phrase
+                                            result signatureo (BString.unshow targetId) connection timestamp)
+                                    end
             handle Json.Exn msg1 msg2 => Err (String.concat [msg1, ": ", msg2])
                 | Word8Extra.InvalidHex => Err "A health record's byte string has an odd length."
     
@@ -141,8 +177,8 @@ struct
      *)
     fun checkSignature pubKey hr =
         let
-            fun clearSig (HealthRecordC appraiserId phrase result _ targetId timestamp) =
-                HealthRecordC appraiserId phrase result None targetId timestamp
+            fun clearSig (HealthRecordC appraiserId phrase result _ targetId connection timestamp) =
+                HealthRecordC appraiserId phrase result None targetId connection timestamp
             val hrClearedBs =
                 BString.fromString (Json.stringify (toJson (clearSig hr)))
             fun checkSig signatureBs =
@@ -254,54 +290,83 @@ struct
                     else mainParser n)
                 stream
         end
-    (* (* decodeStringArray: string -> (string list, string) result
-     * `decodeStringArray enc`
-     * Decodes an array of arbitrary length strings from Ethereum ABI format.
-     *)
-    fun decodeStringArray enc = 
-        if String.size enc < 66 orelse String.substring enc 0 2 <> "0x"
-        then Err "HealthRecord.decodeStringArray: byte string either was not long enough or did not start with \"0x\"."
-        else
-            (let
-                fun decode_aux bs n =
-                    let
-                        val start = 32 * n
-                        val lenOffset =
-                            BString.toInt BString.BigEndian
-                                (BString.substring bs start 32) - start
-                        val length =
-                            BString.toInt BString.BigEndian
-                                (BString.substring bs lenOffset 32)
-                        val strOffset = 32 + lenOffset
-                    in
-                        BString.toString
-                            (BString.substring bs strOffset length)
-                    end
-                fun decode bs = 
-                    let
-                        val arrLen =
-                            BString.toInt BString.BigEndian
-                                (BString.substring bs 0 32)
-                        val rest = BString.extract bs 32 None
-                    in
-                        Ok (List.genlist (decode_aux rest) arrLen)
-                    end
-                val bs = BString.unshow (String.extract enc 2 None)
-                val first =
-                    BString.substring bs 0 32
-                val rest =
-                    BString.extract bs 32 None
-            in
-                if BString.toInt BString.BigEndian first <> 32
-                then decode bs
-                else
-                    case decode rest of
-                      Err _ => decode bs
-                    | Ok result => Ok result
-            end
-            handle
-                Word8Extra.InvalidHex => Err "HealthRecord.decodeStringArray: invalid hex") *)
     
+    (* addAppraiser: string -> int -> int -> string -> string -> BString.bstring
+        -> (BString.bstring, string) result
+     * `addAppraiser host port jsonId sender recepient appraiserId`
+     * Calls the Ethereum blockchain at host `host` and port number `port`,
+     * calling the `addAppraiser` method of the smart contract at `recipient`
+     * from `sender` with parameters `appraiserId`. The `jsonId` is an
+     * arbitrary integer used to identify the corresponding repsonse to this
+     * request. `sender` and `recipient` need to be hexademical strings
+     * prefixed by "0x" and represent a 20 byte Ethereum address. The
+     * transaction hash is returned.
+     *)
+     fun addAppraiser host port jsonId recipient sender appraiserId =
+        let
+            fun formEthFunc data =
+                Blockchain.formEthSendTransaction jsonId sender recipient data
+            val argsEnc =
+                Blockchain.encodeBytes appraiserId
+            val message = formEthFunc ("0xbd53605c" ^ argsEnc)
+            fun respFunc resp =
+                Ok (BString.unshow (String.extract resp 2 None))
+                handle Word8Extra.InvalidHex =>
+                    Err "HealthRecord.addAppraiser: Error from BString.unshow caught"
+        in
+            case (Blockchain.sendRequest host port message) of
+              Ok resp =>
+                Blockchain.processResponse resp jsonId respFunc "HealthRecord.addAppraiser"
+            | Err msg =>
+                Err (String.concat [
+                    "HealthRecord.addAppraiser: failed to parse HTTP response.\n",
+                    msg])
+        end
+        handle Socket.Err msg =>
+                Err (String.concat
+                    ["HealthRecord.addAppraiser, socket error: ", msg])
+            | Socket.InvalidFD =>
+                Err "HealthRecord.addAppraiser, socket error: invalid file descriptor."
+            | _ => Err "HealthRecord.addAppraiser: unknown error"
+
+    (* removeAppraiser: string -> int -> int -> string -> string -> BString.bstring
+        -> (BString.bstring, string) result
+     * `removeAppraiser host port jsonId sender recepient appraiserId`
+     * Calls the Ethereum blockchain at host `host` and port number `port`,
+     * calling the `removeAppraiser` method of the smart contract at `recipient`
+     * from `sender` with parameters `appraiserId`. The `jsonId` is an
+     * arbitrary integer used to identify the corresponding repsonse to this
+     * request. `sender` and `recipient` need to be hexademical strings
+     * prefixed by "0x" and represent a 20 byte Ethereum address. The
+     * transaction hash is returned.
+     *)
+     fun removeAppraiser host port jsonId recipient sender appraiserId =
+        let
+            fun formEthFunc data =
+                Blockchain.formEthSendTransaction jsonId sender recipient data
+            val argsEnc =
+                Blockchain.encodeBytes appraiserId
+            val message = formEthFunc ("0x8586e8e9" ^ argsEnc)
+            fun respFunc resp =
+                Ok (BString.unshow (String.extract resp 2 None))
+                handle Word8Extra.InvalidHex =>
+                    Err "HealthRecord.removeAppraiser: Error from BString.unshow caught"
+        in
+            case (Blockchain.sendRequest host port message) of
+              Ok resp =>
+                Blockchain.processResponse resp jsonId respFunc "HealthRecord.removeAppraiser"
+            | Err msg =>
+                Err (String.concat [
+                    "HealthRecord.removeAppraiser: failed to parse HTTP response.\n",
+                    msg])
+        end
+        handle Socket.Err msg =>
+                Err (String.concat
+                    ["HealthRecord.removeAppraiser, socket error: ", msg])
+            | Socket.InvalidFD =>
+                Err "HealthRecord.removeAppraiser, socket error: invalid file descriptor."
+            | _ => Err "HealthRecord.removeAppraiser: unknown error"
+
     (* addRecord: string -> int -> int -> string -> string -> BString.bstring ->
         BString.bstring -> Json.json -> (BString.bstring, string) result
      * `addRecord host port jsonId sender recipient appraiserId targetId record`
@@ -334,14 +399,15 @@ struct
                     msg])
         end
         handle Socket.Err msg =>
-                Err (String.concat ["HealthRecord.addRecord, socket error: ", msg])
+                Err (String.concat
+                    ["HealthRecord.addRecord, socket error: ", msg])
             | Socket.InvalidFD =>
                 Err "HealthRecord.addRecord, socket error: invalid file descriptor."
             | _ => Err "HealthRecord.addRecord: unknown error"
     
     (* getRecentRecord: string -> int -> int -> string -> string -> BString.bstring ->
         BString.bstring -> (Json.json, string) result
-     * `getRecentRecord host port jsonId sender recipient appraiserId targetId record`
+     * `getRecentRecord host port jsonId sender recipient appraiserId targetId`
      * Queries the Ethereum blockchain at host `host` and at port number `port`,
      * calling the `getRecentRecord` method of the smart contract at `recipient`
      * from `sender` with the parameters `appraiserId` and `targetId`. The
@@ -376,7 +442,7 @@ struct
 
     (* getAllRecords: string -> int -> int -> string -> string -> BString.bstring ->
         BString.bstring -> (((Json.json, string) result) list, string) result
-     * `getAllRecords host port jsonId sender recipient appraiserId targetId record`
+     * `getAllRecords host port jsonId sender recipient appraiserId targetId`
      * Queries the Ethereum blockchain at host `host` and at port number `port`,
      * calling the `getAllRecords` method of the smart contract at `recipient`
      * from `sender` with the parameters `appraiserId` and `targetId`. The
@@ -412,6 +478,44 @@ struct
             | Socket.InvalidFD =>
                 Err "HealthRecord.getAllRecords, socket error: invalid file descriptor."
             | _ => Err "HealthRecord.getAllRecords: unknown error"
+
+    (* clearRecords: string -> int -> int -> string -> string -> BString.bstring ->
+        BString.bstring -> (BString.bstring, string) result
+     * `clearRecords host port jsonId sender recipient appraiserId targetId`
+     * Queries the Ethereum blockchain at host `host` and at port number `port`,
+     * calling the `clearRecord` method of the smart contract at `recipient`
+     * from `sender` with the parameters `appraiserId` and `targetId`. The
+     * `jsonId` is an arbitrary integer used to identify the corresponding
+     * response to this request. `sender` and `recipient` need to be hexadecimal
+     * strings prefixed by "0x" and represent a 20 byte Ethereum address.
+     *)
+    fun clearRecords host port jsonId recipient sender appraiserId targetId =
+        let
+            fun formEthFunc data =
+                Blockchain.formEthSendTransaction jsonId sender recipient data
+            val argsEnc = encodeBytesBytes appraiserId targetId
+            val message = formEthFunc ("0x36ae4bb1" ^ argsEnc)
+            fun stringToHR str =
+                Result.bind (Json.parse str) fromJson
+            val decoder = BinaryParser.parseWithPrefix decodeStringArray "0x"
+            fun respFunc resp =
+                Ok (BString.unshow (String.extract resp 2 None))
+                handle Word8Extra.InvalidHex =>
+                    Err "HealthRecord.addRecord: Error from BString.unshow caught."
+        in
+            case (Blockchain.sendRequest host port message) of
+              Ok resp =>
+                Blockchain.processResponse resp jsonId respFunc "HealthRecord.clearRecords"
+            | Err msg =>
+                Err (String.concat [
+                    "HealthRecord.clearRecords: failed to parse HTTP response.\n",
+                    msg])
+        end
+        handle Socket.Err msg =>
+                Err (String.concat ["HealthRecord.clearRecords, socket error: ", msg])
+            | Socket.InvalidFD =>
+                Err "HealthRecord.clearRecords, socket error: invalid file descriptor."
+            | _ => Err "HealthRecord.clearRecords: unknown error"
 end
 
 (* testing code

@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "Hacl_Hash.h"
 #include "Hacl_Ed25519.h"
@@ -16,6 +17,12 @@
 #define PRIV_LEN 32
 #define PUB_LEN  64
 #define SIG_LEN  64
+
+// Created for ./system/posix/meas/meas_ffi.c to make use of
+bool sha512(uint8_t const *data, size_t const data_len, uint8_t *digest) {
+    Hacl_Hash_SHA2_hash_512(data, data_len, digest);
+    return true;
+}
 
 // Arguments: message to be hashed in c
 // Returns: hash in a

@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 3.10.2)
-# cmake_policy(SET CMP0076 NEW)
 set(CMAKE_USER_MAKE_RULES_OVERRIDE "DefaultConfig.cmake")
 project(CakemlAM C ASM)
 
@@ -28,13 +27,36 @@ set(BASIS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/system/basis_ffi.c" CACHE PATH "File
 get_files(util_src util/Extra.sml util/ByteString.sml util/Misc.sml util/CoqDefaults.sml util/Parser.sml util/Json.sml util/Ini.sml)
 get_files(cop_src ${util_src} copland/Instr.sml copland/AM.sml copland/VM.sml
     copland/json/CoplandToJson.sml copland/json/JsonToCopland.sml copland/Parser.sml)
-get_files(crypto_src system/crypto/CryptoFFI.sml system/crypto/Random.sml)
+get_files(crypto_src system/crypto/openssl/CryptoFFI.sml system/crypto/openssl/Random.sml)
+get_files(crypto_src_hacl system/crypto/evercrypt/CryptoFFI.sml system/crypto/evercrypt/Random.sml)
+get_files(crypto_src_tpm system/crypto/tpm/CryptoFFI.sml system/crypto/tpm/Random.sml)
 get_files(posix_src ${crypto_src} system/posix/sockets/SocketFFI.sml system/posix/time/TimeFFI.sml system/posix/meas/MeasFFI.sml)
+get_files(posix_src_hacl ${crypto_src_hacl} system/posix/sockets/SocketFFI.sml system/posix/time/TimeFFI.sml system/posix/meas/MeasFFI.sml)
+get_files(posix_src_tpm ${crypto_src_tpm} system/posix/sockets/SocketFFI.sml system/posix/time/TimeFFI.sml system/posix/meas/MeasFFI.sml)
 get_files(server_am_src ${cop_src} ${posix_src} am/Measurements.sml am/CommTypes.sml am/ServerAm.sml)
+get_files(server_am_src_hacl ${cop_src} ${posix_src_hacl} am/Measurements.sml am/CommTypes.sml am/ServerAm.sml)
+get_files(server_am_src_tpm ${cop_src} ${posix_src_tpm} am/Measurements.sml am/CommTypes.sml am/ServerAm.sml)
 
 get_files(posix_c_files
-    ${BASIS_FILE} system/crypto/crypto_ffi.c system/posix/sockets/socket_ffi.c
-    system/posix/time/time_ffi.c system/posix/meas/meas_ffi.c
+    ${BASIS_FILE}
+    system/crypto/openssl/crypto_ffi.c
+    system/posix/sockets/socket_ffi.c
+    system/posix/time/time_ffi.c
+    system/posix/meas/meas_ffi.c
+)
+get_files(posix_c_files_hacl
+    ${BASIS_FILE}
+    system/crypto/evercrypt/crypto_ffi.c
+    system/posix/sockets/socket_ffi.c
+    system/posix/time/time_ffi.c
+    system/posix/meas/meas_ffi.c
+)
+get_files(posix_c_files_tpm
+    ${BASIS_FILE}
+    system/crypto/tpm/crypto_ffi.c
+    system/posix/sockets/socket_ffi.c
+    system/posix/time/time_ffi.c
+    system/posix/meas/meas_ffi.c
 )
 
 # OS Config
@@ -67,14 +89,39 @@ mark_as_advanced(CLEAR
     CMAKE_C_FLAGS_RELEASE CMAKE_EXE_LINKER_FLAGS CMAKE_VERBOSE_MAKEFILE
 )
 
-add_subdirectory(system/crypto)
+add_subdirectory(system/crypto/evercrypt)
+add_subdirectory(system/crypto/openssl)
+add_subdirectory(system/crypto/tpm)
 
 function(build_posix_am name)
     build_cake("${name}.cake" SOURCES "${ARGN}")
     add_executable(${name} ${posix_c_files})
+    if(${STATIC_LINKING})
+        set(link_flags "-static-libgcc -static -lcrypto")
+    else()
+        set(link_flags "-lcrypto")
+    endif()
+    target_link_libraries(${name} "${name}.cake" ${link_flags})
+endfunction()
+
+function(build_posix_am_hacl name)
+    build_cake("${name}.cake" SOURCES "${ARGN}")
+    add_executable(${name} ${posix_c_files_hacl})
     add_hacl(${name})
     if(${STATIC_LINKING})
         set(link_flags "-static-libgcc -static")
+    endif()
+    target_link_libraries(${name} "${name}.cake" ${link_flags})
+endfunction()
+
+function(build_posix_am_tpm name)
+    build_cake("${name}.cake" SOURCES "${ARGN}")
+    add_executable(${name} ${posix_c_files_tpm})
+    add_tpm(${name})
+    if(${STATIC_LINKING})
+        set(link_flags "-static-libgcc -static -lcrypto")
+    else()
+        set(link_flags "-lcrypto")
     endif()
     target_link_libraries(${name} "${name}.cake" ${link_flags})
 endfunction()
