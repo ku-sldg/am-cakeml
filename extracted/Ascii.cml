@@ -1,0 +1,2 @@
+datatype ascii =
+  Ascii bool bool bool bool bool bool bool bool

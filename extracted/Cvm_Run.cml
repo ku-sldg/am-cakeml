@@ -1,0 +1,9 @@
+(** val run_cvm : coq_Core_Term -> cvm_st -> cvm_st **)
+
+fun run_cvm t st =
+  execSt (build_cvm t) st
+
+(** val run_cvm' : coq_Term -> cvm_st -> cvm_st **)
+
+fun run_cvm' t st =
+  run_cvm (copland_compile t) st

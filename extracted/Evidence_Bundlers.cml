@@ -1,0 +1,20 @@
+(** val cons_gg :
+    coq_BS -> coq_EvC -> coq_Plc -> coq_ASP_PARAMS -> coq_EvC **)
+
+fun cons_gg sig0 e p ps =
+  let val Coq_evc bits et = e in
+  Coq_evc (Coq_cons sig0 bits) (Coq_gg p ps et) end
+
+(** val cons_hh :
+    coq_BS -> coq_EvC -> coq_Plc -> coq_ASP_PARAMS -> coq_EvC **)
+
+fun cons_hh hsh e p ps =
+  let val Coq_evc _ et = e in
+  Coq_evc (Coq_cons hsh Coq_nil) (Coq_hh p ps et) end
+
+(** val ss_cons : coq_EvC -> coq_EvC -> coq_EvC **)
+
+fun ss_cons e1 e2 =
+  let val Coq_evc bits1 et1 = e1 in
+  let val Coq_evc bits2 et2 = e2 in
+  Coq_evc (app bits1 bits2) (Coq_ss et1 et2) end end

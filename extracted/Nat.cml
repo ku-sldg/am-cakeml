@@ -1,0 +1,6 @@
+(** val add : nat -> nat -> nat **)
+
+fun add n m =
+  case n of
+    O => m
+  | S p => S (add p m)
