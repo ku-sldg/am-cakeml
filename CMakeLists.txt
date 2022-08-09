@@ -25,7 +25,7 @@ endfunction()
 set(BASIS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/system/basis_ffi.c" CACHE PATH "Filepath of basis_ffi.c to use (associated with the compiler version).")
 
 get_files(util_src util/Extra.sml util/ByteString.sml util/Misc.sml util/CoqDefaults.sml util/Parser.sml util/Json.sml util/Ini.sml)
-get_files(cop_src ${util_src} copland/Instr.sml copland/AM.sml copland/VM.sml
+get_files(cop_src ${util_src} copland/BS.sml copland/Instr.sml copland/AM.sml copland/VM.sml
     copland/json/CoplandToJson.sml copland/json/JsonToCopland.sml copland/Parser.sml)
 get_files(crypto_src system/crypto/openssl/CryptoFFI.sml system/crypto/openssl/Random.sml)
 get_files(crypto_src_hacl system/crypto/evercrypt/CryptoFFI.sml system/crypto/evercrypt/Random.sml)
