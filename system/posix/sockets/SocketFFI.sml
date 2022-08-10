@@ -22,7 +22,7 @@ structure Socket = struct
         fun listen port qLen = 
             let val payload = BString.concat (FFI.n2w2 qLen) (BString.fromString (Int.toString port))
              in case FFI.callOpt ffi_listen 8 payload of 
-                      Some bs => Fd bs
+                      Some bsv => Fd bsv
                     | None => raise (Err "Error in listen()")
             end
 
@@ -30,7 +30,7 @@ structure Socket = struct
         (* Takes the fd of an actively listening socket, returns the fd of a connection *)
         (* Blocks until there is an incoming connection *)
         fun accept sockfd = case FFI.callOpt ffi_accept 8 (getFd sockfd) of 
-              Some bs => Fd bs
+              Some bsv => Fd bsv
             | None => raise (Err "Error in accept()")
 
         (* string -> int -> sockfd *)
@@ -39,7 +39,7 @@ structure Socket = struct
         fun connect host port = 
             let val payload = FFI.nullSeparated [host, (Int.toString port)]
              in case FFI.callOpt ffi_connect 8 payload of 
-                      Some bs => Fd bs
+                      Some bsv => Fd bsv
                     | None => raise (Err "Error in connect()")
             end
 

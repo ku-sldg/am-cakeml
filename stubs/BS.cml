@@ -1,2 +1,0 @@
-type coq_BS = nat (*BString.bstring*)
-(*type bs = coq_BS*)

@@ -1,1 +1,0 @@
-type hihi = nat

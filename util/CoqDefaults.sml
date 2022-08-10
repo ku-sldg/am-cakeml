@@ -2,6 +2,12 @@
 
 (* Default Coq *)
 
+(*
+datatype 'a option = None
+                   | Some 'a
+*)
+                     
+
 datatype nat = O
              | S nat
 

@@ -1,0 +1,60 @@
+type coq_Plc = nat
+
+type coq_N_ID = nat
+
+type coq_Event_ID = nat
+
+type coq_ASP_ID = string
+
+type coq_TARG_ID = string
+
+type coq_Arg = string
+
+datatype coq_ASP_PARAMS =
+  Coq_asp_paramsC coq_ASP_ID (coq_Arg list) coq_Plc coq_TARG_ID
+
+datatype coq_Evidence =
+  Coq_mt 
+| Coq_nn coq_N_ID
+| Coq_gg coq_Plc coq_ASP_PARAMS coq_Evidence
+| Coq_hh coq_Plc coq_ASP_PARAMS coq_Evidence
+| Coq_ss coq_Evidence coq_Evidence
+
+datatype coq_SP =
+  ALL 
+| NONE 
+
+datatype coq_FWD =
+  COMP 
+| EXTD 
+
+datatype coq_ASP =
+  NULL 
+| CPY 
+| ASPC coq_SP coq_FWD coq_ASP_PARAMS
+| SIG 
+| HSH 
+
+type coq_Split = (coq_SP, coq_SP) prod
+
+datatype coq_Term =
+  Coq_asp coq_ASP
+| Coq_att coq_Plc coq_Term
+| Coq_lseq coq_Term coq_Term
+| Coq_bseq coq_Split coq_Term coq_Term
+| Coq_bpar coq_Split coq_Term coq_Term
+
+datatype coq_ASP_Core =
+  NULLC 
+| CLEAR 
+| CPYC 
+| ASPCC coq_FWD coq_ASP_PARAMS
+
+type coq_Loc = nat
+
+datatype coq_Core_Term =
+  Coq_aspc coq_ASP_Core
+| Coq_attc coq_Plc coq_Term
+| Coq_lseqc coq_Core_Term coq_Core_Term
+| Coq_bseqc coq_Core_Term coq_Core_Term
+| Coq_bparc coq_Loc coq_Core_Term coq_Core_Term

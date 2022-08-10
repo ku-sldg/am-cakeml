@@ -1,0 +1,7 @@
+(** val sig_params : coq_ASP_PARAMS **)
+
+val sig_params = undefined ()
+
+(** val hsh_params : coq_ASP_PARAMS **)
+
+val hsh_params = undefined ()
