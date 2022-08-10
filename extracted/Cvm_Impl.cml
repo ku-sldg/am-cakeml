@@ -1,4 +1,4 @@
-(** val build_cvm : coq_Core_Term -> coq_unit coq_CVM **)
+(** val build_cvm : coq_Core_Term -> unit coq_CVM **)
 
 fun build_cvm t = case t of
   Coq_aspc a => bind (do_prim a) put_ev

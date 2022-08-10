@@ -14,15 +14,15 @@ fun bind m f s =
      Some v => f v s'
    | None => Coq_pair None s') end
 
-(** val modify : ('a1 -> 'a1) -> ('a1, coq_unit) coq_St **)
+(** val modify : ('a1 -> 'a1) -> ('a1, unit) coq_St **)
 
 fun modify f s =
-  Coq_pair (Some Coq_tt) (f s)
+  Coq_pair (Some ()) (f s)
 
-(** val put : 'a1 -> ('a1, coq_unit) coq_St **)
+(** val put : 'a1 -> ('a1, unit) coq_St **)
 
 fun put s _ =
-  Coq_pair (Some Coq_tt) s
+  Coq_pair (Some ()) s
 
 (** val get : ('a1, 'a1) coq_St **)
 

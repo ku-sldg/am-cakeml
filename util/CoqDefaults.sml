@@ -28,6 +28,10 @@ fun nat_plus n m =
     case n of O => m
             | S n' => S (nat_plus n' m)
 
+
+(* add alias added as temp fix for extraction purposes *)
+fun add n m = nat_plus n m
+
 fun nat_minus n m =
     case n of O => O
             | S n' => case m of O => n

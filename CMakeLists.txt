@@ -35,8 +35,15 @@ get_files(cop_src ${util_src} stubs/BS.sml extracted/Datatypes.sml extracted/Ter
 copland/AM.sml copland/VM.sml copland/json/CoplandToJson.sml
 copland/json/JsonToCopland.sml copland/Parser.sml) ]]
 
-get_files(cop_src ${util_src} stubs/BS.sml extracted/Datatypes.cml)
-#[[ extracted/Term_Defs_Core.cml
+get_files(cop_src ${util_src} stubs/BS.sml
+extracted/Datatypes.cml
+extracted/Term_Defs_Core.cml stubs/Params_Admits_hardcoded.cml
+extracted/Term_Defs.cml stubs/Axioms_Io.cml
+extracted/Evidence_Bundlers.cml extracted/StMonad_Coq.cml
+extracted/Cvm_St.cml extracted/IO_Type.cml stubs/IO_Stubs.cml
+extracted/Cvm_Monad.cml extracted/Cvm_Impl.cml extracted/Cvm_Run.cml)
+
+#[[
 copland/AM.sml copland/VM.sml copland/json/CoplandToJson.sml
 copland/json/JsonToCopland.sml copland/Parser.sml) ]]
 

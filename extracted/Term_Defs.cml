@@ -59,7 +59,7 @@ datatype coq_EvC =
 (** val mt_evc : coq_EvC **)
 
 val mt_evc =
-  Coq_evc Coq_nil Coq_mt
+  Coq_evc [] Coq_mt
 
 (** val get_et : coq_EvC -> coq_Evidence **)
 

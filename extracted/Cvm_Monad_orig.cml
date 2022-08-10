@@ -82,16 +82,16 @@ val nullEv =
     bind inc_id (fn x =>
       bind (add_tracem ((Coq_null x p) :: [])) (fn _ => ret mt_evc)))
 
-(** val clearEv : unit -> coq_EvC coq_CVM **)
+(** val clearEv : coq_EvC coq_CVM **)
 
-fun clearEv _ =
+val clearEv =
   ret mt_evc
 
 (** val do_prim : coq_ASP_Core -> coq_EvC coq_CVM **)
 
 fun do_prim a = case a of
   NULLC => nullEv
-| CLEAR => clearEv ()
+| CLEAR => clearEv
 | CPYC => copyEv
 | ASPCC fwd params => invoke_ASP fwd params
 
