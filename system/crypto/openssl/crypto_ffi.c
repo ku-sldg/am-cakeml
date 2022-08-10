@@ -353,6 +353,7 @@ void ffidiffieHellman(uint8_t *const in, const size_t in_len, uint8_t *const out
      * |-------|---------|
      * | 0..255 | Key |
      * | 256..383 | IV |
+     * | 384..511 | ignored |
      */
     assert(in_len >= PUB_KEY_LEN);
     assert(out_len >= HASH_LEN);
