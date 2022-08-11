@@ -1,8 +1,11 @@
 (** val do_asp : coq_ASP_PARAMS -> coq_RawEv -> coq_BS **)
 
-fun do_asp ps e = empty_bs
-(*
-  failwith "AXIOM TO BE REALIZED" *)
+fun do_asp ps e =
+    let val res = empty_bs in
+    print ("Running ASP with params: \n" ^ (aspParamsToString ps) ^ "\n");
+    empty_bs
+    end
+(* failwith "AXIOM TO BE REALIZED" *)
 
 (** val doRemote_session : coq_Term -> coq_Plc -> coq_EvC -> coq_EvC **)
 

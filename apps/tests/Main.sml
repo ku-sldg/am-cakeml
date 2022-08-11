@@ -21,6 +21,15 @@ Expected result:
 DDAF35A193617ABACC417349AE20413112E6FA4E89A97EA20A9EEEE64B55D39A2192992A274FC1A836BA3C23A3FEEBBD454D4423643CE80E2A9AC94FA54CA49F
 *)
 
+fun copTests () =
+    let val t = demo_phrase
+        val res = run_cvm_fresh t
+    in print ("Phrase ran: \n" ^ (termToString demo_phrase) ^ "\n\n" ^
+              "Cvm_St result: \n" ^ (cvm_st_ToString res)
+             )
+    end
+    handle (Meas.Err s) => TextIO.print_err ("ERROR: " ^ s ^ "\n")
+
 fun hashTests () =
     let (* val evidence  = H (BString.fromString "abc") *)
         (*val hashTest  = evToString (evalTerm am evidence (Asp Hsh)) *)
@@ -84,10 +93,12 @@ fun sigTest () =
 
 (* Run all tests *)
 fun main () = (
+    copTests ()
+    (*
     hashTests ();
     hashDirTest ();
     nonceTest ();
-    sigTest ()
+    sigTest () *)
 ) handle Meas.Err msg => TextIO.print_err ("Meas err: " ^ msg ^ "\n")
        | Crypto.Err msg => TextIO.print_err ("Crypto err: " ^ msg ^ "\n")
        | Word8Extra.InvalidHex => TextIO.print_err ("Invalid hex\n")

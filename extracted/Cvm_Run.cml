@@ -7,3 +7,8 @@ fun run_cvm t st =
 
 fun run_cvm' t st =
   run_cvm (copland_compile t) st
+
+(** val run_cvm_fresh : coq_Term -> cvm_st **)
+
+fun run_cvm_fresh t =
+  run_cvm' t empty_vmst
