@@ -98,9 +98,19 @@ structure Crypto = struct
                 BString.toCString plaintext
             end
         
+        (* bstring -> bstring -> string -> bstring
+         * encryptOneShot privKey pubKey plaintext
+         * Performs a Diffie-Hellman key exchange and then AES-256-CBC
+         * encryption with the generated secret.
+         *)
         fun encryptOneShot privKey pubKey msg =
             encrypt (keyExchange privKey pubKey) msg
         
+        (* bstring -> bstring -> bstring -> string
+         * decryptOneShot privKey pubKey ciphertext
+         * Performs a Diffie-Hellman key exchange and then AES-256-CBC
+         * decryption with the generated secret.
+         *)
         fun decryptOneShot privKey pubKey ciphertext =
             decrypt (keyExchange privKey pubKey) ciphertext
     end
