@@ -43,7 +43,8 @@ extracted/Evidence_Bundlers.cml extracted/StMonad_Coq.cml
 extracted/Cvm_St.cml extracted/IO_Type.cml stubs/IO_Stubs.sml
 extracted/Cvm_Monad.cml extracted/Cvm_Impl.cml extracted/Cvm_Run.cml
 copland/CvmUtil.sml stubs/Example_Phrases_Demo_Admits.cml
-extracted/Example_Phrases_Demo.cml)
+extracted/Example_Phrases_Demo.cml copland/json/CoplandToJson.sml
+copland/json/JsonToCopland.sml)
 
 #[[
 copland/AM.sml copland/VM.sml copland/json/CoplandToJson.sml
@@ -65,7 +66,7 @@ get_files(server_am_src_hacl ${cop_src} ${posix_src_hacl} am/Measurements.sml am
 get_files(server_am_src_tpm ${cop_src} ${posix_src_tpm} am/Measurements.sml am/CommTypes.sml am/ServerAm.sml)
 ]]
 
-get_files(server_am_src ${cop_src} ${posix_src} )
+get_files(server_am_src ${cop_src} ${posix_src})
 get_files(server_am_src_hacl ${cop_src} ${posix_src_hacl} )
 get_files(server_am_src_tpm ${cop_src} ${posix_src_tpm} )
 

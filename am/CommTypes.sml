@@ -6,8 +6,10 @@ type addr = string
 (* Nameserver mapping *)
 (* We could map to an address/port pair, but for now we assume the port number
    is 5000 *)
-type nsMap = ((pl, addr) map)
+type nsMap = ((coq_Plc, addr) map)
 val emptyNsMap : nsMap = Map.empty nat_compare
+
+                                   (*
 
 (* To place,
    From place,
@@ -74,3 +76,5 @@ fun jsonToResponse js = case (Json.toMap js) of
           [Json.Int pl1, Json.Int pl2, ev] =>
               RES (natFromInt pl1) (natFromInt pl2) (jsonToEv ev)
         | _ => raise Json.Exn "getRES" "unexpected argument list"
+
+*)
