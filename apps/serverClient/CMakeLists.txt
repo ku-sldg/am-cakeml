@@ -4,6 +4,7 @@ get_files(client_src ${server_am_src} ClientTest.sml)
 build_posix_am("client" ${client_src})
 
 get_files(server_src ${server_am_src} Server.sml)
+#get_files(server_src ${server_am_src})
 build_posix_am("server" ${server_src})
 
 add_custom_target(am DEPENDS server client)

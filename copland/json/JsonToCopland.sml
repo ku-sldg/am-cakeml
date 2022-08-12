@@ -18,6 +18,8 @@ fun jsonStringListToList (Json.Array args) =
 
 fun jsonStringToBS (Json.String s) = BString.unshow s
 
+fun jsonBsListToList (Json.Array args) =
+    List.map jsonStringToBS args
 
                                                     
 
