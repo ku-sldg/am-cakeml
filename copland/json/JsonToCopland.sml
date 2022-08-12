@@ -47,13 +47,17 @@ and
     getTerm (Json.String constructor) (Json.Array args) =
         case constructor of
             "Asp"  => Coq_asp (getAsp args)
+                              
+          | "Att"  => getAtt args                                          
+          | "Lseq" => getLseq args
+                              
+          | "Bseq" => getBseq args
                               (*
-        | "Att"  => getAtt  args
-        | "Lseq" => getLseq args
-        | "Bseq" => getBseq args
-        | "Bpar" => getBpar args *)
-         |  _ => raise Json.Exn "getTerm" ("Unexpected constructor for Copland term: " ^ constructor)
-
+          | "Bpar" => getBpar args
+        |  _ => raise Json.Exn "getTerm" ("Unexpected constructor for Copland term: " ^ constructor)
+*)
+                     
+                    
     and
     (* getAsp :: json list -> coq_ASP
        Expected:  [Json.Object [("constructor", name), ("data", Json.Array args)]
@@ -121,29 +125,34 @@ and
     *)
 (*
     and
-    getAtt data = case data of
+    getAtt data = Coq_asp NULL
+    case data of
           [ Json.Int place, term] => Att(natFromInt place) (jsonToTerm term)
         | _ => raise  Json.Exn "getAtt" "unexpected argument list"
-
+*)
+    and
+    getAtt data =
+    case data of
+        [ Json.Int place, term] => Coq_att (natFromInt place) (jsonToTerm term)
+      | _ => raise  Json.Exn "getAtt" "unexpected argument list"
+                  
     and
     getLseq data = case data of
-          [term1, term2] => Lseq (jsonToTerm term1) (jsonToTerm term2)
+          [term1, term2] => Coq_lseq (jsonToTerm term1) (jsonToTerm term2)
         | _ => raise  Json.Exn "getLseq" "unexpected argument list"
 
     and
     getBseq data = case data of
           [ Json.Array [Json.String sp1, Json.String sp2], term1, term2] =>
-            Bseq (stringToSp sp1, stringToSp sp2) (jsonToTerm term1) (jsonToTerm term2)
+            Coq_bseq (Coq_pair (spFromString sp1) (spFromString sp2)) (jsonToTerm term1) (jsonToTerm term2)
         | _ => raise  Json.Exn "getBseq" "unexpected argument list"
-
     and
     getBpar data = case data of
           [ Json.Array [Json.String sp1, Json.String sp2], term1, term2] =>
-            Bpar (stringToSp sp1, stringToSp sp2) (jsonToTerm term1) (jsonToTerm term2)
+            Coq_bpar (Coq_pair (spFromString sp1) (spFromString sp2)) (jsonToTerm term1) (jsonToTerm term2)
         | _ => raise  Json.Exn "getBpar" "unexpected argument list"
-*)
 
- (*                    
+(*                    
 
 (* json object to ev object *)
 fun jsonToEv js = case (Json.toMap js) of
@@ -205,6 +214,5 @@ fun jsonToEv js = case (Json.toMap js) of
     getPP data = case data of
           [ev1, ev2] => PP (jsonToEv ev1) (jsonToEv ev2)
         | _ => raise Json.Exn "getPP" "unexpected argument list"
-
 
 *)
