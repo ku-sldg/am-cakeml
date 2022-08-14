@@ -30,8 +30,7 @@ get_files(util_src util/CoqDefaults.sml util/Extra.sml util/ByteString.sml util/
 #[[get_files(cop_src ${util_src} stubs/BS.sml extracted/Datatypes.sml
 copland/Instr.sml copland/AM.sml copland/VM.sml copland/json/CoplandToJson.sml copland/json/JsonToCopland.sml
 copland/Parser.sml) ]]
-#[[
-get_files(cop_src ${util_src} stubs/BS.sml extracted/Datatypes.sml extracted/Term_Defs_Core.cml
+#[[ get_files(cop_src ${util_src} stubs/BS.sml extracted/Datatypes.sml extracted/Term_Defs_Core.cml
 copland/AM.sml copland/VM.sml copland/json/CoplandToJson.sml
 copland/json/JsonToCopland.sml copland/Parser.sml) ]]
 
