@@ -34,22 +34,6 @@ copland/Parser.sml) ]]
 copland/AM.sml copland/VM.sml copland/json/CoplandToJson.sml
 copland/json/JsonToCopland.sml copland/Parser.sml) ]]
 
-get_files(cop_src ${util_src} stubs/BS.sml
-extracted/Datatypes.cml
-extracted/Term_Defs_Core.cml stubs/Params_Admits_hardcoded.cml
-extracted/Term_Defs.cml copland/CoplandUtil.sml stubs/Axioms_Io.cml
-extracted/Evidence_Bundlers.cml extracted/StMonad_Coq.cml
-extracted/Cvm_St.cml extracted/IO_Type.cml stubs/IO_Stubs.sml
-extracted/Cvm_Monad.cml extracted/Cvm_Impl.cml extracted/Cvm_Run.cml
-copland/CvmUtil.sml stubs/Example_Phrases_Demo_Admits.cml
-extracted/Example_Phrases_Demo.cml copland/json/CoplandToJson.sml
-copland/json/JsonToCopland.sml copland/Parser.sml)
-
-#[[
-copland/AM.sml copland/VM.sml copland/json/CoplandToJson.sml
-copland/json/JsonToCopland.sml copland/Parser.sml) ]]
-
-
 get_files(crypto_src system/crypto/openssl/CryptoFFI.sml system/crypto/openssl/Random.sml)
 get_files(crypto_src_hacl system/crypto/evercrypt/CryptoFFI.sml system/crypto/evercrypt/Random.sml)
 get_files(crypto_src_tpm system/crypto/tpm/CryptoFFI.sml system/crypto/tpm/Random.sml)
@@ -59,13 +43,47 @@ get_files(posix_src_tpm ${crypto_src_tpm}
 system/posix/sockets/SocketFFI.sml system/posix/time/TimeFFI.sml
 system/posix/meas/MeasFFI.sml)
 
+get_files(cop_src ${util_src} ${posix_src} stubs/BS.sml
+extracted/Datatypes.cml
+extracted/Term_Defs_Core.cml stubs/Params_Admits_hardcoded.cml
+extracted/Term_Defs.cml copland/CoplandUtil.sml stubs/Axioms_Io.cml
+extracted/Evidence_Bundlers.cml extracted/StMonad_Coq.cml
+extracted/Cvm_St.cml extracted/IO_Type.cml
+copland/json/CoplandToJson.sml
+copland/json/JsonToCopland.sml
+am/CommTypes.sml
+copland/Parser.sml
+am/ServerAM.sml
+am/CoplandCommUtil.sml
+stubs/IO_Stubs.sml
+extracted/Cvm_Monad.cml extracted/Cvm_Impl.cml extracted/Cvm_Run.cml
+copland/CvmUtil.sml stubs/Example_Phrases_Demo_Admits.cml
+extracted/Example_Phrases_Demo.cml
+copland/Parser)
+#[[copland/json/CoplandToJson.sml
+copland/json/JsonToCopland.sml) ]]
+
+#[[
+copland/AM.sml copland/VM.sml copland/json/CoplandToJson.sml
+copland/json/JsonToCopland.sml copland/Parser.sml) ]]
+
+#[[
+get_files(crypto_src system/crypto/openssl/CryptoFFI.sml system/crypto/openssl/Random.sml)
+get_files(crypto_src_hacl system/crypto/evercrypt/CryptoFFI.sml system/crypto/evercrypt/Random.sml)
+get_files(crypto_src_tpm system/crypto/tpm/CryptoFFI.sml system/crypto/tpm/Random.sml)
+get_files(posix_src ${crypto_src} system/posix/sockets/SocketFFI.sml system/posix/time/TimeFFI.sml system/posix/meas/MeasFFI.sml)
+get_files(posix_src_hacl ${crypto_src_hacl} system/posix/sockets/SocketFFI.sml system/posix/time/TimeFFI.sml system/posix/meas/MeasFFI.sml)
+get_files(posix_src_tpm ${crypto_src_tpm}
+system/posix/sockets/SocketFFI.sml system/posix/time/TimeFFI.sml
+system/posix/meas/MeasFFI.sml) ]]
+
 #[[
 get_files(server_am_src ${cop_src} ${posix_src} am/Measurements.sml am/CommTypes.sml am/ServerAm.sml)
 get_files(server_am_src_hacl ${cop_src} ${posix_src_hacl} am/Measurements.sml am/CommTypes.sml am/ServerAm.sml)
 get_files(server_am_src_tpm ${cop_src} ${posix_src_tpm} am/Measurements.sml am/CommTypes.sml am/ServerAm.sml)
 ]]
 
-get_files(server_am_src ${cop_src} ${posix_src} am/CommTypes.sml
+get_files(server_am_src ${cop_src} ${posix_src} # am/CommTypes.sml
 am/ServerAM.sml)
 get_files(server_am_src_hacl ${cop_src} ${posix_src_hacl} )
 get_files(server_am_src_tpm ${cop_src} ${posix_src_tpm} )

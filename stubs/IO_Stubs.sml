@@ -9,7 +9,12 @@ fun do_asp ps e =
 
 (** val doRemote_session : coq_Term -> coq_Plc -> coq_EvC -> coq_EvC **)
 
-fun doRemote_session t p e = mt_evc
+fun doRemote_session t p e =
+    let val _ = empty_bs in
+        print ("Running doRemote_session\n");
+        Coq_evc (sendReq_local_ini t p (get_bits e)) Coq_mt
+    end
+  (* TODO:  Is the dummy Evidence Type value (Coq_mt) ok here? *)
   (* failwith "AXIOM TO BE REALIZED" *)
 
 (** val parallel_vm_thread : coq_Loc -> coq_EvC **)

@@ -23,7 +23,7 @@ fun appraise nonce pub ev = case ev of
                    *)
 
 
-                   
+(*                   
 exception DispatchErr string
 (* coq_Plc -> nsMap -> coq_Plc -> (bs list) -> coq_Term -> (bs list) *)
 fun socketDispatch me nsMap pl ev t =
@@ -36,9 +36,10 @@ fun socketDispatch me nsMap pl ev t =
      in Socket.close fd;
         ev
     end
+*)
 
 
-                   
+(*              
 
 (* coq_Term -> () *)
 fun sendReq t pl nsMap (* am key *) = 
@@ -59,6 +60,7 @@ fun sendReq t pl nsMap (* am key *) =
          | _                => TextIOExtra.printLn_err "Fatal: unknown error"
 
 
+*)
                                                        
 
 (*
@@ -77,27 +79,33 @@ fun sendReqIni ini =
 (* () -> () *)
 
                                                        
-
-
                                                        
 fun main () = (* sendReq term *)
 
     let val name  = CommandLine.name ()
         val usage = ("Usage: " ^ name ^ " configurationFile\n"
                     ^ "e.g.   " ^ name ^ " config.ini\n")
-        val me = S O
+        val toPl = S O
      in case CommandLine.arguments () of
               [fileName] => (
                   case parseIniFile fileName of
-                    Err e  => TextIOExtra.printLn_err e
+                    Err e  =>  let val _ = O in
+                                    TextIOExtra.printLn_err e; []
+                               end
                    | Ok ini =>
                      case (iniServerAm ini) of
-                         Err e => TextIOExtra.printLn_err e
-                      | Ok nsMap => sendReq subterm me nsMap
+                         Err e => let val _ = O in
+                                       TextIOExtra.printLn_err e; []
+                                  end
+                       | Ok nsMap => let val _ = O in
+                                         print "Sending Request in ClientTest\n"; 
+                                         sendReq subterm toPl nsMap []
+                                     end
               )
-           | _ => TextIO.print_err usage
+           | _ => let val _ = O in
+                       TextIOExtra.printLn_err usage; []
+                  end
     end
 
-val () = main ()
-
-              
+        
+val _ = main ()      
