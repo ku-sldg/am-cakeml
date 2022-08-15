@@ -1,21 +1,26 @@
 
 exception DispatchErr string
 (* coq_Plc -> nsMap -> coq_Plc -> (bs list) -> coq_Term -> (bs list) *)
-fun socketDispatch me nsMap pl ev t =
-    let val addr = case Map.lookup nsMap pl of
+fun socketDispatch fromPl nsMap toPl ev t =
+    let val addr = case Map.lookup nsMap toPl of
               Some a => a
-            | None => raise DispatchErr ("Place "^ plToString pl ^" not in nameserver map")
-        val req  = (REQ me pl nsMap t ev)
-        val fd   = Socket.connect addr 5000
+            | None => raise DispatchErr ("Place "^ plToString toPl ^" not in nameserver map")
+        val req  = (REQ fromPl toPl nsMap t ev)
+        val port =
+            case toPl of
+                (S O) => 5000
+              | (S (S O)) => 5002
+              | _ => 5000 (* TODO: fix this hard-coding... *)
+        val fd   = Socket.connect addr port
         val (RES _ _ resev) = (serverSend fd req; serverRcv fd)
      in Socket.close fd;
         resev
     end
 
 (* coq_Term -> coq_Plc -> nsMap -> (bs list) -> (bs list) *)
-fun sendReq t pl nsMap evv (* am key *) =
-    let val me = O
-        val resev = socketDispatch me nsMap pl evv t
+fun sendReq t toPl nsMap evv (* am key *) =
+    let val fromPl = O
+        val resev = socketDispatch fromPl nsMap toPl evv t
     in
         (print ("Sent term:\n" ^ termToString t ^ "\n\nInitial raw evidence:\n" ^
                 rawEvToString evv)); (* ^ "\n\nEvidence recieved:\n" ^

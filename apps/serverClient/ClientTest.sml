@@ -3,7 +3,7 @@
 val dir = "testDir"
 
 val subterm = demo_phrase (* (Asp (Aspc (Id (S O)) [dir])) *)
-val term = Coq_att O subterm (* Att (S O) (Lseq subterm (Asp Sig)) *)
+val term = Coq_att (S (S O)) subterm (* Att (S O) (Lseq subterm (Asp Sig)) *)
 
 
                    (*
@@ -99,7 +99,7 @@ fun main () = (* sendReq term *)
                                   end
                        | Ok nsMap => let val _ = O in
                                          print "Sending Request in ClientTest\n"; 
-                                         sendReq subterm toPl nsMap []
+                                         sendReq term toPl nsMap []
                                      end
               )
            | _ => let val _ = O in
