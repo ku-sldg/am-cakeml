@@ -12,6 +12,7 @@ fun fwdFromString n =
     of  "COMP" => COMP
     |   "EXTD" => EXTD
     | "ENCR" => ENCR
+    | "KILL" => KILL
 
 fun jsonStringToString (Json.String s) = s
 fun jsonStringListToList (Json.Array args) =

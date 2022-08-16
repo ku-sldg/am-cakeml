@@ -17,6 +17,12 @@ fun cons_hsh hsh e p ps =
 fun cons_enc enc e p ps =
   let val Coq_evc _ et = e in Coq_evc (enc :: []) (Coq_uu p ENCR ps et) end
 
+(** val cons_kill :
+    coq_BS -> coq_EvC -> coq_Plc -> coq_ASP_PARAMS -> coq_EvC **)
+
+fun cons_kill _ e p ps =
+  let val Coq_evc _ et = e in Coq_evc [] (Coq_uu p KILL ps et) end
+
 (** val ss_cons : coq_EvC -> coq_EvC -> coq_EvC **)
 
 fun ss_cons e1 e2 =

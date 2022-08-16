@@ -84,6 +84,7 @@ fun fwdToString fwd =
         COMP => "COMP"
       | EXTD => "EXTD"
       | ENCR => "ENCR"
+      | KILL => "KILL"
 
 
 (* aspToString :: coq_ASP -> string *)

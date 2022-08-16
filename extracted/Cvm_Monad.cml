@@ -59,6 +59,7 @@ fun fwd_asp fwd bs e p ps =
     COMP => cons_hsh bs e p ps
   | ENCR => cons_enc bs e p ps
   | EXTD => cons_gg bs e p ps
+  | KILL => cons_kill bs e p ps
 
 (** val invoke_ASP : coq_FWD -> coq_ASP_PARAMS -> coq_EvC coq_CVM **)
 

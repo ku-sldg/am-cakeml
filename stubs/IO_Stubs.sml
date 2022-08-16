@@ -1,9 +1,9 @@
 (** val do_asp : coq_ASP_PARAMS -> coq_RawEv -> coq_BS **)
 
 fun do_asp ps e =
-    let val res = empty_bs in
+    let val res = BString.fromString "a" (*empty_bs*) in
     print ("Running ASP with params: \n" ^ (aspParamsToString ps) ^ "\n");
-    empty_bs
+    res
     end
 (* failwith "AXIOM TO BE REALIZED" *)
 

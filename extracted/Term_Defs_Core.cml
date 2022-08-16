@@ -17,6 +17,7 @@ datatype coq_FWD =
   COMP 
 | ENCR 
 | EXTD 
+| KILL 
 
 datatype coq_Evidence =
   Coq_mt 
