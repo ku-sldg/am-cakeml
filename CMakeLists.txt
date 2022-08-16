@@ -55,9 +55,10 @@ am/CommTypes.sml
 copland/Parser.sml
 am/ServerAM.sml
 am/CoplandCommUtil.sml
+stubs/Example_Phrases_Demo_Admits.cml
 stubs/IO_Stubs.sml
 extracted/Cvm_Monad.cml extracted/Cvm_Impl.cml extracted/Cvm_Run.cml
-copland/CvmUtil.sml stubs/Example_Phrases_Demo_Admits.cml
+copland/CvmUtil.sml
 extracted/Example_Phrases_Demo.cml
 copland/Parser)
 #[[copland/json/CoplandToJson.sml

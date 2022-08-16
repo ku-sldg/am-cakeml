@@ -1,10 +1,46 @@
 (** val do_asp : coq_ASP_PARAMS -> coq_RawEv -> coq_BS **)
 
+
 fun do_asp ps e =
-    let val res = BString.fromString "a" (*empty_bs*) in
-    print ("Running ASP with params: \n" ^ (aspParamsToString ps) ^ "\n");
-    res
-    end
+    case ps of
+        Coq_asp_paramsC aspid args tpl tid =>
+        let val res =
+                case (aspid = get_data_aspid) of
+                    True =>
+                    let val _ = () in
+                        print ("Matched aspid:  " ^ aspid ^ "\n");
+                        BString.fromString "data"
+                    end
+                  | _ =>
+                    case (aspid = tpm_sig_aspid) of
+                        True =>
+                        let val _ = () in
+                            print ("Matched aspid:  " ^ aspid ^ "\n");
+                            BString.fromString ("sig( " ^
+                                                    (rawEvToString e)
+                                                    ^ " )")
+                        end
+                      | _ =>
+                        case (aspid = ssl_enc_aspid) of
+                            True =>
+                            let val _ = () in
+                                print ("Matched aspid:  " ^ aspid ^ "\n");
+                                BString.fromString ("enc( " ^
+                                                        (rawEvToString e)
+                                                        ^ " )")
+                            end
+                          | _ =>
+                            let val _ = () in
+                                print ("Matched OTHER aspid:  " ^ aspid ^ "\n");
+                                BString.fromString "v"
+                            end
+                                                           
+                                         
+
+        in
+            print ("Running ASP with params: \n" ^ (aspParamsToString ps) ^ "\n");
+            res
+        end
 (* failwith "AXIOM TO BE REALIZED" *)
 
 (** val doRemote_session : coq_Term -> coq_Plc -> coq_EvC -> coq_EvC **)
