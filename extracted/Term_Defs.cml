@@ -9,6 +9,7 @@ fun asp_term_to_core a = case a of
    | NONE => Coq_lseqc (Coq_aspc CLEAR) (Coq_aspc (ASPCC fwd params)))
 | SIG => Coq_aspc (ASPCC EXTD sig_params)
 | HSH => Coq_aspc (ASPCC COMP hsh_params)
+| ENC q => Coq_aspc (ASPCC ENCR (enc_params q))
 
 (** val copland_compile : coq_Term -> coq_Core_Term **)
 

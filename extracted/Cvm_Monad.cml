@@ -56,7 +56,8 @@ fun tag_ASP params mpl e =
 
 fun fwd_asp fwd bs e p ps =
   case fwd of
-    COMP => cons_hh bs e p ps
+    COMP => cons_hsh bs e p ps
+  | ENCR => cons_enc bs e p ps
   | EXTD => cons_gg bs e p ps
 
 (** val invoke_ASP : coq_FWD -> coq_ASP_PARAMS -> coq_EvC coq_CVM **)

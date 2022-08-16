@@ -62,6 +62,7 @@ fun aspToJson asp = case asp of
                                             [spToJson sp, fwdToJson fwd, aspParamsToJson ps]
     | SIG => noArgConstructor "Sig"
     | HSH => noArgConstructor "Hsh"
+    | ENC q => constructorWithArgs "Enc" [placeToJson q]
                               
                       
 (*

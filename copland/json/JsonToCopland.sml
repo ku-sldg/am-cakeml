@@ -11,6 +11,7 @@ fun fwdFromString n =
     case n
     of  "COMP" => COMP
     |   "EXTD" => EXTD
+    | "ENCR" => ENCR
 
 fun jsonStringToString (Json.String s) = s
 fun jsonStringListToList (Json.Array args) =
@@ -75,11 +76,21 @@ and
         | [("constructor", Json.String "Aspc"), ("data", args)] =>
             getAspc args
         | [("data", args), ("constructor", Json.String "Aspc")] =>
-            getAspc args
+          getAspc args
+        | [("constructor", Json.String "Enc"), ("data", args)] =>
+            getEnc args
+        | [("data", args), ("constructor", Json.String "Enc")] =>
+            getEnc args
         | _ => raise Json.Exn "getAspFromAList" "does not contain just constructor and data pairs"
                      
     and
+     (* getEnc :: Json.Array -> coq_ASP *)
+    getEnc (Json.Array args) = case args of
+    [Json.Int q] => ENC (natFromInt q)
+        
+                    | _ => raise Json.Exn "getAspc" "unexpected argument list"
     (* getAspc :: Json.Array -> coq_ASP *)
+    and                              
     getAspc (Json.Array args) = case args of
     (* args :: json list 
        Expected: [Json.String "ALL" | "NONE", Json.String "COMP" | "EXTD", 

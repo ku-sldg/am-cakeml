@@ -98,7 +98,7 @@ fun main () = (* sendReq term *)
                                        TextIOExtra.printLn_err e; []
                                   end
                        | Ok nsMap => let val _ = O in
-                                         print "Sending Request in ClientTest\n"; 
+                                         print "\nSending Request in ClientTest\n\n"; 
                                          sendReq term toPl nsMap []
                                      end
               )

@@ -82,7 +82,8 @@ fun spToString sp =
 fun fwdToString fwd =
     case fwd of
         COMP => "COMP"
-     | EXTD => "EXTD"
+      | EXTD => "EXTD"
+      | ENCR => "ENCR"
 
 
 (* aspToString :: coq_ASP -> string *)
@@ -91,6 +92,7 @@ fun aspToString asp = case asp of
     | CPY => "CPY"
     | SIG => "SIG"
     | HSH => "HSH"
+    | ENC q => concatWith " " ["(ENC", plToString q, ")"]
     | ASPC sp fwd ps => concatWith " " ["(ASPC", spToString sp, fwdToString fwd,
                                         aspParamsToString ps, ")"]
 
@@ -161,9 +163,14 @@ fun evToString e = concatWith " "
 fun evToString e = concatWith " "
     let fun parens e = "(" ^ evToString e ^ ")"
      in case e of
-          Coq_mt         => ["Mt"]
+            Coq_mt         => ["Mt"]
+          | Coq_uu p fwd ps ev  =>
+            ["UU_E", plToString p, fwdToString fwd, aspParamsToString ps,
+             parens ev]
+                                  (*
         | Coq_gg p ps ev => ["SIG_E", plToString p, aspParamsToString ps, parens ev]
         | Coq_hh p ps ev => ["HSH_E", plToString p, aspParamsToString ps, parens ev]
+*)
         | Coq_nn i       => ["N", nIdToString i]
         | Coq_ss ev1 ev2   => ["SS_E", parens ev1, parens ev2]
     end

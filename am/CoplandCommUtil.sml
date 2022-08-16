@@ -23,7 +23,7 @@ fun sendReq t toPl nsMap evv (* am key *) =
         val resev = socketDispatch fromPl nsMap toPl evv t
     in
         (print ("Sent term:\n" ^ termToString t ^ "\n\nInitial raw evidence:\n" ^
-                rawEvToString evv)); (* ^ "\n\nEvidence recieved:\n" ^
+                rawEvToString evv ^ "\nRaw evidence received:\n" ^ rawEvToString resev ^ "\n\n")); (* ^ "\n\nEvidence recieved:\n" ^
                (rawEvToString resev) )); *)
         resev
     end
@@ -55,14 +55,15 @@ fun sendReq_local_ini t pl ev =
                                 end
                     | Ok ini =>
                       let val _ = O in
-                          print "Parsed ini OK\n";
+                          print "Parsed INI OK\n";
                           case (iniServerAm ini) of
                               Err e => let val _ = O in
                                            TextIOExtra.printLn_err e; []
                                        end
                             | Ok nsMap =>
                               let val _ = O in
-                                  print "Parsed INI Ok\n";
+                                  print "Parsed nsMap of INI OK\n\n";
+                                  print "\nSending Request in senReq_ocal_ini\n\n"; 
                                   sendReq t pl nsMap ev
                               end
                       end )
