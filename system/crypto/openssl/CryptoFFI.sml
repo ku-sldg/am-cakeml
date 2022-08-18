@@ -14,8 +14,11 @@ structure Crypto = struct
         val pubkeyLen = 270
         val signLen = 256
         val digestLen = 64
-        val ivLen = 128
-        (* int -> int -> int *)
+        val ivLen = 16
+        (* int -> int -> int
+         * Calculates how much padding the encryption/decryption methods will
+         * need for the output.
+         *)
         fun paddingCalc num modulus =
             let
                 val rem = num mod modulus
@@ -65,7 +68,7 @@ structure Crypto = struct
         
         (* bstring -> bstring -> bstring
          * keyExchange privKey pubKey
-         * Takes a 256-bit RSA private key `privKey` and another public key
+         * Takes a 2048-bit DH private key `privKey` and another public key
          * `pubKey` from two different key pairs, and returns a SHA-512 digest
          * of a shared secret with length `digestLen`.
          *)

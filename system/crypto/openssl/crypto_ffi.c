@@ -7,12 +7,14 @@
 #include <openssl/evp.h>
 #include <openssl/err.h>
 #include <openssl/rand.h>
-#include <openssl/rsa.h>
+#include <openssl/x509.h>
 
 #define FFI_SUCCESS 0
 #define FFI_FAILURE 1
-#define PUB_KEY_LEN 270
+#define RSA_PUB_KEY_LEN 270
 /* private RSA keys do not have a fixed length */
+#define DH_PUB_KEY_LEN 552
+#define DH_PRIV_KEY_LEN 554
 #define HASH_LEN 64
 #define SIG_LEN 256
 #define SYM_KEY_LEN 32
@@ -136,7 +138,7 @@ cleanup:
     return result;
 }
 
-bool convert_private_key(const uint8_t *priv, const size_t priv_len, EVP_PKEY **pkey) {
+bool convert_rsa_private_key(const uint8_t *priv, const size_t priv_len, EVP_PKEY **pkey) {
     /* Takes a private key in raw DER format `priv` which is `priv_len` in
      * length and parses the key into a useable `EVP_PKEY` format stored at
      * `*pkey`. Returns `true` upon success and `false` on failure.
@@ -179,7 +181,7 @@ void ffisignMsg(uint8_t *const in, const size_t in_len, uint8_t *const out, cons
     const size_t priv_len = ((*in) << 8) | (*(in + 1));
     assert(in_len >= pkey_len_prefix_len + priv_len);
     EVP_PKEY *pkey = NULL;
-    assert(convert_private_key(in + pkey_len_prefix_len, priv_len, &pkey));
+    assert(convert_rsa_private_key(in + pkey_len_prefix_len, priv_len, &pkey));
     const size_t msg_len = in_len - priv_len - pkey_len_prefix_len;
     uint8_t *sig = NULL;
     size_t sig_len = 0;
@@ -234,10 +236,10 @@ cleanup:
     return result;
 }
 
-bool convert_public_key(const uint8_t *pub, const size_t pub_len, EVP_PKEY **pkey) {
+bool convert_rsa_public_key(const uint8_t *pub, const size_t pub_len, EVP_PKEY **pkey) {
     /* Converts a raw public key, `pub` with length `pub_len`, into a more
-     * useable `EVP_PKEY` stored in `*pkey`. Returns `0` upon success and `-1`
-     * on failure.
+     * useable `EVP_PKEY` stored in `*pkey`. Returns `true` upon success and
+     * `false` on failure.
      * 
      * Note: For some reason, only RSA public keys can be recovered. I (Andrew
      * Cousino, 2022, OpenSSL v3.0.2) have tried to get EC keys to work but
@@ -263,17 +265,17 @@ void ffisigCheck(uint8_t *const in, const size_t in_len, uint8_t *const out, con
      * Format for `in`:
      * | Bytes | Meaning |
      * |-------|---------|
-     * | 0..PUB_KEY_LEN - 1 | RSA public key |
-     * | PUB_KEY_LEN..PUB_KEY_LEN + SIG_LEN - 1 | Signature |
-     * | PUB_KEY_LEN + SIG_LEN..in_len | Message |
+     * | 0..RSA_PUB_KEY_LEN - 1 | RSA public key |
+     * | RSA_PUB_KEY_LEN..RSA_PUB_KEY_LEN + SIG_LEN - 1 | Signature |
+     * | RSA_PUB_KEY_LEN + SIG_LEN..in_len | Message |
      */
-    assert(in_len >= PUB_KEY_LEN + SIG_LEN);
+    assert(in_len >= RSA_PUB_KEY_LEN + SIG_LEN);
     assert(out_len >= 1);
     EVP_PKEY *pub_key = NULL;
-    assert(convert_public_key(in, PUB_KEY_LEN, &pub_key));
-    const size_t msg_len = in_len - PUB_KEY_LEN - SIG_LEN;
+    assert(convert_rsa_public_key(in, RSA_PUB_KEY_LEN, &pub_key));
+    const size_t msg_len = in_len - RSA_PUB_KEY_LEN - SIG_LEN;
     bool verified = false;
-    assert(digest_verify(in + PUB_KEY_LEN + SIG_LEN, msg_len, in + PUB_KEY_LEN, SIG_LEN, pub_key, &verified));
+    assert(digest_verify(in + RSA_PUB_KEY_LEN + SIG_LEN, msg_len, in + RSA_PUB_KEY_LEN, SIG_LEN, pub_key, &verified));
     out[0] = verified ? FFI_SUCCESS : FFI_FAILURE;
     EVP_PKEY_free(pub_key);
 }
@@ -334,6 +336,51 @@ cleanup:
     return result;
 }
 
+bool convert_dh_private_key(const uint8_t *priv, const size_t priv_len, EVP_PKEY **pkey) {
+    /* Takes a private key in raw DER format `priv` which is `priv_len` in
+     * length and parses the key into a useable `EVP_PKEY` format stored at
+     * `*pkey`. Returns `true` upon success and `false` on failure.
+     */
+    if (priv == NULL || priv_len == 0 || pkey == NULL) {
+        printf("Uninitialized paramters.\n");
+        if (priv == NULL) {
+            printf("\tpriv is null.\n");
+        }
+        if (priv_len == 0) {
+            printf("\tpriv_len is zero.\n");
+        }
+        if (pkey == NULL) {
+            printf("\tpkey is null.\n");
+        }
+        return false;
+    }
+    if (d2i_PrivateKey(EVP_PKEY_DH, pkey, &priv, priv_len) == NULL) {
+        printf("Error recovering private key, error code 0x%lx.\n", ERR_get_error());
+        return false;
+    }
+    return true;
+}
+
+bool convert_dh_public_key(const uint8_t *pub, const size_t pub_len, EVP_PKEY **pkey) {
+    /* Converts a raw public key, `pub` with length `pub_len`, into a more
+     * useable `EVP_PKEY` stored in `*pkey`. Returns `0` upon success and `-1`
+     * on failure.
+     * 
+     * Note: For some reason, only RSA public keys can be recovered. I (Andrew
+     * Cousino, 2022, OpenSSL v3.0.2) have tried to get EC keys to work but
+     * have so far failed to do so.
+     */
+    if (pub == NULL || pub_len == 0 || pkey == NULL) {
+        printf("Uninitialized paramters.\n");
+        return false;
+    }
+    if (d2i_PUBKEY(pkey, &pub, pub_len) == NULL) {
+        printf("Error recovering public key, error code 0x%lx.\n", ERR_get_error());
+        return false;
+    }
+    return true;
+}
+
 void ffidiffieHellman(uint8_t *const in, const size_t in_len, uint8_t *const out, const size_t out_len) {
     /* Takes in an RSA private key and a public key from different asymmetric
      * key pairs and then outputs a symmetric "key". Technically, this key is
@@ -345,8 +392,8 @@ void ffidiffieHellman(uint8_t *const in, const size_t in_len, uint8_t *const out
      * Format for `in`:
      * | Bytes | Meaning |
      * |-------|---------|
-     * | 0..in_len - PUB_KEY_LEN - 1 | An RSA private key in raw DER format |
-     * | in_len - PUB_KEY_LEN..in_len - 1 | An RSA public key in raw DER format |
+     * | 0..DH_PRIV_KEY_LEN - 1 | A DH private key in raw DER format |
+     * | DH_PRIV_KEY_LEN..in_len - 1 | A DH public key in raw DER format |
      * 
      * Format of `out`:
      * | Bytes | Meaning |
@@ -355,13 +402,12 @@ void ffidiffieHellman(uint8_t *const in, const size_t in_len, uint8_t *const out
      * | 256..383 | IV |
      * | 384..511 | ignored |
      */
-    assert(in_len >= PUB_KEY_LEN);
+    assert(in_len >= DH_PUB_KEY_LEN + DH_PRIV_KEY_LEN);
     assert(out_len >= HASH_LEN);
-    const size_t priv_key_raw_len = in_len - PUB_KEY_LEN;
     EVP_PKEY *priv_key = NULL;
-    assert(convert_private_key(in, priv_key_raw_len, &priv_key));
+    assert(convert_dh_private_key(in, DH_PRIV_KEY_LEN, &priv_key));
     EVP_PKEY *pub_key = NULL;
-    assert(convert_public_key(in + priv_key_raw_len, PUB_KEY_LEN, &pub_key));
+    assert(convert_dh_public_key(in + DH_PRIV_KEY_LEN, DH_PUB_KEY_LEN, &pub_key));
     uint8_t *secret = NULL;
     size_t secret_len = 0;
     assert(dh_key_agreement(priv_key, pub_key, &secret, &secret_len));
@@ -395,7 +441,7 @@ bool encrypt(const uint8_t *plaintext, const size_t plaintext_len, const uint8_t
         goto cleanup;
     }
     *ciphertext_len += len;
-    if (EVP_EncryptFinal_ex(ctx, *ciphertext, &len) != 1) {
+    if (EVP_EncryptFinal_ex(ctx, *ciphertext + len, &len) != 1) {
         printf("EVP_EncryptFinal_ex failed, error code %lx\n", ERR_get_error());
         goto cleanup;
     }
@@ -410,7 +456,7 @@ cleanup:
     return result;
 }
 
-void ffiencrypt(uint8_t *const in, size_t const in_len, uint8_t *const out, size_t const out_len) {
+void ffiencrypt(uint8_t *const in, size_t const in_len, uint8_t *out, size_t const out_len) {
     /* Takes in a key, an initialization vector (IV), and a message, and then
      * encrypts them using AES 256-bit with CBC. The `out` should have length
      * `out_len` which is at least as large as `in` (`in_len`) and a multiple of
@@ -425,13 +471,10 @@ void ffiencrypt(uint8_t *const in, size_t const in_len, uint8_t *const out, size
      * | 512..in_len - 1 | plaintext |
      */
     assert(in_len >= HASH_LEN);
-    assert(out_len >= in_len && out_len % IV_LEN == 0);
-    uint8_t *ciphertext = NULL;
+    assert((out_len + HASH_LEN >= in_len) && (out_len % IV_LEN == 0));
     size_t ciphertext_len = 0;
-    assert(encrypt(in + HASH_LEN, in_len - HASH_LEN, in, in + SYM_KEY_LEN, &ciphertext, &ciphertext_len));
-    assert(out_len == ciphertext_len);
-    memcpy(out, ciphertext, out_len);
-    OPENSSL_free(ciphertext);
+    assert(encrypt(in + HASH_LEN, in_len - HASH_LEN, in, in + SYM_KEY_LEN, &out, &ciphertext_len));
+    assert(out_len >= ciphertext_len);
 }
 
 bool decrypt(const uint8_t *ciphertext, const size_t ciphertext_len, const uint8_t *key, const uint8_t *iv, uint8_t **plaintext, size_t *plaintext_len) {
@@ -458,7 +501,7 @@ bool decrypt(const uint8_t *ciphertext, const size_t ciphertext_len, const uint8
         goto cleanup;
     }
     *plaintext_len += len;
-    if (EVP_DecryptFinal_ex(ctx, *plaintext, &len) != 1) {
+    if (EVP_DecryptFinal_ex(ctx, *plaintext + len, &len) != 1) {
         printf("EVP_DecryptFinal_ex failed, error code %lx\n", ERR_get_error());
         goto cleanup;
     }
@@ -473,7 +516,7 @@ cleanup:
     return result;
 }
 
-void ffidecrypt(uint8_t *const in, const size_t in_len, uint8_t *const out, const size_t out_len) {
+void ffidecrypt(uint8_t *const in, const size_t in_len, uint8_t *out, const size_t out_len) {
     /* Performs AES 256-bit with CBC decryption using a key, an iv, and some
      * ciphertext to produce plaintext. The output `out` should have length
      * `out_len` at least as large as `in` and which is a multiple of the block
@@ -486,11 +529,8 @@ void ffidecrypt(uint8_t *const in, const size_t in_len, uint8_t *const out, cons
      * | 512..in_len - 1 | ciphertext |
      */
     assert(in_len >= HASH_LEN);
-    assert(out_len >= in_len && out_len % IV_LEN == 0);
-    uint8_t *plaintext = NULL;
+    assert(out_len + HASH_LEN >= in_len && out_len % IV_LEN == 0);
     size_t plaintext_len = 0;
-    assert(decrypt(in + HASH_LEN, in_len - HASH_LEN, in, in + SYM_KEY_LEN, &plaintext, &plaintext_len));
-    assert(plaintext_len == out_len);
-    memcpy(out, plaintext, out_len);
-    OPENSSL_free(plaintext);
+    assert(decrypt(in + HASH_LEN, in_len - HASH_LEN, in, in + SYM_KEY_LEN, &out, &plaintext_len));
+    assert(out_len >= plaintext_len);
 }
