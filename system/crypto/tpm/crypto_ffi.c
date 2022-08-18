@@ -9,7 +9,16 @@
 #include <openssl/err.h>
 #include <openssl/rand.h>
 
+#include "powerup.h"
+#include "startup.h"
+#include "createprimary.h"
+#include "create.h"
+#include "load.h"
 #include "sign.h"
+#include "flushcontext.h"
+#include "verifysignature.h"
+
+#include "ibmtss/tssfile.h"
 
 
 #define FFI_SUCCESS 0
@@ -18,6 +27,201 @@
 /* private RSA keys do not have a fixed length */
 #define HASH_LEN 64
 #define SIG_LEN 256
+
+
+    /* 
+    Intended to be run before the Copland phrase
+    Uses TSS functions powerup, startup, createprimary
+
+    In-
+    Uses-
+    Out- parentHandle.txt
+    */
+void ffitpmSetup(uint8_t *const in, uint64_t const in_len, uint8_t *const out, uint64_t const out_len) {
+    int rc = 0;
+
+    char *powerupArgv[] = {"powerup"};
+    unsigned int powerupArgc = sizeof(powerupArgv) / sizeof(powerupArgv[0]);
+
+    char *startupArgv[] = {"startup", "-c"};
+    unsigned int startupArgc = sizeof(startupArgv) / sizeof(startupArgv[0]);
+
+    char *createprimaryArgv[] = {"createprimary", "-hi", "p"};
+    unsigned int createprimaryArgc = sizeof(createprimaryArgv) / sizeof(createprimaryArgv[0]);
+    
+    if (rc == 0) {
+        rc = powerup(powerupArgc, powerupArgv);
+    }
+    if (rc == 0) {
+        rc = startup(startupArgc, startupArgv);
+    }
+    if (rc == 0) {
+        rc = createprimary(createprimaryArgc, createprimaryArgv);
+    }
+
+    if (rc == 0) {
+        out[0] = FFI_SUCCESS;
+    }
+    else {
+        out[0] = FFI_FAILURE;
+    }
+}
+    /*
+    create_and_load_ak
+    Uses TSS functions create, load
+    
+    In- 
+    Uses- parentHandle.txt
+    Out- keyHandle.txt, pub.pem, #pub.bin#, #priv.bin#
+    */
+
+void ffitpmCreateSigKey(uint8_t *const in, uint64_t const in_len, uint8_t *const out, uint64_t const out_len) {
+    int rc = 0;
+
+    FILE *parentHandle_file;
+    char parentHandle[9];
+    parentHandle_file = fopen("parentHandle.txt","r");
+    if (parentHandle_file == NULL) {
+        rc = 1; // parentHandle.txt could not be opened
+    }
+    if (rc == 0) {
+        fgets(parentHandle, 9, (FILE*)parentHandle_file);
+        fclose(parentHandle_file);
+    }
+    
+    char *createArgv[] = {"create", "-hp", parentHandle, "-rsa", "2048", "-halg", "sha512", "-si", "-kt", "f", "-kt", "p", "-opr", "priv.bin", "-opu", "pub.bin", "-opem", "pub.pem"};
+    unsigned int createArgc = sizeof(createArgv) / sizeof(createArgv[0]);
+
+    char *loadArgv[] = {"load", "-hp", parentHandle, "-ipr", "priv.bin", "-ipu", "pub.bin"};
+    unsigned int loadArgc = sizeof(loadArgv) / sizeof(loadArgv[0]);
+
+    if (rc == 0) {
+        rc = create(createArgc, createArgv);
+    }
+    if (rc == 0) {
+        rc = load(loadArgc, loadArgv);
+    }
+
+    if (rc == 0) {
+        out[0] = FFI_SUCCESS;
+    }
+    else {
+        out[0] = FFI_FAILURE;
+    }
+}
+
+
+    /*
+    get_data
+    Uses TSS functions TSS_GetData
+    
+    In- 
+    Uses- data.txt
+    Out- data
+    */
+void ffigetData(uint8_t *const in, uint64_t const in_len, uint8_t *const out, uint64_t const out_len) {
+    int rc = 0;
+
+    unsigned char *data = NULL;
+    size_t data_len;
+    char *filename = "data.txt";
+
+    rc = TSS_GetData(&data, &data_len, filename);
+    memset(out, 0, out_len);
+    if (rc == 0) {
+        memcpy(out, data, data_len);
+    }
+}
+
+
+    /*
+    tpm_sig
+    Uses TSS functions sign, flushcontext
+    
+    In- data
+    Uses- keyHandle.txt, parentHandle.txt
+    Out- signature
+    */
+void ffitpmSign(uint8_t *const in, uint64_t const in_len, uint8_t *const out, uint64_t const out_len) {
+    int rc = 0;
+
+    FILE *parentHandle_file;
+    char parentHandle[9];
+    parentHandle_file = fopen("parentHandle.txt","r");
+    if (parentHandle_file == NULL) {
+        rc = 1; // parentHandle.txt could not be opened
+    }
+    if (rc != 1) {
+        fgets(parentHandle, 9, (FILE*)parentHandle_file);
+        fclose(parentHandle_file);
+    }
+
+    FILE *keyHandle_file;
+    char keyHandle[9];
+    keyHandle_file = fopen("keyHandle.txt","r");
+    if (keyHandle_file == NULL) {
+        rc = 2; // keyHandle.txt could not be opened
+    }
+    if (rc != 2) {
+        fgets(keyHandle, 9, (FILE*)keyHandle_file);
+        fclose(keyHandle_file);
+    }
+    
+    char *data = malloc(in_len);
+    memcpy(data, in, in_len);
+
+    char *signArgv[] = {"sign", "-hk", keyHandle, "-halg", "sha512", "-salg", "rsa", "-id", data};
+    unsigned int signArgc = sizeof(signArgv) / sizeof(signArgv[0]);
+
+    char *flushHPArgv[] = {"flushcontext", "-ha", parentHandle};
+    unsigned int flushHPArgc = sizeof(flushHPArgv) / sizeof(flushHPArgv[0]);
+
+    char *flushHKArgv[] = {"flushcontext", "-ha", keyHandle};
+    unsigned int flushHKArgc = sizeof(flushHKArgv) / sizeof(flushHKArgv[0]);
+
+    uint8_t *signature  = sign(signArgc, signArgv);
+    memcpy(out, signature, out_len);
+    
+    flushcontext(flushHPArgc, flushHPArgv);
+    flushcontext(flushHKArgc, flushHKArgv);
+
+}
+
+
+/* Uses TSS functions verifysignature */
+/* this function needs changed */
+void ffitpmCheckSig(uint8_t *const in, uint64_t const in_len, uint8_t *const out, uint64_t const out_len) {
+    int rc = 0;
+
+    char *verifyArgv[] = {"verifysignature", "-ipem", "pub.pem", "-halg", "sha512", "-rsa", "-if", "signTest.txt", "-is", "sig.bin"};
+    unsigned int verifyArgc = sizeof(verifyArgv) / sizeof(verifyArgv[0]);
+
+    if (rc == 0) {
+        rc = verifysignature(verifyArgc, verifyArgv);
+    }
+
+    if (rc == 0) {
+        out[0] = FFI_SUCCESS;
+    }
+    else {
+        out[0] = FFI_FAILURE;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 bool sha512(uint8_t const *data, size_t dataLen, uint8_t *hash) {
     /* https://wiki.openssl.org/index.php/EVP_Message_Digests
@@ -164,35 +368,38 @@ bool convert_private_key(uint8_t const *priv, size_t const priv_len, EVP_PKEY **
 }
 
 void ffisignMsg(uint8_t *const in, uint64_t const in_len, uint8_t *const out, uint64_t const out_len) {
-    int rc;
-
-    //char input[in_len];
-    //strcpy(input, in);
-    char input[] = "sign -h";
-
-    char* tpmArgv[50];
-    int tpmArgc = 0;
-
-    char* token;
-    char* saveptr;
-    token = strtok_r(input, " ", &saveptr);
-    tpmArgv[tpmArgc] = token;
-    tpmArgc = tpmArgc + 1;
-    while (token != NULL)
-    {
-        token = strtok_r(NULL, " ", &saveptr);
-        if (token != NULL)
-        {
-            tpmArgv[tpmArgc] = token;
-            tpmArgc = tpmArgc + 1;
-        }
-    }
-
-    if(strcmp(tpmArgv[0],"sign") == 0)
-        rc = sign(tpmArgc, tpmArgv);
-
-    if (out_len >= 1)
-        out[0] = rc;
+    /* Creates a signature for a message stored in `in` from a key which is
+     * also stored in `in` and stores the signature in `out` which must have a
+     * length of `out_len`. Called directly by CakeML.
+     * 
+     * Format of `in`: (because RSA has private keys that vary slightly in length)
+     * | Bytes | Meaning |
+     * |-------|---------|
+     * | 0, 1  | The length of the private key stored, call this `key_len` |
+     * | 2..key_len + 1 | The raw private key in DER format, is length `key_len` |
+     * | key_len + 2..in_len - 1 | The remainder is the message to be signed |
+     */
+    uint8_t const pkey_len_prefix_len = 2;
+    assert(in_len > pkey_len_prefix_len);
+    assert(out_len >= SIG_LEN);
+    size_t const priv_len = ((*in) << 8) | (*(in + 1));
+    uint8_t *priv = (uint8_t *)OPENSSL_malloc(priv_len);
+    assert(in_len >= pkey_len_prefix_len + priv_len);
+    memcpy(priv, in + pkey_len_prefix_len, priv_len);
+    EVP_PKEY *pkey = NULL;
+    assert(convert_private_key(priv, priv_len, &pkey));
+    const size_t msg_len = in_len - priv_len - pkey_len_prefix_len;
+    uint8_t *msg = (uint8_t *)OPENSSL_malloc(msg_len);
+    memcpy(msg, in + pkey_len_prefix_len + priv_len, msg_len);
+    uint8_t *sig = NULL;
+    size_t sig_len = 0;
+    assert(digestSign(msg, msg_len, &sig, &sig_len, pkey));
+    assert(sig_len == SIG_LEN);
+    memcpy(out, sig, SIG_LEN);
+    OPENSSL_free(sig);
+    OPENSSL_free(priv);
+    OPENSSL_free(msg);
+    OPENSSL_free(pkey);
 }
 
 bool digestVerify(uint8_t const *msg, size_t const msg_len, uint8_t const *sig, const size_t sig_len, EVP_PKEY *key, bool *verified) {
