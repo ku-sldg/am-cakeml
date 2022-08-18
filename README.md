@@ -19,6 +19,7 @@ cp cake /usr/bin
 - Make
 - CMake: Version 3.10.2 or higher.
 - CCMake: Optional, but highly recommended. Provides a GUI for configuring CMake parameters.
+- OpenSSL development files/headers
 
 ### Instructions
 Create a build directory at the top level of the source tree, then invoke cmake from within the directory:

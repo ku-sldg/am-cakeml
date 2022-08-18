@@ -281,7 +281,7 @@ void ffisha512(uint8_t *const in, uint64_t const in_len, uint8_t *const out, uin
     OPENSSL_free(msg);
 }
 
-bool digestSign(uint8_t const *msg, size_t const msg_len, uint8_t **sig, size_t *sig_len, EVP_PKEY *pkey) {
+bool digest_sign(uint8_t const *msg, size_t const msg_len, uint8_t **sig, size_t *sig_len, EVP_PKEY *pkey) {
     /* https://wiki.openssl.org/index.php/EVP_Signing_and_Verifying
      * Message to be signed is contained in `msg` and has length `msg_len`.
      * Signature will be stored in `*sig` and its length will be written to
@@ -402,7 +402,7 @@ void ffisignMsg(uint8_t *const in, uint64_t const in_len, uint8_t *const out, ui
     OPENSSL_free(pkey);
 }
 
-bool digestVerify(uint8_t const *msg, size_t const msg_len, uint8_t const *sig, const size_t sig_len, EVP_PKEY *key, bool *verified) {
+bool digest_verify(uint8_t const *msg, size_t const msg_len, uint8_t const *sig, const size_t sig_len, EVP_PKEY *key, bool *verified) {
     /* https://wiki.openssl.org/index.php/EVP_Signing_and_Verifying
      * Takes a message `msg`, of length `msg_len`, and a signature `sig`, of
      * length `sig_len`, verifies the pair with the public key `key`, and stores
@@ -491,7 +491,7 @@ void ffisigCheck(uint8_t *const in, uint64_t const in_len, uint8_t *const out, u
     uint8_t *msg = (uint8_t *)OPENSSL_malloc(msg_len);
     memcpy(msg, in + PUB_KEY_LEN + SIG_LEN, msg_len);
     bool verified = false;
-    assert(digestVerify(msg, msg_len, sig, SIG_LEN, pub_key, &verified));
+    assert(digest_verify(msg, msg_len, sig, SIG_LEN, pub_key, &verified));
     out[0] = verified ? FFI_SUCCESS : FFI_FAILURE;
     OPENSSL_free(pub);
     OPENSSL_free(sig);
