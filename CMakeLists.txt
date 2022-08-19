@@ -43,10 +43,19 @@ get_files(posix_src_tpm ${crypto_src_tpm}
 system/posix/sockets/SocketFFI.sml system/posix/time/TimeFFI.sml
 system/posix/meas/MeasFFI.sml)
 
-get_files(cop_src ${util_src} ${posix_src} stubs/BS.sml
+get_files(cop_src ${util_src} ${posix_src}
+stubs/BS.sml
 extracted/Datatypes.cml
-extracted/Term_Defs_Core.cml stubs/Params_Admits_hardcoded.cml
-extracted/Term_Defs.cml copland/CoplandUtil.sml stubs/Axioms_Io.cml
+extracted/OptMonad_Coq.cml
+extracted/Term_Defs_Core.cml
+extracted/Appraisal_Evidence.cml
+extracted/ConcreteEvidence.cml
+stubs/Params_Admits_hardcoded.cml
+extracted/Term_Defs.cml
+stubs/Appraisal_IO_Stubs_New.sml
+extracted/Appraisal_Defs_New.cml
+extracted/Impl_appraisal.cml
+copland/CoplandUtil.sml stubs/Axioms_Io.cml
 extracted/Evidence_Bundlers.cml extracted/StMonad_Coq.cml
 extracted/Cvm_St.cml extracted/IO_Type.cml
 copland/json/CoplandToJson.sml
