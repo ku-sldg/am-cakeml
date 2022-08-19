@@ -1,0 +1,20 @@
+(** val build_app_comp_evC :
+    coq_Evidence -> coq_RawEv -> coq_EvidenceC coq_Opt **)
+
+fun build_app_comp_evC et ls =
+  case et of
+    Coq_uu p fwd params et' =>
+    bind (peel_bs ls) (fn x =>
+      let val Coq_pair bs ls' = x in
+      (case fwd of
+         COMP => ret Coq_mtc
+       | ENCR =>
+         bind (decrypt_bs_to_rawev bs params) (fn decrypted_ls =>
+           bind (build_app_comp_evC et' decrypted_ls) (fn rest =>
+             ret (Coq_eec p params default_bs rest)))
+       | EXTD =>
+         bind (checkGG params p bs ls') (fn v =>
+           bind (build_app_comp_evC et' ls') (fn rest =>
+             ret (Coq_ggc p params v rest)))
+       | KILL => ret (Coq_kkc p params et')) end)
+  | _ => ret Coq_mtc

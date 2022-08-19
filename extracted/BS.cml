@@ -1,0 +1,6 @@
+type coq_BS (* AXIOM TO BE REALIZED *)
+
+(** val default_bs : coq_BS **)
+
+val default_bs =
+  failwith "AXIOM TO BE REALIZED"

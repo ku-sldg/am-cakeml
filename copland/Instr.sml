@@ -70,7 +70,7 @@ fun termToString t = concatWith " "
 type n_id = id
 val nIdToString = idToString
 
-local type bs = BString.bstring in
+(* local type bs = BString.bstring in *)
 datatype ev =
       Mt
     | U asp_id (arg list) bs ev
@@ -79,7 +79,7 @@ datatype ev =
     | N n_id bs ev
     | SS ev ev
     | PP ev ev
-end
+(* end *)
 
 fun evToString e = concatWith " "
     let fun parens e = "(" ^ evToString e ^ ")"

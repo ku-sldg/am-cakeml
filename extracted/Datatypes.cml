@@ -1,0 +1,14 @@
+datatype ('a, 'b) prod =
+  Coq_pair 'a 'b
+
+(** val snd : ('a1, 'a2) prod -> 'a2 **)
+
+fun snd p = case p of
+  Coq_pair _ y => y
+
+(** val app : 'a1 list -> 'a1 list -> 'a1 list **)
+
+fun app l m =
+  case l of
+    [] => m
+  | a :: l1 => a :: (app l1 m)

@@ -1,0 +1,3 @@
+(** val add : nat -> nat -> nat **)
+
+fun add = (+)

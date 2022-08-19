@@ -1,0 +1,31 @@
+(** val cons_gg :
+    coq_BS -> coq_EvC -> coq_Plc -> coq_ASP_PARAMS -> coq_EvC **)
+
+fun cons_gg sig0 e p ps =
+  let val Coq_evc bits et = e in
+  Coq_evc (sig0 :: bits) (Coq_uu p EXTD ps et) end
+
+(** val cons_hsh :
+    coq_BS -> coq_EvC -> coq_Plc -> coq_ASP_PARAMS -> coq_EvC **)
+
+fun cons_hsh hsh e p ps =
+  let val Coq_evc _ et = e in Coq_evc (hsh :: []) (Coq_uu p COMP ps et) end
+
+(** val cons_enc :
+    coq_BS -> coq_EvC -> coq_Plc -> coq_ASP_PARAMS -> coq_EvC **)
+
+fun cons_enc enc e p ps =
+  let val Coq_evc _ et = e in Coq_evc (enc :: []) (Coq_uu p ENCR ps et) end
+
+(** val cons_kill :
+    coq_BS -> coq_EvC -> coq_Plc -> coq_ASP_PARAMS -> coq_EvC **)
+
+fun cons_kill _ e p ps =
+  let val Coq_evc _ et = e in Coq_evc [] (Coq_uu p KILL ps et) end
+
+(** val ss_cons : coq_EvC -> coq_EvC -> coq_EvC **)
+
+fun ss_cons e1 e2 =
+  let val Coq_evc bits1 et1 = e1 in
+  let val Coq_evc bits2 et2 = e2 in
+  Coq_evc (app bits1 bits2) (Coq_ss et1 et2) end end

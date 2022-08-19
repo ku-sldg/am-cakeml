@@ -1,0 +1,36 @@
+(** val do_asp : coq_ASP_PARAMS -> coq_RawEv -> coq_BS **)
+
+val do_asp =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val doRemote_session : coq_Term -> coq_Plc -> coq_EvC -> coq_EvC **)
+
+val doRemote_session =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val parallel_vm_thread : coq_Loc -> coq_EvC **)
+
+val parallel_vm_thread =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val do_asp' : coq_ASP_PARAMS -> coq_RawEv -> coq_BS coq_IO **)
+
+fun do_asp' params e =
+  ret (do_asp params e)
+
+(** val doRemote_session' :
+    coq_Term -> coq_Plc -> coq_EvC -> coq_EvC coq_IO **)
+
+fun doRemote_session' t pTo e =
+  ret (doRemote_session t pTo e)
+
+(** val do_start_par_thread :
+    coq_Loc -> coq_Core_Term -> coq_RawEv -> unit coq_IO **)
+
+fun do_start_par_thread _ _ _ =
+  ret ()
+
+(** val do_wait_par_thread : coq_Loc -> coq_EvC coq_IO **)
+
+fun do_wait_par_thread loc =
+  ret (parallel_vm_thread loc)

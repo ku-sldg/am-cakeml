@@ -1,7 +1,7 @@
 (* Depends on: util, copland, system/crypto, am/Measurements, am/CommTypes,
    am/ServerAm*)
 
-val am = serverAm (BString.empty) emptyNsMap
+(* val am = serverAm (BString.empty) emptyNsMap *)
 
 (* Examples *)
 val goldenFileHash = BString.unshow "DDAF35A193617ABACC417349AE20413112E6FA4E89A97EA20A9EEEE64B55D39A2192992A274FC1A836BA3C23A3FEEBBD454D4423643CE80E2A9AC94FA54CA49F"
@@ -21,12 +21,21 @@ Expected result:
 DDAF35A193617ABACC417349AE20413112E6FA4E89A97EA20A9EEEE64B55D39A2192992A274FC1A836BA3C23A3FEEBBD454D4423643CE80E2A9AC94FA54CA49F
 *)
 
+fun copTests () =
+    let val t = demo_phrase
+        val res = run_cvm_fresh t
+    in print ("Phrase ran: \n" ^ (termToString demo_phrase) ^ "\n\n" ^
+              "Cvm_St result: \n" ^ (cvm_st_ToString res)
+             )
+    end
+    handle (Meas.Err s) => TextIO.print_err ("ERROR: " ^ s ^ "\n")
+
 fun hashTests () =
-    let val evidence  = H (BString.fromString "abc")
-        val hashTest  = evToString (evalTerm am evidence (Asp Hsh))
+    let (* val evidence  = H (BString.fromString "abc") *)
+        (*val hashTest  = evToString (evalTerm am evidence (Asp Hsh)) *)
         val hashFilev = Meas.hashFile "hashTest.txt"
         val hashFileS = BString.show hashFilev
-     in print ("Hash test: "      ^ hashTest  ^ "\n\n" ^
+     in print ((* "Hash test: "      ^ hashTest  ^ "\n\n" ^ *)
                "Hash file test: \n" ^ hashFileS ^ "\n" ^
                (if hashFilev = goldenFileHash then "Golden Value Check:  Passed" else "Golden Value Check:  Failed") ^ "\n\n")
     end
@@ -39,7 +48,7 @@ Expected result(composite hash):
 7BE9FDA48F4179E611C698A73CFF09FAF72869431EFEE6EAAD14DE0CB44BBF66503F752B7A8EB17083355F3CE6EB7D2806F236B25AF96A24E22B887405C20081
 *)
 fun hashDirTest () =
-    let val hashDirv = hashDir "testDir" ""
+    let val hashDirv = BString.empty (* hashDir "testDir" "" *)
         val hashDirS = BString.show hashDirv
      in print ("Hash directory test: \n" ^ hashDirS ^ "\n" ^
               (if hashDirv = goldenDirHash then "Golden Value Check:  Passed" else "Golden Value Check:  Failed") ^ "\n\n")
@@ -118,9 +127,11 @@ fun encryptTest () =
 
 (* Run all tests *)
 fun main () = (
+    copTests ()
+    (*
     hashTests ();
     hashDirTest ();
-    nonceTest ();
+    nonceTest (); *)
     sigTest ();
     encryptTest ()
 ) handle Meas.Err msg => TextIO.print_err ("Meas err: " ^ msg ^ "\n")

@@ -1,0 +1,9 @@
+datatype cvm_st =
+  Coq_mk_st coq_EvC (coq_Ev list) coq_Plc coq_Event_ID
+
+(** val empty_vmst : cvm_st **)
+
+val empty_vmst =
+  Coq_mk_st (Coq_evc [] Coq_mt) [] O O
+
+type 'a coq_CVM = (cvm_st, 'a) coq_St

@@ -1,0 +1,18 @@
+type 'a coq_Opt = 'a option
+
+(** val ret : 'a1 -> 'a1 coq_Opt **)
+
+fun ret a =
+  Some a
+
+(** val bind : 'a1 coq_Opt -> ('a1 -> 'a2 coq_Opt) -> 'a2 coq_Opt **)
+
+fun bind m f =
+  case m of
+    Some v => f v
+  | None => None
+
+(** val failm : 'a1 coq_Opt **)
+
+val failm =
+  None
