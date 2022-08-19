@@ -127,7 +127,7 @@ fun encryptTest () =
 
 (* Run all tests *)
 fun main () = (
-    copTests ()
+    copTests ();
     (*
     hashTests ();
     hashDirTest ();
