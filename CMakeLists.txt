@@ -50,12 +50,12 @@ extracted/OptMonad_Coq.cml
 extracted/Term_Defs_Core.cml
 extracted/Appraisal_Evidence.cml
 extracted/ConcreteEvidence.cml
-stubs/Params_Admits_hardcoded.cml
+stubs/Params_Admits_hardcoded.sml
 extracted/Term_Defs.cml
 stubs/Appraisal_IO_Stubs_New.sml
 extracted/Appraisal_Defs_New.cml
 extracted/Impl_appraisal.cml
-copland/CoplandUtil.sml stubs/Axioms_Io.cml
+copland/CoplandUtil.sml stubs/Axioms_Io.sml
 extracted/Evidence_Bundlers.cml extracted/StMonad_Coq.cml
 extracted/Cvm_St.cml extracted/IO_Type.cml
 copland/json/CoplandToJson.sml
@@ -64,7 +64,7 @@ am/CommTypes.sml
 copland/Parser.sml
 am/ServerAM.sml
 am/CoplandCommUtil.sml
-stubs/Example_Phrases_Demo_Admits.cml
+stubs/Example_Phrases_Demo_Admits.sml
 stubs/IO_Stubs.sml
 extracted/Cvm_Monad.cml
 extracted/Cvm_Impl.cml

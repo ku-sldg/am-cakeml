@@ -8,44 +8,49 @@ fun stringListToJsonList args  =  Json.fromList (List.map stringToJson args)
 
 fun byteStringToJson bs = Json.fromString (BString.show bs)
 
-                                          (*
-
-fun idToJson (Id a) = Json.fromInt (natToInt a)
-                                          *)
-
 fun aspIdToJson i = Json.fromString i
 
 fun targIdToJson i = Json.fromString i
 
 fun placeToJson pl = Json.fromInt (natToInt pl)
-                           
+
+(* spPairToJson : (coq_SP * coq_SP) -> json *)
 fun spPairToJson (sp1, sp2) =
     Json.fromList
         [Json.fromString  (spToString sp1), Json.fromString (spToString sp2)]
-                              
+        
+(* spProdToJson : (coq_SP, coq_SP) prod -> json 
+   NOTE:  `prod` is the Coq pair type extracted naively to cakeml 
+*)                             
 fun spProdToJson sp =
     case sp of
         Coq_pair sp1 sp2 => spPairToJson (sp1,sp2)                            
-                                  
+
+(* nsMapToJson : am/CommTypes.nsMap -> json 
+   type nsMap = ((coq_Plc, addr) map)
+*)
 fun nsMapToJson map =
     let fun jsonify (pl, addr) = (plToString pl, Json.fromString addr)
     in Json.fromPairList (List.map jsonify (Map.toAscList map))
     end
 
         
-
+(* noArgConstructor : string -> json *)
 fun noArgConstructor cName =
     Json.fromPairList [("constructor", stringToJson cName )]
 
+(* constructorWithArgs : string -> (json list) -> json *)
 fun constructorWithArgs cName arglist =
     Json.fromPairList [("constructor", stringToJson cName),
                        ("data", Json.Array arglist)]
 
+(* spToJson : coq_SP -> json *)
 fun spToJson sp = stringToJson (spToString sp)
 
+(* fwdToJson : coq_FWD -> json *)
 fun fwdToJson fwd = stringToJson (fwdToString fwd)
 
-                                 
+(* aspParamsToJson : coq_ASP_PARAMS -> json *)                               
 fun aspParamsToJson ps =
     case ps of
         Coq_asp_paramsC i args tpl tid =>
@@ -58,33 +63,33 @@ fun aspParamsToJson ps =
 fun aspToJson asp = case asp of
       NULL => noArgConstructor "Null"
     | CPY  => noArgConstructor "Cpy"
-    | ASPC sp fwd ps => constructorWithArgs "Aspc"
-                                            [spToJson sp, fwdToJson fwd, aspParamsToJson ps]
+    | ASPC sp fwd ps =>
+      constructorWithArgs "Aspc"
+                          [spToJson sp, fwdToJson fwd, aspParamsToJson ps]
     | SIG => noArgConstructor "Sig"
     | HSH => noArgConstructor "Hsh"
     | ENC q => constructorWithArgs "Enc" [placeToJson q]
-                              
-                      
-(*
-fun aspToJson asp = case asp of
-      Cpy => noArgConstructor "Cpy"
-    | Aspc aspid args => constructorWithArgs "Aspc" [idToJson aspid, stringListToJsonList args]
-    | Sig => noArgConstructor "Sig"
-    | Hsh => noArgConstructor "Hsh"
-*)
 
-
-                              
-
+(* termToJson : coq_Term -> json *)
 fun termToJson term = case term of
-      Coq_asp asp      => constructorWithArgs "Asp"  [aspToJson asp]
-    | Coq_att pl t     => constructorWithArgs "Att"  [placeToJson pl, termToJson t]
-    | Coq_lseq t1 t2   => constructorWithArgs "Lseq" [termToJson t1, termToJson t2]
-    | Coq_bseq p t1 t2 => constructorWithArgs "Bseq" [spProdToJson p, termToJson t1, termToJson t2]
-    | Coq_bpar p t1 t2 => constructorWithArgs "Bpar" [spProdToJson p, termToJson t1, termToJson t2]
-    |  _ => raise  Json.Exn "termToJson" "Unexpected constructor for APDT term: "
+      Coq_asp asp => constructorWithArgs "Asp"  [aspToJson asp]
+    | Coq_att pl t => constructorWithArgs "Att"  [placeToJson pl, termToJson t]
+    | Coq_lseq t1 t2 =>
+      constructorWithArgs "Lseq"
+                          [termToJson t1, termToJson t2]
+    | Coq_bseq p t1 t2 =>
+      constructorWithArgs "Bseq"
+                          [spProdToJson p, termToJson t1, termToJson t2]
+    | Coq_bpar p t1 t2 =>
+      constructorWithArgs "Bpar"
+                          [spProdToJson p, termToJson t1, termToJson t2]
+    |  _ =>
+       raise  Json.Exn "termToJson" "Unexpected constructor for APDT term: "
 
-                   (*
+
+
+
+(*
 fun evToJson e = case e of
       Mt => noArgConstructor "Mt"
     | U aid args bs ev => constructorWithArgs "U" [idToJson aid, stringListToJsonList args, byteStringToJson bs, evToJson ev]

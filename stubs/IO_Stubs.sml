@@ -1,3 +1,6 @@
+(* Dependencies:  extracted/Term_Defs_Core.cml, extracted/Term_Defs.cml, 
+     stubs/BS.sml, am/CoplandCommUtil.sml, ... (TODO: more IO dependencies?) *)
+
 (** val do_asp : coq_ASP_PARAMS -> coq_RawEv -> coq_BS **)
 
 

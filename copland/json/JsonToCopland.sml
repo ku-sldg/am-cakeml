@@ -1,4 +1,4 @@
-(* Depends on: util, copland/Instr *)
+(* Depends on: util, extracted/ *)
 
 (* spFromString :: string -> coq_SP *)
 fun spFromString n =
@@ -8,30 +8,30 @@ fun spFromString n =
 
 (* fwdFromString :: string -> coq_FWD *)
 fun fwdFromString n =
-    case n
-    of  "COMP" => COMP
-    |   "EXTD" => EXTD
-    | "ENCR" => ENCR
-    | "KILL" => KILL
+    case n of
+        "COMP" => COMP
+      | "EXTD" => EXTD
+      | "ENCR" => ENCR
+      | "KILL" => KILL
 
 fun jsonStringToString (Json.String s) = s
 fun jsonStringListToList (Json.Array args) =
     List.map jsonStringToString args
 
+(* jsonStringToBS : json -> coq_BS *)
 fun jsonStringToBS (Json.String s) = BString.unshow s
 
+(* jsonBsListToList : json -> coq_BS list *)
 fun jsonBsListToList (Json.Array args) =
     List.map jsonStringToBS args
 
                                                     
 
-(* json object to Copland phrase
-   
-   jsonToTerm :: json -> coq_Term 
- *)                                           
+(* jsonToTerm : json -> coq_Term 
+   (json object to Copland phrase)  *)      
 fun jsonToTerm js = case (Json.toMap js) of
-                    (* Json.toMap :: json -> ((string,json) map) option *)
-      Some js' => fromAList (Map.toAscList js') (* js' :: (string,json) map *)
+                    (* Json.toMap : json -> ((string,json) map) option *)
+      Some js' => fromAList (Map.toAscList js') (* js' : (string,json) map *)
     | None =>
         raise Json.Exn "jsonToTerm" "Copland term does not begin as an AList"
 
@@ -54,10 +54,11 @@ and
           | "Lseq" => getLseq args
                               
           | "Bseq" => getBseq args
-                              (*
+                              
           | "Bpar" => getBpar args
-        |  _ => raise Json.Exn "getTerm" ("Unexpected constructor for Copland term: " ^ constructor)
-*)
+          |  _ => raise Json.Exn "getTerm"
+                        ("Unexpected constructor for Copland term: " ^
+                         constructor)
                      
                     
     and
@@ -128,20 +129,6 @@ and
         | "Hsh" => HSH
         | _ => raise Json.Exn "getAspNullaryConstructor" ("Unexpected constructor for Copland Asp term: " ^ constructor)
 
-         
-
-    (*
-    getAspc (Json.Array args) = case args of
-          [Json.Int aspId, args] => ASPC (Id (natFromInt aspId)) (jsonStringListToList args)
-        | _ => raise Json.Exn "getAspc" "unexpected argument list"
-    *)
-(*
-    and
-    getAtt data = Coq_asp NULL
-    case data of
-          [ Json.Int place, term] => Att(natFromInt place) (jsonToTerm term)
-        | _ => raise  Json.Exn "getAtt" "unexpected argument list"
-*)
     and
     getAtt data =
     case data of
@@ -164,7 +151,12 @@ and
             Coq_bpar (Coq_pair (spFromString sp1) (spFromString sp2)) (jsonToTerm term1) (jsonToTerm term2)
         | _ => raise  Json.Exn "getBpar" "unexpected argument list"
 
-(*                    
+
+
+
+
+                      
+(*  TODO:  need to update evidence (which kind?) json representation below
 
 (* json object to ev object *)
 fun jsonToEv js = case (Json.toMap js) of

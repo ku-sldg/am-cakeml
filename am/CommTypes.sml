@@ -1,4 +1,4 @@
-(* Depends on: util, copland/Instr,
+(* Depends on: util, extracted/,
    copland/Json/CoplandToJson *)
 
 type addr = string

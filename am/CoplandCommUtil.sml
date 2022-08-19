@@ -22,9 +22,10 @@ fun sendReq t toPl nsMap evv (* am key *) =
     let val fromPl = O
         val resev = socketDispatch fromPl nsMap toPl evv t
     in
-        (print ("Sent term:\n" ^ termToString t ^ "\n\nInitial raw evidence:\n" ^
-                rawEvToString evv ^ "\nRaw evidence received:\n" ^ rawEvToString resev ^ "\n\n")); (* ^ "\n\nEvidence recieved:\n" ^
-               (rawEvToString resev) )); *)
+        (print ("Sent term:\n" ^ termToString t ^
+                "\n\nInitial raw evidence:\n" ^
+                rawEvToString evv ^ "\nRaw evidence received:\n" ^
+                rawEvToString resev ^ "\n\n"));
         resev
     end
 (*
