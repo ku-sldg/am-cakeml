@@ -25,14 +25,14 @@ fun copTests () =
     let val t = demo_phrase
         val res = run_cvm_fresh t
     in print ("Phrase ran: \n" ^ (termToString demo_phrase) ^ "\n\n" ^
-              "Cvm_St result: \n" ^ (cvm_st_ToString res)
+              "Cvm_St result: \n" ^ (cvm_st_ToString res) ^ "\n"
              )
     end
     handle (Meas.Err s) => TextIO.print_err ("ERROR: " ^ s ^ "\n")
 
 fun hashTests () =
     let (* val evidence  = H (BString.fromString "abc") *)
-        (*val hashTest  = evToString (evalTerm am evidence (Asp Hsh)) *)
+        (* val hashTest  = evToString (evalTerm am evidence (Asp Hsh)) *)
         val hashFilev = Meas.hashFile "hashTest.txt"
         val hashFileS = BString.show hashFilev
      in print ((* "Hash test: "      ^ hashTest  ^ "\n\n" ^ *)

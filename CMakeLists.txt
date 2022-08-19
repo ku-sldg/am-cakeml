@@ -62,7 +62,7 @@ copland/json/CoplandToJson.sml
 copland/json/JsonToCopland.sml
 am/CommTypes.sml
 copland/Parser.sml
-am/ServerAM.sml
+am/ServerAm.sml
 am/CoplandCommUtil.sml
 stubs/Example_Phrases_Demo_Admits.sml
 stubs/IO_Stubs.sml
@@ -73,7 +73,7 @@ copland/CvmUtil.sml
 extracted/Example_Phrases_Demo.cml
 copland/Parser)
 
-get_files(server_am_src ${cop_src} ${posix_src} am/ServerAM.sml)
+get_files(server_am_src ${cop_src} ${posix_src} am/ServerAm.sml)
 get_files(server_am_src_hacl ${cop_src} ${posix_src_hacl} )
 get_files(server_am_src_tpm ${cop_src} ${posix_src_tpm} )
 
