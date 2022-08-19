@@ -19,7 +19,7 @@
 #include <sys/mman.h>
 
 // External call to sha512 in `./system/crypto/openssl/crypto_ffi.c`.
-bool sha512(uint8_t const *, size_t const, uint8_t *);
+bool sha512(const uint8_t *, const size_t, uint8_t *);
 
 #define FFI_SUCCESS 0
 #define FFI_FAILURE 1
