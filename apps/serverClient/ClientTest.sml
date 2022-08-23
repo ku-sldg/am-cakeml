@@ -87,6 +87,10 @@ fun main () = (* sendReq term *)
                     ^ "e.g.   " ^ name ^ " config.ini\n")
         val toPl = S O
         val myPl = O
+        val enc_test = decode_RawEv (encode_RawEv [(BString.fromString "one"),
+                                                   (BString.fromString "two"),
+                                                   (BString.fromString "three")])
+        (* val dec_test = decode_RawEv enc_test *)
      in case CommandLine.arguments () of
               [fileName] => (
                   case parseIniFile fileName of
@@ -98,7 +102,9 @@ fun main () = (* sendReq term *)
                          Err e => let val _ = O in
                                        TextIOExtra.printLn_err e
                                   end
-                       | Ok nsMap => let val _ = O in 
+                       | Ok nsMap => let val _ = O in
+                                         (* print ("Enc test: " ^ (BString.toString enc_test)); *)
+                                         print ("Dec test: " ^ (rawEvToString enc_test));
                                          print "\nSending Request in ClientTest\n\n";
                                          let val rawev_res = sendReq term toPl nsMap []
                                              val et_computed = eval term myPl Coq_mt

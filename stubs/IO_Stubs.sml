@@ -1,6 +1,24 @@
 (* Dependencies:  extracted/Term_Defs_Core.cml, extracted/Term_Defs.cml, 
      stubs/BS.sml, am/CoplandCommUtil.sml, ... (TODO: more IO dependencies?) *)
 
+(* 
+   fun encode_RawEv : coq_RawEv -> coq_BS 
+
+   This function takes a coq_RawEv value (list of coq_BS values) and encodes it as a single
+   coq_BS value (to, for instance prepare it for cryptographic transformation).  To encode, 
+   we first take the raw evidence sequence to an Array of Json strings (am/CommTypes.bsListToJsonList).
+   Next, we "stringify" that Array (am/ServerAM.jsonToStr) to a single string.  Finally, we lift
+   that string into a bstring (BString.fromString).
+*)
+fun encode_RawEv ls = BString.fromString (jsonToStr (bsListToJsonList ls))
+
+(* 
+   fun decode_RawEv : coq_BS -> coq_RawEv
+   This should be the inverse of encode_RawEv.
+*)
+fun decode_RawEv bsval = jsonBsListToList (strToJson (BString.toString bsval))
+
+
 (** val do_asp : coq_ASP_PARAMS -> coq_RawEv -> coq_BS **)
 
 
