@@ -4,17 +4,28 @@
 fun build_app_comp_evC et ls =
   case et of
     Coq_uu p fwd params et' =>
-    bind (peel_bs ls) (fn x =>
-      let val Coq_pair bs ls' = x in
-      (case fwd of
-         COMP => ret Coq_mtc
-       | ENCR =>
+    (case fwd of
+       ENCR =>
+       bind (peel_bs ls) (fn x =>
+         let val Coq_pair bs _ = x in
          bind (decrypt_bs_to_rawev bs params) (fn decrypted_ls =>
            bind (build_app_comp_evC et' decrypted_ls) (fn rest =>
-             ret (Coq_eec p params default_bs rest)))
-       | EXTD =>
+             ret (Coq_eec p params default_bs rest))) end)
+     | EXTD =>
+       bind (peel_bs ls) (fn x =>
+         let val Coq_pair bs ls' = x in
          bind (checkGG params p bs ls') (fn v =>
            bind (build_app_comp_evC et' ls') (fn rest =>
-             ret (Coq_ggc p params v rest)))
-       | KILL => ret (Coq_kkc p params et')) end)
+             ret (Coq_ggc p params v rest))) end)
+     | _ => ret Coq_mtc)
+  | Coq_ss et1 et2 =>
+    bind (build_app_comp_evC et1 (firstn (et_size et1) ls)) (fn x =>
+      bind (build_app_comp_evC et2 (skipn (et_size et1) ls)) (fn y =>
+        ret (Coq_ssc x y)))
   | _ => ret Coq_mtc
+
+(** val run_gen_appraise :
+    coq_Term -> coq_Plc -> coq_Evidence -> coq_RawEv -> coq_EvidenceC **)
+
+fun run_gen_appraise t p et ls =
+  fromSome Coq_mtc (build_app_comp_evC (eval t p et) ls)

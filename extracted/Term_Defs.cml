@@ -52,6 +52,18 @@ fun copland_compile t = case t of
         Coq_bparc O (Coq_lseqc (Coq_aspc CLEAR) (copland_compile t1))
           (Coq_lseqc (Coq_aspc CLEAR) (copland_compile t2)))) end
 
+(** val et_size : coq_Evidence -> nat **)
+
+fun et_size e = case e of
+  Coq_mt => O
+| Coq_nn _ => S O
+| Coq_uu _ fwd _ e' =>
+  (case fwd of
+     EXTD => add (S O) (et_size e')
+   | KILL => O
+   | _ => S O)
+| Coq_ss e1 e2 => add (et_size e1) (et_size e2)
+
 type coq_RawEv = coq_BS list
 
 datatype coq_EvC =
@@ -71,6 +83,50 @@ fun get_et e = case e of
 
 fun get_bits e = case e of
   Coq_evc ls _ => ls
+
+(** val splitEv_T_l : coq_Split -> coq_Evidence -> coq_Evidence **)
+
+fun splitEv_T_l sp e =
+  let val Coq_pair s _ = sp in (case s of
+                                  ALL => e
+                                | NONE => Coq_mt) end
+
+(** val splitEv_T_r : coq_Split -> coq_Evidence -> coq_Evidence **)
+
+fun splitEv_T_r sp e =
+  let val Coq_pair _ s0 = sp in (case s0 of
+                                   ALL => e
+                                 | NONE => Coq_mt) end
+
+(** val sp_ev : coq_SP -> coq_Evidence -> coq_Evidence **)
+
+fun sp_ev sp e =
+  case sp of
+    ALL => e
+  | NONE => Coq_mt
+
+(** val eval_asp : coq_ASP -> coq_Plc -> coq_Evidence -> coq_Evidence **)
+
+fun eval_asp t p e =
+  case t of
+    NULL => Coq_mt
+  | CPY => e
+  | ASPC sp fwd params => Coq_uu p fwd params (sp_ev sp e)
+  | SIG => Coq_uu p EXTD sig_params e
+  | HSH => Coq_uu p COMP hsh_params e
+  | ENC q => Coq_uu p ENCR (enc_params q) e
+
+(** val eval : coq_Term -> coq_Plc -> coq_Evidence -> coq_Evidence **)
+
+fun eval t p e =
+  case t of
+    Coq_asp a => eval_asp a p e
+  | Coq_att q t1 => eval t1 q e
+  | Coq_lseq t1 t2 => eval t2 p (eval t1 p e)
+  | Coq_bseq s t1 t2 =>
+    Coq_ss (eval t1 p (splitEv_T_l s e)) (eval t2 p (splitEv_T_r s e))
+  | Coq_bpar s t1 t2 =>
+    Coq_ss (eval t1 p (splitEv_T_l s e)) (eval t2 p (splitEv_T_r s e))
 
 datatype coq_Ev =
   Coq_null nat coq_Plc

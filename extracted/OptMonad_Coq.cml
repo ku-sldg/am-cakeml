@@ -16,3 +16,9 @@ fun bind m f =
 
 val failm =
   None
+
+(** val fromSome : 'a1 -> 'a1 coq_Opt -> 'a1 **)
+
+fun fromSome default opt = case opt of
+  Some x => x
+| None => default

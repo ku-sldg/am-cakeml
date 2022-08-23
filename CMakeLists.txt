@@ -46,16 +46,18 @@ system/posix/time/TimeFFI.sml system/posix/meas/MeasFFI.sml)
 get_files(cop_src ${util_src} ${posix_src}
 stubs/BS.sml
 extracted/Datatypes.cml
+extracted/List.cml
 extracted/OptMonad_Coq.cml
 extracted/Term_Defs_Core.cml
 extracted/Appraisal_Evidence.cml
 extracted/ConcreteEvidence.cml
 stubs/Params_Admits_hardcoded.sml
 extracted/Term_Defs.cml
+copland/CoplandUtil.sml
 stubs/Appraisal_IO_Stubs_New.sml
 extracted/Appraisal_Defs_New.cml
 extracted/Impl_appraisal.cml
-copland/CoplandUtil.sml stubs/Axioms_Io.sml
+stubs/Axioms_Io.sml
 extracted/Evidence_Bundlers.cml extracted/StMonad_Coq.cml
 extracted/Cvm_St.cml extracted/IO_Type.cml
 copland/json/CoplandToJson.sml

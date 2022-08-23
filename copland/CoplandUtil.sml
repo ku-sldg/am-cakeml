@@ -91,8 +91,8 @@ fun evidenceCToString e = concatWith " "
                                    BString.toString bs, evToString et]
           | Coq_eec p ps bs e' => ["EEc", plToString p, aspParamsToString ps,
                                    BString.toString bs, parens e']
-          | Coq_kkc p ps et => ["KKc", plToString p, aspParamsToString ps,
-                                evToString et]
+          (* | Coq_kkc p ps et => ["KKc", plToString p, aspParamsToString ps,
+                                evToString et] *)
           | Coq_ssc ev1 ev2   => ["SSc", parens ev1, parens ev2]
     end
 

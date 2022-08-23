@@ -3,7 +3,7 @@
 val dir = "testDir"
 
 val subterm = demo_phrase (* (Asp (Aspc (Id (S O)) [dir])) *)
-val term = Coq_att (S (S O)) subterm (* Att (S O) (Lseq subterm (Asp Sig)) *)
+val term = subterm (* Coq_att (S (S O)) subterm *) (* Att (S O) (Lseq subterm (Asp Sig)) *)
 
 
                    (*
@@ -86,24 +86,33 @@ fun main () = (* sendReq term *)
         val usage = ("Usage: " ^ name ^ " configurationFile\n"
                     ^ "e.g.   " ^ name ^ " config.ini\n")
         val toPl = S O
+        val myPl = O
      in case CommandLine.arguments () of
               [fileName] => (
                   case parseIniFile fileName of
                     Err e  =>  let val _ = O in
-                                    TextIOExtra.printLn_err e; []
+                                    TextIOExtra.printLn_err e
                                end
                    | Ok ini =>
                      case (iniServerAm ini) of
                          Err e => let val _ = O in
-                                       TextIOExtra.printLn_err e; []
+                                       TextIOExtra.printLn_err e
                                   end
-                       | Ok nsMap => let val _ = O in
-                                         print "\nSending Request in ClientTest\n\n"; 
-                                         sendReq term toPl nsMap []
+                       | Ok nsMap => let val _ = O in 
+                                         print "\nSending Request in ClientTest\n\n";
+                                         let val rawev_res = sendReq term toPl nsMap []
+                                             val et_computed = eval term myPl Coq_mt
+                                             val appraise_res = run_gen_appraise term myPl Coq_mt rawev_res in
+                                             print ("Evidence Type computed: \n" ^
+                                                    (evToString et_computed) ^ "\n\n");
+                                             print ("Appraisal EvidenceC computed: \n" ^
+                                                    evidenceCToString appraise_res ^ "\n\n")
+                                         end
+                                        
                                      end
               )
            | _ => let val _ = O in
-                       TextIOExtra.printLn_err usage; []
+                       TextIOExtra.printLn_err usage
                   end
     end
 
