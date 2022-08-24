@@ -27,7 +27,7 @@ structure Crypto = struct
             let
                 val rem = num mod modulus
             in
-                if rem = 0 then num else num + modulus - rem
+                if rem = 0 then num + ivLen else num + modulus - rem
             end
         val dataLen = 50   (* overestimated length in bytes of data.txt *)
         val tpmSigLen = 262 (* length in bytes of tpm signature *)

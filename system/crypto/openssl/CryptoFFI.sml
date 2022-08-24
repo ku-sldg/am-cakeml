@@ -24,7 +24,7 @@ structure Crypto = struct
                 val rem = num mod modulus
             in
                 print ("num in paddingCalc: " ^ (Int.toString num) ^ "\n");
-                if rem = 0 then (num + 16) else (num + modulus - rem) + 16
+                if rem = 0 then num + modulus else num + modulus - rem
             end
     in
         (* bstring -> bstring
