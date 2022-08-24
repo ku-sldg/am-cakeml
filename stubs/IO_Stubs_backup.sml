@@ -1,6 +1,23 @@
 (* Dependencies:  extracted/Term_Defs_Core.cml, extracted/Term_Defs.cml, 
      stubs/BS.sml, am/CoplandCommUtil.sml, ... (TODO: more IO dependencies?) *)
 
+(* 
+   fun encode_RawEv : coq_RawEv -> coq_BS 
+
+   This function takes a coq_RawEv value (list of coq_BS values) and encodes it as a single
+   coq_BS value (to, for instance prepare it for cryptographic transformation).  To encode, 
+   we first take the raw evidence sequence to an Array of Json strings (am/CommTypes.bsListToJsonList).
+   Next, we "stringify" that Array (am/ServerAM.jsonToStr) to a single string.  Finally, we lift
+   that string into a bstring (BString.fromString).
+*)
+fun encode_RawEv ls = BString.fromString (jsonToStr (bsListToJsonList ls))
+
+(* 
+   fun decode_RawEv : coq_BS -> coq_RawEv
+   This should be the inverse of encode_RawEv.
+*)
+fun decode_RawEv bsval = jsonBsListToList (strToJson (BString.toString bsval))
+
 
 (** val do_asp : coq_ASP_PARAMS -> coq_RawEv -> coq_BS **)
 
@@ -20,36 +37,18 @@ fun do_asp ps e =
                         True =>
                         let val _ = () in
                             print ("Matched aspid:  " ^ aspid ^ "\n");
-                            let val msg = encode_RawEv e
-                                val prikey = privGood
-                                val sigRes = Crypto.signMsg prikey msg in
-                                sigRes
-                            end
-
-                            (*
                             BString.fromString ("sig( " ^
                                                     (rawEvToString e)
-                                                    ^ " )") *)
+                                                    ^ " )")
                         end
                       | _ =>
                         case (aspid = ssl_enc_aspid) of
                             True =>
                             let val _ = () in
                                 print ("Matched aspid:  " ^ aspid ^ "\n");
-                                let val plaintext =
-                                        (*
-                                        "The quick brown fox jumped over the lazy dog." *)
-                                        
-                                        BString.toString (encode_RawEv e) 
-                                    val ciphertext = Crypto.encryptOneShot
-                                                         priv1 pub2 plaintext in
-                                    ciphertext
-                                end
-                                (*
                                 BString.fromString ("enc( " ^
                                                         (rawEvToString e)
                                                         ^ " )")
-                                *)
                             end
                           | _ =>
                             let val _ = () in

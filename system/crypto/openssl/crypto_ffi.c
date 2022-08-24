@@ -269,6 +269,10 @@ void ffisigCheck(uint8_t *const in, const size_t in_len, uint8_t *const out, con
      * | RSA_PUB_KEY_LEN..RSA_PUB_KEY_LEN + SIG_LEN - 1 | Signature |
      * | RSA_PUB_KEY_LEN + SIG_LEN..in_len | Message |
      */
+
+    printf("in_len %zu\n", in_len);
+    printf("RSA_PUB_KEY_LEN %zu\n", RSA_PUB_KEY_LEN);
+    printf("SIG_LEN %zu\n", SIG_LEN);
     assert(in_len >= RSA_PUB_KEY_LEN + SIG_LEN);
     assert(out_len >= 1);
     EVP_PKEY *pub_key = NULL;
@@ -474,6 +478,8 @@ void ffiencrypt(uint8_t *const in, size_t const in_len, uint8_t *out, size_t con
     assert((out_len + HASH_LEN >= in_len) && (out_len % IV_LEN == 0));
     size_t ciphertext_len = 0;
     assert(encrypt(in + HASH_LEN, in_len - HASH_LEN, in, in + SYM_KEY_LEN, &out, &ciphertext_len));
+    printf("out_len %zu\n", out_len);
+    printf("ciphertext_len %zu\n", ciphertext_len);
     assert(out_len >= ciphertext_len);
 }
 

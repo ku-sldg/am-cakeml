@@ -54,19 +54,20 @@ extracted/ConcreteEvidence.cml
 stubs/Params_Admits_hardcoded.sml
 extracted/Term_Defs.cml
 copland/CoplandUtil.sml
+copland/json/CoplandToJson.sml
+copland/json/JsonToCopland.sml
+am/CommTypes.sml
+stubs/IO_Stubs_extra.sml
+stubs/Example_Phrases_Demo_Admits.sml
 stubs/Appraisal_IO_Stubs_New.sml
 extracted/Appraisal_Defs_New.cml
 extracted/Impl_appraisal.cml
 stubs/Axioms_Io.sml
 extracted/Evidence_Bundlers.cml extracted/StMonad_Coq.cml
 extracted/Cvm_St.cml extracted/IO_Type.cml
-copland/json/CoplandToJson.sml
-copland/json/JsonToCopland.sml
-am/CommTypes.sml
 copland/Parser.sml
 am/ServerAm.sml
 am/CoplandCommUtil.sml
-stubs/Example_Phrases_Demo_Admits.sml
 stubs/IO_Stubs.sml
 extracted/Cvm_Monad.cml
 extracted/Cvm_Impl.cml
@@ -75,7 +76,7 @@ copland/CvmUtil.sml
 extracted/Example_Phrases_Demo.cml
 copland/Parser)
 
-get_files(server_am_src ${cop_src} ${posix_src} am/ServerAm.sml)
+get_files(server_am_src ${cop_src} ${posix_src} )
 get_files(server_am_src_hacl ${cop_src} ${posix_src_hacl} )
 get_files(server_am_src_tpm ${cop_src} ${posix_src_tpm} )
 

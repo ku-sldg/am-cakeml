@@ -23,7 +23,8 @@ structure Crypto = struct
             let
                 val rem = num mod modulus
             in
-                if rem = 0 then num else num + modulus - rem
+                print ("num in paddingCalc: " ^ (Int.toString num) ^ "\n");
+                if rem = 0 then (num + 16) else (num + modulus - rem) + 16
             end
     in
         (* bstring -> bstring
@@ -57,7 +58,12 @@ structure Crypto = struct
             if BString.length pub <> pubkeyLen then
                 raise (Err "Wrong public key size, Error in sigCheck FFI")
             else
-                FFI.callBool ffi_sigCheck (BString.concatList [pub, sign, msg])
+                let val args = (BString.concatList [pub, sign, msg])
+                    val argslen = BString.length args in
+                print ("\nsigCheck argslen size in cakeml: " ^
+                       (Int.toString argslen) ^ "\n\n");
+                    FFI.callBool ffi_sigCheck (BString.concatList [pub, sign, msg])
+                end
         
         (* int -> bstring
          * randomBytes len
@@ -85,6 +91,7 @@ structure Crypto = struct
                 val plaintext = BString.concat (BString.fromString msg) BString.nullByte
                 val padding = paddingCalc (BString.length plaintext) ivLen
             in
+                print ("padding val: " ^ (Int.toString padding) ^ "\n");
                 FFI.call ffi_encrypt padding (BString.concat secret plaintext)
             end
         
