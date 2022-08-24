@@ -7,4 +7,4 @@ get_files(tests_src ${server_am_src} Main.sml)
 build_posix_am("tests" ${tests_src})
 
 get_files(tests_src_tpm ${server_am_src_tpm} Main_tpm.sml)
-build_posix_am_tpm("tests_tpm" ${tests_src_tpm})
+#build_posix_am_tpm("tests_tpm" ${tests_src_tpm})
