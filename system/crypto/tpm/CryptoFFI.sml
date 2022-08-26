@@ -35,27 +35,27 @@ structure Crypto = struct
 
 
 
-    (* setup tpm for attestation *)
-    val tpmSetup =
-        FFI.callBool ffi_tpmSetup (BString.nulls 0)
+        (* setup tpm for attestation *)
+        fun tpmSetup () =
+            FFI.callBool ffi_tpmSetup (BString.nulls 0)
 
-    (* create_and_load_ak *) 
-    val tpmCreateSigKey =
-        FFI.callBool ffi_tpmCreateSigKey (BString.nulls 0)
+        (* create_and_load_ak *) 
+        fun tpmCreateSigKey () =
+            FFI.callBool ffi_tpmCreateSigKey (BString.nulls 0)
 
-    (* get_data *)
-    val getData =
-        FFI.call ffi_getData dataLen (BString.nulls 0)
+        (* get_data *)
+        fun getData () =
+            FFI.call ffi_getData dataLen (BString.nulls 0)
 
-    (* tpm_sig *)
-    fun tpmSign data = 
-        FFI.call ffi_tpmSign tpmSigLen data
+        (* tpm_sig *)
+        fun tpmSign data = 
+            FFI.call ffi_tpmSign tpmSigLen data
 
         (* bstring -> bstring
          * hash bs
          * Returns the SHA-512 hash of the given byte string.
          *)
-        val hash = FFI.call ffi_sha512 digestLen
+        fun hash () = FFI.call ffi_sha512 digestLen
 
         (* bstring -> bstring -> bstring
          * signMsg privKey msg
