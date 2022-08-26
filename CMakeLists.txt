@@ -28,22 +28,32 @@ get_files(util_src util/CoqDefaults.sml util/Extra.sml
 util/ByteString.sml util/Misc.sml util/Parser.sml util/Json.sml
 util/Ini.sml)
 
+
+
 get_files(crypto_src system/crypto/openssl/CryptoFFI.sml
 system/crypto/openssl/Random.sml)
+
 get_files(crypto_src_hacl system/crypto/evercrypt/CryptoFFI.sml
 system/crypto/evercrypt/Random.sml)
+
 get_files(crypto_src_tpm system/crypto/tpm/CryptoFFI.sml
 system/crypto/tpm/Random.sml)
+
+
+
 get_files(posix_src ${crypto_src} system/posix/sockets/SocketFFI.sml
 system/posix/time/TimeFFI.sml system/posix/meas/MeasFFI.sml)
+
 get_files(posix_src_hacl ${crypto_src_hacl}
 system/posix/sockets/SocketFFI.sml
 system/posix/time/TimeFFI.sml system/posix/meas/MeasFFI.sml)
+
 get_files(posix_src_tpm ${crypto_src_tpm}
 system/posix/sockets/SocketFFI.sml
 system/posix/time/TimeFFI.sml system/posix/meas/MeasFFI.sml)
 
-get_files(cop_src ${util_src} ${posix_src}
+
+get_files(cop_src 
 stubs/BS.sml
 extracted/Datatypes.cml
 extracted/List.cml
@@ -76,9 +86,11 @@ copland/CvmUtil.sml
 extracted/Example_Phrases_Demo.cml
 copland/Parser)
 
-get_files(server_am_src ${cop_src} ${posix_src} )
-get_files(server_am_src_hacl ${cop_src} ${posix_src_hacl} )
-get_files(server_am_src_tpm ${cop_src} ${posix_src_tpm} )
+get_files(server_am_src ${util_src} ${posix_src} ${cop_src} )
+get_files(server_am_src_hacl ${util_src} ${posix_src_hacl} ${cop_src} )
+get_files(server_am_src_tpm ${util_src} ${posix_src_tpm} ${cop_src} )
+
+
 
 get_files(posix_c_files
     ${BASIS_FILE}

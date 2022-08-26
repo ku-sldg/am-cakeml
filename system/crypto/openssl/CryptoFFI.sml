@@ -31,7 +31,7 @@ structure Crypto = struct
          * hash bs
          * Returns the SHA-512 hash of the given byte string.
          *)
-        val hash = FFI.call ffi_sha512 digestLen
+        fun hash () = FFI.call ffi_sha512 digestLen
 
         (* bstring -> bstring -> bstring
          * signMsg privKey msg
