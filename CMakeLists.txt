@@ -25,10 +25,8 @@ endfunction()
 set(BASIS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/system/basis_ffi.c" CACHE PATH "Filepath of basis_ffi.c to use (associated with the compiler version).")
 
 get_files(util_src util/CoqDefaults.sml util/Extra.sml
-util/ByteString.sml util/Misc.sml util/Parser.sml util/Json.sml
-util/Ini.sml)
-
-
+    util/ByteString.sml util/Misc.sml util/Parser.sml util/Json.sml
+    util/Ini.sml util/BinaryParser.sml util/Http.sml)
 
 get_files(crypto_src system/crypto/openssl/CryptoFFI.sml
 system/crypto/openssl/Random.sml)
@@ -54,41 +52,43 @@ system/posix/time/TimeFFI.sml system/posix/meas/MeasFFI.sml)
 
 
 get_files(cop_src 
-stubs/BS.sml
-extracted/Datatypes.cml
-extracted/List.cml
-extracted/OptMonad_Coq.cml
-extracted/Term_Defs_Core.cml
-extracted/Appraisal_Evidence.cml
-extracted/ConcreteEvidence.cml
-stubs/Params_Admits_hardcoded.sml
-extracted/Term_Defs.cml
-copland/CoplandUtil.sml
-copland/json/CoplandToJson.sml
-copland/json/JsonToCopland.sml
-am/CommTypes.sml
-stubs/IO_Stubs_extra.sml
-stubs/Example_Phrases_Demo_Admits.sml
-stubs/Appraisal_IO_Stubs_New.sml
-extracted/Appraisal_Defs_New.cml
-extracted/Impl_appraisal.cml
-stubs/Axioms_Io.sml
-extracted/Evidence_Bundlers.cml extracted/StMonad_Coq.cml
-extracted/Cvm_St.cml extracted/IO_Type.cml
-copland/Parser.sml
-am/ServerAm.sml
-am/CoplandCommUtil.sml
-stubs/IO_Stubs.sml
-extracted/Cvm_Monad.cml
-extracted/Cvm_Impl.cml
-extracted/Cvm_Run.cml
-copland/CvmUtil.sml
-extracted/Example_Phrases_Demo.cml
-copland/Parser)
+    stubs/BS.sml
+    extracted/Datatypes.cml
+    extracted/List.cml
+    extracted/OptMonad_Coq.cml
+    extracted/Term_Defs_Core.cml
+    extracted/Appraisal_Evidence.cml
+    extracted/ConcreteEvidence.cml
+    stubs/Params_Admits_hardcoded.sml
+    extracted/Term_Defs.cml
+    copland/CoplandUtil.sml
+    copland/json/CoplandToJson.sml
+    copland/json/JsonToCopland.sml
+    am/CommTypes.sml
+    stubs/IO_Stubs_extra.sml
+    stubs/Example_Phrases_Demo_Admits.sml
+    stubs/Appraisal_IO_Stubs_New.sml
+    extracted/Appraisal_Defs_New.cml
+    extracted/Impl_appraisal.cml
+    stubs/Axioms_Io.sml
+    extracted/Evidence_Bundlers.cml extracted/StMonad_Coq.cml
+    extracted/Cvm_St.cml extracted/IO_Type.cml
+    copland/Parser.sml
+    am/ServerAm.sml
+    am/CoplandCommUtil.sml
+    apps/blockchain/Blockchain.sml
+    apps/blockchain/HealthRecord.sml
+    stubs/IO_Stubs.sml
+    extracted/Cvm_Monad.cml
+    extracted/Cvm_Impl.cml
+    extracted/Cvm_Run.cml
+    copland/CvmUtil.sml
+    extracted/Example_Phrases_Demo.cml
+    copland/Parser)
 
-get_files(server_am_src ${util_src} ${posix_src} ${cop_src} )
-get_files(server_am_src_hacl ${util_src} ${posix_src_hacl} ${cop_src} )
-get_files(server_am_src_tpm ${util_src} ${posix_src_tpm} ${cop_src} )
+get_files(server_am_src ${util_src} ${posix_src} ${cop_src})
+get_files(server_am_src_hacl ${util_src} ${posix_src_hacl} ${cop_src})
+get_files(server_am_src_tpm ${util_src} ${posix_src_tpm} ${cop_src})
 
 
 

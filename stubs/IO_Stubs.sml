@@ -52,10 +52,41 @@ fun do_asp ps e =
                                 *)
                             end
                           | _ =>
-                            let val _ = () in
-                                print ("Matched OTHER aspid:  " ^ aspid ^ "\n");
-                                BString.fromString "v"
-                            end
+                            if aspid = pub_bc_aspid
+                            then
+                              let
+                                (* FIX IDs *)
+                                val attestId = BString.unshow "deadbeef"
+                                val targetId = BString.unshow "facefeed"
+                                (* FIX change to target IP info *)
+                                val blockchainIp =
+                                  HealthRecord.TcpIp blockchainIpAddr
+                                    blockchainIpPort
+                                val signingKey =
+                                  BString.fromString
+                                    (String.concat
+                                      (Option.getOpt
+                                        (TextIO.b_inputLinesFrom "src-pub.bin")
+                                        []))
+                                val phrase = Coq_asp NULL
+                                val hr = HealthRecord.healthRecord
+                                  targetId phrase (Json.fromBool True) None
+                                  attestId blockchainIp pub1 signingKey
+                                  (timestamp ())
+                                val hrAddResult = HealthRecord.addRecord
+                                  blockchainIpAddr blockchainIpPort jsonId
+                                  healthRecordContract userAddress targetId
+                                  attestId (HealthRecord.toJson hr)
+                              in
+                                case hrAddResult of
+                                  Ok bstring => bstring
+                                | Err str =>
+                                  (print (String.concat [str, "\n"]);
+                                  BString.nulls 1)
+                              end
+                            else
+                              (print ("Matched OTHER aspid:  " ^ aspid ^ "\n");
+                              BString.fromString "v")
                                                            
                                          
 

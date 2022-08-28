@@ -178,3 +178,9 @@ fun main () = (
 val _ = main ()
 
 *)
+
+val blockchainIpAddr = "127.0.0.1"
+val blockchainIpPort = 8543
+val jsonId = 3 (* any positive integer will do *)
+val healthRecordContract = "0x744e262E95Eb21B383947E925e73153581dC6bFF"
+val userAddress = "0xbb1db114f1535e8b01f54a5fc9ab19146fdff846"
