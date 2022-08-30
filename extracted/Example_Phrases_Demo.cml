@@ -1,13 +1,13 @@
 (** val create_and_load_ak : coq_Term **)
 
 val create_and_load_ak =
-  Coq_asp (ASPC ALL KILL (Coq_asp_paramsC cal_ak_aspid cal_ak_args source_plc
+  Coq_asp (ASPC ALL KEEP (Coq_asp_paramsC cal_ak_aspid cal_ak_args source_plc
     cal_ak_targid))
 
 (** val pub_key_to_bc : coq_Term **)
 
 val pub_key_to_bc =
-  Coq_asp (ASPC ALL KILL (Coq_asp_paramsC pub_bc_aspid pub_bc_args source_plc
+  Coq_asp (ASPC ALL KEEP (Coq_asp_paramsC pub_bc_aspid pub_bc_args source_plc
     pub_bc_targid))
 
 (** val get_data : coq_Term **)

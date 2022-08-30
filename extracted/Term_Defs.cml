@@ -61,6 +61,7 @@ fun et_size e = case e of
   (case fwd of
      EXTD => add (S O) (et_size e')
    | KILL => O
+   | KEEP => et_size e'
    | _ => S O)
 | Coq_ss e1 e2 => add (et_size e1) (et_size e2)
 
@@ -111,7 +112,11 @@ fun eval_asp t p e =
   case t of
     NULL => Coq_mt
   | CPY => e
-  | ASPC sp fwd params => Coq_uu p fwd params (sp_ev sp e)
+  | ASPC sp fwd params =>
+    (case fwd of
+       KILL => Coq_mt
+     | KEEP => sp_ev sp e
+     | _ => Coq_uu p fwd params (sp_ev sp e))
   | SIG => Coq_uu p EXTD sig_params e
   | HSH => Coq_uu p COMP hsh_params e
   | ENC q => Coq_uu p ENCR (enc_params q) e

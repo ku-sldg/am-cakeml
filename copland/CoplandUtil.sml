@@ -32,6 +32,7 @@ fun fwdToString fwd =
       | EXTD => "EXTD"
       | ENCR => "ENCR"
       | KILL => "KILL"
+      | KEEP => "KEEP"
 
 (* aspToString :: coq_ASP -> string *)
 fun aspToString asp = case asp of
