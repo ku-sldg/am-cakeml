@@ -72,9 +72,9 @@ fun checkGG'' ps p bs ls =
         val checkGood = Crypto.sigCheck pub signGood msg in
         if checkGood
         then (print ("\n\nSig Check PASSED\n\n");
-              BString.fromString "True")
+              passed_bs)
         else (print ("\n\nSig Check FAILED\n\n");
-              BString.fromString "False")
+              failed_bs)
     end
         
 
@@ -98,8 +98,16 @@ fun checkGG' ps p bs ls =
             True => checkGG'' ps p bs ls
           | _ =>
             let val _ = (print "Checking non-signature EXTD ASP ... \n\n") in
-                BString.fromString "data.txt check" (* TODO: check data val here? *)
+                BString.fromString "check(data.txt)" (* TODO: check data val here? *)
             end
                      
         
+(** fun checkNonce' : coq_BS -> coq_BS -> coq_BS **)
 
+fun checkNonce' nonceGolden nonceCandidate =
+    if (nonceGolden = nonceCandidate)
+    then passed_bs
+    else failed_bs
+
+    (*
+  failwith "AXIOM TO BE REALIZED" *)

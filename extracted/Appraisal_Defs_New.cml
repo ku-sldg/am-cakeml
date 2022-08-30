@@ -9,3 +9,8 @@ fun decrypt_bs_to_rawev bs params =
 
 fun checkGG params p sig0 ls =
   Some (checkGG' params p sig0 ls)
+
+(** val checkNonce : coq_BS -> coq_BS -> coq_BS coq_Opt **)
+
+fun checkNonce nonceGolden nonceCandidate =
+  Some (checkNonce' nonceGolden nonceCandidate)

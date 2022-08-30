@@ -8,11 +8,6 @@ fun run_cvm t st =
 fun run_cvm' t st =
   run_cvm (copland_compile t) st
 
-(** val run_cvm_fresh : coq_Term -> cvm_st **)
-
-fun run_cvm_fresh t =
-  run_cvm' t empty_vmst
-
 (** val run_cvm_w_config : coq_Term -> coq_Plc -> coq_RawEv -> cvm_st **)
 
 fun run_cvm_w_config t p e =

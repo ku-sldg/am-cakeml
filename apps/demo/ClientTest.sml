@@ -87,9 +87,10 @@ fun main () = (* sendReq term *)
                     ^ "e.g.   " ^ name ^ " config.ini\n")
         val toPl = S O
         val myPl = O
+                       (*
         val enc_test = decode_RawEv (encode_RawEv [(BString.fromString "one"),
                                                    (BString.fromString "two"),
-                                                   (BString.fromString "three")])
+                                                   (BString.fromString "three")]) *)
         (* val dec_test = decode_RawEv enc_test *)
      in case CommandLine.arguments () of
               [fileName] => (
@@ -103,14 +104,17 @@ fun main () = (* sendReq term *)
                                        TextIOExtra.printLn_err e
                                   end
                        | Ok nsMap => let val _ = O in
-                                         (* print ("Enc test: " ^ (BString.toString enc_test)); *)
-                                         print ("Dec test: " ^ (rawEvToString enc_test));
+                                         (* print ("Enc test: " ^ (BString.toString enc_test)); 
+                                         print ("Dec test: " ^ (rawEvToString enc_test)); *)
                                          print "\nSending Request in ClientTest\n\n";
-                                         let val rawev_res = sendReq term toPl nsMap []
-                                             val et_computed = eval term myPl Coq_mt
-                                             val appraise_res = run_gen_appraise term myPl Coq_mt rawev_res in
-                                             print ("Evidence Type computed: \n" ^
-                                                    (evToString et_computed) ^ "\n\n");
+                                         let val nonceVal = BString.fromString "anonce"
+                                             (* val badNonceVal = BString.fromString "badnonce" *)
+                                             val rawev_res = sendReq term toPl nsMap [nonceVal]
+                                             (* val et_computed = eval term myPl Coq_mt
+                                                val appraise_res = run_gen_appraise term myPl Coq_mt rawev_res *)
+                                             val appraise_res = run_gen_appraise_w_nonce term myPl nonceVal rawev_res in
+                                             (* print ("Evidence Type computed: \n" ^
+                                                    (evToString et_computed) ^ "\n\n"); *)
                                              print ("Appraisal EvidenceC computed: \n" ^
                                                     evidenceCToString appraise_res ^ "\n\n")
                                          end

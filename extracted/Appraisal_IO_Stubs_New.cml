@@ -8,3 +8,8 @@ val decrypt_bs_to_rawev' =
 
 val checkGG' =
   failwith "AXIOM TO BE REALIZED"
+
+(** val checkNonce' : coq_BS -> coq_BS -> coq_BS **)
+
+val checkNonce' =
+  failwith "AXIOM TO BE REALIZED"
