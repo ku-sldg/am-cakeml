@@ -23,9 +23,9 @@ fun sendReq t toPl nsMap evv (* am key *) =
         val resev = socketDispatch fromPl nsMap toPl evv t
     in
         (print ("Sent term:\n" ^ termToString t ^
-                "\n\nInitial raw evidence:\n" ^
-                rawEvToString evv ^ "\nRaw evidence received:\n" ^
-                rawEvToString resev ^ "\n\n"));
+                "\n\nInitial raw evidence (Sent):\n" ^
+                rawEvToString evv ^ "\n\nRaw evidence result (Received):\n" ^
+                rawEvToString resev ^ "\n"));
         resev
     end
 (*

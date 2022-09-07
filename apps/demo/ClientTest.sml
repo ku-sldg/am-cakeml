@@ -106,7 +106,7 @@ fun main () = (* sendReq term *)
                        | Ok nsMap => let val _ = O in
                                          (* print ("Enc test: " ^ (BString.toString enc_test)); 
                                          print ("Dec test: " ^ (rawEvToString enc_test)); *)
-                                         print "\nSending Request in ClientTest\n\n";
+                                         print "\nSending Request in Client\n\n";
                                          let val nonceVal = BString.fromString "anonce"
                                              (* val badNonceVal = BString.fromString "badnonce" *)
                                              val rawev_res = sendReq term toPl nsMap [nonceVal]
@@ -115,7 +115,7 @@ fun main () = (* sendReq term *)
                                              val appraise_res = run_gen_appraise_w_nonce term myPl nonceVal rawev_res in
                                              (* print ("Evidence Type computed: \n" ^
                                                     (evToString et_computed) ^ "\n\n"); *)
-                                             print ("Appraisal EvidenceC computed: \n" ^
+                                             print ("Appraisal Evidence Summary Structure: \n" ^
                                                     evidenceCToString appraise_res ^ "\n\n")
                                          end
                                         

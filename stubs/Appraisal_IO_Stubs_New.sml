@@ -31,7 +31,8 @@ fun decode_RawEv bsval = jsonBsListToList (strToJson (BString.toString bsval))
 fun decrypt_bs_to_rawev' bs ps =
     let val recoveredtext = Crypto.decryptOneShot priv2 pub1 bs
         val bs_recovered = BString.fromString recoveredtext
-        val res = decode_RawEv bs_recovered in
+        val res = decode_RawEv bs_recovered
+        val _ = print ("\nDecryption Succeeded: \n" ^ (rawEvToString res) ^ "\n" ) in
         res
     end
 
@@ -64,10 +65,11 @@ fun checkGG'' ps p bs ls =
         val pub_len = BString.length pub
         val sig_len = BString.length signGood
         val msg_len = BString.length msg
-  
+
+                                     (* 
         val _ = print ("pub_len: \n" ^ (Int.toString pub_len) ^ "\n")
         val _ = print ("sig_len: \n" ^ (Int.toString sig_len) ^ "\n")
-        val _ = print ("msg_len: \n" ^ (Int.toString msg_len) ^ "\n")
+        val _ = print ("msg_len: \n" ^ (Int.toString msg_len) ^ "\n") *)
 
         val checkGood = Crypto.sigCheck pub signGood msg in
         if checkGood
@@ -97,7 +99,7 @@ fun checkGG' ps p bs ls =
         case (aspid = tpm_sig_aspid) of
             True => checkGG'' ps p bs ls
           | _ =>
-            let val _ = (print "Checking non-signature EXTD ASP ... \n\n") in
+            let val _ = (print "Checking non-signature ASP ... \n\n") in
                 BString.fromString "check(data.txt)" (* TODO: check data val here? *)
             end
                      
@@ -106,8 +108,14 @@ fun checkGG' ps p bs ls =
 
 fun checkNonce' nonceGolden nonceCandidate =
     if (nonceGolden = nonceCandidate)
-    then passed_bs
-    else failed_bs
+    then
+        let val _ = print "Nonce Check PASSED\n\n" in
+            passed_bs
+        end
+    else
+        let val _ = print "Nonce Check FAILED\n\n" in
+            failed_bs
+        end
 
     (*
   failwith "AXIOM TO BE REALIZED" *)
