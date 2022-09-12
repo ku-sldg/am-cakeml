@@ -25,7 +25,6 @@ fun encode_RawEv ls = BString.fromString (jsonToStr (bsListToJsonList ls))
 fun decode_RawEv bsval = jsonBsListToList (strToJson (BString.toString bsval))
 
 
-
 (** val decrypt_bs_to_rawev' : coq_BS -> coq_ASP_PARAMS -> coq_RawEv **)
 
 fun decrypt_bs_to_rawev' bs ps =
@@ -36,60 +35,23 @@ fun decrypt_bs_to_rawev' bs ps =
         res
     end
 
-    (*
-    [BString.fromString "SigVal", BString.fromString "DataVal"]
-    *)
-    
-
-
-    (* [BString.fromString ("decrypted ( " ^
-                                                     (BString.toString bs) ^
-                                                     " )"),
-                                  default_bs (* ,
-                                  default_bs ,
-                                  default_bs,
-                                  default_bs,
-                                  default_bs *)]
-     *)
-    
-  (* failwith "AXIOM TO BE REALIZED" *)
-
-
 
 (** val checkGG'' :
     coq_ASP_PARAMS -> coq_Plc -> coq_BS -> coq_RawEv -> coq_BS **)
-
 fun checkGG'' ps p bs ls =
     let val msg = encode_RawEv ls
         val signGood = bs
-        val pub_len = BString.length pub
+        val theirPubkey = pub (* TODO: read source pubkey from blockchain here *)
+        val pub_len = BString.length theirPubkey
         val sig_len = BString.length signGood
         val msg_len = BString.length msg
-
-                                     (* 
-        val _ = print ("pub_len: \n" ^ (Int.toString pub_len) ^ "\n")
-        val _ = print ("sig_len: \n" ^ (Int.toString sig_len) ^ "\n")
-        val _ = print ("msg_len: \n" ^ (Int.toString msg_len) ^ "\n") *)
-
-        val checkGood = Crypto.sigCheck pub signGood msg in
+        val checkGood = Crypto.sigCheck theirPubkey signGood msg in
         if checkGood
         then (print ("\n\nSig Check PASSED\n\n");
               passed_bs)
         else (print ("\n\nSig Check FAILED\n\n");
               failed_bs)
     end
-        
-
-    (*
-    BString.fromString ("{EXTD_CHECK ( " ^
-                        (BString.toString bs) ^ ", " ^
-                        (rawEvToString ls) ^
-                        " ) }")
-    *)
-    
-
-                              (* default_bs *)
-  (* failwith "AXIOM TO BE REALIZED" *)
 
 (** val checkGG' :
     coq_ASP_PARAMS -> coq_Plc -> coq_BS -> coq_RawEv -> coq_BS **)
@@ -105,7 +67,6 @@ fun checkGG' ps p bs ls =
                      
         
 (** fun checkNonce' : coq_BS -> coq_BS -> coq_BS **)
-
 fun checkNonce' nonceGolden nonceCandidate =
     if (nonceGolden = nonceCandidate)
     then
@@ -116,6 +77,3 @@ fun checkNonce' nonceGolden nonceCandidate =
         let val _ = print "Nonce Check FAILED\n\n" in
             failed_bs
         end
-
-    (*
-  failwith "AXIOM TO BE REALIZED" *)

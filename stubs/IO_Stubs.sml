@@ -1,57 +1,50 @@
 (* Dependencies:  extracted/Term_Defs_Core.cml, extracted/Term_Defs.cml, 
-     stubs/BS.sml, am/CoplandCommUtil.sml, ... (TODO: more IO dependencies?) *)
+     stubs/BS.sml, stubs, Example_Phrases_Demo_Admits.sml, 
+     am/CoplandCommUtil.sml, ... (TODO: more IO dependencies?) *)
 
 
 (** val do_asp : coq_ASP_PARAMS -> coq_RawEv -> coq_BS **)
 
 
 fun do_asp ps e =
-    case ps of
-        Coq_asp_paramsC aspid args tpl tid =>
-        let val res =
-                case (aspid = get_data_aspid) of
-                    True =>
-                    let val _ = () in
-                        print ("Matched aspid:  " ^ aspid ^ "\n");
-                        BString.fromString "data"
-                    end
-                  | _ =>
-                    case (aspid = tpm_sig_aspid) of
-                        True =>
-                        let val _ = () in
-                            print ("Matched aspid:  " ^ aspid ^ "\n");
-                            let val msg = encode_RawEv e
-                                val prikey = privGood
-                                val sigRes = Crypto.signMsg prikey msg in
-                                sigRes
-                            end
-
-                            (*
-                            BString.fromString ("sig( " ^
-                                                    (rawEvToString e)
-                                                    ^ " )") *)
-                        end
-                      | _ =>
-                        case (aspid = ssl_enc_aspid) of
-                            True =>
-                            let val _ = () in
-                                print ("Matched aspid:  " ^ aspid ^ "\n");
-                                let val plaintext =
-                                        (*
-                                        "The quick brown fox jumped over the lazy dog." *)
-                                        
-                                        BString.toString (encode_RawEv e) 
-                                    val ciphertext = Crypto.encryptOneShot
-                                                         priv1 pub2 plaintext in
-                                    ciphertext
-                                end
-                                (*
-                                BString.fromString ("enc( " ^
-                                                        (rawEvToString e)
-                                                        ^ " )")
-                                *)
-                            end
-                          | _ =>
+    case ps of Coq_asp_paramsC aspid args tpl tid =>
+      let val res =
+              case (aspid = cal_ak_aspid) of    
+                  True => (* TODO: TPM setup + create_and_load_ak ASP here *)
+                  empty_bs
+                    
+                | _ => 
+                  case (aspid = get_data_aspid) of
+                      True => (* TODO: get_data ASP here *)
+                      let val _ = () in
+                          print ("Matched aspid:  " ^ aspid ^ "\n");
+                          BString.fromString "data"
+                      end
+                    | _ =>
+                      case (aspid = tpm_sig_aspid) of
+                          True =>
+                          let val _ = () in
+                              print ("Matched aspid:  " ^ aspid ^ "\n");
+                              let val msg = encode_RawEv e
+                                  val prikey = privGood
+                                  val sigRes = Crypto.signMsg prikey msg in
+                                  sigRes
+                              end
+                          end
+                        | _ =>
+                          case (aspid = ssl_enc_aspid) of
+                              True =>
+                              let val _ = () in
+                                  print ("Matched aspid:  " ^ aspid ^ "\n");
+                                  let val plaintext =
+                                          BString.toString (encode_RawEv e) 
+                                      val ciphertext =
+                                          Crypto.encryptOneShot
+                                              priv1 pub2 plaintext in
+                                      ciphertext
+                                  end
+                              end
+                        | _ =>
                             if aspid = pub_bc_aspid
                             then
                               let
@@ -90,10 +83,10 @@ fun do_asp ps e =
                                                            
                                          
 
-        in
-            print ("Running ASP with params: \n" ^ (aspParamsToString ps) ^ "\n");
-            res
-        end
+      in
+          print ("Running ASP with params: \n" ^ (aspParamsToString ps) ^ "\n");
+          res
+      end
 (* failwith "AXIOM TO BE REALIZED" *)
 
 (** val doRemote_session : coq_Term -> coq_Plc -> coq_EvC -> coq_EvC **)
