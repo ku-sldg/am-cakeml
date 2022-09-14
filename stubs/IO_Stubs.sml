@@ -26,8 +26,9 @@ fun do_asp ps e =
                           let val _ = () in
                               print ("Matched aspid:  " ^ aspid ^ "\n");
                               let val msg = encode_RawEv e
-                                  val prikey = privGood
+                                  val prikey = privGood (* TODO read TPM key *)
                                   val sigRes = Crypto.signMsg prikey msg in
+                                  (* TODO:  use tpmSign ffi *)
                                   sigRes
                               end
                           end
