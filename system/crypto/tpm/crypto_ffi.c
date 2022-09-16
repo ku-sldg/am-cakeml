@@ -33,6 +33,7 @@
 #define SYM_KEY_LEN 32
 #define IV_LEN 16
 
+#define TPM_SIG_LEN 262
 
     /* 
     Intended to be run before the Copland phrase
@@ -40,7 +41,7 @@
 
     In-
     Uses-
-    Out- parentHandle.txt
+    Out- src-parentkey-handle.txt
     */
 void ffitpmSetup(uint8_t *const in, uint64_t const in_len, uint8_t *const out, uint64_t const out_len) {
     int rc = 0;
@@ -76,8 +77,8 @@ void ffitpmSetup(uint8_t *const in, uint64_t const in_len, uint8_t *const out, u
     Uses TSS functions create, load
     
     In- 
-    Uses- parentHandle.txt
-    Out- keyHandle.txt, pub.pem, #pub.bin#, #priv.bin#
+    Uses- src-parentkey-handle.txt
+    Out- src-prikey-handle.txt, src-pub.bin, src-pub.pem, src-prikey-wrap.bin
     */
 
 void ffitpmCreateSigKey(uint8_t *const in, uint64_t const in_len, uint8_t *const out, uint64_t const out_len) {
@@ -85,19 +86,19 @@ void ffitpmCreateSigKey(uint8_t *const in, uint64_t const in_len, uint8_t *const
 
     FILE *parentHandle_file;
     char parentHandle[9];
-    parentHandle_file = fopen("parentHandle.txt","r");
+    parentHandle_file = fopen("src-parentkey-handle.txt","r");
     if (parentHandle_file == NULL) {
-        rc = 1; // parentHandle.txt could not be opened
+        rc = 1; // src-parentkey-handle.txt could not be opened
     }
     if (rc == 0) {
         fgets(parentHandle, 9, (FILE*)parentHandle_file);
         fclose(parentHandle_file);
     }
     
-    char *createArgv[] = {"create", "-hp", parentHandle, "-rsa", "2048", "-halg", "sha512", "-si", "-kt", "f", "-kt", "p", "-opr", "priv.bin", "-opu", "pub.bin", "-opem", "pub.pem"};
+    char *createArgv[] = {"create", "-hp", parentHandle, "-rsa", "2048", "-halg", "sha512", "-si", "-kt", "f", "-kt", "p", "-opr", "src-prikey-wrap.bin", "-opu", "src-pub.bin", "-opem", "src-pub.pem"};
     unsigned int createArgc = sizeof(createArgv) / sizeof(createArgv[0]);
 
-    char *loadArgv[] = {"load", "-hp", parentHandle, "-ipr", "priv.bin", "-ipu", "pub.bin"};
+    char *loadArgv[] = {"load", "-hp", parentHandle, "-ipr", "src-prikey-wrap.bin", "-ipu", "src-pub.bin"};
     unsigned int loadArgc = sizeof(loadArgv) / sizeof(loadArgv[0]);
 
     if (rc == 0) {
@@ -121,7 +122,7 @@ void ffitpmCreateSigKey(uint8_t *const in, uint64_t const in_len, uint8_t *const
     Uses TSS functions TSS_GetData
     
     In- 
-    Uses- data.txt
+    Uses- src-data.txt
     Out- data
     */
 void ffigetData(uint8_t *const in, uint64_t const in_len, uint8_t *const out, uint64_t const out_len) {
@@ -129,7 +130,7 @@ void ffigetData(uint8_t *const in, uint64_t const in_len, uint8_t *const out, ui
 
     unsigned char *data = NULL;
     size_t data_len;
-    char *filename = "data.txt";
+    char *filename = "src-data.txt";
 
     rc = TSS_GetData(&data, &data_len, filename);
     memset(out, 0, out_len);
@@ -144,7 +145,7 @@ void ffigetData(uint8_t *const in, uint64_t const in_len, uint8_t *const out, ui
     Uses TSS functions sign, flushcontext
     
     In- data
-    Uses- keyHandle.txt, parentHandle.txt
+    Uses- src-prikey-handle.txt, src-parentkey-handle.txt
     Out- signature
     */
 void ffitpmSign(uint8_t *const in, uint64_t const in_len, uint8_t *const out, uint64_t const out_len) {
@@ -152,9 +153,9 @@ void ffitpmSign(uint8_t *const in, uint64_t const in_len, uint8_t *const out, ui
 
     FILE *parentHandle_file;
     char parentHandle[9];
-    parentHandle_file = fopen("parentHandle.txt","r");
+    parentHandle_file = fopen("src-parentkey-handle.txt","r");
     if (parentHandle_file == NULL) {
-        rc = 1; // parentHandle.txt could not be opened
+        rc = 1; // src-parentkey-handle.txt could not be opened
     }
     if (rc != 1) {
         fgets(parentHandle, 9, (FILE*)parentHandle_file);
@@ -163,9 +164,9 @@ void ffitpmSign(uint8_t *const in, uint64_t const in_len, uint8_t *const out, ui
 
     FILE *keyHandle_file;
     char keyHandle[9];
-    keyHandle_file = fopen("keyHandle.txt","r");
+    keyHandle_file = fopen("src-prikey-handle.txt","r");
     if (keyHandle_file == NULL) {
-        rc = 2; // keyHandle.txt could not be opened
+        rc = 2; // src-prikey-handle.txt could not be opened
     }
     if (rc != 2) {
         fgets(keyHandle, 9, (FILE*)keyHandle_file);
@@ -194,11 +195,18 @@ void ffitpmSign(uint8_t *const in, uint64_t const in_len, uint8_t *const out, ui
 
 
 /* Uses TSS functions verifysignature */
-/* this function needs changed */
-void ffitpmCheckSig(uint8_t *const in, uint64_t const in_len, uint8_t *const out, uint64_t const out_len) {
+/* this function needs changed possibly */
+/*
+void fficheckTpmSig(uint8_t *const in, uint64_t const in_len, uint8_t *const out, uint64_t const out_len) {
     int rc = 0;
 
-    char *verifyArgv[] = {"verifysignature", "-ipem", "pub.pem", "-halg", "sha512", "-rsa", "-if", "signTest.txt", "-is", "sig.bin"};
+    char *sig = malloc(TPM_SIG_LEN);
+    memcpy(sig, in, TPM_SIG_LEN);
+
+    char *data = malloc(in_len-TPM_SIG_LEN);
+    memcpy(data, in[TPM_SIG_LEN], in_len-TPM_SIG_LEN);
+
+    char *verifyArgv[] = {"verifysignature", "-ipem", "src-pub.pem", "-halg", "sha512", "-rsa", "-is", sig, "-id", data};
     unsigned int verifyArgc = sizeof(verifyArgv) / sizeof(verifyArgv[0]);
 
     if (rc == 0) {
@@ -212,6 +220,7 @@ void ffitpmCheckSig(uint8_t *const in, uint64_t const in_len, uint8_t *const out
         out[0] = FFI_FAILURE;
     }
 }
+*/
 
 bool sha512(const uint8_t *data, const size_t dataLen, uint8_t *hash) {
     /* https://wiki.openssl.org/index.php/EVP_Message_Digests

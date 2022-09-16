@@ -8,13 +8,14 @@ structure Crypto = struct
         fun ffi_signMsg         x y = #(signMsg)            x y
         fun ffi_sigCheck        x y = #(sigCheck)           x y
         fun ffi_randomBytes     x y = #(randomBytes)        x y
-        fun ffi_diffieHellman x y = #(diffieHellman) x y
-        fun ffi_encrypt x y = #(encrypt) x y
-        fun ffi_decrypt x y = #(decrypt) x y
+        fun ffi_diffieHellman   x y = #(diffieHellman)      x y
+        fun ffi_encrypt         x y = #(encrypt)            x y
+        fun ffi_decrypt         x y = #(decrypt)            x y
         fun ffi_tpmSetup        x y = #(tpmSetup)           x y 
         fun ffi_tpmCreateSigKey x y = #(tpmCreateSigKey)    x y    
         fun ffi_getData         x y = #(getData)            x y 
         fun ffi_tpmSign         x y = #(tpmSign)            x y 
+
         val pubkeyLen = 270
         val signLen = 256
         val digestLen = 64
@@ -29,7 +30,7 @@ structure Crypto = struct
             in
                 if rem = 0 then num + ivLen else num + modulus - rem
             end
-        val dataLen = 50   (* overestimated length in bytes of data.txt *)
+        val dataLen = 50   (* overestimated length in bytes of src-data.txt *)
         val tpmSigLen = 262 (* length in bytes of tpm signature *)
     in
 
@@ -50,6 +51,10 @@ structure Crypto = struct
         (* tpm_sig *)
         fun tpmSign data = 
             FFI.call ffi_tpmSign tpmSigLen data
+        (*
+        fun checkTpmSig sig data = 
+            FFI.call ffi_checkTpmSig (BString.concatList [sig,data])
+        *)
 
         (* bstring -> bstring
          * hash bs

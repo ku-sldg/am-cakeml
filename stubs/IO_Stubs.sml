@@ -10,28 +10,36 @@ fun do_asp ps e =
     case ps of Coq_asp_paramsC aspid args tpl tid =>
       let val res =
               case (aspid = cal_ak_aspid) of    
-                  True => (* TODO: TPM setup + create_and_load_ak ASP here *)
-                  empty_bs
+                  True => 
+                    let val _ = () in
+                          print ("Matched aspid:  " ^ aspid ^ "\n");
+                          let val setupSuccess = Crypto.tpmSetup ()
+                              val cal_akSuccess = Crypto.tpmCreateSigKey () in
+                                if cal_akSuccess then BString.fromString "0" else BString.fromString "1"
+                          end
+                    end
                     
                 | _ => 
                   case (aspid = get_data_aspid) of
-                      True => (* TODO: get_data ASP here *)
-                      let val _ = () in
-                          print ("Matched aspid:  " ^ aspid ^ "\n");
-                          BString.fromString "data"
-                      end
+                      True => 
+                        let val _ = () in
+                              print ("Matched aspid:  " ^ aspid ^ "\n");
+                              let val dataRes = Crypto.getData () in
+                                    dataRes
+                              end
+                        end
+                      
                     | _ =>
                       case (aspid = tpm_sig_aspid) of
                           True =>
-                          let val _ = () in
-                              print ("Matched aspid:  " ^ aspid ^ "\n");
-                              let val msg = encode_RawEv e
-                                  val prikey = privGood (* TODO read TPM key *)
-                                  val sigRes = Crypto.signMsg prikey msg in
-                                  (* TODO:  use tpmSign ffi *)
-                                  sigRes
-                              end
-                          end
+                            let val _ = () in
+                                  print ("Matched aspid:  " ^ aspid ^ "\n");
+                                  let val data = encode_RawEv e
+                                      val sigRes = Crypto.tpmSign data in
+                                        sigRes
+                                  end
+                            end
+
                         | _ =>
                           case (aspid = ssl_enc_aspid) of
                               True =>
