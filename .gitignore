@@ -17,3 +17,9 @@ CMakeCache.txt
 # Editor stuff
 /.vscode
 *.code-workspace
+
+# Config files
+apps/demo/*.txt
+apps/demo/*.bin
+apps/demo/*.pem
+stubs/IO_Stubs_extra.sml
