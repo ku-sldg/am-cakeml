@@ -39,13 +39,28 @@ fun decrypt_bs_to_rawev' bs ps =
 (** val checkGG'' :
     coq_ASP_PARAMS -> coq_Plc -> coq_BS -> coq_RawEv -> coq_BS **)
 fun checkGG'' ps p bs ls =
-    let val msg = encode_RawEv ls
+    let
+        val msg = encode_RawEv ls
         val signGood = bs
-        val theirPubkey = pub (* TODO: read source pubkey from blockchain here *)
+        (* FIX ids *)
+        val attestId = BString.unshow "deadbeef"
+        val targetId = BString.unshow "facefeed"
+        val blockchainResult =
+            HealthRecord.getRecentRecord blockchainIpAddr blockchainIpPort
+                jsonId
+                healthRecordContract
+                userAddress
+                attestId
+                targetId
+        val theirPubkeyResult =
+            Result.map HealthRecord.getSigningKey
+                (Result.bind blockchainResult HealthRecord.fromJson)
+        val theirPubkey = Result.getRes theirPubkeyResult (BString.nulls 270)
         val pub_len = BString.length theirPubkey
         val sig_len = BString.length signGood
         val msg_len = BString.length msg
-        val checkGood = Crypto.sigCheck theirPubkey signGood msg in
+        val checkGood = Crypto.sigCheck theirPubkey signGood msg
+    in
         if checkGood
         then (print ("\n\nSig Check PASSED\n\n");
               passed_bs)

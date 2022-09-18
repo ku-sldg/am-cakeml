@@ -67,6 +67,8 @@ get_files(cop_src
     am/CommTypes.sml
     stubs/IO_Stubs_extra.sml
     stubs/Example_Phrases_Demo_Admits.sml
+    apps/blockchain/Blockchain.sml
+    apps/blockchain/HealthRecord.sml
     stubs/Appraisal_IO_Stubs_New.sml
     extracted/Appraisal_Defs_New.cml
     extracted/Impl_appraisal.cml
@@ -76,8 +78,6 @@ get_files(cop_src
     copland/Parser.sml
     am/ServerAm.sml
     am/CoplandCommUtil.sml
-    apps/blockchain/Blockchain.sml
-    apps/blockchain/HealthRecord.sml
     stubs/IO_Stubs.sml
     extracted/Cvm_Monad.cml
     extracted/Cvm_Impl.cml
