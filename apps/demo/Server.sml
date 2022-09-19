@@ -1,5 +1,8 @@
 (* Depends on: util, copland, system/sockets, am/Measurementsm am/CommTypes,
-   am/ServerAm *)
+   am/ServerAm extracted/Term_Defs_Core.cml *)
+
+(* term_policy_check_good :: Coq_Term (extracted/Term_Defs_Core.cml/) -> bool *)
+fun term_policy_check_good termIn = True (* TODO: invoke policy code here *)
 
 (* When things go well, this returns a JSON evidence string. When they go wrong,
    it returns a raw error message string. In the future, we may want to wrap
@@ -7,7 +10,11 @@
 fun evalJson s =
     let val (REQ pl1 pl2 map t ev) = jsonToRequest (strToJson s)
         val me = O (* TODO: hardcode ok? *)
-        val ev' = run_cvm_rawEv t me ev
+        val policy_check = term_policy_check_good t
+        val ev' = if (policy_check)
+                  then run_cvm_rawEv t me ev
+                  else [] (* Returning empty evidence on failed policy check.
+                             TODO:  return error response to client? *)
      in jsonToStr (responseToJson (RES pl2 pl1 ev'))
     end
     handle Json.Exn s1 s2 =>
