@@ -56,7 +56,7 @@ fun checkGG'' ps p bs ls =
         val theirPubkeyResult =
             Result.map HealthRecord.getSigningKey
                 (Result.bind blockchainResult HealthRecord.fromJson)
-        val theirPubkey = Result.getRes theirPubkeyResult (BString.nulls 281)
+        val theirPubkey = Result.getRes theirPubkeyResult (BString.nulls 280)
         val pub_len = BString.length theirPubkey
         val sig_len = BString.length signGood
         val msg_len = BString.length msg

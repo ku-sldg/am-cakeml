@@ -64,12 +64,24 @@ fun do_asp ps e =
                                 val blockchainIp =
                                   HealthRecord.TcpIp blockchainIpAddr
                                     blockchainIpPort
+                                val signingKeyNull =
+                                  String.concat
+                                    (Option.getOpt
+                                      (TextIO.b_inputLinesFrom "src-pub.bin")
+                                      [])
+                                val signingKeyNullSize =
+                                  String.size signingKeyNull
+                                val signingKeyNullEnd =
+                                  if signingKeyNullSize > 2
+                                  then signingKeyNullSize - 1
+                                  else signingKeyNullSize
                                 val signingKey =
                                   BString.fromString
-                                    (String.concat
-                                      (Option.getOpt
-                                        (TextIO.b_inputLinesFrom "src-pub.bin")
-                                        []))
+                                    (String.substring
+                                      signingKeyNull
+                                      0
+                                      signingKeyNullEnd)
+                                (* val _ = print (String.concat ["\nSigning key size: ", Int.toString (BString.length signingKey), "\n"]) *)
                                 val phrase = Coq_asp NULL
                                 val hr = HealthRecord.healthRecord
                                   targetId phrase (Json.fromBool True) None
@@ -89,9 +101,6 @@ fun do_asp ps e =
                             else
                               (print ("Matched OTHER aspid:  " ^ aspid ^ "\n");
                               BString.fromString "v")
-                                                           
-                                         
-
       in
           print ("Running ASP with params: \n" ^ (aspParamsToString ps) ^ "\n");
           res
