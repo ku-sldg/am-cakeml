@@ -77,8 +77,8 @@ fun do_asp ps e =
                                   (timestamp ())
                                 val hrAddResult = HealthRecord.addRecord
                                   blockchainIpAddr blockchainIpPort jsonId
-                                  healthRecordContract userAddress targetId
-                                  attestId (HealthRecord.toJson hr)
+                                  healthRecordContract userAddress attestId
+                                  targetId (HealthRecord.toJson hr)
                               in
                                 case hrAddResult of
                                   Ok bstring => bstring

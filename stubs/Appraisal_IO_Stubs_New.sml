@@ -45,6 +45,7 @@ fun checkGG'' ps p bs ls =
         (* FIX ids *)
         val attestId = BString.unshow "deadbeef"
         val targetId = BString.unshow "facefeed"
+        (* FIX IP address info *)
         val blockchainResult =
             HealthRecord.getRecentRecord blockchainIpAddr blockchainIpPort
                 jsonId
@@ -55,7 +56,7 @@ fun checkGG'' ps p bs ls =
         val theirPubkeyResult =
             Result.map HealthRecord.getSigningKey
                 (Result.bind blockchainResult HealthRecord.fromJson)
-        val theirPubkey = Result.getRes theirPubkeyResult (BString.nulls 270)
+        val theirPubkey = Result.getRes theirPubkeyResult (BString.nulls 281)
         val pub_len = BString.length theirPubkey
         val sig_len = BString.length signGood
         val msg_len = BString.length msg
