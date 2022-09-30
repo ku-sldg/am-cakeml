@@ -79,22 +79,23 @@ fun evToString e = concatWith " "
         | Coq_ss ev1 ev2   => ["SS_E", parens ev1, parens ev2]
     end
 
-(* evidenceCToString :: coq_EvidenceC -> string *)                      
+(* evidenceCToString :: coq_EvidenceC -> string *)
+(* evidenceCToString :: coq_AppResultC -> string *) 
 fun evidenceCToString e = concatWith " "
     let fun parens e = "(" ^ evidenceCToString e ^ ")"
      in case e of
-            Coq_mtc         => ["Mtc"]
-          | Coq_nnc i bs => ["NNc", nIdToString i, BString.toString bs]
-          | Coq_ggc p ps bs e' =>
+            Coq_mtc_app         => ["Mtc"]
+          | Coq_nnc_app i bs => ["NNc", nIdToString i, BString.toString bs]
+          | Coq_ggc_app p ps bs e' =>
             ["GGc", plToString p, aspParamsToString ps,
-             BString.toString bs, parens e']
-          | Coq_hhc p ps bs et => ["HHc", plToString p, aspParamsToString ps,
-                                   BString.toString bs, evToString et]
-          | Coq_eec p ps bs e' => ["EEc", plToString p, aspParamsToString ps,
+             BString.toString bs, parens e' ]
+          | Coq_hhc_app p ps bs e' => ["HHc", plToString p, aspParamsToString ps,
+                                   BString.toString bs, parens e' (* evToString et *)]
+          | Coq_eec_app p ps bs e' => ["EEc", plToString p, aspParamsToString ps,
                                    BString.toString bs, parens e']
           (* | Coq_kkc p ps et => ["KKc", plToString p, aspParamsToString ps,
                                 evToString et] *)
-          | Coq_ssc ev1 ev2   => ["SSc", parens ev1, parens ev2]
+          | Coq_ssc_app ev1 ev2   => ["SSc", parens ev1, parens ev2]
     end
 
 (* rawEvToString :: coq_RawEv -> string *)

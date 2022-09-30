@@ -85,8 +85,8 @@ fun main () = (* sendReq term *)
     let val name  = CommandLine.name ()
         val usage = ("Usage: " ^ name ^ " configurationFile\n"
                     ^ "e.g.   " ^ name ^ " config.ini\n")
-        val toPl = S O
-        val myPl = O
+        val toPl = source_plc (* S O *)
+        val myPl = dest_plc   (* O *)
                        (*
         val enc_test = decode_RawEv (encode_RawEv [(BString.fromString "one"),
                                                    (BString.fromString "two"),

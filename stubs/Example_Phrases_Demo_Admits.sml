@@ -1,6 +1,10 @@
 (** val source_plc : coq_Plc **)
 
-val source_plc = O
+val source_plc = S O
+
+(** val dest_plc : coq_Plc **)
+
+val dest_plc = O
 
 (** val cal_ak_targid : coq_ASP_ID **)
 

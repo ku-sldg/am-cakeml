@@ -98,26 +98,6 @@ fun do_prim a = case a of
 | CPYC => copyEv
 | ASPCC fwd params => invoke_ASP fwd params
 
-(** val event_id_span' : coq_Term -> nat **)
-
-fun event_id_span' t = case t of
-  Coq_asp _ => S O
-| Coq_att _ x => add (S (S O)) (event_id_span' x)
-| Coq_lseq x y => add (event_id_span' x) (event_id_span' y)
-| Coq_bseq _ x y => add (S (S O)) (add (event_id_span' x) (event_id_span' y))
-| Coq_bpar _ x y => add (S (S O)) (add (event_id_span' x) (event_id_span' y))
-
-(** val event_id_span : coq_Core_Term -> nat **)
-
-fun event_id_span t = case t of
-  Coq_aspc a => (case a of
-                   CLEAR => O
-                 | _ => S O)
-| Coq_attc _ x => add (S (S O)) (event_id_span' x)
-| Coq_lseqc x y => add (event_id_span x) (event_id_span y)
-| Coq_bseqc x y => add (S (S O)) (add (event_id_span x) (event_id_span y))
-| Coq_bparc _ x y => add (S (S O)) (add (event_id_span x) (event_id_span y))
-
 (** val inc_remote_event_ids : coq_Term -> unit coq_CVM **)
 
 fun inc_remote_event_ids t =

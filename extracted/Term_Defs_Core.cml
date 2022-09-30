@@ -61,3 +61,11 @@ datatype coq_Core_Term =
 | Coq_lseqc coq_Core_Term coq_Core_Term
 | Coq_bseqc coq_Core_Term coq_Core_Term
 | Coq_bparc coq_Loc coq_Core_Term coq_Core_Term
+
+datatype coq_AppResultC =
+  Coq_mtc_app 
+| Coq_nnc_app coq_N_ID coq_BS
+| Coq_ggc_app coq_Plc coq_ASP_PARAMS coq_BS coq_AppResultC
+| Coq_hhc_app coq_Plc coq_ASP_PARAMS coq_BS coq_AppResultC
+| Coq_eec_app coq_Plc coq_ASP_PARAMS coq_BS coq_AppResultC
+| Coq_ssc_app coq_AppResultC coq_AppResultC

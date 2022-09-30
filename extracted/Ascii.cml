@@ -1,2 +1,23 @@
 datatype ascii =
   Ascii bool bool bool bool bool bool bool bool
+
+(** val eqb : ascii -> ascii -> bool **)
+
+fun eqb a b =
+  let val Ascii a0 a1 a2 a3 a4 a5 a6 a7 = a in
+  let val Ascii b0 b1 b2 b3 b4 b5 b6 b7 = b in
+  (case case case case case case case eqb a0 b0 of
+                                   True => eqb a1 b1
+                                 | False => False of
+                              True => eqb a2 b2
+                            | False => False of
+                         True => eqb a3 b3
+                       | False => False of
+                    True => eqb a4 b4
+                  | False => False of
+               True => eqb a5 b5
+             | False => False of
+          True => eqb a6 b6
+        | False => False of
+     True => eqb a7 b7
+   | False => False) end end

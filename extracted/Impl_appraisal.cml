@@ -1,13 +1,13 @@
 (** val build_app_comp_evC :
-    coq_Evidence -> coq_RawEv -> coq_BS -> coq_EvidenceC coq_Opt **)
+    coq_Evidence -> coq_RawEv -> coq_BS -> coq_AppResultC coq_Opt **)
 
 fun build_app_comp_evC et ls nonceGolden =
   case et of
-    Coq_mt => ret Coq_mtc
+    Coq_mt => ret Coq_mtc_app
   | Coq_nn nid =>
     bind (peel_bs ls) (fn x =>
       let val Coq_pair bs _ = x in
-      bind (checkNonce nonceGolden bs) (fn res => ret (Coq_nnc nid res)) end)
+      bind (checkNonce nonceGolden bs) (fn res => ret (Coq_nnc_app nid res)) end)
   | Coq_uu p fwd params et' =>
     (case fwd of
        ENCR =>
@@ -15,29 +15,30 @@ fun build_app_comp_evC et ls nonceGolden =
          let val Coq_pair bs _ = x in
          bind (decrypt_bs_to_rawev bs params) (fn decrypted_ls =>
            bind (build_app_comp_evC et' decrypted_ls nonceGolden) (fn rest =>
-             ret (Coq_eec p params passed_bs rest))) end)
+             ret (Coq_eec_app p params passed_bs rest))) end)
      | EXTD =>
        bind (peel_bs ls) (fn x =>
          let val Coq_pair bs ls' = x in
          bind (checkGG params p bs ls') (fn v =>
            bind (build_app_comp_evC et' ls' nonceGolden) (fn rest =>
-             ret (Coq_ggc p params v rest))) end)
-     | _ => ret Coq_mtc)
+             ret (Coq_ggc_app p params v rest))) end)
+     | KEEP => build_app_comp_evC et' ls nonceGolden
+     | _ => ret Coq_mtc_app)
   | Coq_ss et1 et2 =>
     bind (build_app_comp_evC et1 (firstn (et_size et1) ls) nonceGolden)
       (fn x =>
       bind (build_app_comp_evC et2 (skipn (et_size et1) ls) nonceGolden)
-        (fn y => ret (Coq_ssc x y)))
+        (fn y => ret (Coq_ssc_app x y)))
 
 (** val run_gen_appraise :
     coq_Term -> coq_Plc -> coq_Evidence -> coq_BS -> coq_RawEv ->
-    coq_EvidenceC **)
+    coq_AppResultC **)
 
 fun run_gen_appraise t p et nonceGolden ls =
-  fromSome Coq_mtc (build_app_comp_evC (eval t p et) ls nonceGolden)
+  fromSome Coq_mtc_app (build_app_comp_evC (eval t p et) ls nonceGolden)
 
 (** val run_gen_appraise_w_nonce :
-    coq_Term -> coq_Plc -> coq_BS -> coq_RawEv -> coq_EvidenceC **)
+    coq_Term -> coq_Plc -> coq_BS -> coq_RawEv -> coq_AppResultC **)
 
 fun run_gen_appraise_w_nonce t p nonceIn ls =
   run_gen_appraise t p (Coq_nn O) nonceIn ls
