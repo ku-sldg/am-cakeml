@@ -23,4 +23,4 @@ apps/demo/*.txt
 apps/demo/*.bin
 apps/demo/*.pem
 stubs/IO_Stubs_extra.sml
-do_extract.sh
+./do_extract.sh
