@@ -15,6 +15,7 @@ structure Crypto = struct
         fun ffi_tpmCreateSigKey x y = #(tpmCreateSigKey)    x y    
         fun ffi_getData         x y = #(getData)            x y 
         fun ffi_tpmSign         x y = #(tpmSign)            x y 
+        fun ffi_checkTpmSig     x y = #(checkTpmSig)        x y
 
         val pubkeyLen = 270
         val signLen = 256
@@ -51,10 +52,11 @@ structure Crypto = struct
         (* tpm_sig *)
         fun tpmSign data = 
             FFI.call ffi_tpmSign tpmSigLen data
-        (*
-        fun checkTpmSig sig data = 
-            FFI.call ffi_checkTpmSig (BString.concatList [sig,data])
-        *)
+        
+        (* verify tpm signature using tss *)
+        fun checkTpmSig tpmSig data = 
+            FFI.callBool ffi_checkTpmSig (BString.concatList [tpmSig,data])
+            
 
         (* bstring -> bstring
          * hash bs

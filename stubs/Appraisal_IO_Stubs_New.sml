@@ -60,7 +60,7 @@ fun checkGG'' ps p bs ls =
         val pub_len = BString.length theirPubkey
         val sig_len = BString.length signGood
         val msg_len = BString.length msg
-        val checkGood = Crypto.sigCheck theirPubkey signGood msg
+        val checkGood = Crypto.checkTpmSig signGood msg
     in
         if checkGood
         then (print ("\n\nSig Check PASSED\n\n");

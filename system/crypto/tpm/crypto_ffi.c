@@ -173,10 +173,10 @@ void ffitpmSign(uint8_t *const in, uint64_t const in_len, uint8_t *const out, ui
         fclose(keyHandle_file);
     }
     
-    char *data = malloc(in_len);
+    unsigned char *data = malloc(in_len);
     memcpy(data, in, in_len);
 
-    char *signArgv[] = {"sign", "-hk", keyHandle, "-halg", "sha512", "-salg", "rsa", "-id", data};
+    char *signArgv[] = {"sign", "-hk", keyHandle, "-halg", "sha512", "-salg", "rsa"};
     unsigned int signArgc = sizeof(signArgv) / sizeof(signArgv[0]);
 
     char *flushHPArgv[] = {"flushcontext", "-ha", parentHandle};
@@ -184,8 +184,8 @@ void ffitpmSign(uint8_t *const in, uint64_t const in_len, uint8_t *const out, ui
 
     char *flushHKArgv[] = {"flushcontext", "-ha", keyHandle};
     unsigned int flushHKArgc = sizeof(flushHKArgv) / sizeof(flushHKArgv[0]);
-
-    uint8_t *signature  = sign(signArgc, signArgv);
+    
+    uint8_t *signature  = sign(signArgc, signArgv, data, in_len);
     memcpy(out, signature, out_len);
     
     flushcontext(flushHPArgc, flushHPArgv);
@@ -195,24 +195,23 @@ void ffitpmSign(uint8_t *const in, uint64_t const in_len, uint8_t *const out, ui
 
 
 /* Uses TSS functions verifysignature */
-/* this function needs changed possibly */
-/*
 void fficheckTpmSig(uint8_t *const in, uint64_t const in_len, uint8_t *const out, uint64_t const out_len) {
     int rc = 0;
-
-    char *sig = malloc(TPM_SIG_LEN);
+    
+    unsigned char *sig = malloc(TPM_SIG_LEN);
     memcpy(sig, in, TPM_SIG_LEN);
 
-    char *data = malloc(in_len-TPM_SIG_LEN);
-    memcpy(data, in[TPM_SIG_LEN], in_len-TPM_SIG_LEN);
-
-    char *verifyArgv[] = {"verifysignature", "-ipem", "src-pub.pem", "-halg", "sha512", "-rsa", "-is", sig, "-id", data};
+    uint64_t data_len = in_len - TPM_SIG_LEN;
+    unsigned char *data = malloc(data_len);
+    memcpy(data, &in[TPM_SIG_LEN], data_len);
+    
+    char *verifyArgv[] = {"verifysignature", "-ipem", "src-pub.pem", "-halg", "sha512", "-rsa"};
     unsigned int verifyArgc = sizeof(verifyArgv) / sizeof(verifyArgv[0]);
 
     if (rc == 0) {
-        rc = verifysignature(verifyArgc, verifyArgv);
+        rc = verifysignature(verifyArgc, verifyArgv, data, data_len, sig, TPM_SIG_LEN);
     }
-
+    
     if (rc == 0) {
         out[0] = FFI_SUCCESS;
     }
@@ -220,7 +219,6 @@ void fficheckTpmSig(uint8_t *const in, uint64_t const in_len, uint8_t *const out
         out[0] = FFI_FAILURE;
     }
 }
-*/
 
 bool sha512(const uint8_t *data, const size_t dataLen, uint8_t *hash) {
     /* https://wiki.openssl.org/index.php/EVP_Message_Digests
