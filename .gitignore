@@ -19,8 +19,14 @@ CMakeCache.txt
 *.code-workspace
 
 # Config files
-apps/demo/*.txt
-apps/demo/*.bin
-apps/demo/*.pem
-stubs/IO_Stubs_extra.sml
+*src-prikey-handle.txt
+*src-prikey-wrap.bin
+*src-pub.bin
+*src-pub.pem
+*src-parentkey-handle.txt
+stubs/IO_Stubs_extra*
+#stubs/IO_Stubs_extra_orig.sml
 ./do_extract.sh
+
+# Backup files
+*backup.*

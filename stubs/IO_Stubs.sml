@@ -64,11 +64,13 @@ fun do_asp ps e =
                                 val blockchainIp =
                                   HealthRecord.TcpIp blockchainIpAddr
                                     blockchainIpPort
+				val pubkey_src_file = "src-pub.pem"
                                 val signingKeyNull =
                                   String.concat
                                     (Option.getOpt
-                                      (TextIO.b_inputLinesFrom "src-pub.pem")
+                                      (TextIO.b_inputLinesFrom pubkey_src_file)
                                       [])
+				val _=(print ("\nRead Bytes from file '" ^ pubkey_src_file ^ "' :\n" ^ signingKeyNull))
                                 val signingKeyNullSize =
                                   String.size signingKeyNull
                                 val signingKeyNullEnd =

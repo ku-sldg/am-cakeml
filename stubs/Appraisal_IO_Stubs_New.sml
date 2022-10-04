@@ -53,14 +53,72 @@ fun checkGG'' ps p bs ls =
                 userAddress
                 attestId
                 targetId
+
+
+	val bcErrString =
+	    case blockchainResult of
+	    	 Ok v => "bc success"
+		 | Err e' => e'
+	val _ = print ("\nBC read error:  \n" ^ bcErrString ^ "\n\n")
+
         val theirPubkeyResult =
             Result.map HealthRecord.getSigningKey
                 (Result.bind blockchainResult HealthRecord.fromJson)
-        val theirPubkey = Result.getRes theirPubkeyResult (BString.nulls 451)
+		
+			     
+	val theirPubkey_bc =
+	    case theirPubkeyResult of
+	    	   Ok v => let val _ =
+		   (print ("\ntheirPubkey read error (JSON):  \n" ^ "success" ^ "\n\n")) in
+		   v end 
+		   | Err errString => let val _ =
+		   print ("\ntheirPubkey read error (JSON):  \n" ^ errString ^ "\n\n") in
+		   (BString.nulls 451) end		       
+
+
+
+
+	(*
+	val hrResult = HealthRecord.getSigningKey blockchainResult
+	val hrErrString =
+	    case hrResult of
+	    	 Ok _ => "hr success"
+		 | Err e' => e'
+	val _ = print ("\HR.getSigningKey read error:  \n" ^ hrErrString ^ "\n\n")
+	*)
+
+
+
+
+
+
+	val pubkeyfile_src = "../server/src-pub.pem"
+
+	val signingKeyNull = String.concat
+	    		     (Option.getOpt
+                                      (TextIO.b_inputLinesFrom pubkeyfile_src)
+                                      			       [])
+	val _=(print ("\nRead Bytes from file '" ^ pubkeyfile_src ^ "':\n" ^ signingKeyNull ^ "\n\n"))
+        val signingKeyNullSize = String.size signingKeyNull
+        val signingKeyNullEnd = if signingKeyNullSize > 2
+                                then signingKeyNullSize - 1
+                                else signingKeyNullSize
+        val signingKey =
+                                  BString.fromString
+                                    (String.substring
+                                      signingKeyNull
+                                      0
+                                      signingKeyNullEnd)
+
+
+	val theirPubkey = signingKey (* theirPubkey_bc *)
+	val _ = print ("\ntheirPubkey bytes: \n" ^ (BString.toString theirPubkey) ^ "\n\n")
         val pub_len = BString.length theirPubkey
         val sig_len = BString.length signGood
         val msg_len = BString.length msg
+	val pubkeyfile_dest = "src-pub.pem"
         val outFileHandle = TextIO.openOut "src-pub.pem"
+	val _ = print ("\nOutputting pubkey FROM blockchain TO file: " ^ pubkeyfile_dest ^ "\n")
         val _ = TextIO.output outFileHandle (BString.toString theirPubkey)
         val checkGood = Crypto.checkTpmSig signGood msg
     in
