@@ -67,7 +67,7 @@ fun do_asp ps e =
                                 val signingKeyNull =
                                   String.concat
                                     (Option.getOpt
-                                      (TextIO.b_inputLinesFrom "src-pub.bin")
+                                      (TextIO.b_inputLinesFrom "src-pub.pem")
                                       [])
                                 val signingKeyNullSize =
                                   String.size signingKeyNull

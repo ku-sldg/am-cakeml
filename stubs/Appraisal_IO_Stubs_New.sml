@@ -56,10 +56,12 @@ fun checkGG'' ps p bs ls =
         val theirPubkeyResult =
             Result.map HealthRecord.getSigningKey
                 (Result.bind blockchainResult HealthRecord.fromJson)
-        val theirPubkey = Result.getRes theirPubkeyResult (BString.nulls 280)
+        val theirPubkey = Result.getRes theirPubkeyResult (BString.nulls 451)
         val pub_len = BString.length theirPubkey
         val sig_len = BString.length signGood
         val msg_len = BString.length msg
+        val outFileHandle = TextIO.openOut "src-pub.pem"
+        val _ = TextIO.output outFileHandle (BString.toString theirPubkey)
         val checkGood = Crypto.checkTpmSig signGood msg
     in
         if checkGood
