@@ -45,13 +45,17 @@ fun checkGG'' ps p bs ls =
         (* FIX ids *)
         val attestId = BString.unshow "deadbeef"
         val targetId = BString.unshow "facefeed"
-
-	val _ = print "\n\n Please enter a character (after 5+ seconds) to query blockchain and proceed with appraisal:  "
-	val delay = TextIO.input1 (TextIO.stdIn)
-
-
-
-
+        (* val _ = print "\n\n Please enter a character (after 5+ seconds) to query blockchain and proceed with appraisal:  "
+        val delay = TextIO.input1 (TextIO.stdIn) *)
+        fun ackermann m n =
+            if m = 0
+            then n + 1
+            else
+                if n = 0
+                then ackermann (m - 1) 1
+                else ackermann (m - 1) (ackermann m (n - 1))
+        val _ = ackermann 4 1
+        val _ = ackermann 4 1
         (* FIX IP address info *)
         val blockchainResult =
             HealthRecord.getRecentRecord blockchainIpAddr blockchainIpPort
@@ -107,7 +111,7 @@ fun checkGG'' ps p bs ls =
                                       			       [])
 	val _=(print ("\nRead Bytes from file '" ^ pubkeyfile_src ^ "':\n" ^ signingKeyNull ^ "\n\n"))
         val signingKeyNullSize = String.size signingKeyNull
-        val signingKeyNullEnd = if signingKeyNullSize > 2
+        val signingKeyNullEnd = if signingKeyNullSize > 1
                                 then signingKeyNullSize - 1
                                 else signingKeyNullSize
         val signingKey =

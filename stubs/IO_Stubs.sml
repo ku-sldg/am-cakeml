@@ -74,7 +74,7 @@ fun do_asp ps e =
                                 val signingKeyNullSize =
                                   String.size signingKeyNull
                                 val signingKeyNullEnd =
-                                  if signingKeyNullSize > 2
+                                  if signingKeyNullSize > 1
                                   then signingKeyNullSize - 1
                                   else signingKeyNullSize
                                 val signingKey =
