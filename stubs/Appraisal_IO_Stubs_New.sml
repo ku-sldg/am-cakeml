@@ -90,7 +90,7 @@ fun checkGG'' ps p bs ls =
 
 
 
-
+(*
 
 	val pubkeyfile_src = "../server/src-pub.pem"
 
@@ -110,8 +110,11 @@ fun checkGG'' ps p bs ls =
                                       0
                                       signingKeyNullEnd)
 
+*)
+                                          
 
-	val theirPubkey = signingKey (* theirPubkey_bc *)
+
+	val theirPubkey = (* signingKey *) theirPubkey_bc
 	val _ = print ("\ntheirPubkey bytes: \n" ^ (BString.toString theirPubkey) ^ "\n\n")
         val pub_len = BString.length theirPubkey
         val sig_len = BString.length signGood
