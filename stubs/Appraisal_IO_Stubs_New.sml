@@ -45,6 +45,13 @@ fun checkGG'' ps p bs ls =
         (* FIX ids *)
         val attestId = BString.unshow "deadbeef"
         val targetId = BString.unshow "facefeed"
+
+	val _ = print "\n\n Please enter a character (after 5+ seconds) to query blockchain and proceed with appraisal:  "
+	val delay = TextIO.input1 (TextIO.stdIn)
+
+
+
+
         (* FIX IP address info *)
         val blockchainResult =
             HealthRecord.getRecentRecord blockchainIpAddr blockchainIpPort
@@ -119,8 +126,8 @@ fun checkGG'' ps p bs ls =
         val pub_len = BString.length theirPubkey
         val sig_len = BString.length signGood
         val msg_len = BString.length msg
-	val pubkeyfile_dest = "src-pub.pem"
-        val outFileHandle = TextIO.openOut "src-pub.pem"
+	val pubkeyfile_dest = "src-pub.pem" (* "src-pub-temp-client.pem" *)
+        val outFileHandle = TextIO.openOut pubkeyfile_dest
 	val _ = print ("\nOutputting pubkey FROM blockchain TO file: " ^ pubkeyfile_dest ^ "\n")
         val _ = TextIO.output outFileHandle (BString.toString theirPubkey)
         val checkGood = Crypto.checkTpmSig signGood msg

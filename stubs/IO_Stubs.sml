@@ -64,7 +64,7 @@ fun do_asp ps e =
                                 val blockchainIp =
                                   HealthRecord.TcpIp blockchainIpAddr
                                     blockchainIpPort
-				val pubkey_src_file = "src-pub.pem"
+				val pubkey_src_file = "src-pub.pem" (* "src-pub-temp.pem" *)
                                 val signingKeyNull =
                                   String.concat
                                     (Option.getOpt
@@ -79,10 +79,11 @@ fun do_asp ps e =
                                   else signingKeyNullSize
                                 val signingKey =
                                   BString.fromString
-                                    (String.substring
+                                    ((String.substring
                                       signingKeyNull
                                       0
-                                      signingKeyNullEnd)
+                                      signingKeyNullEnd) ^ "\n")
+				(* val signingKey = signingKey' ^ "\n" *)
                                 (* val _ = print (String.concat ["\nSigning key size: ", Int.toString (BString.length signingKey), "\n"]) *)
                                 val phrase = Coq_asp NULL
                                 val hr = HealthRecord.healthRecord
