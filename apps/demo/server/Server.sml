@@ -2,7 +2,7 @@
    am/ServerAm extracted/Term_Defs_Core.cml *)
 
 (* term_policy_check_good :: Coq_Term (extracted/Term_Defs_Core.cml/) -> bool *)
-fun term_policy_check_good termIn = True (* TODO: invoke policy code here *)
+fun term_policy_check_good p termIn = privPolicy p termIn (* TODO: invoke policy code here *)
 
 (* When things go well, this returns a JSON evidence string. When they go wrong,
    it returns a raw error message string. In the future, we may want to wrap
@@ -10,7 +10,7 @@ fun term_policy_check_good termIn = True (* TODO: invoke policy code here *)
 fun evalJson s =
     let val (REQ pl1 pl2 map t ev) = jsonToRequest (strToJson s)
         val me = O (* TODO: hardcode ok? *)
-        val policy_check = term_policy_check_good t
+        val policy_check = term_policy_check_good dest_plc t
         val ev' = if (policy_check)
                   then run_cvm_rawEv t me ev
                   else [] (* Returning empty evidence on failed policy check.

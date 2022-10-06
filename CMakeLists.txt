@@ -67,6 +67,8 @@ get_files(cop_src
     am/CommTypes.sml
     stubs/IO_Stubs_extra.sml
     stubs/Example_Phrases_Demo_Admits.sml
+    stubs/Compare_Stub.sml
+    extracted/privPolicy.cml
     apps/blockchain/Blockchain.sml
     apps/blockchain/HealthRecord.sml
     stubs/Appraisal_IO_Stubs_New.sml
