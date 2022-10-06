@@ -54,7 +54,7 @@ fun checkGG'' ps p bs ls =
                 if n = 0
                 then ackermann (m - 1) 1
                 else ackermann (m - 1) (ackermann m (n - 1))
-        val _ = ackermann 4 1
+        (* val _ = ackermann 4 1 *)
         val _ = ackermann 4 1
         (* FIX IP address info *)
         val blockchainResult =
