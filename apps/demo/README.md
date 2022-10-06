@@ -1,7 +1,11 @@
 # A client/server demo scenario #
 
 ## Build
-To build this example, first start by building the CakeML Attestation Manager by following the directions in the README [here](https://github.com/ku-sldg/am-cakeml). To test a successful install, make sure you navigate to `apps/tests/` and run `../../build/apps/tests/tests`.
+To build this example, first start by building the CakeML Attestation
+Manager by following the directions in the README
+[here](https://github.com/ku-sldg/am-cakeml). To test a successful
+install, from the `/build/` folder first run `make tests_tpm`.  Then
+navigate to `../apps/tests/` and run `../../build/apps/tests/tests_tpm`.
 
 Once completed, you are ready to configure and run the client/server demo. 
 
