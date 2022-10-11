@@ -18,8 +18,8 @@ fun socketDispatch fromPl nsMap toPl ev t =
     end
 
 (* coq_Term -> coq_Plc -> nsMap -> (bs list) -> (bs list) *)
-fun sendReq t toPl nsMap evv (* am key *) =
-    let val fromPl = O
+fun sendReq t fromPl toPl nsMap evv (* am key *) =
+    let (* val fromPl = O *)
         val resev = socketDispatch fromPl nsMap toPl evv t
     in
         (print ("Sent term:\n" ^ termToString t ^
@@ -38,13 +38,13 @@ fun sendReq t toPl nsMap evv (* am key *) =
 
                                                        
 (* coq_Term -> coq_Plc -> nsMap -> (bs list) *)
-fun sendReq_nonce t pl nsMap (* am key *) = 
+fun sendReq_nonce t fromPl toPl nsMap (* am key *) = 
     let val nonce = Random.random (Random.seed (Meas.urand 32)) 16 in
-        sendReq t pl nsMap [nonce]
+        sendReq t fromPl toPl nsMap [nonce]
     end
 
 (* coq_Term -> coq_Plc -> (bs list) -> (bs list) *)      
-fun sendReq_local_ini t pl ev =
+fun sendReq_local_ini t fromPl toPl ev =
     let val name  = CommandLine.name ()
         val usage = ("Usage: " ^ name ^ " configurationFile\n"
                     ^ "e.g.   " ^ name ^ " config.ini\n") in
@@ -65,7 +65,7 @@ fun sendReq_local_ini t pl ev =
                               let val _ = O in
                                   print "Parsed nsMap of INI OK\n\n";
                                   print "\nSending Request in senReq_ocal_ini\n\n"; 
-                                  sendReq t pl nsMap ev
+                                  sendReq t fromPl toPl nsMap ev
                               end
                       end )
            | _ =>  let val _ = O in
