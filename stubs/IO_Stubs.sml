@@ -105,7 +105,16 @@ fun do_asp ps e =
                                   end
                                 | _ => 
                                   case (aspid = store_clientData_aspid) of
-                                      True => let val _ = (print ("\nRun store_clientData asp here...\n")) in 
+                                      True => let val _ = (print ("\nRunning store_clientData asp here...\n"))
+                                                  val outfile = "client_data.txt"
+                                                  val ostream = TextIO.openOut outfile
+                                                  val client_data = encode_RawEv e
+                                                  val _ = TextIO.output ostream (BString.toString client_data)
+                                                  val _ = TextIO.closeOut ostream
+                                                  
+
+
+                                              in 
                                                   BString.empty
                                               end
                                     | _ =>                     

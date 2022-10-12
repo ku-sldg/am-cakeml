@@ -43,7 +43,7 @@ fun main () = (* sendReq term *)
                                                   end
                                      val _ = case bool_res of
                                                  True =>
-                                                 let val client_data = BString.empty
+                                                 let val client_data = BString.fromString "client secret"
                                                      val client_phrase = client_data_phrase
                                                      val _ = sendReq client_phrase myPl toPl
                                                                      nsMap [client_data]
