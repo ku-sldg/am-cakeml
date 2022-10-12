@@ -65,3 +65,15 @@ val ssl_enc_aspid = "ssl_enc_aspid"
 (** val ssl_enc_args : coq_Arg list **)
 
 val ssl_enc_args = [""]
+
+(** val store_clientData_targid : coq_ASP_ID **)
+
+val store_clientData_targid = "store_clientData_targid"
+
+(** val store_clientData_aspid : coq_ASP_ID **)
+
+val store_clientData_aspid = "store_clientData_aspid"
+
+(** val store_clientData_args : coq_Arg list **)
+
+val store_clientData_args = [""]

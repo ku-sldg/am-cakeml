@@ -30,11 +30,20 @@ fun main () = (* sendReq term *)
                                              val rawev_res = sendReq term myPl toPl nsMap [nonceVal]
                                              (* val et_computed = eval term myPl Coq_mt *)
                                              val appraise_res = run_gen_appraise_w_nonce
-									term myPl nonceVal rawev_res in
+									term myPl nonceVal rawev_res
                                              (* print ("Evidence Type computed: \n" ^
                                                     (evToString et_computed) ^ "\n\n"); *)
-                                             print ("Appraisal Evidence Summary Structure: \n" ^
-                                                    evidenceCToString appraise_res ^ "\n\n")
+                                             val _ = print ("Appraisal Evidence Summary Structure: \n" ^
+                                                            evidenceCToString appraise_res ^ "\n\n")
+
+                                             val client_data = BString.empty
+                                             val client_phrase = client_data_phrase
+                                         
+                                             val _ = sendReq client_phrase myPl toPl nsMap [client_data]
+
+
+                                         in
+                                             print ("\nSent data to appraised server...\n")
                                          end
                                         
                                      end

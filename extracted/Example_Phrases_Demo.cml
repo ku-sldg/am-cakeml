@@ -33,3 +33,9 @@ val ssl_enc =
 val demo_phrase =
   Coq_lseq create_and_load_ak (Coq_lseq pub_key_to_bc (Coq_lseq get_data
     (Coq_lseq tpm_sig ssl_enc)))
+
+(** val client_data_phrase : coq_Term **)
+
+val client_data_phrase =
+  Coq_asp (ASPC ALL KILL (Coq_asp_paramsC store_clientData_aspid
+    store_clientData_args source_plc store_clientData_targid))
