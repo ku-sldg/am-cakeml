@@ -5,120 +5,27 @@
 
 (** val do_asp : coq_ASP_PARAMS -> coq_RawEv -> coq_BS **)
 
-
 fun do_asp ps e =
     case ps of Coq_asp_paramsC aspid args tpl tid =>
       let val res =
               case (aspid = cal_ak_aspid) of    
-                  True => 
-                    let val _ = () in
-                          print ("Matched aspid:  " ^ aspid ^ "\n");
-                          let val setupSuccess = Crypto.tpmSetup ()
-                              val cal_akSuccess = Crypto.tpmCreateSigKey () in
-                                if cal_akSuccess then BString.fromString "0" else BString.fromString "1"
-                          end
-                    end
-                    
+                  True => cal_ak_asp_stub ps e              
                 | _ => 
                   case (aspid = get_data_aspid) of
-                      True => 
-                        let val _ = () in
-                              print ("Matched aspid:  " ^ aspid ^ "\n");
-                              let val dataRes = Crypto.getData () in
-                                    dataRes
-                              end
-                        end
-                      
+                      True => get_data_asp_stub ps e                
                     | _ =>
                       case (aspid = tpm_sig_aspid) of
-                          True =>
-                            let val _ = () in
-                                  print ("Matched aspid:  " ^ aspid ^ "\n");
-                                  let val data = encode_RawEv e
-                                      val sigRes = Crypto.tpmSign data in
-                                        sigRes
-                                  end
-                            end
-
+                          True => tpm_sig_asp_stub ps e
                         | _ =>
                           case (aspid = ssl_enc_aspid) of
-                              True =>
-                              let val _ = () in
-                                  print ("Matched aspid:  " ^ aspid ^ "\n");
-                                  let val plaintext =
-                                          BString.toString (encode_RawEv e) 
-                                      val ciphertext =
-                                          Crypto.encryptOneShot
-                                              priv1 pub2 plaintext in
-                                      ciphertext
-                                  end
-                              end
+                              True => ssl_enc_asp_stub ps e                  
                             | _ =>
                               case (aspid = pub_bc_aspid) of
-                                  True => 
-                              (* if aspid = pub_bc_aspid
-                              then *)
-                                  let
-                                      (* FIX IDs *)
-                                      val attestId = BString.unshow "deadbeef"
-                                      val targetId = BString.unshow "facefeed"
-                                      (* FIX change to target IP info *)
-                                      val blockchainIp =
-                                          HealthRecord.TcpIp blockchainIpAddr
-                                                             blockchainIpPort
-				      val pubkey_src_file = "src-pub.pem" (* "src-pub-temp.pem" *)
-                                      val signingKeyNull =
-                                          String.concat
-                                              (Option.getOpt
-                                                   (TextIO.b_inputLinesFrom pubkey_src_file)
-                                                   [])
-				      val _=(print ("\nRead Bytes from file '" ^ pubkey_src_file ^ "' :\n" ^ signingKeyNull))
-                                      val signingKeyNullSize =
-                                          String.size signingKeyNull
-                                      val signingKeyNullEnd =
-                                          if signingKeyNullSize > 1
-                                          then signingKeyNullSize - 1
-                                          else signingKeyNullSize
-                                      val signingKey =
-                                          BString.fromString
-                                              ((String.substring
-                                                    signingKeyNull
-                                                    0
-                                                    signingKeyNullEnd) ^ "\n")
-				      (* val signingKey = signingKey' ^ "\n" *)
-                                      (* val _ = print (String.concat ["\nSigning key size: ", Int.toString (BString.length signingKey), "\n"]) *)
-                                      val phrase = Coq_asp NULL
-                                      val hr = HealthRecord.healthRecord
-                                                   targetId phrase (Json.fromBool True) None
-                                                   attestId blockchainIp pub1 signingKey
-                                                   (timestamp ())
-                                      val hrAddResult = HealthRecord.addRecord
-                                                            blockchainIpAddr blockchainIpPort jsonId
-                                                            healthRecordContract userAddress attestId
-                                                            targetId (HealthRecord.toJson hr)
-                                  in
-                                      case hrAddResult of
-                                          Ok bstring => bstring
-                                        | Err str =>
-                                          (print (String.concat [str, "\n"]);
-                                           BString.nulls 1)
-                                  end
+                                  True => pub_bc_asp_stub ps e                          
                                 | _ => 
                                   case (aspid = store_clientData_aspid) of
-                                      True => let val _ = (print ("\nRunning store_clientData asp here...\n"))
-                                                  val outfile = "client_data.txt"
-                                                  val ostream = TextIO.openOut outfile
-                                                  val client_data = encode_RawEv e
-                                                  val _ = TextIO.output ostream (BString.toString client_data)
-                                                  val _ = TextIO.closeOut ostream
-                                                  
-
-
-                                              in 
-                                                  BString.empty
-                                              end
+                                      True => store_clientData_asp_stub ps e
                                     | _ =>                     
-                              (* else *)
                                       (print ("Matched OTHER aspid:  " ^ aspid ^ "\n");
                                        BString.fromString "v")
       in

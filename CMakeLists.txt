@@ -80,6 +80,13 @@ get_files(cop_src
     copland/Parser.sml
     am/ServerAm.sml
     am/CoplandCommUtil.sml
+    stubs/cal_ak_ASP_Stub.sml
+    stubs/get_data_ASP_Stub.sml
+    stubs/tpm_sig_ASP_Stub.sml
+    stubs/ssl_enc_ASP_Stub.sml
+    stubs/pub_bc_ASP_Stub.sml
+    stubs/store_clientData_ASP_Stub.sml
+    stubs/ssl_sig_ASP_Stub.sml
     stubs/IO_Stubs.sml
     extracted/Cvm_Monad.cml
     extracted/Cvm_Impl.cml

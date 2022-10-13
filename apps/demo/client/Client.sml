@@ -26,8 +26,13 @@ fun main () = (* sendReq term *)
                                      val nonceVal = BString.fromString "anonce"
                                      (* val badNonceVal = BString.fromString "badnonce" *)
 				     (* sendReq --> am/CoplandCommUtil.sml *)
-				     val auth_token = BString.fromString "auth_tok"
-                                     val rawev_res = sendReq term myPl toPl nsMap [auth_token, nonceVal]
+				     val auth_token = (* BString.fromString "auth_tok" *)
+                                         let val res = run_cvm_rawEv ssl_sig myPl [] (* [BString.empty] *) in
+                                             res
+                                         end
+                                     val _ = print ("\n\nauth_token sent: " ^ (rawEvToString auth_token) ^ "\n\n")
+                                     val initEv = List.@ auth_token [nonceVal]
+                                     val rawev_res = sendReq term myPl toPl nsMap initEv (* [auth_token, nonceVal] *)
                                      (* val et_computed = eval term myPl Coq_mt *)
                                      val appraise_res = run_gen_appraise_w_nonce
 							    term myPl nonceVal rawev_res
@@ -46,8 +51,9 @@ fun main () = (* sendReq term *)
                                                  True =>
                                                  let val client_data = BString.fromString "client secret"
                                                      val client_phrase = client_data_phrase
+                                                     val initEv_Client = List.@ auth_token [client_data]
                                                      val _ = sendReq client_phrase myPl toPl
-                                                                     nsMap [auth_token, client_data]
+                                                                     nsMap initEv_Client (* [auth_token, client_data] *)
                                                                      
                                                                      
                                                  in (print ("\nSent data to appraised server...\n"))
@@ -65,3 +71,21 @@ fun main () = (* sendReq term *)
     end
         
 val _ = main ()      
+
+
+
+
+
+(*
+List.null: 'a list -> bool
+List.length: 'a list -> int
+List.rev: 'a list -> 'a list
+List.@: 'a list -> 'a list -> 'a list
+List.hd: 'a list -> 'a
+List.tl: 'a list -> 'a list
+List.last: 'a list -> 'a
+List.getItem: 'a list -> ('a * 'a list) option
+List.nth: 'a list -> int -> 'a
+List.take: 'a list -> int -> 'a list
+List.drop: 'a list -> int -> 'a list
+*)

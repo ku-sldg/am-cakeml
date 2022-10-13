@@ -35,7 +35,7 @@ fun decrypt_bs_to_rawev' bs ps =
         res
     end
 
-
+(* TPM sig checking *)
 (** val checkGG'' :
     coq_ASP_PARAMS -> coq_Plc -> coq_BS -> coq_RawEv -> coq_BS **)
 fun checkGG'' ps p bs ls =
@@ -137,11 +137,46 @@ fun checkGG'' ps p bs ls =
         val checkGood = Crypto.checkTpmSig signGood msg
     in
         if checkGood
-        then (print ("\n\nSig Check PASSED\n\n");
+        then (print ("\n\nTPM Sig Check PASSED\n\n");
               passed_bs)
-        else (print ("\n\nSig Check FAILED\n\n");
+        else (print ("\n\nTPM Sig Check FAILED\n\n");
               failed_bs)
     end
+
+
+
+
+(* SSL sig checking *)
+(** val checkGG''' :
+    coq_ASP_PARAMS -> coq_Plc -> coq_BS -> coq_RawEv -> coq_BS **)
+fun checkGG''' ps p bs ls =
+    let
+        val msg = encode_RawEv ls
+        val signGood = bs		       
+
+	val theirPubkey = pub (* signingKey *) (* theirPubkey_bc *)
+	val _ = print ("\ntheirPubkey bytes: \n" ^ (BString.toString theirPubkey) ^ "\n\n")
+        val pub_len = BString.length theirPubkey
+        val sig_len = BString.length signGood
+        val msg_len = BString.length msg
+
+                                     (*
+	val pubkeyfile_dest = "src-pub.pem" (* "src-pub-temp-client.pem" *)
+        val outFileHandle = TextIO.openOut pubkeyfile_dest
+	val _ = print ("\nOutputting pubkey FROM blockchain TO file: " ^ pubkeyfile_dest ^ "\n")
+        val _ = TextIO.output outFileHandle (BString.toString theirPubkey)
+                                     *)
+                                     
+        val checkGood = Crypto.sigCheck theirPubkey signGood msg (* Crypto.checkTpmSig signGood msg *)
+    in
+        if checkGood
+        then (print ("\n\nSSL Sig Check PASSED\n\n");
+              passed_bs)
+        else (print ("\n\nSSL Sig Check FAILED\n\n");
+              failed_bs)
+    end
+
+
 
 (** val checkGG' :
     coq_ASP_PARAMS -> coq_Plc -> coq_BS -> coq_RawEv -> coq_BS **)
@@ -150,10 +185,11 @@ fun checkGG' ps p bs ls =
         Coq_asp_paramsC aspid args tpl tid =>
         case (aspid = tpm_sig_aspid) of
             True => checkGG'' ps p bs ls
-          | _ =>
-            let val _ = (print "Checking non-signature ASP ... \n\n") in
-                BString.fromString "check(data.txt)" (* TODO: check data val here? *)
-            end
+          | _ => case (aspid = ssl_sig_aspid) of
+                     True => checkGG''' ps p bs ls
+                   | _ => let val _ = (print "Checking non-signature ASP ... \n\n") in
+                              BString.fromString "check(data.txt)" (* TODO: check data val here? *)
+                          end
                      
         
 (** fun checkNonce' : coq_BS -> coq_BS -> coq_BS **)

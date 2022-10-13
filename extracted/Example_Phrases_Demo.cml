@@ -28,6 +28,12 @@ val ssl_enc =
   Coq_asp (ASPC ALL ENCR (Coq_asp_paramsC ssl_enc_aspid ssl_enc_args
     source_plc ssl_enc_targid))
 
+(** val ssl_sig : coq_Term **)
+
+val ssl_sig =
+  Coq_asp (ASPC ALL EXTD (Coq_asp_paramsC ssl_sig_aspid ssl_sig_args dest_plc
+    ssl_sig_targid))
+
 (** val demo_phrase : coq_Term **)
 
 val demo_phrase =
