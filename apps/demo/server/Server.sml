@@ -8,7 +8,10 @@ fun term_policy_check_good p termIn = privPolicy p termIn (* TODO: invoke policy
    it returns a raw error message string. In the future, we may want to wrap
    said error messages in JSON as well to make it easier on the client. *)
 fun evalJson s =
-    let val (REQ pl1 pl2 map t ev) = jsonToRequest (strToJson s)
+    let val (REQ pl1 pl2 map t ev') = jsonToRequest (strToJson s)
+    	val ev = List.tl ev'
+	val ev_head = List.hd ev'
+	val _ = print ("\nAuth Token: " ^ (BString.toString ev_head))
         val me = O (* TODO: hardcode ok? *)
         val policy_check = term_policy_check_good dest_plc t
         val ev' = if (policy_check)

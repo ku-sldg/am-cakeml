@@ -26,7 +26,8 @@ fun main () = (* sendReq term *)
                                      val nonceVal = BString.fromString "anonce"
                                      (* val badNonceVal = BString.fromString "badnonce" *)
 				     (* sendReq --> am/CoplandCommUtil.sml *)
-                                     val rawev_res = sendReq term myPl toPl nsMap [nonceVal]
+				     val auth_token = BString.fromString "auth_tok"
+                                     val rawev_res = sendReq term myPl toPl nsMap [auth_token, nonceVal]
                                      (* val et_computed = eval term myPl Coq_mt *)
                                      val appraise_res = run_gen_appraise_w_nonce
 							    term myPl nonceVal rawev_res
