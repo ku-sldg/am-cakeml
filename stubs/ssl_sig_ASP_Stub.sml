@@ -6,7 +6,8 @@ fun ssl_sig_asp_stub ps e =
                let val _ = () in
                    print ("Matched aspid:  " ^ aspid ^ "\n");
                    let val data = encode_RawEv e
-                       val sigRes = Crypto.signMsg privGood data (* Crypto.tpmSign data *) in
+		       val myPriKey = privGood (* privBad *)
+                       val sigRes = Crypto.signMsg myPriKey data (* Crypto.tpmSign data *) in
                        sigRes
                    end
                end

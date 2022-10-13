@@ -152,12 +152,14 @@ fun checkGG'' ps p bs ls =
 fun checkGG''' ps p bs ls =
     let
         val msg = encode_RawEv ls
-        val signGood = bs		       
+        val signGood_loc = bs   
 
 	val theirPubkey = pub (* signingKey *) (* theirPubkey_bc *)
 	val _ = print ("\ntheirPubkey bytes: \n" ^ (BString.toString theirPubkey) ^ "\n\n")
+	val _ = print ("\nmsg: " ^ (BString.show msg) ^ "\n\n")
+	val _ = print ("\nsignGood: " ^ (BString.show signGood_loc) ^ "\n\n")
         val pub_len = BString.length theirPubkey
-        val sig_len = BString.length signGood
+        val sig_len = BString.length signGood_loc
         val msg_len = BString.length msg
 
                                      (*
@@ -167,7 +169,7 @@ fun checkGG''' ps p bs ls =
         val _ = TextIO.output outFileHandle (BString.toString theirPubkey)
                                      *)
                                      
-        val checkGood = Crypto.sigCheck theirPubkey signGood msg (* Crypto.checkTpmSig signGood msg *)
+        val checkGood = Crypto.sigCheck theirPubkey signGood_loc msg (* Crypto.checkTpmSig signGood msg *)
     in
         if checkGood
         then (print ("\n\nSSL Sig Check PASSED\n\n");
