@@ -25,9 +25,13 @@ fun do_asp ps e =
                                 | _ => 
                                   case (aspid = store_clientData_aspid) of
                                       True => store_clientData_asp_stub ps e
-                                    | _ =>                     
-                                      (print ("Matched OTHER aspid:  " ^ aspid ^ "\n");
-                                       BString.fromString "v")
+
+                                    | _ => 
+                                      case (aspid = ssl_sig_aspid) of
+                                          True => ssl_sig_asp_stub ps e
+                                        | _ =>                     
+                                          (print ("Matched OTHER aspid:  " ^ aspid ^ "\n");
+                                           BString.fromString "v")
       in
           print ("Running ASP with params: \n" ^ (aspParamsToString ps) ^ "\n");
           res
