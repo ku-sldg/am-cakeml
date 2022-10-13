@@ -47,7 +47,7 @@ fun main () = (* sendReq term *)
                                                  let val client_data = BString.fromString "client secret"
                                                      val client_phrase = client_data_phrase
                                                      val _ = sendReq client_phrase myPl toPl
-                                                                     nsMap [client_data]
+                                                                     nsMap [auth_token, client_data]
                                                                      
                                                                      
                                                  in (print ("\nSent data to appraised server...\n"))
