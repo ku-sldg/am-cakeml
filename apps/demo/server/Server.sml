@@ -11,8 +11,12 @@ fun evalJson s =
     let val (REQ pl1 pl2 map t ev') = jsonToRequest (strToJson s)
     	val ev = List.tl ev'
 	val ev_head = List.hd ev'
-	val _ = print ("\nAuth Token: " ^ (BString.toString ev_head))
+	val _ = print ("\nAuth Token: " ^ (BString.toString ev_head) ^ "\n\n")
         val me = O (* TODO: hardcode ok? *)
+        val appraise_res =
+            run_gen_appraise (ssl_sig) me (Coq_mt) BString.empty [ev_head]
+        val _ = print ("Auth Appraisal Evidence Summary Structure: \n" ^
+                       evidenceCToString appraise_res ^ "\n\n")
         val policy_check = term_policy_check_good dest_plc t
         val ev' = if (policy_check)
                   then run_cvm_rawEv t me ev
