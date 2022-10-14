@@ -17,17 +17,55 @@ fun evalJson s =
             run_gen_appraise (ssl_sig) me (Coq_mt) BString.empty [ev_head]
         val _ = print ("Auth Appraisal Evidence Summary Structure: \n" ^
                        evidenceCToString appraise_res ^ "\n\n")
-        val policy_check = term_policy_check_good dest_plc t
-        val ev' = if (policy_check)
-                  then run_cvm_rawEv t me ev
-                  else [] (* Returning empty evidence on failed policy check.
-                             TODO:  return error response to client? *)
-     in jsonToStr (responseToJson (RES pl2 pl1 ev'))
+        val auth_bool_res =
+            case appraise_res of
+                Coq_ggc_app _ _ sigcheckres _ => (sigcheckres = passed_bs)
+              | _ =>
+                let val _ =
+                        print ("\nFailed to match expected Appraisal Evidence structure\n")
+                in False
+                end
+        val ev' =
+            if (auth_bool_res)
+            then
+                let val _ = (print "\nPASSED authentication (client request)\n")
+                    val policy_check = term_policy_check_good dest_plc t in
+                    if (policy_check)
+                    then
+                        let val _= (print "\nPASSED policy check (client request)\n") in
+                            run_cvm_rawEv t me ev
+                        end
+
+                     
+                    else
+                        let val _= (print "\nFAILED policy check (client request)\n") in
+                            []
+                        end
+                end
+            else
+                let val _= (print "\nFAILED authentication (client request)\n") in
+                    []
+                end
+
+                      (*
+            case (auth_bool_res) of
+                True =>
+                let
+                    val policy_check = term_policy_check_good dest_plc t in
+                    case (policy_check) of
+                        True => run_cvm_rawEv t me ev
+                      | _ =>  (print "\nFailed policy check for client\n"); []
+                      (* Returning empty evidence on failed policy check.
+                         TODO:  return error response to client? *)
+                end
+              | _ => (print "\nFailed to authenticate client\n"); [] *)
+            
+    in jsonToStr (responseToJson (RES pl2 pl1 ev'))
     end
     handle Json.Exn s1 s2 =>
-            (TextIO.print_err (String.concat ["JSON error", s1, ": ", s2, "\n"]);
-             "Invalid JSON/Copland term")
-                (*
+           (TextIO.print_err (String.concat ["JSON error", s1, ": ", s2, "\n"]);
+            "Invalid JSON/Copland term")
+        (*
          | USMexpn s =>
             (TextIO.print_err (String.concat ["USM error: ", s, "\n"]);
             "USM failure")   *)
