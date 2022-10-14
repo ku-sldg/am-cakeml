@@ -64,13 +64,22 @@ get_files(cop_src
     copland/CoplandUtil.sml
     copland/json/CoplandToJson.sml
     copland/json/JsonToCopland.sml
-    am/CommTypes.sml
     stubs/IO_Stubs_extra.sml
+    am/CommTypes.sml
     stubs/Example_Phrases_Demo_Admits.sml
     stubs/Compare_Stub.sml
     extracted/privPolicy.cml
     apps/blockchain/Blockchain.sml
     apps/blockchain/HealthRecord.sml
+    stubs/cal_ak_ASP_Stub.sml
+    stubs/get_data_ASP_Stub.sml
+    stubs/tpm_sig_ASP_Stub.sml
+    stubs/ssl_enc_ASP_Stub.sml
+    stubs/pub_bc_ASP_Stub.sml
+    stubs/store_clientData_ASP_Stub.sml
+    stubs/ssl_sig_ASP_Stub.sml
+    stubs/kim_meas_ASP_Stub.sml
+    stubs/appraise_kim_meas_ASP.sml
     stubs/Appraisal_IO_Stubs_New.sml
     extracted/Appraisal_Defs_New.cml
     extracted/Impl_appraisal.cml
@@ -80,13 +89,6 @@ get_files(cop_src
     copland/Parser.sml
     am/ServerAm.sml
     am/CoplandCommUtil.sml
-    stubs/cal_ak_ASP_Stub.sml
-    stubs/get_data_ASP_Stub.sml
-    stubs/tpm_sig_ASP_Stub.sml
-    stubs/ssl_enc_ASP_Stub.sml
-    stubs/pub_bc_ASP_Stub.sml
-    stubs/store_clientData_ASP_Stub.sml
-    stubs/ssl_sig_ASP_Stub.sml
     stubs/IO_Stubs.sml
     extracted/Cvm_Monad.cml
     extracted/Cvm_Impl.cml

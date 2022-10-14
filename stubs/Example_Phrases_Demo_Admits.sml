@@ -89,3 +89,15 @@ val ssl_sig_aspid = "ssl_sig_aspid"
 (** val ssl_sig_args : coq_Arg list **)
 
 val ssl_sig_args = [""]
+
+(** val kim_meas_targid : coq_ASP_ID **)
+
+val kim_meas_targid = "kim_meas_targid"
+
+(** val kim_meas_aspid : coq_ASP_ID **)
+
+val kim_meas_aspid = "kim_meas_aspid"
+
+(** val kim_meas_args : coq_Arg list **)
+
+val kim_meas_args = [""]

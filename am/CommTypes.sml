@@ -78,3 +78,36 @@ fun jsonToResponse js = case (Json.toMap js) of
           [Json.Int pl1, Json.Int pl2, ev] =>
               RES (natFromInt pl1) (natFromInt pl2) (jsonBsListToList ev)
         | _ => raise Json.Exn "getRES" "unexpected argument list"
+
+fun strToJson str = Result.okValOf (Json.parse str)
+fun jsonToStr js  = Json.stringify js
+
+
+
+(* 
+   fun encode_RawEv : coq_RawEv -> coq_BS 
+
+   This function takes a coq_RawEv value (list of coq_BS values) and encodes it as a single
+   coq_BS value (to, for instance prepare it for cryptographic transformation).  To encode, 
+   we first take the raw evidence sequence to an Array of Json strings (am/CommTypes.bsListToJsonList).
+   Next, we "stringify" that Array (am/ServerAM.jsonToStr) to a single string.  Finally, we lift
+   that string into a bstring (BString.fromString).
+*)
+fun encode_RawEv ls = BString.fromString (jsonToStr (bsListToJsonList ls))
+
+(* 
+   fun decode_RawEv : coq_BS -> coq_RawEv
+   This should be the inverse of encode_RawEv.
+*)
+fun decode_RawEv bsval = jsonBsListToList (strToJson (BString.toString bsval))
+
+
+(** val decrypt_bs_to_rawev' : coq_BS -> coq_ASP_PARAMS -> coq_RawEv **)
+
+fun decrypt_bs_to_rawev' bs ps (* priv pub *) =
+    let val recoveredtext = Crypto.decryptOneShot (* priv pub *) priv2 pub1 bs
+        val bs_recovered = BString.fromString recoveredtext
+        val res = decode_RawEv bs_recovered
+        val _ = print ("\nDecryption Succeeded: \n" ^ (rawEvToString res) ^ "\n" ) in
+        res
+    end

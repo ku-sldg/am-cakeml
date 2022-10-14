@@ -112,3 +112,18 @@ val ssl_sig_aspid =
 
 val ssl_sig_args =
   failwith "AXIOM TO BE REALIZED"
+
+(** val kim_meas_targid : coq_ASP_ID **)
+
+val kim_meas_targid =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val kim_meas_aspid : coq_ASP_ID **)
+
+val kim_meas_aspid =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val kim_meas_args : coq_Arg list **)
+
+val kim_meas_args =
+  failwith "AXIOM TO BE REALIZED"

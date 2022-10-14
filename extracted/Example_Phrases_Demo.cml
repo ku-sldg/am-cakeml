@@ -34,11 +34,17 @@ val ssl_sig =
   Coq_asp (ASPC ALL EXTD (Coq_asp_paramsC ssl_sig_aspid ssl_sig_args dest_plc
     ssl_sig_targid))
 
+(** val kim_meas : coq_Term **)
+
+val kim_meas =
+  Coq_asp (ASPC ALL EXTD (Coq_asp_paramsC kim_meas_aspid kim_meas_args
+    dest_plc kim_meas_targid))
+
 (** val demo_phrase : coq_Term **)
 
 val demo_phrase =
-  Coq_lseq create_and_load_ak (Coq_lseq pub_key_to_bc (Coq_lseq get_data
-    (Coq_lseq tpm_sig ssl_enc)))
+  Coq_lseq kim_meas (Coq_lseq create_and_load_ak (Coq_lseq pub_key_to_bc
+    (Coq_lseq get_data (Coq_lseq tpm_sig ssl_enc))))
 
 (** val client_data_phrase : coq_Term **)
 

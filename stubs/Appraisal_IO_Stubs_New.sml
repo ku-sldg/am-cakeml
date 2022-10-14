@@ -2,38 +2,7 @@
      extracted/Term_Defs.cml, ... (TODO: crypto dependencies?) *)
 
 
-fun strToJson str = Result.okValOf (Json.parse str)
-fun jsonToStr js  = Json.stringify js
 
-
-
-(* 
-   fun encode_RawEv : coq_RawEv -> coq_BS 
-
-   This function takes a coq_RawEv value (list of coq_BS values) and encodes it as a single
-   coq_BS value (to, for instance prepare it for cryptographic transformation).  To encode, 
-   we first take the raw evidence sequence to an Array of Json strings (am/CommTypes.bsListToJsonList).
-   Next, we "stringify" that Array (am/ServerAM.jsonToStr) to a single string.  Finally, we lift
-   that string into a bstring (BString.fromString).
-*)
-fun encode_RawEv ls = BString.fromString (jsonToStr (bsListToJsonList ls))
-
-(* 
-   fun decode_RawEv : coq_BS -> coq_RawEv
-   This should be the inverse of encode_RawEv.
-*)
-fun decode_RawEv bsval = jsonBsListToList (strToJson (BString.toString bsval))
-
-
-(** val decrypt_bs_to_rawev' : coq_BS -> coq_ASP_PARAMS -> coq_RawEv **)
-
-fun decrypt_bs_to_rawev' bs ps =
-    let val recoveredtext = Crypto.decryptOneShot priv2 pub1 bs
-        val bs_recovered = BString.fromString recoveredtext
-        val res = decode_RawEv bs_recovered
-        val _ = print ("\nDecryption Succeeded: \n" ^ (rawEvToString res) ^ "\n" ) in
-        res
-    end
 
 (* TPM sig checking *)
 (** val checkGG'' :
@@ -178,8 +147,6 @@ fun checkGG''' ps p bs ls =
               failed_bs)
     end
 
-
-
 (** val checkGG' :
     coq_ASP_PARAMS -> coq_Plc -> coq_BS -> coq_RawEv -> coq_BS **)
 fun checkGG' ps p bs ls =
@@ -187,13 +154,18 @@ fun checkGG' ps p bs ls =
         Coq_asp_paramsC aspid args tpl tid =>
         case (aspid = tpm_sig_aspid) of
             True => checkGG'' ps p bs ls
+                              
           | _ => case (aspid = ssl_sig_aspid) of
                      True => checkGG''' ps p bs ls
-                   | _ => let val _ = (print "Checking non-signature ASP ... \n\n") in
-                              BString.fromString "check(data.txt)" (* TODO: check data val here? *)
-                          end
-                     
-        
+
+                   | _ => case (aspid = kim_meas_aspid) of
+                              True => appraise_kim_meas_asp_stub ps p bs ls
+                                                 
+                            | _ => let val _ = (print "Checking non-signature ASP ... \n\n") in
+                                       BString.fromString "check(data.txt)" (* TODO: check data val here? *)
+                                   end
+                                       
+                                       
 (** fun checkNonce' : coq_BS -> coq_BS -> coq_BS **)
 fun checkNonce' nonceGolden nonceCandidate =
     if (nonceGolden = nonceCandidate)
