@@ -11,7 +11,7 @@ fun appraise_kim_meas_asp_stub ps p bs ls =
                            (Option.getOpt
                                 (TextIO.b_inputLinesFrom targ_file)
                                 [])
-		       val _ = (print ("\nRead Bytes from file '" ^ targ_file ^ "' :\n" ^ targ_file_contents))
+		       val _ = () (* (print ("\nRead Bytes from file '" ^ targ_file ^ "' :\n" ^ targ_file_contents)) *)
                        val bs_contents = BString.fromString targ_file_contents 
                        val bool_res = (bs_contents = bs)
                    in

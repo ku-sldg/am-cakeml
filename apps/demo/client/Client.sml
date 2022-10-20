@@ -33,6 +33,7 @@ fun main () = (* sendReq term *)
                                      val _ = print ("\n\nauth_token sent: " ^ (rawEvToString auth_token) ^ "\n\n")
                                      val initEv = List.@ auth_token [nonceVal]
                                      val rawev_res = sendReq term myPl toPl nsMap initEv (* [auth_token, nonceVal] *)
+                                     val _ = print "\n\nStarting Evidence Appraisal...\n\n"
                                      (* val et_computed = eval term myPl Coq_mt *)
                                      val appraise_res = run_gen_appraise_w_nonce
 							    term myPl nonceVal rawev_res
@@ -43,23 +44,30 @@ fun main () = (* sendReq term *)
                                      val bool_res =
                                          case appraise_res of
                                              Coq_eec_app _ _ _
-                                                         (Coq_ggc_app _ _ sigcheckres _) =>
-                                             (sigcheckres = passed_bs)
+                                                         (Coq_ggc_app _ _ sigcheckres
+                                                                      (Coq_ggc_app _ _ _
+                                                                      (Coq_ggc_app _ _ kimcheckres _))) =>
+                                             if (sigcheckres = passed_bs)
+                                             then if (kimcheckres = passed_bs)
+                                                  then True
+                                                  else False
+                                             else False
                                            | _ => let val _ = print ("\nFailed to match expected Appraisal Evidence structure\n") in False
                                                   end
                                      val _ = case bool_res of
                                                  True =>
-                                                 let val client_data = BString.fromString "client secret"
+                                                 let val _ = print "\nSending Client data to Server ... \n"
+                                                     val client_data = BString.fromString "client data"
                                                      val client_phrase = client_data_phrase
                                                      val initEv_Client = List.@ auth_token [client_data]
                                                      val _ = sendReq client_phrase myPl toPl
                                                                      nsMap initEv_Client (* [auth_token, client_data] *)
                                                                      
                                                                      
-                                                 in (print ("\nSent data to appraised server...\n"))
+                                                 in () (* (print ("\nSent data to appraised server...\n")) *)
                                                  end
                                                | _ =>
-                                                 (print ("\nAppraisal of Server failed.\n")) in
+                                                 (print ("\nAppraisal of Server FAILED.\n")) in
                                      ()
                                                      
                                  end

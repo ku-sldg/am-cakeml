@@ -38,8 +38,11 @@ fun checkGG'' ps p bs ls =
 	val bcErrString =
 	    case blockchainResult of
 	    	 Ok v => "bc success"
-		 | Err e' => e'
+	       | Err e' => e'
+                  (*             
 	val _ = print ("\nBC read error:  \n" ^ bcErrString ^ "\n\n")
+                  *)
+                               
 
         val theirPubkeyResult =
             Result.map HealthRecord.getSigningKey
@@ -48,12 +51,16 @@ fun checkGG'' ps p bs ls =
 			     
 	val theirPubkey_bc =
 	    case theirPubkeyResult of
-	    	   Ok v => let val _ =
-		   (print ("\ntheirPubkey read error (JSON):  \n" ^ "success" ^ "\n\n")) in
-		   v end 
-		   | Err errString => let val _ =
+	    	Ok v =>  let val _ = (print "\n\nPulled Server public key from Blockchain...\n\n")
+                         in v
+                         end
+
+                                 (*
+		   (print ("\ntheirPubkey read error (JSON):  \n" ^ "success" ^ "\n\n")) in *)
+		   
+		   | Err errString => (BString.nulls 451) (* let val _ =
 		   print ("\ntheirPubkey read error (JSON):  \n" ^ errString ^ "\n\n") in
-		   (BString.nulls 451) end		       
+		   (BString.nulls 451) end *)		       
 
 
 
@@ -95,13 +102,15 @@ fun checkGG'' ps p bs ls =
 
 
 	val theirPubkey = (* signingKey *) theirPubkey_bc
-	val _ = print ("\ntheirPubkey bytes: \n" ^ (BString.toString theirPubkey) ^ "\n\n")
+                              (* 
+	val _ = print ("\ntheirPubkey bytes: \n" ^ (BString.toString theirPubkey) ^ "\n\n") *)
         val pub_len = BString.length theirPubkey
         val sig_len = BString.length signGood
         val msg_len = BString.length msg
 	val pubkeyfile_dest = "src-pub.pem" (* "src-pub-temp-client.pem" *)
         val outFileHandle = TextIO.openOut pubkeyfile_dest
-	val _ = print ("\nOutputting pubkey FROM blockchain TO file: " ^ pubkeyfile_dest ^ "\n")
+                                           (* 
+	val _ = print ("\nOutputting pubkey FROM blockchain TO file: " ^ pubkeyfile_dest ^ "\n") *)
         val _ = TextIO.output outFileHandle (BString.toString theirPubkey)
         val checkGood = Crypto.checkTpmSig signGood msg
     in
@@ -161,8 +170,8 @@ fun checkGG' ps p bs ls =
                    | _ => case (aspid = kim_meas_aspid) of
                               True => appraise_kim_meas_asp_stub ps p bs ls
                                                  
-                            | _ => let val _ = (print "Checking non-signature ASP ... \n\n") in
-                                       BString.fromString "check(data.txt)" (* TODO: check data val here? *)
+                            | _ => let val _ = () (* (print ("\n\nChecking ASP with ID: " ^ aspid ^ "\n\n")) *) in
+                                       BString.fromString ("check(" ^ aspid ^ ")") (* TODO: check data val here? *)
                                    end
                                        
                                        

@@ -24,7 +24,7 @@ fun sendReq t fromPl toPl nsMap evv (* am key *) =
     in
         (print ("Sent term:\n" ^ termToString t ^
                 "\n\nInitial raw evidence (Sent):\n" ^
-                rawEvToString evv ^ "\n\nRaw evidence result (Received):\n" ^
+                rawEvToString evv ^ "\n\nReceived Raw evidence result.\n" ^
                 rawEvToString resev ^ "\n"));
         resev
     end

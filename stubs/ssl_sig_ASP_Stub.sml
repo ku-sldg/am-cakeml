@@ -16,9 +16,10 @@ fun get_prikey ps = (* BString.empty *)
                 let val opt_key_string = Map.lookup ini "privateKey"
                     val key_bytes = case opt_key_string of
                                         Some v =>
-                                        let val res = BString.unshow v
-                                            val _ = print ("\n\nPrikey bytes: \n " ^ BString.show res) in res
+                                        let val res = BString.unshow v in res
                                         end
+                                                                     (*
+                                            val _ = print ("\n\nPrikey bytes: \n " ^ BString.show res) in res *)                               
                                        | _ =>
                                          let val _ = TextIOExtra.printLn_err "\nError:  no 'privateKey' field configured for ini\n\n"
                                          in BString.empty
