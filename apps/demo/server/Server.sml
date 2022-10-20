@@ -11,7 +11,7 @@ fun evalJson s =
     let val (REQ pl1 pl2 map t ev') = jsonToRequest (strToJson s)
     	val ev = List.tl ev'
 	val ev_head = List.hd ev'
-	val _ = print ("\nAuth Token: " ^ (BString.toString ev_head) ^ "\n\n")
+	val _ = print ("\nReceived request with Auth Token: " ^ (BString.toString ev_head) ^ "\n\n")
         val me = O (* TODO: hardcode ok? *)
         val appraise_res =
             run_gen_appraise (ssl_sig) me (Coq_mt) BString.empty [ev_head]

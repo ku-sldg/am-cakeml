@@ -19,7 +19,8 @@ fun pub_bc_asp_stub ps e =
                            (Option.getOpt
                                 (TextIO.b_inputLinesFrom pubkey_src_file)
                                 [])
-		   val _=(print ("\nRead Bytes from file '" ^ pubkey_src_file ^ "' :\n" ^ signingKeyNull))
+                           (*
+                   val _=(print ("\nRead Bytes from file '" ^ pubkey_src_file ^ "' :\n" ^ signingKeyNull)) *)
                    val signingKeyNullSize =
                        String.size signingKeyNull
                    val signingKeyNullEnd =
