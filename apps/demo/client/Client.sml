@@ -22,7 +22,7 @@ fun main () = (* sendReq term *)
                      Err e => let val _ = O in
                                   TextIOExtra.printLn_err e
                               end
-                   | Ok nsMap => let val _ = (print "\nSending Request in Client\n\n")
+                   | Ok nsMap => let val _ = () 
                                      val nonceVal = BString.fromString "anonce"
                                      (* val badNonceVal = BString.fromString "badnonce" *)
 				     (* sendReq --> am/CoplandCommUtil.sml *)
@@ -30,6 +30,7 @@ fun main () = (* sendReq term *)
                                          let val res = run_cvm_rawEv ssl_sig myPl [] (* [BString.empty] *) in
                                              res
                                          end
+                                     val _ = (print "\nSending Request in Client\n")
                                      val _ = print ("\n\nauth_token sent: " ^ (rawEvToString auth_token) ^ "\n\n")
                                      val initEv = List.@ auth_token [nonceVal]
                                      val rawev_res = sendReq term myPl toPl nsMap initEv (* [auth_token, nonceVal] *)
