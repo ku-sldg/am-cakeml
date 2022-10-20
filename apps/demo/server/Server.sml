@@ -32,7 +32,7 @@ fun evalJson s =
                     val policy_check = term_policy_check_good dest_plc t in
                     if (policy_check)
                     then
-                        let val _= (print "\nPASSED policy check (client request)\n") in
+                        let val _= (print "\nPASSED policy check (client request)\n\n") in
                             run_cvm_rawEv t me ev
                         end
 

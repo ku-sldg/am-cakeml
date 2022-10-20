@@ -16,9 +16,9 @@ fun appraise_kim_meas_asp_stub ps p bs ls =
                        val bool_res = (bs_contents = bs)
                    in
                        if bool_res
-                       then (print ("\n\nKIM Appraisal Check PASSED\n\n");
+                       then (print ("\nKIM Appraisal Check PASSED\n\n");
                              passed_bs)
-                       else (print ("\n\nKIM Appraisal Check FAILED\n\n");
+                       else (print ("\nKIM Appraisal Check FAILED\n\n");
                              failed_bs)
                    end
                end

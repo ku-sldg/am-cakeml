@@ -154,9 +154,9 @@ fun checkGG''' ps p bs ls =
         val checkGood = Crypto.sigCheck theirPubkey signGood_loc msg (* Crypto.checkTpmSig signGood msg *)
     in
         if checkGood
-        then (print ("\n\nSSL Sig Check PASSED\n\n");
+        then (print ("\nSSL Sig Check PASSED\n\n");
               passed_bs)
-        else (print ("\n\nSSL Sig Check FAILED\n\n");
+        else (print ("\nSSL Sig Check FAILED\n\n");
               failed_bs)
     end
 
