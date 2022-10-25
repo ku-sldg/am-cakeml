@@ -79,14 +79,17 @@ get_files(cop_src
     stubs/store_clientData_ASP_Stub.sml
     stubs/ssl_sig_ASP_Stub.sml
     stubs/kim_meas_ASP_Stub.sml
+    copland/Parser.sml
+    util/IniUtil.sml
     stubs/appraise_kim_meas_ASP.sml
+    stubs/appraise_ssl_sig_ASP.sml
+    stubs/appraise_tpm_sig_ASP.sml
     stubs/Appraisal_IO_Stubs_New.sml
     extracted/Appraisal_Defs_New.cml
     extracted/Impl_appraisal.cml
     stubs/Axioms_Io.sml
     extracted/Evidence_Bundlers.cml extracted/StMonad_Coq.cml
     extracted/Cvm_St.cml extracted/IO_Type.cml
-    copland/Parser.sml
     am/ServerAm.sml
     am/CoplandCommUtil.sml
     stubs/IO_Stubs.sml

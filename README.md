@@ -5,7 +5,13 @@ This project makes use of formally verified components, including the CakeML com
 
 # Building
 
-The following documents the process of building standalone executables for Linux and MacOS.
+## Automated Build (Docker)
+
+See README instructions at the following repository for a (Docker-based) automated build: [am-docker](https://github.com/ku-sldg/am-docker).
+
+## Manual Build
+
+The following documents the process of manually building standalone executables for Linux and MacOS.
 
 ### Prerequisites
 - CakeML v1322: [Download](https://github.com/CakeML/cakeml/releases/tag/v1322) the CakeML compiler (`cake-x64-64.tar.gz` is most likely the version you want, it targets 64-bit architectures). Unpack the tarball, run `make cake`, then put the `cake` executable on your system path. E.g.
@@ -47,3 +53,8 @@ This manual configuration should not be necessary for most builds. It may be nec
 
 ### Why are you using the sml file extension for CakeML files?
 To make use of sml syntax highlighting. CakeML does stray from SML syntax slightly, but it is better than nothing 😃.
+
+# Contact
+Primary maintainer:  [Adam Petz](https://ampetz.github.io/) (ampetz@ku.edu)
+
+Contributors:  TJ Barclay, Andrew Cousino, Anna Fritz, Ed Komp, [Grant Jurgensen](https://grant.jurgensen.dev/), [Garrett Mills](https://garrettmills.dev/), Michael Nieses, Sarah Scott, [Perry Alexander](https://perry.alexander.name/)

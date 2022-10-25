@@ -74,4 +74,39 @@ in
         end handle TextIO.BadFileName => Err "Bad file name"
                  | TextIO.InvalidFD   => Err "Invalid file descriptor"
 
+fun get_ini _ =
+    let val name  = CommandLine.name ()
+        val usage = ("Usage: " ^ name ^ " configurationFile\n"
+                     ^ "e.g.   " ^ name ^ " config.ini\n")
+
+    in case CommandLine.arguments () of
+           [fileName] => (
+            case parseIniFile fileName of
+                Err e  =>  let val _ = TextIOExtra.printLn_err e in
+                               Map.empty String.compare
+                           end
+              | Ok ini => ini
+        )
+    end
+
+
+                                             
+(* fun get_ini_hexbytes s :: string -> BString 
+
+   This function looks for the input key string (s) in the input ini map 
+   (ini) If found, it converts the hex string representation to 
+   a bytestring and returns it.
+*)
+fun get_ini_hexbytes ini s =
+    let val opt_key_string = Map.lookup ini s
+        val key_bytes = case opt_key_string of
+                            Some v => BString.unshow v
+                          | _ =>
+                            let val _ = TextIOExtra.printLn_err ("\nError:  no '" ^ s ^ "' field configured for ini\n\n")
+                            in BString.empty
+                            end
+    in key_bytes
+    end
+
+
 end

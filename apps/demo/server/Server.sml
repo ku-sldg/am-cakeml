@@ -118,15 +118,8 @@ fun startServer ini =
 
 (* () -> () *)
 fun main () =
-    let val name  = CommandLine.name ()
-        val usage = "Usage: " ^ name ^ " configurationFile\n"
-                  ^ "e.g.   " ^ name ^ " config.ini\n"
-     in case CommandLine.arguments () of
-              [fileName] => (
-                  case parseIniFile fileName of
-                    Err e  => TextIOExtra.printLn_err e
-                  | Ok ini => startServer ini
-              )
-           | _ => TextIO.print_err usage
+    let val ini = get_ini () in
+        startServer ini
     end
+        
 val () = main ()
