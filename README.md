@@ -49,6 +49,58 @@ From the build directory, type `ccmake ..` to bring up the configuration GUI. Ho
 
 This manual configuration should not be necessary for most builds. It may be necessary if you want to use a C compiler other than your default compiler, change the compile flags, cross-compile, etc.
 
+# Source File Layout
+
+## Top-level files/scripts
+
+`CMakeLists.txt`:  This file is the main "dependency configuration" file for the CMake build workflow.  Adding new source files will likely require changes to this file to allow re-compilation.
+
+`print_cakeml_types.sh`:  Script that prints out the types of functions provided by the CakeML standard library.
+
+`do_extract.sh`:  Once customized, this script supports copying extracted CakeML source files (.cml extension) from their initially-extracted location to their end location in this project.  To customize, replace the contents of the `COQ_DIR` variable with the full path to the directory containing the extracted .cml files.  If using the [Copland AVM repo](https://github.com/ku-sldg/copland-avm) for extraction, this path would be something like:  `.../copland-avm/src`.
+
+## Top-level directories
+
+`/am`:  This directory contains source files related to Attestation Manager (AM) capabilities and utilities.
+* ServerAM.sml:  Helper functions for configuring AMs and performing AM-to-AM communication.
+* CommTypes.sml:  Datatypes and utility functions for dealing with AM communication and encoding/decoding of AM structures.
+* CoplandCommUtil.sml:  Utility functions to facilitate AM communication, including interpreting Copland remote requests.
+
+`/apps`:  This directory contains a collection of applications used to generate executables for specific attestation scenarios and also for testing.
+* blockchain/:  blockchain-related testing
+* repl/:  a REPL for prototyping parsing of Copland concrete syntax.  (NOTE:  this code is likely deprecated at the moment due to slight changes in the Copland representation).
+* demo/:  A client-server demo scenario, with executables for each in their respecrive subdirectories.  See the README in demo/ for more details around configuration and running of this scenario.
+* serverClient/:  An older client-server scenario used primarily for testing.
+* template/:  A template used as a basis for creating new apps.
+* tests/:  Test executables for testing various parts of the system, with different library dependencies.
+
+`/build`:  A working directory for building application executables.  This folder must be created before first use (See top-level README instructions).
+`/copland`:  Contains source files with utilities and various wrappers around Copland datatypes and functionality.
+* CoplandUtil.sml:  Mostly ToString methods for common Copland datatypes.
+* CvmUtil.sml:  ToString and other utilities related to the internal CVM state structure.
+* Parser.sml:  Parser utilities for everything from string-based numerals to Copland concrete syntax (commented out at present--needs updating).
+* /json:  Sub-directory containing source files for converting Copland datatypes to (CoplandToJson.sml) and from (JsonToCopland.sml) their JSON representations.
+
+`/extracted`:  Directory that holds extracted source files.  These files should NOT be modified by hand.  Our current extraction pipeline uses the formal Coq specification [here](https://github.com/ku-sldg/copland-avm) in addition to a custom Coq plugin for CakeML extraction [here](https://github.com/ku-sldg/cakeml-synthesis).  
+
+`/stubs`:  This directory holds a collection of source files that define datatypes and functions that instantiate code left empty in extracted code.  These "stubbed out" items are deemed inappropriate (or infeasible) for direct formalization at present due to their external IO requirements or low-level nature.
+* IO_Stubs.sml:  Fills in external IO stubs left abstract in the definition of the Copland Virtual Machine (CVM).
+* Appraisal_IO_Stubs.sml:  Fills in external IO stubs left abstract in the Copland generalized appraisal procedure.
+* BS.sml:  Instantiates a concrete representation of binary data (and some default values).
+* Compare_Stub.sml:  Instantiates equality stubs for string and number comparison.
+* Example_Phrases_Demo_Admits.sml:  Demo-specific instantiations of parameters for custom Copland terms.
+* Params_Admits_hardcoded.sml:  Similar to Example_Phrases_Demo_Admits.sml.
+* IO_Stubs_extra.sml:  Some hard-coded configuration parameters necessary for CVM execution (This file will hopefully go away once the CVM is more "externally-configurable").
+* appraise_\<asp name\>_ASP.sml:  Custom appraisal procedures, where \<asp name\> is the name of the ASP being appraised. 
+* \<asp name\>_ASP_Stub.sml:  Custom ASP stub implementations, where \<asp name\> is the ID of the ASP being defined.
+
+
+`/system`:  A collection of system-level utilities.  Of note is the `/crypto` sub-directory which holds stubs and wrappers for various cryptographic implementations.
+
+
+`/util`:  Source files with miscellaneous utility functions used throughout this codebase.  Examples include parsing (Parser.sml), Json (Json.sml), and binary data representation (ByteString.sml).
+
+
 # Misc.
 
 ### Why are you using the sml file extension for CakeML files?

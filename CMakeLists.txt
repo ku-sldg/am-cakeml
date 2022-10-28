@@ -84,7 +84,7 @@ get_files(cop_src
     stubs/appraise_kim_meas_ASP.sml
     stubs/appraise_ssl_sig_ASP.sml
     stubs/appraise_tpm_sig_ASP.sml
-    stubs/Appraisal_IO_Stubs_New.sml
+    stubs/Appraisal_IO_Stubs.sml
     extracted/Appraisal_Defs_New.cml
     extracted/Impl_appraisal.cml
     stubs/Axioms_Io.sml
