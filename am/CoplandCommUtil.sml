@@ -17,6 +17,24 @@ fun socketDispatch fromPl nsMap toPl ev t =
         resev
     end
 
+
+(* coq_Term -> coq_Plc -> (bs list) -> (bs list) *)
+fun am_sendReq t fromPl toPl (*nsMap*) evv (* am key *) =
+    let (* val fromPl = O *)
+        val myini = get_ini ()
+        val nsMap = get_ini_nsMap myini
+        val resev = socketDispatch fromPl nsMap toPl evv t
+    in
+        (print ("Sent term:\n" ^ termToString t ^
+                "\n\nInitial raw evidence (Sent):\n" ^
+                rawEvToString evv ^ "\n\nReceived raw evidence result.\n" (* ^
+                rawEvToString resev ^ "\n" *) ));
+        resev
+    end
+
+
+
+        
 (* coq_Term -> coq_Plc -> nsMap -> (bs list) -> (bs list) *)
 fun sendReq t fromPl toPl nsMap evv (* am key *) =
     let (* val fromPl = O *)

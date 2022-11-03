@@ -30,3 +30,12 @@ fun iniServerAm ini =
                     Result.bind ((Ok (BString.unshow key)) handle _ =>
                                                                   Err "Could not parse private key")
                                 (fn key => Ok (iniNsMap ini)))
+
+
+fun get_ini_nsMap ini =
+    case (iniServerAm ini) of
+        Err e => let val _ = O in
+                     (TextIOExtra.printLn_err e);
+                     (Map.empty nat_compare)
+                 end
+      | Ok v => v
