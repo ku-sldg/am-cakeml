@@ -13,6 +13,12 @@ val doRemote_session =
 val parallel_vm_thread =
   failwith "AXIOM TO BE REALIZED"
 
+(** val am_sendReq :
+    coq_Term -> coq_Plc -> coq_Plc -> coq_RawEv -> coq_RawEv **)
+
+val am_sendReq =
+  failwith "AXIOM TO BE REALIZED"
+
 (** val do_asp' : coq_ASP_PARAMS -> coq_RawEv -> coq_BS coq_IO **)
 
 fun do_asp' params e =

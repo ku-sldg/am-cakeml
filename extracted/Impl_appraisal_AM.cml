@@ -1,0 +1,64 @@
+(** val peel_bs_am : coq_RawEv -> (coq_BS, coq_RawEv) prod coq_AM **)
+
+fun peel_bs_am ls = case ls of
+  [] => failm
+| bs :: ls' => ret (Coq_pair bs ls')
+
+(** val gen_appraise_AM :
+    coq_Evidence -> coq_RawEv -> coq_AppResultC coq_AM **)
+
+fun gen_appraise_AM et ls =
+  case et of
+    Coq_mt => ret Coq_mtc_app
+  | Coq_nn nid =>
+    bind (peel_bs_am ls) (fn v =>
+      let val Coq_pair bs _ = v in
+      bind (checkNonce nid bs) (fn res => ret (Coq_nnc_app nid res)) end)
+  | Coq_uu p fwd params et' =>
+    (case fwd of
+       ENCR =>
+       bind (peel_bs_am ls) (fn v =>
+         let val Coq_pair bs _ = v in
+         bind (decrypt_bs_to_rawev_am bs params) (fn decrypted_ls =>
+           bind (gen_appraise_AM et' decrypted_ls) (fn rest =>
+             ret (Coq_eec_app p params passed_bs rest))) end)
+     | EXTD =>
+       bind (peel_bs_am ls) (fn v =>
+         let val Coq_pair bs ls' = v in
+         bind (checkGG params p bs ls') (fn v0 =>
+           bind (gen_appraise_AM et' ls') (fn rest =>
+             ret (Coq_ggc_app p params v0 rest))) end)
+     | KEEP => gen_appraise_AM et' ls
+     | _ => ret Coq_mtc_app)
+  | Coq_ss et1 et2 =>
+    bind (gen_appraise_AM et1 (firstn (et_size et1) ls)) (fn x =>
+      bind (gen_appraise_AM et2 (skipn (et_size et1) ls)) (fn y =>
+        ret (Coq_ssc_app x y)))
+
+(** val fromSome : 'a1 -> 'a1 option -> 'a1 **)
+
+fun fromSome default opt = case opt of
+  Some x => x
+| None => default
+
+(** val gen_appraise_am_comp :
+    coq_Term -> coq_Plc -> coq_Evidence -> coq_RawEv -> coq_AppResultC coq_AM **)
+
+fun gen_appraise_am_comp t p et ls =
+  gen_appraise_AM (eval t p et) ls
+
+(** val am_sendReq_nonce :
+    coq_Term -> coq_Plc -> coq_Plc -> coq_AppResultC coq_AM **)
+
+fun am_sendReq_nonce t pFrom pTo =
+  bind (am_newNonce gen_nonce_bits) (fn nid =>
+    let val resev = am_sendReq t pFrom pTo (gen_nonce_bits :: []) in
+    gen_appraise_am_comp t pFrom (Coq_nn nid) resev end)
+
+(** val run_am_sendReq_nonce :
+    coq_Term -> coq_Plc -> coq_Plc -> coq_AppResultC **)
+
+fun run_am_sendReq_nonce t pFrom pTo =
+  let val am_comp = am_sendReq_nonce t pFrom pTo in
+  let val optRes = evalSt am_comp empty_amst in
+  fromSome Coq_mtc_app optRes end end

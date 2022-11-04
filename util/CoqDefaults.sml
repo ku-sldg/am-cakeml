@@ -79,6 +79,9 @@ fun concatWith s l =
 
 (* Map functions *)
 
+
+(*
+
 type ('a, 'b) mymap = ('a * 'b) list
 
 val map_empty = []
@@ -92,6 +95,10 @@ fun map_set m k v = (k,v)::m
 fun map_dom m = case m
                  of [] => []
                   | ((i,a)::ms) => i :: map_dom ms
+
+*)
+
+                             
 
 (* It'd be nice if this could work *)
 (* 'f = 'a -> 'a -> order *)

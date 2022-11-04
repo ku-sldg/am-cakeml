@@ -7,7 +7,8 @@ fun term_policy_check_good p termIn = privPolicy p termIn (* TODO: invoke policy
 (* When things go well, this returns a JSON evidence string. When they go wrong,
    it returns a raw error message string. In the future, we may want to wrap
    said error messages in JSON as well to make it easier on the client. *)
-fun evalJson s =
+fun evalJson s =       (* jsonToStr (responseToJson (RES O O [])) *)
+    
     let val (REQ pl1 pl2 map t ev') = jsonToRequest (strToJson s)
         val ev = ev'
       (*
@@ -79,9 +80,6 @@ fun evalJson s =
          | USMexpn s =>
             (TextIO.print_err (String.concat ["USM error: ", s, "\n"]);
             "USM failure")   *)
-
-
-
               
 
 fun respondToMsg client = Socket.output client (evalJson (Socket.inputAll client))

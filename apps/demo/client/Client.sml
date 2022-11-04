@@ -2,9 +2,14 @@
 
 val term = demo_phrase
 
-fun main () = () (* run_am_sendReq_nonce demo_phrase dest_plc source_plc *)
+fun main () = run_am_sendReq_nonce demo_phrase dest_plc source_plc (* () *)
 
-               
+
+
+(*
+
+
+                  
 (* main :: () -> () *)                                                 
 fun main' () = (* sendReq term *)
 
@@ -64,6 +69,9 @@ fun main' () = (* sendReq term *)
             ()     
         end
     end
+
+
+*)
         
 val _ = main ()      
              

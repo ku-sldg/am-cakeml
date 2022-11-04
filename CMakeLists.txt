@@ -84,14 +84,18 @@ get_files(cop_src
     stubs/appraise_kim_meas_ASP.sml
     stubs/appraise_ssl_sig_ASP.sml
     stubs/appraise_tpm_sig_ASP.sml
-    stubs/Appraisal_IO_Stubs.sml
-    extracted/Appraisal_Defs_New.cml
-    extracted/Impl_appraisal.cml
+    stubs/Appraisal_IO_Stubs_AM.sml
+    stubs/Maps.sml
+    extracted/StMonad_Coq.cml
+    extracted/AM_St.cml
+    extracted/AM_Monad.cml
+    extracted/Appraisal_Defs_AM.cml
     stubs/Axioms_Io.sml
-    extracted/Evidence_Bundlers.cml extracted/StMonad_Coq.cml
+    extracted/Evidence_Bundlers.cml
     extracted/Cvm_St.cml extracted/IO_Type.cml
     am/ServerAm.sml
     am/CoplandCommUtil.sml
+    extracted/Impl_appraisal_AM.cml
     stubs/IO_Stubs.sml
     extracted/Cvm_Monad.cml
     extracted/Cvm_Impl.cml

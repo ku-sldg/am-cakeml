@@ -1,0 +1,26 @@
+type 'a coq_AM = (coq_AM_St, 'a) coq_St
+
+(** val am_newNonce : coq_BS -> nat coq_AM **)
+
+fun am_newNonce bs =
+  bind get (fn oldSt =>
+    let val oldMap =
+      let val Coq_mkAM_St am_nonceMap _ = oldSt in am_nonceMap end
+    in
+    let val oldId = let val Coq_mkAM_St _ am_nonceId = oldSt in am_nonceId end
+    in
+    let val newMap = map_set nat_EqClass oldMap oldId bs in
+    let val newId = add oldId (S O) in
+    bind (put (Coq_mkAM_St newMap newId)) (fn _ => ret oldId) end end end end)
+
+(** val am_getNonce : nat -> coq_BS coq_AM **)
+
+fun am_getNonce nid =
+  bind get (fn oldSt =>
+    let val oldMap =
+      let val Coq_mkAM_St am_nonceMap _ = oldSt in am_nonceMap end
+    in
+    let val resopt = map_get nat_EqClass oldMap nid in
+    (case resopt of
+       Some res => ret res
+     | None => failm) end end)

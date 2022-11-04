@@ -1,0 +1,7 @@
+datatype coq_AM_St =
+  Coq_mkAM_St ((nat, coq_BS) coq_MapC) nat
+
+(** val empty_amst : coq_AM_St **)
+
+val empty_amst =
+  Coq_mkAM_St (map_empty nat_EqClass) O

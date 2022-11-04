@@ -1,0 +1,17 @@
+(** val decrypt_bs_to_rawev_am :
+    coq_BS -> coq_ASP_PARAMS -> coq_RawEv coq_AM **)
+
+fun decrypt_bs_to_rawev_am bs params =
+  ret (decrypt_bs_to_rawev' bs params)
+
+(** val checkGG :
+    coq_ASP_PARAMS -> coq_Plc -> coq_BS -> coq_RawEv -> coq_BS coq_AM **)
+
+fun checkGG params p sig0 ls =
+  ret (checkGG' params p sig0 ls)
+
+(** val checkNonce : nat -> coq_BS -> coq_BS coq_AM **)
+
+fun checkNonce nid nonceCandidate =
+  bind (am_getNonce nid) (fn nonceGolden =>
+    ret (checkNonce' nonceGolden nonceCandidate))
