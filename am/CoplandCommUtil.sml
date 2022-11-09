@@ -1,11 +1,11 @@
 
 exception DispatchErr string
-(* coq_Plc -> nsMap -> coq_Plc -> (bs list) -> coq_Term -> (bs list) *)
-fun socketDispatch fromPl nsMap toPl ev t =
+(* coq_Plc -> nsMap -> coq_Plc -> coq_Evidence -> (bs list) -> coq_Term -> (bs list) *)
+fun socketDispatch fromPl nsMap toPl et ev t =
     let val addr = case Map.lookup nsMap toPl of
               Some a => a
             | None => raise DispatchErr ("Place "^ plToString toPl ^" not in nameserver map")
-        val req  = (REQ fromPl toPl nsMap t ev)
+        val req  = (REQ fromPl toPl nsMap t et ev)
         val port =
             case toPl of
                 (S O) => 5000
@@ -18,12 +18,12 @@ fun socketDispatch fromPl nsMap toPl ev t =
     end
 
 
-(* coq_Term -> coq_Plc -> (bs list) -> (bs list) *)
-fun am_sendReq t fromPl toPl (*nsMap*) evv (* am key *) =
+(* coq_Term -> coq_Plc -> coq_Plc -> coq_Evidence -> (bs list) -> (bs list) *)
+fun am_sendReq t fromPl toPl (*nsMap*) et evv (* am key *) =
     let (* val fromPl = O *)
         val myini = get_ini ()
         val nsMap = get_ini_nsMap myini
-        val resev = socketDispatch fromPl nsMap toPl evv t
+        val resev = socketDispatch fromPl nsMap toPl et evv t
     in
         (print ("Sent term:\n" ^ termToString t ^
                 "\n\nInitial raw evidence (Sent):\n" ^
@@ -38,7 +38,8 @@ fun am_sendReq t fromPl toPl (*nsMap*) evv (* am key *) =
 (* coq_Term -> coq_Plc -> nsMap -> (bs list) -> (bs list) *)
 fun sendReq t fromPl toPl nsMap evv (* am key *) =
     let (* val fromPl = O *)
-        val resev = socketDispatch fromPl nsMap toPl evv t
+        val auth_tok_ev_type = Coq_mt (* TODO: fix hardcode here *)
+        val resev = socketDispatch fromPl nsMap toPl auth_tok_ev_type evv t
     in
         (print ("Sent term:\n" ^ termToString t ^
                 "\n\nInitial raw evidence (Sent):\n" ^

@@ -88,10 +88,21 @@ fun termToJson term = case term of
 
 
 
-
-(*
 fun evToJson e = case e of
-      Mt => noArgConstructor "Mt"
+                     Coq_mt => noArgConstructor "Mt"
+                   | Coq_nn nid => constructorWithArgs "NN" [placeToJson nid]
+                   | Coq_uu p fwd ps e' =>
+                     constructorWithArgs "UU"
+                                         [ placeToJson p,
+                                           fwdToJson fwd,
+                                           aspParamsToJson ps,
+                                           evToJson e' ]
+                   | Coq_ss e1 e2 =>
+                     constructorWithArgs "SS"
+                                         [ evToJson e1,
+                                           evToJson e2 ]
+(*
+                     => 
     | U aid args bs ev => constructorWithArgs "U" [idToJson aid, stringListToJsonList args, byteStringToJson bs, evToJson ev]
     | G bs ev => constructorWithArgs "G" [byteStringToJson bs, evToJson ev]
     | H bs => constructorWithArgs "H" [byteStringToJson bs]

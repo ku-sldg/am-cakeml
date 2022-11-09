@@ -9,14 +9,24 @@ fun term_policy_check_good p termIn = privPolicy p termIn (* TODO: invoke policy
    said error messages in JSON as well to make it easier on the client. *)
 fun evalJson s =       (* jsonToStr (responseToJson (RES O O [])) *)
     
-    let val (REQ pl1 pl2 map t ev') = jsonToRequest (strToJson s)
+    let val (REQ pl1 pl2 map t et ev') = jsonToRequest (strToJson s)
         val ev = ev'
+        (* val me = O (* TODO: hardcode ok? *) *)
+
+        val resev = run_am_serve_auth_tok_req t pl1 pl2 ev' et
+                     
+
+
+
+
+
+                     
       (*
     	val ev = List.tl ev'
 	val ev_head = List.hd ev'
 	val _ = print ("\nReceived request with Auth Token: " ^ (BString.toString ev_head) ^ "\n\n")
 *)
-        val me = O (* TODO: hardcode ok? *)
+      
 
       (*
         val appraise_res =
@@ -24,6 +34,14 @@ fun evalJson s =       (* jsonToStr (responseToJson (RES O O [])) *)
         val _ = print ("Auth Appraisal Evidence Summary Structure: \n" ^
                        evidenceCToString appraise_res ^ "\n\n")
       *)
+
+
+
+
+(*
+
+
+
                      
         val auth_bool_res = True
       (*
@@ -58,6 +76,10 @@ fun evalJson s =       (* jsonToStr (responseToJson (RES O O [])) *)
                     []
                 end
 
+
+
+
+                    
                       (*
             case (auth_bool_res) of
                 True =>
@@ -70,8 +92,11 @@ fun evalJson s =       (* jsonToStr (responseToJson (RES O O [])) *)
                          TODO:  return error response to client? *)
                 end
               | _ => (print "\nFailed to authenticate client\n"); [] *)
+
+
+*)
             
-    in jsonToStr (responseToJson (RES pl2 pl1 ev'))
+    in jsonToStr (responseToJson (RES pl2 pl1 resev))
     end
     handle Json.Exn s1 s2 =>
            (TextIO.print_err (String.concat ["JSON error", s1, ": ", s2, "\n"]);

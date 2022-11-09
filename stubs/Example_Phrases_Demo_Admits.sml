@@ -1,3 +1,8 @@
+(** val client_data_bs : coq_BS **)
+
+val client_data_bs = BString.fromString "client data"
+
+
 (** val source_plc : coq_Plc **)
 
 val source_plc = S O

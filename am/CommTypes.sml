@@ -15,7 +15,7 @@ val emptyNsMap : nsMap = Map.empty nat_compare
    Nameserver mapping,
    Term to execute,
    Initial evidence *)
-datatype requestMessage = REQ coq_Plc coq_Plc nsMap coq_Term (bs list)
+datatype requestMessage = REQ coq_Plc coq_Plc nsMap coq_Term coq_Evidence (bs list)
 
                               
 (* To place,
@@ -25,9 +25,9 @@ datatype responseMessage = RES coq_Plc coq_Plc (bs list)
 
 fun bsListToJsonList args  =  Json.fromList (List.map byteStringToJson args)
 
-fun requestToJson (REQ pl1 pl2 map t ev) = Json.fromPairList
+fun requestToJson (REQ pl1 pl2 map t et ev) = Json.fromPairList
     [("toPlace", placeToJson pl1), ("fromPlace", placeToJson pl2), ("reqNameMap", nsMapToJson map),
-     ("reqTerm", termToJson t), ("reqEv", bsListToJsonList ev)]
+     ("reqTerm", termToJson t), ("reqEvType", evToJson et), ("reqEv", bsListToJsonList ev)]
 
 fun responseToJson (RES pl1 pl2 ev) = Json.fromPairList
     [("respToPlace", placeToJson pl1), ("respFromPlace", placeToJson pl2), ("respEv", bsListToJsonList ev)]
@@ -46,8 +46,8 @@ fun jsonToRequest js = case (Json.toMap js) of
 
     and
     getREQ data = case data of
-          [Json.Int pl1, Json.Int pl2, Json.Object alist, t, ev] =>
-              REQ (natFromInt pl1) (natFromInt pl2) (toPlAddrMap (Map.toAscList alist)) (jsonToTerm t) (jsonBsListToList ev)
+          [Json.Int pl1, Json.Int pl2, Json.Object alist, t, et, ev] =>
+              REQ (natFromInt pl1) (natFromInt pl2) (toPlAddrMap (Map.toAscList alist)) (jsonToTerm t) (jsonToEv et) (jsonBsListToList ev)
         | _ => raise Json.Exn "getREQ" "unexpected argument list"
 
     and

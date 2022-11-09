@@ -77,7 +77,24 @@ fun do_start_par_thread _ _ _ =
 (** val do_wait_par_thread : coq_Loc -> coq_EvC coq_IO **)
 
 fun do_wait_par_thread loc =
-  ret (parallel_vm_thread loc)
+    ret (parallel_vm_thread loc)
+
+
+(** val requester_bound : coq_Term -> coq_Plc -> coq_Evidence -> bool **)
+
+fun requester_bound t p et = True
+
+(** val appraise_auth_tok : coq_AppResultC -> bool **)
+
+fun appraise_auth_tok appres = True
+
+
+
+
+
+        
+
+      (*
 
 (* coq_Term -> coq_Plc -> coq_Plc -> (bs list) -> (bs list) *)
 fun am_sendReq t fromPl toPl evv =
@@ -91,3 +108,10 @@ fun am_sendReq t fromPl toPl evv =
                 rawEvToString resev ^ "\n" *) ));
         resev
     end
+
+*)
+
+
+
+
+      

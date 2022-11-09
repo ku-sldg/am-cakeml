@@ -1,0 +1,36 @@
+(** val am_sendReq_auth :
+    coq_Term -> coq_Plc -> coq_Plc -> coq_RawEv -> unit coq_AM **)
+
+fun am_sendReq_auth _ _ _ _ =
+  ret ()
+
+(** val client_demo_am_comp : unit -> unit coq_AM **)
+
+fun client_demo_am_comp _ =
+  let val app_res = run_am_sendReq_nonce_auth demo_phrase dest_plc source_plc
+  in
+  let val bool_res =
+    case app_res of
+      Coq_eec_app _ _ _ a0 =>
+      (case a0 of
+         Coq_ggc_app _ _ _ a2 =>
+         (case a2 of
+            Coq_ggc_app _ _ _ a4 =>
+            (case a4 of
+               Coq_ggc_app _ _ _ _ => True
+             | _ => False)
+          | _ => False)
+       | _ => False)
+    | _ => False
+  in
+  (case bool_res of
+     True =>
+     bind
+       (am_sendReq_auth client_data_phrase dest_plc source_plc
+         (client_data_bs :: [])) (fn _ => ret ())
+   | False => ret ()) end end
+
+(** val run_client_demo_am_comp : unit -> unit **)
+
+fun run_client_demo_am_comp _ =
+  run_am_app_comp (client_demo_am_comp ()) ()

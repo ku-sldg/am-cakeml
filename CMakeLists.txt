@@ -95,13 +95,14 @@ get_files(cop_src
     extracted/Cvm_St.cml extracted/IO_Type.cml
     am/ServerAm.sml
     am/CoplandCommUtil.sml
-    extracted/Impl_appraisal_AM.cml
     stubs/IO_Stubs.sml
     extracted/Cvm_Monad.cml
     extracted/Cvm_Impl.cml
     extracted/Cvm_Run.cml
-    copland/CvmUtil.sml
     extracted/Example_Phrases_Demo.cml
+    extracted/Impl_appraisal_AM.cml
+    extracted/Demo_AM.cml
+    copland/CvmUtil.sml
     copland/Parser)
 
 get_files(server_am_src ${util_src} ${posix_src} ${cop_src})

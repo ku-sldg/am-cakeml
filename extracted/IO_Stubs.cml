@@ -14,7 +14,7 @@ val parallel_vm_thread =
   failwith "AXIOM TO BE REALIZED"
 
 (** val am_sendReq :
-    coq_Term -> coq_Plc -> coq_Plc -> coq_RawEv -> coq_RawEv **)
+    coq_Term -> coq_Plc -> coq_Plc -> coq_Evidence -> coq_RawEv -> coq_RawEv **)
 
 val am_sendReq =
   failwith "AXIOM TO BE REALIZED"
@@ -40,3 +40,13 @@ fun do_start_par_thread _ _ _ =
 
 fun do_wait_par_thread loc =
   ret (parallel_vm_thread loc)
+
+(** val requester_bound : coq_Term -> coq_Plc -> coq_Evidence -> bool **)
+
+val requester_bound =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val appraise_auth_tok : coq_AppResultC -> bool **)
+
+val appraise_auth_tok =
+  failwith "AXIOM TO BE REALIZED"

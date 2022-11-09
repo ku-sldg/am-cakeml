@@ -2,7 +2,8 @@
 
 val term = demo_phrase
 
-fun main () = run_am_sendReq_nonce demo_phrase dest_plc source_plc (* () *)
+fun main () = (run_client_demo_am_comp () )
+(* run_am_sendReq_nonce demo_phrase dest_plc source_plc *) (* () *)
 
 
 

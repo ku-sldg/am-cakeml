@@ -156,6 +156,94 @@ and
 
 
 
+
+(* jsonToEv : json -> coq_Evidence
+   (json object to Copland Evidence Type)  *)      
+fun jsonToEv js = case (Json.toMap js) of
+                    (* Json.toMap : json -> ((string,json) map) option *)
+      Some js' => fromAList (Map.toAscList js') (* js' : (string,json) map *)
+    | None =>
+        raise Json.Exn "jsonToTerm" "Copland term does not begin as an AList"
+
+and
+(* fromAList :: (string,json) map -> coq_Evidence  *)
+fromAList pairs = case pairs of
+        [("constructor", constructorVal)] =>
+                      getEvidenceNullaryConstructor constructorVal
+                   | [("constructor", constructorVal), ("data", args)] =>
+                     getEvidence constructorVal args
+                   | [("data", args), ("constructor", constructorVal)] =>
+                     getEvidence constructorVal args
+                   | _ =>
+                     raise Json.Exn "fromAList" "jsonToEv does not contain just constructor and data pairs"
+
+    and
+    getEvidence (Json.String constructor) (Json.Array args) =
+    case constructor of
+        "NN" => getNN args
+      | "UU" => getUU args
+      | "SS" => getSS args
+      |  _ => raise Json.Exn "getEvidence"
+                    ("Unexpected constructor for Copland term: " ^
+                     constructor)
+    
+
+    (* getAspc :: Json.Array -> coq_Evidence *)
+    and                              
+    getNN args =  case args of
+    [Json.Int q] => Coq_nn (natFromInt q)
+
+
+    and
+    getUU args =
+    case args of
+        [Json.Int q, Json.String fwdStr, paramsJson, e'] =>
+        Coq_uu (natFromInt q) (fwdFromString fwdStr) (getAspParams paramsJson)
+               (jsonToEv e')
+      | _ => raise Json.Exn "getUU" "unexpected argument list"
+
+    and
+    getSS args =
+    case args of
+
+        [e1, e2] =>
+        Coq_ss (jsonToEv e1) (jsonToEv e2)
+      | _ => raise Json.Exn "getSS" "unexpected argument list"
+
+                                    
+                     
+    and
+    (* getAspParams :: json -> coq_ASP_PARAMS *)
+    (* (string, json) list -> coq_ASP_PARAMS *)
+    getAspParams (Json.Object js') =
+      case (Map.toAscList js') of
+          [("constructor", Json.String "asp_paramsC"), ("data", args)] => getAspParamsArray args
+        | [("data", args), ("constructor", Json.String "asp_paramsC")] => getAspParamsArray args
+        | _ => raise Json.Exn "getAspParams" "expected asp_paramsC constructor object"
+    and
+    (* getAspParamsArray :: json -> coq_ASP_PARAMS
+       Expected:  [Json.String aspid, 
+                   Json.Array [Json.String stringArg1, Json.String stringArg2, ...], 
+                   Json.Int plc, 
+                   Json.String targid] *)
+    getAspParamsArray (Json.Array js) = (* Coq_asp_paramsC "" [] O "" *)
+      case js of
+          [Json.String aspid, arrayArgs, Json.Int plc, Json.String targid] =>
+            Coq_asp_paramsC aspid (jsonStringListToList arrayArgs)  (natFromInt plc) targid
+        | _ => raise Json.Exn "getAspParamsArray" "unexpected Coq_asp_paramsC params"
+    and
+    getEvidenceNullaryConstructor (Json.String constructor) =
+    case constructor of
+        "Mt" => Coq_mt
+      | _ => raise Json.Exn "getAspNullaryConstructor" ("Unexpected constructor for Copland Evidence term: " ^ constructor)
+
+
+
+
+
+
+                      
+
                       
 (*  TODO:  need to update evidence (which kind?) json representation below
 
