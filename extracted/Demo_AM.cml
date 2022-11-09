@@ -3,7 +3,7 @@
 
 fun am_sendReq_auth t pFrom pTo initEv =
   let val auth_rawev = run_cvm_rawEv ssl_sig pFrom [] in
-  let val et = eval t pFrom Coq_mt in
+  let val et = eval ssl_sig pFrom Coq_mt in
   let val resev = am_sendReq t pFrom pTo et (app auth_rawev initEv) in
   ret resev end end end
 
