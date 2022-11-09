@@ -1,8 +1,11 @@
 (** val am_sendReq_auth :
-    coq_Term -> coq_Plc -> coq_Plc -> coq_RawEv -> unit coq_AM **)
+    coq_Term -> coq_Plc -> coq_Plc -> coq_RawEv -> coq_RawEv coq_AM **)
 
-fun am_sendReq_auth _ _ _ _ =
-  ret ()
+fun am_sendReq_auth t pFrom pTo initEv =
+  let val auth_rawev = run_cvm_rawEv ssl_sig pFrom [] in
+  let val et = eval t pFrom Coq_mt in
+  let val resev = am_sendReq t pFrom pTo et (app auth_rawev initEv) in
+  ret resev end end end
 
 (** val client_demo_am_comp : unit -> unit coq_AM **)
 
