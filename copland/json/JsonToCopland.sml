@@ -32,44 +32,48 @@ fun getConstructorString c =
         (Json.String s) => s
       | _ => raise Json.Exn "getConstructorString" "did not find a Json.String in the 'constructor' field"
 
-fun fromAList' pairs f =
-    case pairs of
-        [("constructor", constructorVal), ("data", args)] =>
-        f (getConstructorString constructorVal) args
-      | [("data", args), ("constructor", constructorVal)] =>
-        f (getConstructorString constructorVal) args
-      | [("constructor", constructorVal)] =>
-            f (getConstructorString constructorVal) (Json.Array [])
-      | _ =>
-        raise Json.Exn "fromAList" "does not contain just constructor and data pairs"
 
-fun fromAList m f = fromAList' (Map.toAscList m) f
 
+(* fromJsonMap :: (string,json) map -> (string -> Json.Array(json) -> T) -> T
+
+   parameters:
+   - m:  map from string to json objects.  This is the map representation of 
+         the json object.
+   - f:  function that takes as input the constructor name string, the 
+         Json Array of constructor arguments, and returns the decoded term 
+         of type T.
+   returns:  decoded term of type T (upon sucessful json decoding)
+   error:  Json.Exn (unexpected Json object structure for target term :: T)
+*)
+
+fun fromJsonMap m f = fromAList (Map.toAscList m) f
+                                
+  and
+  fromAList pairs f =
+  case pairs of
+      [("constructor", constructorVal), ("data", args)] =>
+      f (getConstructorString constructorVal) args
+    | [("data", args), ("constructor", constructorVal)] =>
+      f (getConstructorString constructorVal) args
+    | [("constructor", constructorVal)] =>
+      f (getConstructorString constructorVal) (Json.Array [])
+    | _ =>
+      raise Json.Exn "fromAList" "does not contain just constructor and data pairs"
+
+(* json_ObToTerm :: Json.Object(json) -> (string -> Json.Array(json) -> T) -> T *)
 fun json_ObToTerm ob f =
     case ob of
-        (Json.Object m) => fromAList m f
+        (Json.Object m) => fromJsonMap m f
      | _ => raise Json.Exn "json_ObToTerm" "expected Json.Object parameter"
 
-
+(* getAspParams :: string -> Json.Array(json) -> coq_ASP_PARAMS *)
 fun getAspParams constructor (Json.Array args) =
     case constructor of
         "asp_paramsC" => getAspParamsArray args
       | _ => raise Json.Exn "getAspParams" "unexpected asp_paramsC constructor name"
-
-
-    (*
-
-    (* getAspParams :: json -> coq_ASP_PARAMS *)
-    (* (string, json) list -> coq_ASP_PARAMS *)
-    getAspParams (Json.Object js') =
-      case (Map.toAscList js') of
-          [("constructor", Json.String "asp_paramsC"), ("data", args)] => getAspParamsArray args
-        | [("data", args), ("constructor", Json.String "asp_paramsC")] => getAspParamsArray args
-        | _ => raise Json.Exn "getAspParams" "expected asp_paramsC constructor object"
-    *)
     
 
-    (* getAspParamsArray :: json -> coq_ASP_PARAMS
+    (* getAspParamsArray :: json list -> coq_ASP_PARAMS
        Expected:  [Json.String aspid, 
                    Json.Array [Json.String stringArg1, Json.String stringArg2, ...], 
                    Json.Int plc, 
@@ -82,31 +86,13 @@ fun getAspParams constructor (Json.Array args) =
         | _ => raise Json.Exn "getAspParamsArray" "unexpected Coq_asp_paramsC params"
 
 
-              
-                                                    
-
 (* jsonToTerm : json -> coq_Term 
    (json object to Copland phrase)  *)      
 fun jsonToTerm js = case (Json.toMap js) of
                     (* Json.toMap : json -> ((string,json) map) option *)
-      Some m => fromAList m getTerm (* m : (string,json) map *)
+      Some m => fromJsonMap m getTerm (* m : (string,json) map *)
     | None =>
         raise Json.Exn "jsonToTerm" "Copland term does not begin as an AList"
-
-(*
-
-and
-(* fromAList :: (string,json) map -> coq_Term  *)
-fromAList pairs =
-case pairs of
-          [("constructor", constructorVal), ("data", args)] =>
-            getTerm constructorVal args
-        | [("data", args), ("constructor", constructorVal)] =>
-            getTerm constructorVal args
-        | _ =>
-          raise Json.Exn "fromAList" "does not contain just constructor and data pairs"
-          
-*)
 
     and
     getTerm constructor (Json.Array args) =
@@ -127,10 +113,10 @@ case pairs of
     and
     (* getAsp :: json list -> coq_ASP
        Expected:  [Json.Object [("constructor", name), ("data", Json.Array args)]
-       where name = "Null" | "Cpy" | "Aspc" | "Sig" | "Hsh"
+       where name = "Null" | "Cpy" | "Aspc" | "Sig" | "Hsh" | "Enc"
      *)
     getAsp data = case data of
-          [Json.Object m] => fromAList m getAsp' (* getAspFromAList (Map.toAscList js') *)
+          [Json.Object m] => fromJsonMap m getAsp' (* getAspFromAList (Map.toAscList js') *)
                    | _ => raise Json.Exn "getAsp" "Copland Asp term does not begin as an AList"
 
 
@@ -146,56 +132,25 @@ case pairs of
       |  _ => raise Json.Exn "getTerm"
                     ("Unexpected ASP constructor name for Copland term: " ^
                      constructor)
-    
-(*
-    and
-    (* getAspFromAlist :: (string, json) list -> coq_ASP *)
-    getAspFromAList data = case data of
-          [("constructor", constructorVal)] =>
-            getAspNullaryConstructor constructorVal
-        | [("constructor", Json.String "Aspc"), ("data", args)] =>
-            getAspc args
-        | [("data", args), ("constructor", Json.String "Aspc")] =>
-          getAspc args
-        | [("constructor", Json.String "Enc"), ("data", args)] =>
-            getEnc args
-        | [("data", args), ("constructor", Json.String "Enc")] =>
-            getEnc args
-        | _ => raise Json.Exn "getAspFromAList" "does not contain just constructor and data pairs"
-                     
-*)
-                    
-    and
-     (* getEnc :: Json.Array -> coq_ASP *)
-    getEnc args = case args of
-    [Json.Int q] => ENC (natFromInt q)
-        
-                    | _ => raise Json.Exn "getAspc" "unexpected argument list"
+
     (* getAspc :: Json.Array -> coq_ASP *)
     and                              
     getAspc args = case args of
     (* args :: json list 
-       Expected: [Json.String "ALL" | "NONE", Json.String "COMP" | "EXTD", 
-                  Json.Object [("constructor", "asp_paramsC"), ("data", ...)]      *)
-                     (* [("constructor", Json.String "asp_"), ("data", args)] => CPY *)
+       Expected: [Json.String "ALL" | "NONE", Json.String "COMP" | "EXTD" | ...,  
+                  Json.Object [("constructor", "asp_paramsC"), ("data", ...)]]      *)
     [Json.String spStr, Json.String fwdStr, paramsJsonOb] =>
     ASPC (spFromString spStr) (fwdFromString fwdStr)
          (json_ObToTerm paramsJsonOb getAspParams)
                     | _ => raise Json.Exn "getAspc" "unexpected argument list"
 
-
-
-                     
-    (*
-    getAspNullaryConstructor (Json.String constructor) = case constructor of
-          "Cpy" => CPY
-        | "Null" => NULL 
-        | "Sig" => SIG
-        | "Hsh" => HSH
-        | _ => raise Json.Exn "getAspNullaryConstructor" ("Unexpected constructor for Copland Asp term: " ^ constructor)
-
+                                 
+    (* getEnc :: json list -> coq_ASP *)             
     and
-    *)
+    getEnc args = case args of
+    [Json.Int q] => ENC (natFromInt q)
+        
+                    | _ => raise Json.Exn "getAspc" "unexpected argument list"
     and
     getAtt data =
     case data of
@@ -220,29 +175,14 @@ case pairs of
 
 
 
-
-
-
+                      
 (* jsonToEv : json -> coq_Evidence
    (json object to Copland Evidence Type)  *)      
 fun jsonToEv js = case (Json.toMap js) of
                     (* Json.toMap : json -> ((string,json) map) option *)
-      Some m => fromAList m getEvidence (* js' : (string,json) map *)
+      Some m => fromJsonMap m getEvidence (* js' : (string,json) map *)
     | None =>
         raise Json.Exn "jsonToTerm" "Copland term does not begin as an AList"
-(*
-and
-(* fromAList :: (string,json) map -> coq_Evidence  *)
-fromAList pairs = case pairs of
-        [("constructor", constructorVal)] =>
-                      getEvidenceNullaryConstructor constructorVal
-                   | [("constructor", constructorVal), ("data", args)] =>
-                     getEvidence constructorVal args
-                   | [("data", args), ("constructor", constructorVal)] =>
-                     getEvidence constructorVal args
-                   | _ =>
-                     raise Json.Exn "fromAList" "jsonToEv does not contain just constructor and data pairs"
-*)
 
     and
     getEvidence constructor (Json.Array args) =
@@ -256,11 +196,10 @@ fromAList pairs = case pairs of
                      constructor)
                     
 
-    (* getAspc :: Json.Array -> coq_Evidence *)
+    (* getAspc :: json list -> coq_Evidence *)
     and                              
     getNN args =  case args of
     [Json.Int q] => Coq_nn (natFromInt q)
-
 
     and
     getUU args =
@@ -277,107 +216,3 @@ fromAList pairs = case pairs of
         [e1, e2] =>
         Coq_ss (jsonToEv e1) (jsonToEv e2)
       | _ => raise Json.Exn "getSS" "unexpected argument list"
-
-                                    
-    (*
-
-                 
-    and
-    (* getAspParams :: json -> coq_ASP_PARAMS *)
-    (* (string, json) list -> coq_ASP_PARAMS *)
-    getAspParams (Json.Object js') =
-      case (Map.toAscList js') of
-          [("constructor", Json.String "asp_paramsC"), ("data", args)] => getAspParamsArray args
-        | [("data", args), ("constructor", Json.String "asp_paramsC")] => getAspParamsArray args
-        | _ => raise Json.Exn "getAspParams" "expected asp_paramsC constructor object"
-    and
-    (* getAspParamsArray :: json -> coq_ASP_PARAMS
-       Expected:  [Json.String aspid, 
-                   Json.Array [Json.String stringArg1, Json.String stringArg2, ...], 
-                   Json.Int plc, 
-                   Json.String targid] *)
-    getAspParamsArray (Json.Array js) = (* Coq_asp_paramsC "" [] O "" *)
-      case js of
-          [Json.String aspid, arrayArgs, Json.Int plc, Json.String targid] =>
-            Coq_asp_paramsC aspid (jsonStringListToList arrayArgs)  (natFromInt plc) targid
-        | _ => raise Json.Exn "getAspParamsArray" "unexpected Coq_asp_paramsC params"
-        *)
-                   
-    and
-    getEvidenceNullaryConstructor (Json.String constructor) =
-    case constructor of
-        "Mt" => Coq_mt
-      | _ => raise Json.Exn "getAspNullaryConstructor" ("Unexpected constructor for Copland Evidence term: " ^ constructor)
-
-
-
-
-
-
-                      
-
-                      
-(*  TODO:  need to update evidence (which kind?) json representation below
-
-(* json object to ev object *)
-fun jsonToEv js = case (Json.toMap js) of
-      Some js' => fromAList (Map.toAscList js')
-    | None =>
-        raise  Json.Exn "JsonToEv" "Copland evidence does not begin as an AList"
-
-    and
-    fromAList pairs = case pairs of
-          [("constructor", constructorVal)] => handleNullConstructor constructorVal
-        | [("constructor", constructorVal), ("data", args)] => handleConstructorWithArgs constructorVal args
-        | [("data", args), ("constructor", constructorVal)]  => handleConstructorWithArgs constructorVal args
-        | _ =>  raise  Json.Exn "fromAList" "does not contain just constructor and data pairs"
-
-    and
-    handleNullConstructor (Json.String constructor) = case constructor of
-          "Mt" => Mt
-        | _ => raise Json.Exn "handleNullConstructor"  ("Unexpected Null constructor for Copland evidence: " ^constructor)
-
-    and
-    handleConstructorWithArgs (Json.String constructor) (Json.Array args) =
-        case constructor of
-          "U"  => getU  args
-        | "G"  => getG  args
-        | "H"  => getH  args
-        | "N"  => getN  args
-        | "SS" => getSS args
-        | "PP" => getPP args
-        |  _ => raise Json.Exn "handleConstructorWithArgs" ("Unexpected constructor for Copland evidence: "^ constructor)
-
-    and
-    getU data = case data of
-          [Json.Int aspId, args, bs, ev] =>
-            U (Id (natFromInt aspId)) (jsonStringListToList args) (jsonStringToBS bs) (jsonToEv ev)
-        | _ => raise Json.Exn "getU" "unexpected argument list"
-
-    and
-    getG data = case data of
-          [bs, ev] => G (jsonStringToBS bs) (jsonToEv ev)
-        | _ => raise Json.Exn "getG" "unexpected argument list"
-
-    and
-    getH data = case data of
-          [bs] => H (jsonStringToBS bs)
-        | _ => raise Json.Exn "getH" "unexpected argument list"
-
-    and
-    getN data = case data of
-          [Json.Int index, bs, ev] =>
-            N (Id (natFromInt index)) (jsonStringToBS bs) (jsonToEv ev)
-        | _ => raise Json.Exn "getN" "unexpected argument list"
-
-    and
-    getSS data = case data of
-          [ev1, ev2] => SS (jsonToEv ev1) (jsonToEv ev2)
-        | _ => raise Json.Exn "getSS" "unexpected argument list"
-
-    and
-    getPP data = case data of
-          [ev1, ev2] => PP (jsonToEv ev1) (jsonToEv ev2)
-        | _ => raise Json.Exn "getPP" "unexpected argument list"
-
-*)
