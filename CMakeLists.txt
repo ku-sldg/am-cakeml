@@ -61,6 +61,7 @@ get_files(cop_src
     extracted/ConcreteEvidence.cml
     stubs/Params_Admits_hardcoded.sml
     extracted/Term_Defs.cml
+    extracted/Manifest.cml
     copland/CoplandUtil.sml
     copland/json/CoplandToJson.sml
     copland/json/JsonToCopland.sml

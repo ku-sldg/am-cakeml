@@ -1,3 +1,9 @@
+(** val kim_meas : coq_Term **)
+
+val kim_meas =
+  Coq_asp (ASPC ALL EXTD (Coq_asp_paramsC kim_meas_aspid [] dest_plc
+    kim_meas_targid))
+
 (** val create_and_load_ak : coq_Term **)
 
 val create_and_load_ak =
@@ -13,14 +19,14 @@ val pub_key_to_bc =
 (** val get_data : coq_Term **)
 
 val get_data =
-  Coq_asp (ASPC ALL EXTD (Coq_asp_paramsC get_data_aspid get_data_args
-    source_plc get_data_targid))
+  Coq_asp (ASPC ALL EXTD (Coq_asp_paramsC get_data_aspid [] source_plc
+    get_data_targid))
 
 (** val tpm_sig : coq_Term **)
 
 val tpm_sig =
-  Coq_asp (ASPC ALL EXTD (Coq_asp_paramsC tpm_sig_aspid tpm_sig_args
-    source_plc tpm_sig_targid))
+  Coq_asp (ASPC ALL EXTD (Coq_asp_paramsC tpm_sig_aspid [] source_plc
+    tpm_sig_targid))
 
 (** val ssl_enc : coq_Term **)
 
@@ -28,23 +34,17 @@ val ssl_enc =
   Coq_asp (ASPC ALL ENCR (Coq_asp_paramsC ssl_enc_aspid ssl_enc_args
     source_plc ssl_enc_targid))
 
-(** val ssl_sig : coq_Term **)
-
-val ssl_sig =
-  Coq_asp (ASPC ALL EXTD (Coq_asp_paramsC ssl_sig_aspid ssl_sig_args dest_plc
-    ssl_sig_targid))
-
-(** val kim_meas : coq_Term **)
-
-val kim_meas =
-  Coq_asp (ASPC ALL EXTD (Coq_asp_paramsC kim_meas_aspid kim_meas_args
-    dest_plc kim_meas_targid))
-
 (** val demo_phrase : coq_Term **)
 
 val demo_phrase =
   Coq_lseq kim_meas (Coq_lseq create_and_load_ak (Coq_lseq pub_key_to_bc
     (Coq_lseq get_data (Coq_lseq tpm_sig ssl_enc))))
+
+(** val ssl_sig : coq_Term **)
+
+val ssl_sig =
+  Coq_asp (ASPC ALL EXTD (Coq_asp_paramsC ssl_sig_aspid ssl_sig_args dest_plc
+    ssl_sig_targid))
 
 (** val client_data_phrase : coq_Term **)
 

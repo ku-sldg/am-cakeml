@@ -1,0 +1,12 @@
+datatype coq_Manifest =
+  Build_Manifest (coq_ASP_ID list) (coq_Plc list)
+
+(** val asps : coq_Manifest -> coq_ASP_ID list **)
+
+fun asps m =
+  let val Build_Manifest asps0 _ = m in asps0 end
+
+(** val knowsOf : coq_Manifest -> coq_Plc list **)
+
+fun knowsOf m =
+  let val Build_Manifest _ knowsOf0 = m in knowsOf0 end

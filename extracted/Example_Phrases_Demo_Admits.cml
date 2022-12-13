@@ -53,11 +53,6 @@ val get_data_targid =
 val get_data_aspid =
   failwith "AXIOM TO BE REALIZED"
 
-(** val get_data_args : coq_Arg list **)
-
-val get_data_args =
-  failwith "AXIOM TO BE REALIZED"
-
 (** val tpm_sig_targid : coq_ASP_ID **)
 
 val tpm_sig_targid =
@@ -66,11 +61,6 @@ val tpm_sig_targid =
 (** val tpm_sig_aspid : coq_ASP_ID **)
 
 val tpm_sig_aspid =
-  failwith "AXIOM TO BE REALIZED"
-
-(** val tpm_sig_args : coq_Arg list **)
-
-val tpm_sig_args =
   failwith "AXIOM TO BE REALIZED"
 
 (** val ssl_enc_targid : coq_ASP_ID **)
@@ -126,9 +116,4 @@ val kim_meas_targid =
 (** val kim_meas_aspid : coq_ASP_ID **)
 
 val kim_meas_aspid =
-  failwith "AXIOM TO BE REALIZED"
-
-(** val kim_meas_args : coq_Arg list **)
-
-val kim_meas_args =
   failwith "AXIOM TO BE REALIZED"

@@ -4,15 +4,19 @@ fun intToJson n = Json.fromInt n
 
 fun stringToJson s = Json.fromString s
 
-fun stringListToJsonList args  =  Json.fromList (List.map stringToJson args)
+fun stringListToJsonList args  =  Json.fromList (List.map stringToJson args) 
 
 fun byteStringToJson bs = Json.fromString (BString.show bs)
 
 fun aspIdToJson i = Json.fromString i
 
+fun aspidListToJsonList ids = Json.fromList (List.map aspIdToJson ids)
+
 fun targIdToJson i = Json.fromString i
 
 fun placeToJson pl = Json.fromInt (natToInt pl)
+
+fun placeListToJsonList ids = Json.fromList (List.map placeToJson ids)
 
 (* spPairToJson : (coq_SP * coq_SP) -> json *)
 fun spPairToJson (sp1, sp2) =
@@ -111,3 +115,12 @@ fun evToJson e = case e of
     | PP ev1 ev2 => constructorWithArgs "PP" [evToJson ev1, evToJson ev2]
 
 *)
+
+
+fun manifestToJson m =
+    case m of
+        Build_Manifest aspid_field knowsOf_field =>
+        constructorWithArgs "ManifestC" [aspidListToJsonList aspid_field,
+                                         placeListToJsonList knowsOf_field]
+                                         
+                           
