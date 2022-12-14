@@ -14,17 +14,33 @@ fun client_demo_am_comp _ =
   in
   let val bool_res =
     case app_res of
-      Coq_eec_app _ _ _ a0 =>
+      Coq_mtc_app => False
+    | Coq_nnc_app _ _ => False
+    | Coq_ggc_app _ _ _ _ => False
+    | Coq_hhc_app _ _ _ _ => False
+    | Coq_eec_app _ _ _ a0 =>
       (case a0 of
-         Coq_ggc_app _ _ _ a2 =>
+         Coq_mtc_app => False
+       | Coq_nnc_app _ _ => False
+       | Coq_ggc_app _ _ _ a2 =>
          (case a2 of
-            Coq_ggc_app _ _ _ a4 =>
+            Coq_mtc_app => False
+          | Coq_nnc_app _ _ => False
+          | Coq_ggc_app _ _ _ a4 =>
             (case a4 of
-               Coq_ggc_app _ _ _ _ => True
-             | _ => False)
-          | _ => False)
-       | _ => False)
-    | _ => False
+               Coq_mtc_app => False
+             | Coq_nnc_app _ _ => False
+             | Coq_ggc_app _ _ _ _ => True
+             | Coq_hhc_app _ _ _ _ => False
+             | Coq_eec_app _ _ _ _ => False
+             | Coq_ssc_app _ _ => False)
+          | Coq_hhc_app _ _ _ _ => False
+          | Coq_eec_app _ _ _ _ => False
+          | Coq_ssc_app _ _ => False)
+       | Coq_hhc_app _ _ _ _ => False
+       | Coq_eec_app _ _ _ _ => False
+       | Coq_ssc_app _ _ => False)
+    | Coq_ssc_app _ _ => False
   in
   (case bool_res of
      True =>

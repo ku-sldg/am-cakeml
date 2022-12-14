@@ -26,6 +26,10 @@ fun jsonStringToBS (Json.String s) = BString.unshow s
 fun jsonBsListToList (Json.Array args) =
     List.map jsonStringToBS args
 
+fun jsonIntToNat (Json.Int i) = natFromInt i
+fun jsonIntListToNatList (Json.Array args) =
+    List.map jsonIntToNat args
+
 
 fun getConstructorString c =
     case c of
@@ -85,6 +89,28 @@ fun getAspParams constructor (Json.Array args) =
             Coq_asp_paramsC aspid (jsonStringListToList arrayArgs)  (natFromInt plc) targid
         | _ => raise Json.Exn "getAspParamsArray" "unexpected Coq_asp_paramsC params"
 
+(* jsonToManifest : json -> coq_Manifest *)
+fun jsonToManifest js =
+    case (Json.toMap js) of
+        Some m => fromJsonMap m getManifest
+      | None =>
+        raise Json.Exn "jsonToManifest" "Copland Manifest JSON does not begin as an AList"
+
+  and
+  getManifest constructor (Json.Array args) =
+  case constructor of
+      "Manifest" => case args of
+                        [asp_ids, plc_ids] =>
+                        Build_Manifest (jsonStringListToList asp_ids)
+                                       (jsonIntListToNatList plc_ids)
+                      | _ => raise Json.Exn "getManifest" "unexpected argument list"
+                        
+      | _ => raise Json.Exn "getManifest"
+                   ("Unexpected constructor for Manifest JSON term: " ^
+                    constructor)
+                 
+
+                     
 
 (* jsonToTerm : json -> coq_Term 
    (json object to Copland phrase)  *)      
@@ -92,7 +118,7 @@ fun jsonToTerm js = case (Json.toMap js) of
                     (* Json.toMap : json -> ((string,json) map) option *)
       Some m => fromJsonMap m getTerm (* m : (string,json) map *)
     | None =>
-        raise Json.Exn "jsonToTerm" "Copland term does not begin as an AList"
+        raise Json.Exn "jsonToTerm" "Copland term JSON does not begin as an AList"
 
     and
     getTerm constructor (Json.Array args) =

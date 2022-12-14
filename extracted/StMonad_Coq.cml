@@ -11,7 +11,7 @@ fun ret a s =
 fun bind m f s =
   let val Coq_pair a s' = m s in
   (case a of
-     Some v => f v s'
+     Some v => let val Coq_pair b s'' = f v s' in Coq_pair b s'' end
    | None => Coq_pair None s') end
 
 (** val failm : ('a1, 'a2) coq_St **)

@@ -60,7 +60,14 @@ fun aspParamsToJson ps =
         Coq_asp_paramsC i args tpl tid =>
         constructorWithArgs "asp_paramsC" [aspIdToJson i, stringListToJsonList args,
                                            placeToJson tpl, targIdToJson tid]
-                             
+
+(* manifestToJson :: coq_Manifest -> json *)
+fun manifestToJson m =
+    case m of
+        Build_Manifest asp_ids plc_ids =>
+        constructorWithArgs "Manifest" [aspidListToJsonList asp_ids,
+                                        placeListToJsonList plc_ids]
+                                        
                                   
 
 (* aspToJson :: coq_ASP -> json *)                      

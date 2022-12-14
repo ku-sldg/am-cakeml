@@ -3,15 +3,21 @@
 fun privPolicy sendPlc t = case t of
   Coq_asp a =>
   (case a of
-     ASPC _ _ a0 =>
+     NULL => True
+   | CPY => True
+   | ASPC _ _ a0 =>
      let val Coq_asp_paramsC aspid _ rp _ = a0 in
      (case eqb_aspid aspid get_data_aspid of
         True =>
-        (case eqb sendPlc dest_plc of
-           True => eqb rp source_plc
+        (case case eqb sendPlc dest_plc of
+                True => eqb rp source_plc
+              | False => False of
+           True => True
          | False => False)
       | False => True) end
-   | _ => True)
+   | SIG => True
+   | HSH => True
+   | ENC _ => True)
 | Coq_att _ t0 => privPolicy sendPlc t0
 | Coq_lseq t1 t2 =>
   (case privPolicy sendPlc t1 of

@@ -10,9 +10,12 @@ fun event_id_span' t = case t of
 (** val event_id_span : coq_Core_Term -> nat **)
 
 fun event_id_span t = case t of
-  Coq_aspc a => (case a of
-                   CLEAR => O
-                 | _ => S O)
+  Coq_aspc a =>
+  (case a of
+     NULLC => S O
+   | CLEAR => O
+   | CPYC => S O
+   | ASPCC _ _ => S O)
 | Coq_attc _ x => add (S (S O)) (event_id_span' x)
 | Coq_lseqc x y => add (event_id_span x) (event_id_span y)
 | Coq_bseqc x y => add (S (S O)) (add (event_id_span x) (event_id_span y))
