@@ -2,7 +2,7 @@
 
 val term = demo_phrase
 
-fun main () = outputExampleFormalManifest
+fun main () = outputExampleFormalManifest ()
 
 (* (run_client_demo_am_comp () ) *)
 
