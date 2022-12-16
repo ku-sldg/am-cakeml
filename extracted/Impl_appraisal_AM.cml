@@ -16,8 +16,7 @@ fun gen_appraise_AM et ls =
       bind (checkNonce nid bs) (fn res => ret (Coq_nnc_app nid res)) end)
   | Coq_uu p fwd params et' =>
     (case fwd of
-       COMP => ret Coq_mtc_app
-     | ENCR =>
+       ENCR =>
        bind (peel_bs_am ls) (fn v =>
          let val Coq_pair bs _ = v in
          bind (decrypt_bs_to_rawev_am bs params) (fn decrypted_ls =>
@@ -29,8 +28,8 @@ fun gen_appraise_AM et ls =
          bind (checkGG params p bs ls') (fn v0 =>
            bind (gen_appraise_AM et' ls') (fn rest =>
              ret (Coq_ggc_app p params v0 rest))) end)
-     | KILL => ret Coq_mtc_app
-     | KEEP => gen_appraise_AM et' ls)
+     | KEEP => gen_appraise_AM et' ls
+     | _ => ret Coq_mtc_app)
   | Coq_ss et1 et2 =>
     bind (gen_appraise_AM et1 (firstn (et_size et1) ls)) (fn x =>
       bind (gen_appraise_AM et2 (skipn (et_size et1) ls)) (fn y =>

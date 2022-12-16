@@ -20,7 +20,6 @@ fun cons_enc enc e p ps =
 (** val ss_cons : coq_EvC -> coq_EvC -> coq_EvC **)
 
 fun ss_cons e1 e2 =
-  let val Coq_pair e e0 = Coq_pair e1 e2 in
-  let val Coq_evc bits1 et1 = e in
-  let val Coq_evc bits2 et2 = e0 in
-  Coq_evc (app bits1 bits2) (Coq_ss et1 et2) end end end
+  let val Coq_evc bits1 et1 = e1 in
+  let val Coq_evc bits2 et2 = e2 in
+  Coq_evc (app bits1 bits2) (Coq_ss et1 et2) end end

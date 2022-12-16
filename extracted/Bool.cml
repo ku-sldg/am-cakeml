@@ -2,9 +2,7 @@
 
 fun eqb b1 b2 =
   case b1 of
-    True => (case b2 of
-               True => True
-             | False => False)
+    True => b2
   | False => (case b2 of
                 True => False
               | False => True)

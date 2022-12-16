@@ -59,11 +59,10 @@ fun et_size e = case e of
 | Coq_nn _ => S O
 | Coq_uu _ fwd _ e' =>
   (case fwd of
-     COMP => S O
-   | ENCR => S O
-   | EXTD => add (S O) (et_size e')
+     EXTD => add (S O) (et_size e')
    | KILL => O
-   | KEEP => et_size e')
+   | KEEP => et_size e'
+   | _ => S O)
 | Coq_ss e1 e2 => add (et_size e1) (et_size e2)
 
 type coq_RawEv = coq_BS list
@@ -115,11 +114,9 @@ fun eval_asp t p e =
   | CPY => e
   | ASPC sp fwd params =>
     (case fwd of
-       COMP => Coq_uu p fwd params (sp_ev sp e)
-     | ENCR => Coq_uu p fwd params (sp_ev sp e)
-     | EXTD => Coq_uu p fwd params (sp_ev sp e)
-     | KILL => Coq_mt
-     | KEEP => sp_ev sp e)
+       KILL => Coq_mt
+     | KEEP => sp_ev sp e
+     | _ => Coq_uu p fwd params (sp_ev sp e))
   | SIG => Coq_uu p EXTD sig_params e
   | HSH => Coq_uu p COMP hsh_params e
   | ENC q => Coq_uu p ENCR (enc_params q) e
