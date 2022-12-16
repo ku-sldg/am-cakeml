@@ -29,6 +29,15 @@ fun outputManifestJsonString fileString manifest =
 
 fun build_formalManifest asps plcs =
     Build_Manifest asps plcs
+
+val exampleFormalManifest = build_formalManifest
+                                ["asp1", "asp2"]
+                                [natFromInt 22, natFromInt 42]
+
+fun outputExampleFormalManifest () =
+    let val _ = outputManifestJsonString "manifest.out" exampleFormalManifest in
+        ()
+    end
         
 fun build_concreteManifest myAddress defaultSigAsp aspList plcList pubList =
     ManifestC myAddress
