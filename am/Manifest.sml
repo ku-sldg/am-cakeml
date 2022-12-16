@@ -27,18 +27,52 @@ fun outputManifestJsonString fileString manifest =
         TextIO.output ostream jsonString
     end
 
+(* :: string -> Coq_Manifest *)
+fun inputManifestJsonString fileString =
+    let val istream = TextIO.openIn fileString
+        val inString = TextIO.inputAll istream
+        (* val _ = print inString *)
+        val jsonManifest = strToJson inString
+        val res = jsonToManifest jsonManifest
+        (* val _ = print "\nIn inputManifestJsonString\n" *) in
+        res
+    end
+
+(* :: Coq_Manifest -> string *)
+fun formalManifestToString manifest =
+    case manifest of
+        Build_Manifest asps plcs =>
+        let val header = "\nManifest: \n  {"
+            val aspsStr = "  asps: " ^ (listToString asps aspIdToString) ^ " \n"
+            val plcsStr = "     plcs: " ^ (listToString plcs plToString) ^ " \n"
+            val footer = "  }\n"
+            val res = header ^ aspsStr ^ plcsStr ^ footer
+            (*val _ = print "In formalManifestToString" *)
+            (*val _ = print res*) in 
+            res
+        end
+      | _ => let val _ =
+                     print ("\nError: Did not match Build_Manifest constructor in formalManifestToString\n") in ""
+             end
+
 fun build_formalManifest asps plcs =
     Build_Manifest asps plcs
 
 val exampleFormalManifest = build_formalManifest
-                                ["asp1", "asp2"]
+                                ["asp11", "asp25"]
                                 [natFromInt 22, natFromInt 42]
 
-fun outputExampleFormalManifest () =
-    let val _ = outputManifestJsonString "manifest.out" exampleFormalManifest in
+fun outputExampleFormalManifest fileString =
+    let val _ = outputManifestJsonString fileString exampleFormalManifest in
         ()
     end
-        
+
+fun inputAndPrintExampleFormalManifest fileString =
+    let val manifest = inputManifestJsonString fileString
+        val str = formalManifestToString manifest in
+        (*print "hi" ; *)
+        print str
+    end
 fun build_concreteManifest myAddress defaultSigAsp aspList plcList pubList =
     ManifestC myAddress
               defaultSigAsp

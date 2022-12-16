@@ -2,7 +2,11 @@
 
 val term = demo_phrase
 
-fun main () = outputExampleFormalManifest ()
+fun main () = let val filename = "manifest.out" 
+                  val _ = outputExampleFormalManifest filename in
+                  (*print "hiii" ; *)
+                  inputAndPrintExampleFormalManifest filename
+              end
 
 (* (run_client_demo_am_comp () ) *)
 

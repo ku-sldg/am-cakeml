@@ -67,9 +67,7 @@ fun manifestToJson m =
         Build_Manifest asp_ids plc_ids =>
         constructorWithArgs "Manifest" [aspidListToJsonList asp_ids,
                                         placeListToJsonList plc_ids]
-                                        
-                                  
-
+                            
 (* aspToJson :: coq_ASP -> json *)                      
 fun aspToJson asp = case asp of
       NULL => noArgConstructor "Null"
@@ -112,22 +110,6 @@ fun evToJson e = case e of
                      constructorWithArgs "SS"
                                          [ evToJson e1,
                                            evToJson e2 ]
-(*
-                     => 
-    | U aid args bs ev => constructorWithArgs "U" [idToJson aid, stringListToJsonList args, byteStringToJson bs, evToJson ev]
-    | G bs ev => constructorWithArgs "G" [byteStringToJson bs, evToJson ev]
-    | H bs => constructorWithArgs "H" [byteStringToJson bs]
-    | N id bs ev => constructorWithArgs "N" [idToJson id, byteStringToJson bs, evToJson ev]
-    | SS ev1 ev2 => constructorWithArgs "SS" [evToJson ev1, evToJson ev2]
-    | PP ev1 ev2 => constructorWithArgs "PP" [evToJson ev1, evToJson ev2]
 
-*)
-
-
-fun manifestToJson m =
-    case m of
-        Build_Manifest aspid_field knowsOf_field =>
-        constructorWithArgs "ManifestC" [aspidListToJsonList aspid_field,
-                                         placeListToJsonList knowsOf_field]
                                          
                            
