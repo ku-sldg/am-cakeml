@@ -242,3 +242,86 @@ fun jsonToEv js = case (Json.toMap js) of
         [e1, e2] =>
         Coq_ss (jsonToEv e1) (jsonToEv e2)
       | _ => raise Json.Exn "getSS" "unexpected argument list"
+
+
+
+
+fun jsonToRequest js = case (Json.toMap js) of
+          Some js' => fromAList js'
+        | None => raise Json.Exn "JsonToRequest" "Request message does not begin as an object."
+
+    and
+    fromAList pairs =
+        let fun get str = case Map.lookup pairs str of
+                  Some x => x
+                | None   => raise Json.Exn "fromAList" "missing request field"
+         in getREQ (List.map get ["toPlace", "fromPlace", "reqNameMap", "reqTerm", "reqEvType", "reqEv"])
+        end
+
+    and
+    getREQ data = case data of
+          [Json.Int pl1, Json.Int pl2, Json.Object amap, t, et, ev] =>
+              REQ (natFromInt pl1) (natFromInt pl2) (toPlAddrMap (Map.toAscList amap)) (jsonToTerm t) (jsonToEv et) (jsonBsListToList ev)
+        | _ => raise Json.Exn "getREQ" "unexpected argument list"
+
+    and
+    toPlAddrMap alist =
+        let fun unjasonify (s, Json.String s') =
+                case Int.fromString s
+                of Some i => (natFromInt i, s')
+                | None =>
+                    raise Json.Exn "toPlAddrMap" "unexpected non-integer"
+         in Map.fromList nat_compare (List.map unjasonify alist)
+        end
+
+
+fun jsonToResponse js = case (Json.toMap js) of
+          Some js' => fromAList js'
+        | _ => raise Json.Exn "JsonToResponse" "Response message does not begin as an AList"
+
+    and
+    fromAList pairs =
+        let fun get str = case Map.lookup pairs str of
+                  Some x => x
+                | None   => raise Json.Exn "fromAList" "missing request field"
+         in getRES (List.map get ["respToPlace", "respFromPlace", "respEv"])
+        end
+
+    and
+    getRES data = case data of
+          [Json.Int pl1, Json.Int pl2, ev] =>
+              RES (natFromInt pl1) (natFromInt pl2) (jsonBsListToList ev)
+        | _ => raise Json.Exn "getRES" "unexpected argument list"
+
+fun strToJson str = Result.okValOf (Json.parse str)
+fun jsonToStr js  = Json.stringify js
+
+
+                                   
+(* 
+   fun encode_RawEv : coq_RawEv -> coq_BS 
+
+   This function takes a coq_RawEv value (list of coq_BS values) and encodes it as a single
+   coq_BS value (to, for instance prepare it for cryptographic transformation).  To encode, 
+   we first take the raw evidence sequence to an Array of Json strings (am/CommTypes.bsListToJsonList).
+   Next, we "stringify" that Array (am/ServerAM.jsonToStr) to a single string.  Finally, we lift
+   that string into a bstring (BString.fromString).
+*)
+fun encode_RawEv ls = BString.fromString (jsonToStr (bsListToJsonList ls))
+
+(* 
+   fun decode_RawEv : coq_BS -> coq_RawEv
+   This should be the inverse of encode_RawEv.
+*)
+fun decode_RawEv bsval = jsonBsListToList (strToJson (BString.toString bsval))
+
+
+(** val decrypt_bs_to_rawev' : coq_BS -> coq_ASP_PARAMS -> coq_RawEv **)
+
+fun decrypt_bs_to_rawev' bs ps (* priv pub *) =
+    let val recoveredtext = Crypto.decryptOneShot (* priv pub *) priv2 pub1 bs
+        val bs_recovered = BString.fromString recoveredtext
+        val res = decode_RawEv bs_recovered
+        val _ = print ("\nDecryption Succeeded: \n" ^ (rawEvToString res) ^ "\n" ) in
+        res
+    end

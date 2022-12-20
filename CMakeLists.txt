@@ -63,12 +63,13 @@ get_files(cop_src
     extracted/Term_Defs.cml
     extracted/Manifest.cml
     copland/CoplandUtil.sml
-    copland/json/CoplandToJson.sml
-    copland/json/JsonToCopland.sml
+    stubs/Example_Phrases_Demo_Admits.sml
     stubs/IO_Stubs_extra.sml
     am/CommTypes.sml
-    stubs/Example_Phrases_Demo_Admits.sml
     am/Manifest.sml
+    copland/json/CoplandToJson.sml
+    copland/json/JsonToCopland.sml
+    am/ManifestUtils.sml
     stubs/Compare_Stub.sml
     extracted/privPolicy.cml
     apps/blockchain/Blockchain.sml

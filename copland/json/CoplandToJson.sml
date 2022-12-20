@@ -18,6 +18,8 @@ fun placeToJson pl = Json.fromInt (natToInt pl)
 
 fun placeListToJsonList ids = Json.fromList (List.map placeToJson ids)
 
+fun bsListToJsonList args  =  Json.fromList (List.map byteStringToJson args)
+
 (* spPairToJson : (coq_SP * coq_SP) -> json *)
 fun spPairToJson (sp1, sp2) =
     Json.fromList
@@ -35,6 +37,22 @@ fun spProdToJson sp =
 *)
 fun nsMapToJson map =
     let fun jsonify (pl, addr) = (plToString pl, Json.fromString addr)
+    in Json.fromPairList (List.map jsonify (Map.toAscList map))
+    end
+
+(* aspMapToJson : am/Manifest.aspMap -> json 
+   type aspMap = ((coq_ASP_ID, addr) map)
+*)
+fun aspMapToJson map =
+    let fun jsonify (id, addr) = (aspIdToString id, Json.fromString addr)
+    in Json.fromPairList (List.map jsonify (Map.toAscList map))
+    end
+
+(* pubkeyMapToJson : am/Manifest.pubkeyMap -> json 
+   type aspMap = ((coq_Plc, string) map)
+*)
+fun pubkeyMapToJson map =
+    let fun jsonify (pl, pubkey) = (plToString pl, Json.fromString pubkey)
     in Json.fromPairList (List.map jsonify (Map.toAscList map))
     end
 
@@ -58,9 +76,27 @@ fun fwdToJson fwd = stringToJson (fwdToString fwd)
 fun aspParamsToJson ps =
     case ps of
         Coq_asp_paramsC i args tpl tid =>
-        constructorWithArgs "asp_paramsC" [aspIdToJson i, stringListToJsonList args,
-                                           placeToJson tpl, targIdToJson tid]
+        constructorWithArgs "asp_paramsC"
+                            [aspIdToJson i,
+                             stringListToJsonList args,
+                             placeToJson tpl,
+                             targIdToJson tid]
 
+                            
+(* :: concreteManifest -> json *)
+fun concreteManifestToJson m =
+    case m of
+        ManifestC address sigid aspmap plcmap pubmap =>
+        constructorWithArgs "ConcreteManifest"
+                            [stringToJson address,
+                             aspIdToJson sigid,
+                             aspMapToJson aspmap,
+                             nsMapToJson plcmap,
+                             pubkeyMapToJson pubmap]
+
+
+
+                            
 (* manifestToJson :: coq_Manifest -> json *)
 fun manifestToJson m =
     case m of
@@ -112,4 +148,10 @@ fun evToJson e = case e of
                                            evToJson e2 ]
 
                                          
-                           
+
+fun requestToJson (REQ pl1 pl2 map t et ev) = Json.fromPairList
+    [("toPlace", placeToJson pl1), ("fromPlace", placeToJson pl2), ("reqNameMap", nsMapToJson map),
+     ("reqTerm", termToJson t), ("reqEvType", evToJson et), ("reqEv", bsListToJsonList ev)]
+
+fun responseToJson (RES pl1 pl2 ev) = Json.fromPairList
+    [("respToPlace", placeToJson pl1), ("respFromPlace", placeToJson pl2), ("respEv", bsListToJsonList ev)]
