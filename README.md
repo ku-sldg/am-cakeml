@@ -14,7 +14,7 @@ See README instructions at the following repository for a (Docker-based) automat
 The following documents the process of manually building standalone executables for Linux and MacOS.
 
 ### Prerequisites
-- CakeML v1322: [Download](https://github.com/CakeML/cakeml/releases/tag/v1322) the CakeML compiler (`cake-x64-64.tar.gz` is most likely the version you want, it targets 64-bit architectures). Unpack the tarball, run `make cake`, then put the `cake` executable on your system path. E.g.
+- CakeML v2076: [Download](https://github.com/CakeML/cakeml/releases/tag/v2076) the CakeML compiler (`cake-x64-64.tar.gz` is most likely the version you want, it targets 64-bit architectures). Unpack the tarball, run `make cake`, then put the `cake` executable on your system path. E.g.
 ```sh
 tar -xzf cake-x64-64.tar.gz
 cd cake-x64-64
