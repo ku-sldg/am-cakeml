@@ -109,7 +109,7 @@ struct
                 fun toJson numr =
                     case numr of
                       Ok doubleStr =>
-                        Ok (Float (Double.fromString doubleStr))
+                        Ok (Float (Double.toWord (Double.fromString doubleStr)))
                     | Err intStr =>
                         case Int.fromString intStr of
                           None => Err "Error reading integer."
@@ -302,7 +302,7 @@ struct
                 if n >= 0
                 then Int.toString n
                 else String.concat ["-", Int.toString (~n)]
-            | Float r => Double.toString r
+            | Float r => Double.toString (Double.fromWord r)
             | String str => String.concat ["\"", escapeString str, "\""]
             | Array jsons =>
                 let

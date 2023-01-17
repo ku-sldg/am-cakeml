@@ -185,8 +185,8 @@ val jsonId = 3 (* any positive integer will do *)
 
 (* val healthRecordContract = "0x744e262E95Eb21B383947E925e73153581dC6bFF" *)
 (* val healthRecordContract = "0x6187E9EB7C3072018A58ed444df619e29af8f460" *)
-val healthRecordContract = "0xe91a430d5b19e521193732678D6Cb369D857b930"
+val healthRecordContract = "0x6E7A3682d8954bf9E5903a1dc725f123Eb7b034B"
 
 (* val userAddress = "0xbb1db114f1535e8b01f54a5fc9ab19146fdff846" *)
 (* val userAddress = "0x9FF83fAea1bb7d67FfF72e859DDD68F94EffeCE6" *)
-val userAddress = "0xd8e920A871ea48f2F0d7859B72602245b9c0621c"
+val userAddress = "0x481697e0EF0D77275BD32C978DaaE5ad8ce41c24"

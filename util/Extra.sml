@@ -116,8 +116,7 @@ structure StringExtra = struct
     fun foldl f z s = List.foldl f z (String.explode s)
 
     (* (int -> 'a -> char -> 'a) -> 'a -> string -> 'a *)
-    (* Seems to be a typo in the standard library. Should be "List.foldli" *)
-    fun foldli f z s = List.foldi f z (String.explode s)
+    fun foldli f z s = List.foldli f z (String.explode s)
 
     (* crlfLines : string -> string list
      * Takes a string and splits it into a list of substrings at whereever the
