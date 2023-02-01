@@ -1,44 +1,107 @@
-(** val build_app_comp_evC :
-    coq_Evidence -> coq_RawEv -> coq_BS -> coq_AppResultC coq_Opt **)
+(** val peel_bs_am : coq_RawEv -> (coq_BS, coq_RawEv) prod coq_AM **)
 
-fun build_app_comp_evC et ls nonceGolden =
+fun peel_bs_am ls = case ls of
+  [] => failm
+| bs :: ls' => ret (Coq_pair bs ls')
+
+(** val gen_appraise_AM :
+    coq_Evidence -> coq_RawEv -> coq_AppResultC coq_AM **)
+
+fun gen_appraise_AM et ls =
   case et of
     Coq_mt => ret Coq_mtc_app
   | Coq_nn nid =>
-    bind (peel_bs ls) (fn x =>
-      let val Coq_pair bs _ = x in
-      bind (checkNonce nonceGolden bs) (fn res => ret (Coq_nnc_app nid res)) end)
+    bind (peel_bs_am ls) (fn v =>
+      let val Coq_pair bs _ = v in
+      bind (checkNonce nid bs) (fn res => ret (Coq_nnc_app nid res)) end)
   | Coq_uu p fwd params et' =>
     (case fwd of
        ENCR =>
-       bind (peel_bs ls) (fn x =>
-         let val Coq_pair bs _ = x in
-         bind (decrypt_bs_to_rawev bs params) (fn decrypted_ls =>
-           bind (build_app_comp_evC et' decrypted_ls nonceGolden) (fn rest =>
+       bind (peel_bs_am ls) (fn v =>
+         let val Coq_pair bs _ = v in
+         bind (decrypt_bs_to_rawev_am bs params) (fn decrypted_ls =>
+           bind (gen_appraise_AM et' decrypted_ls) (fn rest =>
              ret (Coq_eec_app p params passed_bs rest))) end)
      | EXTD =>
-       bind (peel_bs ls) (fn x =>
-         let val Coq_pair bs ls' = x in
-         bind (checkGG params p bs ls') (fn v =>
-           bind (build_app_comp_evC et' ls' nonceGolden) (fn rest =>
-             ret (Coq_ggc_app p params v rest))) end)
-     | KEEP => build_app_comp_evC et' ls nonceGolden
+       bind (peel_bs_am ls) (fn v =>
+         let val Coq_pair bs ls' = v in
+         bind (checkGG params p bs ls') (fn v0 =>
+           bind (gen_appraise_AM et' ls') (fn rest =>
+             ret (Coq_ggc_app p params v0 rest))) end)
+     | KEEP => gen_appraise_AM et' ls
      | _ => ret Coq_mtc_app)
   | Coq_ss et1 et2 =>
-    bind (build_app_comp_evC et1 (firstn (et_size et1) ls) nonceGolden)
-      (fn x =>
-      bind (build_app_comp_evC et2 (skipn (et_size et1) ls) nonceGolden)
-        (fn y => ret (Coq_ssc_app x y)))
+    bind (gen_appraise_AM et1 (firstn (et_size et1) ls)) (fn x =>
+      bind (gen_appraise_AM et2 (skipn (et_size et1) ls)) (fn y =>
+        ret (Coq_ssc_app x y)))
 
-(** val run_gen_appraise :
-    coq_Term -> coq_Plc -> coq_Evidence -> coq_BS -> coq_RawEv ->
-    coq_AppResultC **)
+(** val fromSome : 'a1 -> 'a1 option -> 'a1 **)
 
-fun run_gen_appraise t p et nonceGolden ls =
-  fromSome Coq_mtc_app (build_app_comp_evC (eval t p et) ls nonceGolden)
+fun fromSome default opt = case opt of
+  Some x => x
+| None => default
 
-(** val run_gen_appraise_w_nonce :
-    coq_Term -> coq_Plc -> coq_BS -> coq_RawEv -> coq_AppResultC **)
+(** val gen_appraise_am_comp :
+    coq_Term -> coq_Plc -> coq_Evidence -> coq_RawEv -> coq_AppResultC coq_AM **)
 
-fun run_gen_appraise_w_nonce t p nonceIn ls =
-  run_gen_appraise t p (Coq_nn O) nonceIn ls
+fun gen_appraise_am_comp t p et ls =
+  gen_appraise_AM (eval t p et) ls
+
+(** val run_am_app_comp : 'a1 coq_AM -> 'a1 -> 'a1 **)
+
+fun run_am_app_comp am_comp default_A =
+  let val optRes = evalSt am_comp empty_amst in fromSome default_A optRes end
+
+(** val am_sendReq_nonce_auth :
+    coq_Term -> coq_Plc -> coq_Plc -> coq_AppResultC coq_AM **)
+
+fun am_sendReq_nonce_auth t pFrom pTo =
+  bind (am_newNonce gen_nonce_bits) (fn nid =>
+    let val auth_rawev = run_cvm_rawEv ssl_sig pFrom [] in
+    let val et = eval ssl_sig pFrom Coq_mt in
+    let val resev =
+      am_sendReq t pFrom pTo et (app auth_rawev (gen_nonce_bits :: []))
+    in
+    gen_appraise_am_comp t pFrom (Coq_nn nid) resev end end end)
+
+(** val run_am_sendReq_nonce_auth :
+    coq_Term -> coq_Plc -> coq_Plc -> coq_AppResultC **)
+
+fun run_am_sendReq_nonce_auth t pFrom pTo =
+  let val am_comp = am_sendReq_nonce_auth t pFrom pTo in
+  run_am_app_comp am_comp Coq_mtc_app end
+
+(** val am_check_auth_tok :
+    coq_Term -> coq_Plc -> coq_RawEv -> coq_Evidence -> (coq_AppResultC,
+    coq_RawEv) prod coq_AM **)
+
+fun am_check_auth_tok t fromPl rawev auth_et =
+  let val esize = et_size auth_et in
+  let val appev = firstn esize rawev in
+  let val restev = skipn esize rawev in
+  bind
+    (case requester_bound t fromPl auth_et of
+       True => gen_appraise_AM auth_et appev
+     | False => ret Coq_mtc_app) (fn appres => ret (Coq_pair appres restev)) end end end
+
+(** val am_serve_auth_tok_req :
+    coq_Term -> coq_Plc -> coq_Plc -> coq_RawEv -> coq_Evidence -> coq_RawEv
+    coq_AM **)
+
+fun am_serve_auth_tok_req t fromPl myPl rawev auth_et =
+  bind (am_check_auth_tok t fromPl rawev auth_et) (fn v =>
+    let val Coq_pair appres initRawEv = v in
+    (case case requester_bound t fromPl auth_et of
+            True => appraise_auth_tok appres
+          | False => False of
+       True =>
+       (case privPolicy fromPl t of
+          True => ret (run_cvm_rawEv t myPl initRawEv)
+        | False => failm)
+     | False => failm) end)
+
+(** val run_am_serve_auth_tok_req :
+    coq_Term -> coq_Plc -> coq_Plc -> coq_RawEv -> coq_Evidence -> coq_RawEv **)
+
+fun run_am_serve_auth_tok_req t fromPl myPl rawev auth_et =
+  run_am_app_comp (am_serve_auth_tok_req t fromPl myPl rawev auth_et) []
