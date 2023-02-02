@@ -74,19 +74,19 @@ get_files(cop_src
     extracted/privPolicy.cml
     apps/blockchain/Blockchain.sml
     apps/blockchain/HealthRecord.sml
-    stubs/cal_ak_ASP_Stub.sml
-    stubs/get_data_ASP_Stub.sml
-    stubs/tpm_sig_ASP_Stub.sml
-    stubs/ssl_enc_ASP_Stub.sml
-    stubs/pub_bc_ASP_Stub.sml
-    stubs/store_clientData_ASP_Stub.sml
-    stubs/ssl_sig_ASP_Stub.sml
-    stubs/kim_meas_ASP_Stub.sml
+    stubs/attestation_asps/cal_ak_ASP_Stub.sml
+    stubs/attestation_asps/get_data_ASP_Stub.sml
+    stubs/attestation_asps/tpm_sig_ASP_Stub.sml
+    stubs/attestation_asps/ssl_enc_ASP_Stub.sml
+    stubs/attestation_asps/pub_bc_ASP_Stub.sml
+    stubs/attestation_asps/store_clientData_ASP_Stub.sml
+    stubs/attestation_asps/ssl_sig_ASP_Stub.sml
+    stubs/attestation_asps/kim_meas_ASP_Stub.sml
     copland/Parser.sml
     util/IniUtil.sml
-    stubs/appraise_kim_meas_ASP.sml
-    stubs/appraise_ssl_sig_ASP.sml
-    stubs/appraise_tpm_sig_ASP.sml
+    stubs/appraisal_asps/appraise_kim_meas_ASP.sml
+    stubs/appraisal_asps/appraise_ssl_sig_ASP.sml
+    stubs/appraisal_asps/appraise_tpm_sig_ASP.sml
     stubs/Appraisal_IO_Stubs.sml
     stubs/Maps.sml
     extracted/StMonad_Coq.cml

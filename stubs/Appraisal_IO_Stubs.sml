@@ -1,6 +1,14 @@
 (* Depends on:  stubs/BS.sml, extracted/Term_Defs_Core.cml, 
      extracted/Term_Defs.cml, ... (TODO: crypto dependencies?) *)
 
+(* CLEANUP:
+Change CMake structure so that 
+'appraisal_asps' and 'attestation_asps'
+build their own folders respectively
+*)
+
+(* CLEANUP: 
+Rename this function in both Coq and in here *)
 (** val checkGG' :
     coq_ASP_PARAMS -> coq_Plc -> coq_BS -> coq_RawEv -> coq_BS **)
 fun checkGG' ps p bs ls =
