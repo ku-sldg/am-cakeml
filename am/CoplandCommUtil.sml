@@ -19,7 +19,7 @@ fun socketDispatch fromPl nsMap toPl et ev t =
 
 
 (* coq_Term -> coq_Plc -> coq_Plc -> coq_Evidence -> (bs list) -> (bs list) *)
-fun am_sendReq t fromPl toPl (*nsMap*) et evv (* am key *) =
+fun am_sendReq t fromPl toPl et evv =
     let (* val fromPl = O *)
         val myini = get_ini ()
         val nsMap = get_ini_nsMap myini
@@ -30,64 +30,4 @@ fun am_sendReq t fromPl toPl (*nsMap*) et evv (* am key *) =
                 rawEvToString evv ^ "\n\nReceived raw evidence result.\n" (* ^
                 rawEvToString resev ^ "\n" *) ));
         resev
-    end
-
-
-
-        
-(* coq_Term -> coq_Plc -> nsMap -> (bs list) -> (bs list) *)
-fun sendReq t fromPl toPl nsMap evv (* am key *) =
-    let (* val fromPl = O *)
-        val auth_tok_ev_type = Coq_mt (* TODO: fix hardcode here *)
-        val resev = socketDispatch fromPl nsMap toPl auth_tok_ev_type evv t
-    in
-        (print ("Sent term:\n" ^ termToString t ^
-                "\n\nInitial raw evidence (Sent):\n" ^
-                rawEvToString evv ^ "\n\nReceived raw evidence result.\n" (* ^
-                rawEvToString resev ^ "\n" *) ));
-        resev
-    end
-(*
-    handle Socket.Err s     => TextIOExtra.printLn_err ("Socket failure on connection: " ^ s)
-         | Socket.InvalidFD => TextIOExtra.printLn_err "Invalid file descriptor"
-         | DispatchErr s    => TextIOExtra.printLn_err ("Dispatch error: " ^ s)
-         | _                => TextIOExtra.printLn_err "Fatal: unknown error" 
-*)
-
-
-                                                       
-(* coq_Term -> coq_Plc -> nsMap -> (bs list) *)
-fun sendReq_nonce t fromPl toPl nsMap (* am key *) = 
-    let val nonce = Random.random (Random.seed (Meas.urand 32)) 16 in
-        sendReq t fromPl toPl nsMap [nonce]
-    end
-
-(* coq_Term -> coq_Plc -> (bs list) -> (bs list) *)      
-fun sendReq_local_ini t fromPl toPl ev =
-    let val name  = CommandLine.name ()
-        val usage = ("Usage: " ^ name ^ " configurationFile\n"
-                    ^ "e.g.   " ^ name ^ " config.ini\n") in
-    case CommandLine.arguments () of
-              [fileName] => (
-                  case parseIniFile fileName of
-                      Err e  => let val _ = O in
-                                    TextIOExtra.printLn_err e; []
-                                end
-                    | Ok ini =>
-                      let val _ = O in
-                          print "Parsed INI OK\n";
-                          case (iniServerAm ini) of
-                              Err e => let val _ = O in
-                                           TextIOExtra.printLn_err e; []
-                                       end
-                            | Ok nsMap =>
-                              let val _ = O in
-                                  print "Parsed nsMap of INI OK\n\n";
-                                  print "\nSending Request in senReq_ocal_ini\n\n"; 
-                                  sendReq t fromPl toPl nsMap ev
-                              end
-                      end )
-           | _ =>  let val _ = O in
-                       TextIOExtra.printLn_err usage; []
-                   end
     end
