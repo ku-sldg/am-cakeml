@@ -18,6 +18,9 @@
  * STRING  ::= '"' [^"] '"'
  * WS      ::= [ \t\r\n]*
  *)
+
+(* CLEANUP (JSON): 
+Cleanup when we do INI -> JSON conversion *)
 local
     (* Import definitions *)
     val pure  = Parser.pure

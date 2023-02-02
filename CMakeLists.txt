@@ -105,7 +105,6 @@ get_files(cop_src
     extracted/Example_Phrases_Demo.cml
     extracted/Impl_appraisal.cml
     extracted/Demo_AM.cml
-    copland/CvmUtil.sml
     copland/Parser)
 
 get_files(server_am_src ${util_src} ${posix_src} ${cop_src})

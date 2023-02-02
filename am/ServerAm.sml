@@ -11,6 +11,10 @@ val serverRcv     = jsonToResponse o strToJson o Socket.inputAll
 
 fun lookup m x = Result.fromOption (Map.lookup m x)
                                    ("No value given for \"" ^ x ^ "\"")
+
+(* CLEANUP (JSON): 
+When we convert to JSON vs. INI, then we can 
+get rid of all the INI stuff *)
 fun iniNsMap m =
     MapExtra.mapPartial nat_compare
                         (fn k => fn v =>
@@ -27,8 +31,7 @@ fun iniNsMap m =
 fun iniServerAm ini =
     Result.bind (lookup ini "privateKey")
                 (fn key =>
-                    Result.bind ((Ok (BString.unshow key)) handle _ =>
-                                                                  Err "Could not parse private key")
+                    Result.bind ((Ok (BString.unshow key)) handle _ => Err "Could not parse private key")
                                 (fn key => Ok (iniNsMap ini)))
 
 
