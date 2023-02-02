@@ -1,4 +1,0 @@
-(** val eqb_aspid : coq_ASP_ID -> coq_ASP_ID -> bool **)
-
-val eqb_aspid =
-  eqb
