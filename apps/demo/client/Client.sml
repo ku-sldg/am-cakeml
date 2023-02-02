@@ -2,13 +2,9 @@
 
 val term = demo_phrase
 
-fun main () = let val filename = "manifest.out" 
-                  val _ = outputExampleFormalManifest filename in
-                  (*print "hiii" ; *)
-                  inputAndPrintExampleFormalManifest filename
-              end
+fun main () =
 
-(* (run_client_demo_am_comp () ) *)
+(run_client_demo_am_comp () )
 
 
     
@@ -84,6 +80,17 @@ fun main' () = (* sendReq term *)
 *)
         
 val _ = main ()      
+
+
+
+(*  (* Manifest output testing code... *)
+    let val filename = "manifest.out" 
+                  val _ = outputExampleFormalManifest filename in
+                  (*print "hiii" ; *)
+                  inputAndPrintExampleFormalManifest filename
+              end
+*)
+
              
 
 
