@@ -1,8 +1,3 @@
-(** val client_data_bs : coq_BS **)
-
-val client_data_bs =
-  failwith "AXIOM TO BE REALIZED"
-
 (** val source_plc : coq_Plc **)
 
 val source_plc =
