@@ -308,20 +308,3 @@ fun jsonToStr js  = Json.stringify js
    that string into a bstring (BString.fromString).
 *)
 fun encode_RawEv ls = BString.fromString (jsonToStr (bsListToJsonList ls))
-
-(* 
-   fun decode_RawEv : coq_BS -> coq_RawEv
-   This should be the inverse of encode_RawEv.
-*)
-fun decode_RawEv bsval = jsonBsListToList (strToJson (BString.toString bsval))
-
-
-(** val decrypt_bs_to_rawev' : coq_BS -> coq_ASP_PARAMS -> coq_RawEv **)
-
-fun decrypt_bs_to_rawev' bs ps (* priv pub *) =
-    let val recoveredtext = Crypto.decryptOneShot (* priv pub *) priv2 pub1 bs
-        val bs_recovered = BString.fromString recoveredtext
-        val res = decode_RawEv bs_recovered
-        val _ = print ("\nDecryption Succeeded: \n" ^ (rawEvToString res) ^ "\n" ) in
-        res
-    end

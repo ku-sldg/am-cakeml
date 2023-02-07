@@ -5,13 +5,32 @@
 Change CMake structure so that 
 'appraisal_asps' and 'attestation_asps'
 build their own folders respectively
-*)
+ *)
 
-(* CLEANUP: 
-Rename this function in both Coq and in here *)
-(** val checkGG' :
+
+
+
+(* 
+   fun decode_RawEv : coq_BS -> coq_RawEv
+   This should be the inverse of encode_RawEv.
+*)
+fun decode_RawEv bsval = jsonBsListToList (strToJson (BString.toString bsval))
+
+
+(** val decrypt_bs_to_rawev : coq_BS -> coq_ASP_PARAMS -> coq_RawEv **)
+
+fun decrypt_bs_to_rawev bs ps (* priv pub *) =
+    let val recoveredtext = Crypto.decryptOneShot (* priv pub *) priv2 pub1 bs
+        val bs_recovered = BString.fromString recoveredtext
+        val res = decode_RawEv bs_recovered
+        val _ = print ("\nDecryption Succeeded: \n" ^ (rawEvToString res) ^ "\n" ) in
+        res
+    end
+
+
+(** val chec_asp_EXTD :
     coq_ASP_PARAMS -> coq_Plc -> coq_BS -> coq_RawEv -> coq_BS **)
-fun check_asp_EXTD' ps p bs ls =
+fun check_asp_EXTD ps p bs ls =
     case ps of
         Coq_asp_paramsC aspid args tpl tid =>
         case (aspid = tpm_sig_aspid) of
@@ -28,8 +47,8 @@ fun check_asp_EXTD' ps p bs ls =
                                    end
                                        
                                        
-(** fun checkNonce' : coq_BS -> coq_BS -> coq_BS **)
-fun checkNonce' nonceGolden nonceCandidate =
+(** fun checkNonce : coq_BS -> coq_BS -> coq_BS **)
+fun checkNonce nonceGolden nonceCandidate =
     if (nonceGolden = nonceCandidate)
     then
         let val _ = print "Nonce Check PASSED\n\n" in
