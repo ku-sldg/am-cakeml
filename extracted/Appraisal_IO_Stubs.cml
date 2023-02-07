@@ -8,10 +8,10 @@ val gen_nonce_bits =
 val decrypt_bs_to_rawev' =
   failwith "AXIOM TO BE REALIZED"
 
-(** val checkGG' :
+(** val check_asp_EXTD' :
     coq_ASP_PARAMS -> coq_Plc -> coq_BS -> coq_RawEv -> coq_BS **)
 
-val checkGG' =
+val check_asp_EXTD' =
   failwith "AXIOM TO BE REALIZED"
 
 (** val checkNonce' : coq_BS -> coq_BS -> coq_BS **)

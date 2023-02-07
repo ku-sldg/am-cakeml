@@ -11,7 +11,7 @@ build their own folders respectively
 Rename this function in both Coq and in here *)
 (** val checkGG' :
     coq_ASP_PARAMS -> coq_Plc -> coq_BS -> coq_RawEv -> coq_BS **)
-fun checkGG' ps p bs ls =
+fun check_asp_EXTD' ps p bs ls =
     case ps of
         Coq_asp_paramsC aspid args tpl tid =>
         case (aspid = tpm_sig_aspid) of

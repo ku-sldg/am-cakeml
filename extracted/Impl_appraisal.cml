@@ -25,7 +25,7 @@ fun gen_appraise_AM et ls =
      | EXTD =>
        bind (peel_bs_am ls) (fn v =>
          let val Coq_pair bs ls' = v in
-         bind (checkGG params p bs ls') (fn v0 =>
+         bind (check_asp_EXTD params p bs ls') (fn v0 =>
            bind (gen_appraise_AM et' ls') (fn rest =>
              ret (Coq_ggc_app p params v0 rest))) end)
      | KEEP => gen_appraise_AM et' ls
