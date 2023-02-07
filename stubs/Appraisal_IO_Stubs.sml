@@ -9,7 +9,7 @@ build their own folders respectively
 
 
 
-
+(* CLEANUP: Add this as a stub in Coq (Appraisal_IO_Stubs.v?) *)
 (* 
    fun decode_RawEv : coq_BS -> coq_RawEv
    This should be the inverse of encode_RawEv.
