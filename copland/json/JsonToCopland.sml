@@ -307,4 +307,5 @@ fun jsonToStr js  = Json.stringify js
    Next, we "stringify" that Array (am/ServerAM.jsonToStr) to a single string.  Finally, we lift
    that string into a bstring (BString.fromString).
 *)
+(* CLEANUP: Find a place to move this so it better fits *)
 fun encode_RawEv ls = BString.fromString (jsonToStr (bsListToJsonList ls))
