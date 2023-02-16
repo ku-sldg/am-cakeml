@@ -125,9 +125,6 @@ structure FFI = struct
     (* ffi -> bstring -> bool *)
     fun callBool ffi input = BString.hd (call ffi 1 input) = success
 
-    (* ffi -> bstring -> () *)
-    fun callUnit ffi input = ((call ffi 0 input); ())
-
     local 
         val wbuf = Word8ArrayExtra.nulls 2
     in
@@ -144,64 +141,6 @@ structure FFI = struct
                       o List.map BString.fromString
 end
 
-(* Bijective maps *)
-structure BiMap = struct
-    local 
-        datatype ('a, 'b) biMap = BiMap (('a, 'b) map) (('b, 'a) map)
-
-        fun left  bmap = case bmap of BiMap l _ => l
-        fun right bmap = case bmap of BiMap _ r => r
-    in
-        type ('a, 'b) biMap = ('a, 'b) biMap
-
-        (* ('a, 'b) biMap -> 'a -> 'b option *)
-        fun lookupl bmap l = Map.lookup (left bmap) l
-
-        (* ('a, 'b) biMap -> 'b -> 'a option *)
-        fun lookupr bmap r = Map.lookup (right bmap) r
-
-        (* ('a, 'b) biMap -> 'a -> bool *)
-        fun existsl bmap l = MapExtra.exists (left bmap) l
-
-        (* ('a, 'b) biMap -> 'b -> bool *)
-        fun existsr bmap r = MapExtra.exists (right bmap) r
- 
-        (* ('a, 'b) biMap -> 'a -> 'b -> ('a, 'b) biMap *)
-        fun insert bmap l r = case bmap of BiMap lmap rmap =>
-            let val lmap' = OptionExtra.option lmap (Map.delete lmap) (Map.lookup rmap r)
-                val rmap' = OptionExtra.option rmap (Map.delete rmap) (Map.lookup lmap l)
-             in BiMap (Map.insert lmap' l r) (Map.insert rmap' r l)
-            end
-
-        (* ('a, 'b) biMap -> 'a -> 'b -> (('a, 'b) biMap) option *)
-        fun maybeInsert bmap l r = case bmap of BiMap lmap rmap =>
-            if existsl bmap l orelse existsr bmap r then 
-                None 
-            else 
-                Some (BiMap (Map.insert lmap l r) (Map.insert rmap r l))
-
-        (* ('a, 'b) biMap -> 'a -> -> ('a, 'b) biMap *)
-        fun deletel bmap l = case bmap of BiMap lmap rmap =>
-            BiMap (Map.delete lmap l) rmap
-
-        (* ('a, 'b) biMap -> 'b -> -> ('a, 'b) biMap *)
-        fun deleter bmap r = case bmap of BiMap lmap rmap =>
-            BiMap lmap (Map.delete rmap r)
-
-        (* ('a, 'b) biMap -> bool *)
-        fun null bmap = Map.null (left bmap)
-
-        (* ('a -> 'a -> ordering) -> ('b -> 'b -> ordering) -> ('a, 'b) biMap *)
-        fun empty lord rord = BiMap (Map.empty lord) (Map.empty rord)
-
-        (* ('a -> 'a -> ordering) -> ('b -> 'b -> ordering) -> ('a, 'b) list -> ('a, 'b) biMap *)
-        fun fromList lord rord = List.foldr (flip (uncurry o insert)) (empty lord rord)
-    end
-end
-
-(* 'a ref -> ('a -> 'a) -> unit *)
-fun updateRef r f = r := f (!r)
-
 (* bool -> (() -> ()) -> () *)
 fun when cond io = if cond then io () else ()
 
@@ -216,7 +155,3 @@ fun loop io x = (
     io x;
     loop io x
 )
-
-(* ('a -> 'b) -> 'a -> () *)
-fun loop_ io x = (loop io x) : unit
-
