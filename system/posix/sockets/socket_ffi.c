@@ -16,9 +16,6 @@
 #include <string.h>     // memset, strerror
 #include <unistd.h>     // close
 
-#include <sys/time.h>
-#include <signal.h>
-
 #define FFI_SUCCESS 0
 #define FFI_FAILURE 1
 
@@ -27,10 +24,10 @@
 // provided FFI functions when possible.
 // However, I'm not sure why ints (usually 4 bytes) are converted back and forth
 // to 8-byte arrays.
-extern int byte2_to_int(uint8_t *b);
-extern void int_to_byte2(int i, uint8_t *b);
-extern int byte8_to_int(uint8_t *b);
-extern void int_to_byte8(int i, uint8_t *b);
+int byte2_to_int(uint8_t *b);
+void int_to_byte2(int i, uint8_t *b);
+int byte8_to_int(uint8_t *b);
+void int_to_byte8(int i, uint8_t *b);
 
 // Arguments: qlen (first 2 bytes of c), and port, a string representation of a
 //     number, following qlen
@@ -161,44 +158,4 @@ void fficonnect(uint8_t * c, const long clen, uint8_t * a, const long alen) {
     // return sockfd
     a[0] = FFI_SUCCESS;
     int_to_byte8(sockfd, a+1);
-}
-
-void ffisocketReadTimeout (unsigned char *c, long clen, unsigned char *a, long alen) {
-    assert(clen == 8);
-    int fd = byte8_to_int(c);
-    int n = byte2_to_int(a);
-    assert(alen >= n + 4);
-
-    fd_set set;
-    FD_ZERO(&set);
-    FD_SET(fd, &set);
-    struct timeval timeout;
-    timeout.tv_sec = 30; // 30 second timeout
-    timeout.tv_usec = 0;
-
-    int ret = select(fd+1, &set, (fd_set *)NULL, (fd_set *)NULL, &timeout);
-    if (ret == -1){
-        // error
-        a[0] = 0;
-    }
-    else if (ret == 0) {
-        // timeout
-        a[0] = 1;
-    }
-    else {
-        // good to read
-        int nread = read(fd, (void *)(a+4), n);
-        if(nread <= 0){
-            a[0] = 0;
-        }
-        else{
-            a[0] = 2;
-            int_to_byte2(nread,&a[1]);
-        }  
-    }
-}
-
-void ffisocketLibInit(unsigned char *c, long clen, unsigned char *a, long alen) {
-    // Prevents SIGPIPE signal when writing to a socket which was unknowingly closed from the other end
-    signal(SIGPIPE, SIG_IGN);
 }
