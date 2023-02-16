@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <stdbool.h>
 #include <string.h>
 #include <stdint.h>
 
@@ -36,6 +37,77 @@ void ffiwriteDataport(const uint8_t * c, const long clen, uint8_t * a, const lon
 
     a[0] = FFI_SUCCESS;
 }
+
+void ffireadDataport(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
+    assert(clen >= 1);
+    assert(alen >= 2);
+
+    const char * name = (const char *)c;
+
+    int fd = open(name, O_RDONLY);
+    ffi_assert(fd >= 0);
+
+    void * dataport = mmap(NULL, alen-1, PROT_READ, MAP_SHARED, fd, getpagesize());
+    ffi_assert(dataport != (void *)(-1));
+
+    memcpy((void *)(a+1), dataport, alen-1);
+
+    munmap(dataport, alen-1);
+    close(fd);
+
+    a[0] = FFI_SUCCESS;
+}
+
+void ffiwaitDataport(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
+    assert(clen >= 1);
+    assert(alen >= sizeof(int) + 1);
+
+    const char * name = (const char *)c;
+
+    int fd = open(name, O_RDONLY);
+    ffi_assert(fd >= 0);
+
+    int val;
+    int result = read(fd, &val, sizeof(int));
+    if (result != sizeof(int)) {
+        close(fd);
+        a[0] = FFI_FAILURE;
+        return;
+    }
+
+    memcpy((void *)a+1, (const void *)(&val), sizeof(int));
+    a[0] = FFI_SUCCESS;
+}
+//
+// Note: emitDataport seems to break when compiled for 32-bit ARM on a 64-bit ARM architecture.
+//   The dataport write will trigger a SIGSEGV or SIGILL signal
+void ffiemitDataport(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
+    assert(clen >= 1);
+    assert(alen >= 1);
+
+    const char * name = (const char *)c;
+
+    // int fd = open(name, O_WRONLY);
+    int fd = open(name, O_RDWR);
+    ffi_assert(fd >= 0);
+
+    void * dataport = mmap(NULL, 1, PROT_WRITE, MAP_SHARED, fd, 0);
+    ffi_assert(dataport != (void *)(-1));
+
+    *((uint8_t *)dataport) = 1;
+
+    munmap(dataport, 1);
+    close(fd);
+
+    a[0] = FFI_SUCCESS;
+}
+
+
+
+
+
+
+
 
 // write the contents of c to the dataport
 void ffidataport_write( unsigned char* c, long clen, unsigned char* a, long alen )
@@ -108,3 +180,4 @@ void ffiemit_event( unsigned char* a, long alen, unsigned char* b, long blen)
 
     return 0;
 }
+
