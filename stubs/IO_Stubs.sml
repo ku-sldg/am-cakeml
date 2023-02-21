@@ -86,31 +86,3 @@ fun requester_bound t p et = True
 (** val appraise_auth_tok : coq_AppResultC -> bool **)
 
 fun appraise_auth_tok appres = True
-
-
-
-
-
-        
-
-      (*
-
-(* coq_Term -> coq_Plc -> coq_Plc -> (bs list) -> (bs list) *)
-fun am_sendReq t fromPl toPl evv =
-    let val myini = get_ini ()
-        val nsMap = get_ini_nsMap myini
-        val resev = socketDispatch fromPl nsMap toPl evv t
-    in
-        (print ("Sent term:\n" ^ termToString t ^
-                "\n\nInitial raw evidence (Sent):\n" ^
-                rawEvToString evv ^ "\n\nReceived raw evidence result.\n" (* ^
-                rawEvToString resev ^ "\n" *) ));
-        resev
-    end
-
-*)
-
-
-
-
-      

@@ -1,3 +1,3 @@
 #!/bin/bash
 
-cp example_client_goodkey.ini example_client.ini
+cp example_client_goodkey.json example_client.json
