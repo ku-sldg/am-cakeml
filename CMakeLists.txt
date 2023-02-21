@@ -26,7 +26,7 @@ set(BASIS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/system/basis_ffi.c" CACHE PATH "File
 
 get_files(util_src util/CoqDefaults.sml util/Extra.sml
     util/ByteString.sml util/Misc.sml util/Parser.sml util/Json.sml
-    util/Ini.sml util/BinaryParser.sml util/Http.sml)
+    util/JsonConfigUtils.sml util/BinaryParser.sml util/Http.sml)
 
 get_files(crypto_src system/crypto/openssl/CryptoFFI.sml
 system/crypto/openssl/Random.sml)
