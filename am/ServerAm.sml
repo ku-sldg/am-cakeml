@@ -7,6 +7,7 @@ fun jsonToStr js  = Json.stringify js
 *)
 
 fun serverSend fd = Socket.output fd o jsonToStr o requestToJson
+fun serverSend_json fd = Socket.output fd o jsonToStr o requestToJson_json
 val serverRcv     = jsonToResponse o strToJson o Socket.inputAll
 
 fun lookup m x = Result.fromOption (Map.lookup m x)
