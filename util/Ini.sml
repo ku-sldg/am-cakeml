@@ -97,26 +97,6 @@ fun get_json _ =
         )
     end
 
-(* Extracts the jsonPlcMap from the overally json config mapping
-    : (string, Json.json) map -> jsonPlcMap *)
-fun extractJsonPlcMap (jsonMap : (string, Json.json) map) =
-    case (Map.lookup jsonMap "plcs") of
-      None =>  Map.empty String.compare
-    | Some v => (* We have our "plcs" map as json 'v' *)
-        case (Json.toMap v) of
-          None =>   Map.empty String.compare
-        | Some jsonMap => (* We should have a (id, json) map here *)
-            let fun mappify' (v : Json.json) =
-                    case (Json.toString v) of
-                      None => "ERROR"
-                      | Some v' => v'
-                fun mappify (v : Json.json) = 
-                    case (Json.toMap v) of
-                      None => Map.empty String.compare
-                    | Some map' => 
-                      Map.map mappify' map'
-            in (Map.map mappify jsonMap)
-            end
 
 (* Convert the Json config into a mapping 
     : Json.json -> (string, Json.json) map *)
@@ -124,6 +104,50 @@ fun json_config_to_map (json : Json.json) =
     case Json.toMap json of
       None => Map.empty String.compare
       | Some v => v
+
+(*****
+ Json Config File Extraction Functions 
+ *****)
+
+
+(* Convert a json blob that represent the json plc map into an actual JsonPlcMap 
+  : Json.json -> jsonPlcMap *)
+fun jsonBlob_to_JsonPlcMap (jsonBlob : Json.json) =
+    case (Json.toMap jsonBlob) of
+      None =>   Map.empty String.compare
+    | Some jsonMap => (* We should have a (id, json) map here *)
+        let fun mappify' (v : Json.json) =
+                case (Json.toString v) of
+                  None => "ERROR"
+                  | Some v' => v'
+            fun mappify (v : Json.json) = 
+                case (Json.toMap v) of
+                  None => Map.empty String.compare
+                | Some map' => 
+                  Map.map mappify' map'
+        in (Map.map mappify jsonMap)
+        end
+
+(* Extracts the jsonPlcMap from the overally json config mapping
+    : (string, Json.json) map -> jsonPlcMap *)
+fun extractJsonPlcMap (jsonMap : (string, Json.json) map) =
+    case (Map.lookup jsonMap "plcs") of
+      None =>  Map.empty String.compare
+    | Some v => (* We have our "plcs" map as json 'v' *)
+        jsonBlob_to_JsonPlcMap v
+
+(* Attempts to lookup "key" in jsonMap
+  if found, returns value after a post processor fn is applied,
+  if not found, returns default value *)
+fun jsonLookupValueOrDefault (jsonMap : (string, Json.json) map) (key : string) def =
+    case (Map.lookup jsonMap key) of
+      None => def
+      | Some v => 
+          case (Json.toString v) of
+            None => def
+            | Some v => v
+
+
 
 fun get_ini _ =
     let val name  = CommandLine.name ()
@@ -139,7 +163,7 @@ fun get_ini _ =
               | Ok ini => ini
         )
     end
-                    
+          
         
                                              
 (* fun get_ini_hexbytes s :: string -> BString 

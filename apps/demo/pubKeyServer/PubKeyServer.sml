@@ -78,15 +78,23 @@ fun lookupOrDefault ini read write k default =
       )
 
 (* (string, string) map -> () *)
-fun startServer ini =
-    let val port = lookupOrDefault ini Int.fromString Int.toString "port" 5000
-        val qLen = lookupOrDefault ini Int.fromString Int.toString "queueLength" 5
-     in case iniServerAm ini of 
+fun startServer (json : (string, Json.json) map) =
+    let val portStr = jsonLookupValueOrDefault json "port" "5000"
+        val portInt = case Int.fromString portStr of
+                        Some pVal => pVal
+                        | None => raise Undef (* TODO *)
+                          (* raise (Undef "Port is not a integer") *)
+        val qLenStr = jsonLookupValueOrDefault json "queueLength" "5"
+        val qLenInt = case Int.fromString qLenStr of
+                        Some qval => qval
+                        | None => raise Undef
+                        (* raise (Undef "Queue Length is not a integer") *)
+     in case jsonServerAm json of 
           Err e => TextIOExtra.printLn_err e
         | Ok _ => (
             (TextIOExtra.printLn ("Starting up")); 
-            (TextIOExtra.printLn (String.concat ["On port: ", Int.toString port, "\nQueue Length: ", Int.toString qLen]));
-            loop handleIncoming (Socket.listen port qLen)
+            (TextIOExtra.printLn (String.concat ["On port: ", portStr, "\nQueue Length: ", qLenStr]));
+            loop handleIncoming (Socket.listen portInt qLenInt)
             )
     end
     handle Socket.Err s => TextIO.print_err ("Socket failure on listener instantiation: " ^ s ^ "\n")
@@ -95,8 +103,10 @@ fun startServer ini =
 
 (* () -> () *)
 fun main () =
-    let val ini = get_ini () in
-        startServer ini
+    let val json = get_json () 
+        val jsonMap = json_config_to_map json
+      in
+        startServer jsonMap
     end
 
 val () = main ()

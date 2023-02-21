@@ -260,19 +260,9 @@ fun jsonToRequest js = case (Json.toMap js) of
 
     and
     getREQ data = case data of
-          [Json.Int pl1, Json.Int pl2, Json.Object amap, t, et, ev] =>
-              REQ (natFromInt pl1) (natFromInt pl2) (toPlAddrMap (Map.toAscList amap)) (jsonToTerm t) (jsonToEv et) (jsonBsListToList ev)
+          [Json.Int pl1, Json.Int pl2, jBlob, t, et, ev] =>
+              REQ (natFromInt pl1) (natFromInt pl2) (jsonBlob_to_JsonPlcMap jBlob) (jsonToTerm t) (jsonToEv et) (jsonBsListToList ev)
         | _ => raise Json.Exn "getREQ" "unexpected argument list"
-
-    and
-    toPlAddrMap alist =
-        let fun unjasonify (s, Json.String s') =
-                case Int.fromString s
-                of Some i => (natFromInt i, s')
-                | None =>
-                    raise Json.Exn "toPlAddrMap" "unexpected non-integer"
-         in Map.fromList nat_compare (List.map unjasonify alist)
-        end
 
 
 fun jsonToResponse js = case (Json.toMap js) of

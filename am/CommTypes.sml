@@ -11,15 +11,7 @@ type jsonPlcMap = ((string, ((string, string) map)) map)
 type nsMap = ((coq_Plc, addr) map)
 val emptyNsMap : nsMap = Map.empty nat_compare
                                    
-
-(* To place,
-   From place,
-   Nameserver mapping,
-   Term to execute,
-   Initial evidence *)
-datatype requestMessage = REQ coq_Plc coq_Plc nsMap coq_Term coq_Evidence (bs list)
-
-datatype requestMessage_json = REQ_json coq_Plc coq_Plc jsonPlcMap coq_Term coq_Evidence (bs list)
+datatype requestMessage = REQ coq_Plc coq_Plc jsonPlcMap coq_Term coq_Evidence (bs list)
 
                               
 (* To place,
