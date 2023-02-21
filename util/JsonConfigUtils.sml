@@ -60,6 +60,8 @@ fun extractJsonPlcMap (jsonMap : (string, Json.json) map) =
     | Some v => (* We have our "plcs" map as json 'v' *)
         jsonBlob_to_JsonPlcMap v
 
+
+(* TODO: I really am not sure how good a concept it is to have this, we should rather just raise an error IMO *)
 (* Attempts to lookup "key" in jsonMap
   if found, returns value after a post processor fn is applied,
   if not found, returns default value *)
