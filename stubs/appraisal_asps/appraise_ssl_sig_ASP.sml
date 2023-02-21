@@ -4,13 +4,21 @@
    coq_ASP_PARAMS -> coq_Plc -> coq_BS -> coq_RawEv -> coq_BS 
 
    Performs openssl signature checking *)
-fun appraise_ssl_sig ps p bs ls =
+fun appraise_ssl_sig (ps : coq_ASP_PARAMS) (p : coq_Plc) (bs : coq_BS) (ls : coq_RawEv)  =
     let
         val msg = encode_RawEv ls
         val signGood_loc = bs   
 
-        val ini = get_ini ()
-	val theirPubkey = get_ini_pubkey ini p
+        val json = get_json ()
+        val jsonMap = json_config_to_map json
+        val jsonPlcMap = extractJsonPlcMap jsonMap
+	      val theirPubkey = 
+          case (Map.lookup jsonPlcMap (natToString p)) of
+            None => raise Undef (* TODO *)
+            | Some pInfoMap =>
+              case (Map.lookup pInfoMap "publicKey") of
+                None => raise Undef (* TODO *)
+                | Some pubKey => BString.fromString pubKey
         (*pub*) (* signingKey *) (* theirPubkey_bc *)
                               
                               (*

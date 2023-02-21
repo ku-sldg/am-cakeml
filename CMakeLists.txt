@@ -82,8 +82,6 @@ get_files(cop_src
     stubs/attestation_asps/store_clientData_ASP_Stub.sml
     stubs/attestation_asps/ssl_sig_ASP_Stub.sml
     stubs/attestation_asps/kim_meas_ASP_Stub.sml
-    copland/Parser.sml
-    util/IniUtil.sml
     stubs/appraisal_asps/appraise_kim_meas_ASP.sml
     stubs/appraisal_asps/appraise_ssl_sig_ASP.sml
     stubs/appraisal_asps/appraise_tpm_sig_ASP.sml

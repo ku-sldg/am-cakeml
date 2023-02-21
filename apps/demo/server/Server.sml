@@ -119,24 +119,6 @@ fun handleIncoming listener =
          | Socket.InvalidFD => TextIOExtra.printLn_err "Invalid file descriptor"
 
 
-                                                       
-
-(* (string, string) map -> (string -> 'a option) -> ('a -> string) -> string -> 'a -> 'a *)
-fun lookupOrDefault ini read write k default =
-    case Map.lookup ini k of
-      None => (
-          TextIOExtra.printLn ("No field \"" ^ k ^ "\", defaulting to " ^ write default ^ ".");
-          default
-      )
-    | Some v => (
-        case read v of
-          None => (
-              TextIOExtra.printLn ("Cannot read \"" ^ k ^ "\", defaulting to " ^ write default ^ ".");
-              default
-          )
-        | Some r => r
-      )
-
 (* (string, string) map -> () *)
 fun startServer (json : (string, Json.json) map) =
     let val portStr = jsonLookupValueOrDefault json "port" "5000"
