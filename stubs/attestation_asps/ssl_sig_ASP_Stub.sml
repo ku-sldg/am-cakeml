@@ -14,7 +14,8 @@ fun ssl_sig_asp_stub (ps : coq_ASP_PARAMS) (e : coq_RawEv) =
                       | Some k => 
                           case (Json.toString k) of
                             None => raise Undef (* TODO *) 
-                            | Some k' => BString.fromString k'
+                            (* We have to do an extra conversion here from hex to bytestring? *)
+                            | Some k' => (BString.unshow k')
                 val sigRes = Crypto.signMsg myPriKey data in
                 sigRes
             end
