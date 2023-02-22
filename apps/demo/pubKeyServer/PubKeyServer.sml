@@ -63,13 +63,11 @@ fun startServer (json : (string, Json.json) map) =
     let val portStr = jsonLookupValueOrDefault json "port" "5000"
         val portInt = case Int.fromString portStr of
                         Some pVal => pVal
-                        | None => raise Undef (* TODO *)
-                          (* raise (Undef "Port is not a integer") *)
+                        | None => raise (Exception "Port is not a integer")
         val qLenStr = jsonLookupValueOrDefault json "queueLength" "5"
         val qLenInt = case Int.fromString qLenStr of
                         Some qval => qval
-                        | None => raise Undef
-                        (* raise (Undef "Queue Length is not a integer") *)
+                        | None => raise (Exception "Queue Length is not a integer")
      in case jsonServerAm json of 
           Err e => TextIOExtra.printLn_err e
         | Ok _ => (
@@ -80,6 +78,7 @@ fun startServer (json : (string, Json.json) map) =
     end
     handle Socket.Err s => TextIO.print_err ("Socket failure on listener instantiation: " ^ s ^ "\n")
          | Crypto.Err s => TextIO.print_err ("Crypto error: " ^ s ^ "\n")
+         | Exception s => TextIO.print_err ("EXCEPTION: " ^ s ^ "\n")
          | _          => TextIO.print_err ("Fatal: unknown error\n")
 
 (* () -> () *)

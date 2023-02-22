@@ -1,7 +1,7 @@
 (* No dependencies *)
 
 (* Extensions to structures in the standard library *)
-
+exception Exception string
 structure ListExtra = struct
     (* int -> 'a -> 'a list *)
     fun replicate len a = List.genlist (const a) len

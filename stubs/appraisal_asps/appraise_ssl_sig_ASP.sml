@@ -14,10 +14,10 @@ fun appraise_ssl_sig (ps : coq_ASP_PARAMS) (p : coq_Plc) (bs : coq_BS) (ls : coq
         val jsonPlcMap = extractJsonPlcMap jsonMap
 	      val theirPubkey = 
           case (Map.lookup jsonPlcMap (natToString p)) of
-            None => raise Undef (* TODO *)
+            None => raise (Exception "Place not found in JSON Mapping")
             | Some pInfoMap =>
               case (Map.lookup pInfoMap "publicKey") of
-                None => raise Undef (* TODO *)
+                None => raise (Exception ("Public key for place '" ^ (natToString p) ^ "' was not found"))
                 | Some pubKey => BString.fromString pubKey
         (*pub*) (* signingKey *) (* theirPubkey_bc *)
                               
