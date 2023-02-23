@@ -118,7 +118,7 @@ fun example_server () = "" ^
 fun main () =
     let val json = case (parseJsonText (example_server ())) of
                     Err e => let val _ = TextIOExtra.printLn_err e in
-                                json.null
+                                Json.null
                              end
                     | Ok json => json
         val jsonMap = json_config_to_map json
