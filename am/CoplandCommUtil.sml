@@ -23,9 +23,8 @@ fun socketDispatch (fromPl : coq_Plc) (jsonPlcMap : jsonPlcMap) (toPl : coq_Plc)
     end
 
 (* coq_Term -> coq_Plc -> coq_Plc -> coq_Evidence -> (bs list) -> (bs list) *)
-fun am_sendReq t fromPl toPl et evv =
-    let (* val fromPl = O *)
-        val myJson = get_json ()
+fun am_sendReq (t : coq_Term) (fromPl : coq_Plc) (toPl : coq_Plc) (et : coq_Evidence) (evv : (bs list)) =
+    let val myJson = JsonConfig.get_json ()
         val jsonMap = json_config_to_map myJson
         val jsonPMap = extractJsonPlcMap jsonMap
         val resev = socketDispatch fromPl jsonPMap toPl et evv t

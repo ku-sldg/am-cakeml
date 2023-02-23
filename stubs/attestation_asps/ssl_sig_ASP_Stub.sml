@@ -6,7 +6,7 @@ fun ssl_sig_asp_stub (ps : coq_ASP_PARAMS) (e : coq_RawEv) =
         let val _ = () in
             print ("Matched aspid:  " ^ aspid ^ "\n");
             let val data = encode_RawEv e
-                val json = get_json ()
+                val json = JsonConfig.get_json ()
                 val jsonMap = json_config_to_map json
                 val myPriKey = 
                     case (Map.lookup jsonMap "privateKey") of

@@ -9,7 +9,7 @@ fun appraise_ssl_sig (ps : coq_ASP_PARAMS) (p : coq_Plc) (bs : coq_BS) (ls : coq
         val msg = encode_RawEv ls
         val signGood_loc = bs   
 
-        val json = get_json ()
+        val json = JsonConfig.get_json ()
         val jsonMap = json_config_to_map json
         val jsonPlcMap = extractJsonPlcMap jsonMap
 	      val theirPubkey = 
