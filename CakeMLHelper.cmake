@@ -75,8 +75,8 @@ function(cakeml_component name)
         1
         PARSED_ARGS
         ""
-        "CML_SOURCES;C_SOURCES;LIBS"
         "ENTRY_NAME"
+        "CML_SOURCES;C_SOURCES;LIBS"
     )
     if(NOT "${PARSED_ARGS_UNPARSED_ARGUMENTS}" STREQUAL "")
         message(FATAL_ERROR "Unknown arguments to cakeml_component ${PARSED_ARGS_UNPARSED_ARGUMENTS}")
