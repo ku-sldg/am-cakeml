@@ -243,6 +243,9 @@ structure TextIOExtra = struct
 end
 
 structure MapExtra = struct
+    (* ('a, 'b) map -> 'a -> bool *)
+    fun exists m k = Option.isSome (Map.lookup m k)
+
     (* ('a -> 'a -> ordering) -> 'a -> 'b -> ('a, 'b) map *)
     fun singleton cmp k v = Map.insert (Map.empty cmp) k v
 
