@@ -43,13 +43,11 @@ fun startServer (json : (string, Json.json) map) =
     let val portStr = jsonLookupValueOrDefault json "port" "5000"
         val portInt = case Int.fromString portStr of
                         Some pVal => pVal
-                        | None => raise Undef (* TODO *)
-                          (* raise (Undef "Port is not a integer") *)
+                        | None => raise (Exception "Port is not an integer")
         val qLenStr = jsonLookupValueOrDefault json "queueLength" "5"
         val qLenInt = case Int.fromString qLenStr of
                         Some qval => qval
-                        | None => raise Undef
-                        (* raise (Undef "Queue Length is not a integer") *)
+                        | None => raise (Exception "Queue length is not an integer")
      in case jsonServerAm json  of 
           Err e => TextIOExtra.printLn_err e
         | Ok _ => loop handleIncoming (Socket.listen portInt qLenInt)

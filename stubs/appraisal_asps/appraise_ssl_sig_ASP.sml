@@ -18,7 +18,7 @@ fun appraise_ssl_sig (ps : coq_ASP_PARAMS) (p : coq_Plc) (bs : coq_BS) (ls : coq
             | Some pInfoMap =>
               case (Map.lookup pInfoMap "publicKey") of
                 None => raise (Exception ("Public key for place '" ^ (natToString p) ^ "' was not found"))
-                | Some pubKey => BString.fromString pubKey
+                | Some pubKey => BString.unshow pubKey
         (*pub*) (* signingKey *) (* theirPubkey_bc *)
                               
                               (*
