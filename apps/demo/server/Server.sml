@@ -9,7 +9,7 @@ fun term_policy_check_good p termIn = privPolicy p termIn (* TODO: invoke policy
    said error messages in JSON as well to make it easier on the client. *)
 fun evalJson s =       (* jsonToStr (responseToJson (RES O O [])) *)
     
-    let val (REQ pl1 pl2 t et ev') = jsonToRequest (strToJson s)
+    let val (REQ pl1 pl2 pMap t et ev') = jsonToRequest (strToJson s)
         val ev = ev'
         val resev = run_am_serve_auth_tok_req t pl1 pl2 ev' et
             

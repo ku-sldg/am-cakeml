@@ -5,7 +5,7 @@
    it returns a raw error message string. In the future, we may want to wrap
    said error messages in JSON as well to make it easier on the client. *)
 fun evalJson s =
-    let val (REQ pl1 pl2 t ev) = jsonToRequest (strToJson s)
+    let val (REQ pl1 pl2 pMap t ev) = jsonToRequest (strToJson s)
         val me = O (* TODO: hardcode ok? *)
         val ev' = run_cvm_rawEv t me ev
      in jsonToStr (responseToJson (RES pl2 pl1 ev'))
