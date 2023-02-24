@@ -10,16 +10,10 @@ fun appraise_ssl_sig (ps : coq_ASP_PARAMS) (p : coq_Plc) (bs : coq_BS) (ls : coq
         val signGood_loc = bs   
 
         val json = JsonConfig.get_json ()
-        val jsonMap = json_config_to_map json
-        val jsonPlcMap = extractJsonPlcMap jsonMap
-	      val theirPubkey = 
-          case (Map.lookup jsonPlcMap (natToString p)) of
-            None => raise (Exception "Place not found in JSON Mapping")
-            | Some pInfoMap =>
-              case (Map.lookup pInfoMap "publicKey") of
-                None => raise (Exception ("Public key for place '" ^ (natToString p) ^ "' was not found"))
-                | Some pubKey => BString.unshow pubKey
-        (*pub*) (* signingKey *) (* theirPubkey_bc *)
+        val (port, queueLength, privKey, plcMap) = JsonConfig.extract_client_config json
+        val (id,ip,port,pubkey) = case (Map.lookup plcMap (natToInt p)) of
+                                    Some m => m
+                                    | None => raise JsonConfig.Excn ("Place "^ (plToString p) ^" not in nameserver map")
                               
                               (*
 	val _ = print ("\ntheirPubkey bytes: \n" ^ (BString.toString theirPubkey) ^ "\n\n")
@@ -27,7 +21,7 @@ fun appraise_ssl_sig (ps : coq_ASP_PARAMS) (p : coq_Plc) (bs : coq_BS) (ls : coq
 	val _ = print ("\nsignGood: " ^ (BString.show signGood_loc) ^ "\n\n")
                               *)
                               
-        val pub_len = BString.length theirPubkey
+        val pub_len = BString.length pubkey
         val sig_len = BString.length signGood_loc
         val msg_len = BString.length msg
 
@@ -38,7 +32,7 @@ fun appraise_ssl_sig (ps : coq_ASP_PARAMS) (p : coq_Plc) (bs : coq_BS) (ls : coq
         val _ = TextIO.output outFileHandle (BString.toString theirPubkey)
                                      *)
                                      
-        val checkGood = Crypto.sigCheck theirPubkey signGood_loc msg (* Crypto.checkTpmSig signGood msg *)
+        val checkGood = Crypto.sigCheck pubkey signGood_loc msg (* Crypto.checkTpmSig signGood msg *)
     in
         if checkGood
         then (print ("\nSSL Sig Check PASSED\n\n");

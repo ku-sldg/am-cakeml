@@ -34,6 +34,10 @@ structure JsonConfig = struct
                       None => raise (Excn ("'" ^ key ^ "' found, but could not be cast"))
                       | Some pval' => pval'
 
+  (* Encodes casts a value and encodes it into Json 
+      : 'A -> ('A -> string) -> Json.json *)
+  fun cast_and_encode v castFn = Json.fromString (castFn v)
+
   (* Parses a json file into its JSON representation 
       : string -> Json.json *)
   fun parseJsonFile (file : string) =
@@ -69,6 +73,20 @@ structure JsonConfig = struct
         (id, ip, port, publicKey)
       end
 
+  (* Encodes a PlcConfig into a Json structure 
+      : PlcConfig -> Json.json *)
+  fun encode_plc_config (p : PlcConfig) =
+      let val (id, ip, port, pubkey) = p
+          val pConfJson = [
+              ("id", cast_and_encode id Int.toString), 
+              ("ip", Json.fromString ip),
+              ("port", cast_and_encode port Int.toString),
+              ("publicKey", cast_and_encode pubkey BString.show)
+              ]
+      in
+        Json.fromMap (Map.fromList String.compare pConfJson)
+      end
+
   (* Attempts to extract a PlcMap from a Json structure 
       : Json.json -> PlcMap *)
   fun extract_plc_map (j : Json.json) =
@@ -94,6 +112,24 @@ structure JsonConfig = struct
         (Map.fromList Int.compare reIndexedMap)
       end
   
+  (* Encodes a PlcMap into a Json structure
+      : PlcMap -> Json.json *)
+  fun encode_plc_map (p : PlcMap) = 
+      let val unpackedMap = Map.toAscList p
+          fun encoder ((p, c) : int * PlcConfig) = 
+              (let val pStr = Int.toString p
+                  val confJson = encode_plc_config c
+              in
+                (pStr, confJson)
+              end) : (string * Json.json)
+          val newList = (List.map encoder unpackedMap) : (string * Json.json) list
+          val encMap = (Map.fromList String.compare newList) : (string, Json.json) map
+          val insideJson = (Json.fromMap encMap)
+      in
+        (* We need to get the external "plcs" tag on *)
+        (Json.fromPairList [("plcs", insideJson)])
+      end
+
   (* Attempts to extract the ClientConfig from a Json structure 
       : Json.json -> ClientConfig = (port * queueLength * privateKey * PlcMap)*)
   fun extract_client_config (j : Json.json) =
@@ -128,42 +164,3 @@ structure JsonConfig = struct
       end) : PubKeyServerConfig
 end
 
-
-
-(* Convert the Json config into a mapping 
-    : Json.json -> (string, Json.json) map *)
-fun json_config_to_map (json : Json.json) =
-    case Json.toMap json of
-      None => Map.empty String.compare
-      | Some v => v
-
-(*****
- Json Config File Extraction Functions 
- *****)
-
-
-(* Convert a json blob that represent the json plc map into an actual JsonPlcMap 
-  : Json.json -> jsonPlcMap *)
-fun jsonBlob_to_JsonPlcMap (jsonBlob : Json.json) =
-    case (Json.toMap jsonBlob) of
-      None =>   Map.empty String.compare
-    | Some jsonMap => (* We should have a (id, json) map here *)
-        let fun mappify' (v : Json.json) =
-                case (Json.toString v) of
-                  None => "ERROR"
-                  | Some v' => v'
-            fun mappify (v : Json.json) = 
-                case (Json.toMap v) of
-                  None => Map.empty String.compare
-                | Some map' => 
-                  Map.map mappify' map'
-        in (Map.map mappify jsonMap)
-        end
-
-(* Extracts the jsonPlcMap from the overally json config mapping
-    : (string, Json.json) map -> jsonPlcMap *)
-fun extractJsonPlcMap (jsonMap : (string, Json.json) map) =
-    case (Map.lookup jsonMap "plcs") of
-      None =>  Map.empty String.compare
-    | Some v => (* We have our "plcs" map as json 'v' *)
-        jsonBlob_to_JsonPlcMap v

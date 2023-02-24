@@ -7,16 +7,8 @@ fun ssl_sig_asp_stub (ps : coq_ASP_PARAMS) (e : coq_RawEv) =
             print ("Matched aspid:  " ^ aspid ^ "\n");
             let val data = encode_RawEv e
                 val json = JsonConfig.get_json ()
-                val jsonMap = json_config_to_map json
-                val myPriKey = 
-                    case (Map.lookup jsonMap "privateKey") of
-                      None => raise (Exception "Private key not found in JSON manifest")
-                      | Some k => 
-                          case (Json.toString k) of
-                            None => raise (Exception "Private key malformed: Could not be converted to a string")
-                            (* We have to do an extra conversion here from hex to bytestring? *)
-                            | Some k' => (BString.unshow k')
-                val sigRes = Crypto.signMsg myPriKey data in
+                val (port, queueLength, privKey, plcMap) = JsonConfig.extract_client_config json
+                val sigRes = Crypto.signMsg privKey data in
                 sigRes
             end
         end
