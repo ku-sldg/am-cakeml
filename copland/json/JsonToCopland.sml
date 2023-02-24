@@ -255,7 +255,7 @@ fun jsonToRequest js = case (Json.toMap js) of
         let fun get str = case Map.lookup pairs str of
                   Some x => x
                 | None   => raise Json.Exn "fromAList" "missing request field"
-         in getREQ (List.map get ["toPlace", "fromPlace", "reqTerm", "reqEvType", "reqEv"])
+         in getREQ (List.map get ["toPlace", "fromPlace", "reqNameMap", "reqTerm", "reqEvType", "reqEv"])
         end
 
     and
