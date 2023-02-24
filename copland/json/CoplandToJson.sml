@@ -148,9 +148,9 @@ fun evToJson e = case e of
                                            evToJson e2 ]
 
 
-fun requestToJson (REQ pl1 pl2 t et ev) = Json.fromPairList
-    [("toPlace", placeToJson pl1), ("fromPlace", placeToJson pl2), 
-    ("reqTerm", termToJson t), ("reqEvType", evToJson et), ("reqEv", bsListToJsonList ev)]
+fun requestToJson (REQ pl1 pl2 jpmap t et ev) = Json.fromPairList
+    [("toPlace", placeToJson pl1), ("fromPlace", placeToJson pl2), ("reqNameMap", JsonConfig.encode_plc_map jpmap),
+     ("reqTerm", termToJson t), ("reqEvType", evToJson et), ("reqEv", bsListToJsonList ev)]
 
 fun responseToJson (RES pl1 pl2 ev) = Json.fromPairList
     [("respToPlace", placeToJson pl1), ("respFromPlace", placeToJson pl2), ("respEv", bsListToJsonList ev)]

@@ -7,8 +7,8 @@ fun ssl_sig_asp_stub (ps : coq_ASP_PARAMS) (e : coq_RawEv) =
             print ("Matched aspid:  " ^ aspid ^ "\n");
             let val data = encode_RawEv e
                 val json = JsonConfig.get_json ()
-                val (port, queueLength, privateKey, plcMap) = JsonConfig.extract_server_config json
-                val sigRes = Crypto.signMsg privateKey data in
+                val (port, queueLength, privKey, plcMap) = JsonConfig.extract_client_config json
+                val sigRes = Crypto.signMsg privKey data in
                 sigRes
             end
         end

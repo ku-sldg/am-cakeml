@@ -48,7 +48,7 @@ fun startServer (json : Json.json) =
          | Crypto.Err s => TextIO.print_err ("Crypto error: " ^ s ^ "\n")
          | JsonConfig.Excn s => TextIO.print_err ("JsonConfig Error: " ^ s ^ "\n")
          | Exception s => TextIO.print_err ("EXCEPTION: " ^ s ^ "\n")
-         | _          => TextIO.print_err "Fatal: unknown error\n"
+         | _          => TextIO.print_err "Fatal: unknown error!\n"
 
 (* () -> () *)
 fun main () =

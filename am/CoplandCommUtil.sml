@@ -1,14 +1,12 @@
 
 exception DispatchErr string
 
-(* coq_Plc -> coq_Plc -> Json.json -> coq_Evidence -> (bs list) -> coq_Term -> (bs list) *)
-fun socketDispatch (fromPl : coq_Plc) (toPl : coq_Plc) (json : Json.json) (et : coq_Evidence) (ev : (bs list)) (t : coq_Term) =
-    let val (port, queueLength, privateKey, plcMap) = JsonConfig.extract_server_config json
-        val toPlInt = (natToInt toPl) : int
-        val (plc, ip, port, pubkey) = case (Map.lookup plcMap toPlInt) of
-                                        None => raise DispatchErr ("Place "^ (plToString toPl) ^" not in nameserver map")
-                                        | Some m => m
-        val req  = (REQ fromPl toPl t et ev)
+(* coq_Plc -> nsMap -> coq_Plc -> coq_Evidence -> (bs list) -> coq_Term -> (bs list) *)
+fun socketDispatch (fromPl : coq_Plc) (pmap : JsonConfig.PlcMap) (toPl : coq_Plc) (et : coq_Evidence) (ev : (bs list)) (t : coq_Term) =
+    let val (id,ip,port,pubkey) = case (Map.lookup pmap (natToInt toPl)) of
+                                    Some m => m
+                                    | None => raise DispatchErr ("Place "^ (plToString toPl) ^" not in nameserver map")
+        val req  = (REQ fromPl toPl pmap t et ev)
         val fd   = Socket.connect ip port
         val (RES _ _ resev) = (serverSend fd req; serverRcv fd)
      in Socket.close fd;
@@ -17,8 +15,9 @@ fun socketDispatch (fromPl : coq_Plc) (toPl : coq_Plc) (json : Json.json) (et : 
 
 (* coq_Term -> coq_Plc -> coq_Plc -> coq_Evidence -> (bs list) -> (bs list) *)
 fun am_sendReq (t : coq_Term) (fromPl : coq_Plc) (toPl : coq_Plc) (et : coq_Evidence) (evv : (bs list)) =
-    let val myJson = JsonConfig.get_json ()
-        val resev = socketDispatch fromPl toPl myJson et evv t
+    let val json = JsonConfig.get_json ()
+        val (port, queueLength, privKey, plcMap) = JsonConfig.extract_client_config json
+        val resev = socketDispatch fromPl plcMap toPl et evv t
     in
         (print ("Sent term:\n" ^ termToString t ^
                 "\n\nInitial raw evidence (Sent):\n" ^

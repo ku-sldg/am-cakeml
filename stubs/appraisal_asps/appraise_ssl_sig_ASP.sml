@@ -10,11 +10,16 @@ fun appraise_ssl_sig (ps : coq_ASP_PARAMS) (p : coq_Plc) (bs : coq_BS) (ls : coq
         val signGood_loc = bs   
 
         val json = JsonConfig.get_json ()
-        val (port, queueLength, privateKey, plcMap) = JsonConfig.extract_server_config json
-        val toPlInt = (natToInt p) : int
-        val (plc, ip, port, pubkey) = case (Map.lookup plcMap toPlInt) of
-                                        None => raise JsonConfig.Excn ("Place "^ (plToString p) ^" not in nameserver map")
-                                        | Some m => m
+        val (port, queueLength, privKey, plcMap) = JsonConfig.extract_client_config json
+        val (id,ip,port,pubkey) = case (Map.lookup plcMap (natToInt p)) of
+                                    Some m => m
+                                    | None => raise JsonConfig.Excn ("Place "^ (plToString p) ^" not in nameserver map")
+                              
+                              (*
+	val _ = print ("\ntheirPubkey bytes: \n" ^ (BString.toString theirPubkey) ^ "\n\n")
+	val _ = print ("\nmsg: " ^ (BString.show msg) ^ "\n\n")
+	val _ = print ("\nsignGood: " ^ (BString.show signGood_loc) ^ "\n\n")
+                              *)
                               
         val pub_len = BString.length pubkey
         val sig_len = BString.length signGood_loc
