@@ -40,13 +40,6 @@ fun nsMapToJson map =
     in Json.fromPairList (List.map jsonify (Map.toAscList map))
     end
 
-(* Convert a JsonPlcMap into its JSON representation *)
-fun jsonPlcMapToJson (m : jsonPlcMap) =
-    let fun mappify x = Json.fromMap (Map.map Json.fromString x)
-    in
-    Json.fromMap (Map.map mappify m)
-    end
-
 (* aspMapToJson : am/Manifest.aspMap -> json 
    type aspMap = ((coq_ASP_ID, addr) map)
 *)
@@ -155,9 +148,9 @@ fun evToJson e = case e of
                                            evToJson e2 ]
 
 
-fun requestToJson (REQ pl1 pl2 jpmap t et ev) = Json.fromPairList
-    [("toPlace", placeToJson pl1), ("fromPlace", placeToJson pl2), ("reqNameMap", jsonPlcMapToJson jpmap),
-     ("reqTerm", termToJson t), ("reqEvType", evToJson et), ("reqEv", bsListToJsonList ev)]
+fun requestToJson (REQ pl1 pl2 t et ev) = Json.fromPairList
+    [("toPlace", placeToJson pl1), ("fromPlace", placeToJson pl2), 
+    ("reqTerm", termToJson t), ("reqEvType", evToJson et), ("reqEv", bsListToJsonList ev)]
 
 fun responseToJson (RES pl1 pl2 ev) = Json.fromPairList
     [("respToPlace", placeToJson pl1), ("respFromPlace", placeToJson pl2), ("respEv", bsListToJsonList ev)]

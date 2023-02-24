@@ -30,7 +30,7 @@ fun decrypt_bs_to_rawev bs ps (* priv pub *) =
 
 (** val chec_asp_EXTD :
     coq_ASP_PARAMS -> coq_Plc -> coq_BS -> coq_RawEv -> coq_BS **)
-fun check_asp_EXTD ps p bs ls =
+fun check_asp_EXTD (ps : coq_ASP_PARAMS) (p : coq_Plc) (bs : coq_BS) (ls : coq_RawEv) =
     case ps of
         Coq_asp_paramsC aspid args tpl tid =>
         case (aspid = tpm_sig_aspid) of
