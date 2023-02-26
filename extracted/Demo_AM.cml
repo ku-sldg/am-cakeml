@@ -1,16 +1,4 @@
-(** val client_demo_am_comp : coq_Term -> bool coq_AM **)
+(** val client_demo_am_comp : coq_Term -> coq_AppResultC **)
 
 fun client_demo_am_comp t =
-  let val app_res = run_am_sendReq_nonce_auth t dest_plc source_plc in
-  let val bool_res = case app_res of
-                       Coq_ggc_app _ _ _ _ => True
-                     | _ => False
-  in
-  (case bool_res of
-     True => ret bool_res
-   | False => ret False) end end
-
-(** val run_client_demo_am_comp : coq_Term -> bool **)
-
-fun run_client_demo_am_comp t =
-  run_am_app_comp (client_demo_am_comp t) False
+  run_am_sendReq_nonce t dest_plc source_plc

@@ -55,6 +55,7 @@ get_files(cop_src
     stubs/BS.sml
     extracted/Datatypes.cml
     extracted/List.cml
+    extracted/Nat.cml
     extracted/OptMonad_Coq.cml
     extracted/Term_Defs_Core.cml
     extracted/Appraisal_Evidence.cml

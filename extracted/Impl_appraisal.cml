@@ -52,56 +52,49 @@ fun gen_appraise_am_comp t p et ls =
 fun run_am_app_comp am_comp default_A =
   let val optRes = evalSt am_comp empty_amst in fromSome default_A optRes end
 
-(** val am_sendReq_nonce_auth :
+(** val am_sendReq_nonce :
     coq_Term -> coq_Plc -> coq_Plc -> coq_AppResultC coq_AM **)
 
-fun am_sendReq_nonce_auth t pFrom pTo =
+fun am_sendReq_nonce t pFrom pTo =
   bind (am_newNonce gen_nonce_bits) (fn nid =>
-    let val auth_rawev = run_cvm_rawEv ssl_sig pFrom [] in
-    let val et = eval ssl_sig pFrom Coq_mt in
-    let val resev =
-      am_sendReq t pFrom pTo et (app auth_rawev (gen_nonce_bits :: []))
-    in
-    gen_appraise_am_comp t pFrom (Coq_nn nid) resev end end end)
+    let val resev = am_sendReq t pFrom pTo Coq_mt [] (gen_nonce_bits :: []) in
+    gen_appraise_am_comp t pFrom (Coq_nn nid) resev end)
 
-(** val run_am_sendReq_nonce_auth :
+(** val run_am_sendReq_nonce :
     coq_Term -> coq_Plc -> coq_Plc -> coq_AppResultC **)
 
-fun run_am_sendReq_nonce_auth t pFrom pTo =
-  let val am_comp = am_sendReq_nonce_auth t pFrom pTo in
+fun run_am_sendReq_nonce t pFrom pTo =
+  let val am_comp = am_sendReq_nonce t pFrom pTo in
   run_am_app_comp am_comp Coq_mtc_app end
 
 (** val am_check_auth_tok :
-    coq_Term -> coq_Plc -> coq_RawEv -> coq_Evidence -> (coq_AppResultC,
-    coq_RawEv) prod coq_AM **)
+    coq_Term -> coq_Plc -> coq_RawEv -> coq_Evidence -> coq_AppResultC coq_AM **)
 
-fun am_check_auth_tok t fromPl rawev auth_et =
-  let val esize = et_size auth_et in
-  let val appev = firstn esize rawev in
-  let val restev = skipn esize rawev in
+fun am_check_auth_tok t fromPl auth_ev auth_et =
   bind
     (case requester_bound t fromPl auth_et of
-       True => gen_appraise_AM auth_et appev
-     | False => ret Coq_mtc_app) (fn appres => ret (Coq_pair appres restev)) end end end
+       True => gen_appraise_AM auth_et auth_ev
+     | False => ret Coq_mtc_app) ret
 
 (** val am_serve_auth_tok_req :
     coq_Term -> coq_Plc -> coq_Plc -> coq_RawEv -> coq_Evidence -> coq_RawEv
-    coq_AM **)
+    -> coq_RawEv coq_AM **)
 
-fun am_serve_auth_tok_req t fromPl myPl rawev auth_et =
-  bind (am_check_auth_tok t fromPl rawev auth_et) (fn v =>
-    let val Coq_pair appres initRawEv = v in
-    (case case requester_bound t fromPl auth_et of
-            True => appraise_auth_tok appres
-          | False => False of
-       True =>
-       (case privPolicy fromPl t of
-          True => ret (run_cvm_rawEv t myPl initRawEv)
-        | False => failm)
-     | False => failm) end)
+fun am_serve_auth_tok_req t fromPl myPl auth_ev auth_et init_ev =
+  bind (am_check_auth_tok t fromPl auth_ev auth_et) (fn v =>
+    case case requester_bound t fromPl auth_et of
+           True => appraise_auth_tok v
+         | False => False of
+      True =>
+      (case privPolicy fromPl t of
+         True => ret (run_cvm_rawEv t myPl init_ev)
+       | False => failm)
+    | False => failm)
 
 (** val run_am_serve_auth_tok_req :
-    coq_Term -> coq_Plc -> coq_Plc -> coq_RawEv -> coq_Evidence -> coq_RawEv **)
+    coq_Term -> coq_Plc -> coq_Plc -> coq_RawEv -> coq_Evidence -> coq_RawEv
+    -> coq_RawEv **)
 
-fun run_am_serve_auth_tok_req t fromPl myPl rawev auth_et =
-  run_am_app_comp (am_serve_auth_tok_req t fromPl myPl rawev auth_et) []
+fun run_am_serve_auth_tok_req t fromPl myPl auth_ev auth_et init_ev =
+  run_am_app_comp
+    (am_serve_auth_tok_req t fromPl myPl auth_ev auth_et init_ev) []

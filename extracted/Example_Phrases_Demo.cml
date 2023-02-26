@@ -40,6 +40,16 @@ val demo_phrase =
   Coq_lseq kim_meas (Coq_lseq create_and_load_ak (Coq_lseq pub_key_to_bc
     (Coq_lseq get_data (Coq_lseq tpm_sig ssl_enc))))
 
+(** val demo_phrase2 : coq_Term **)
+
+val demo_phrase2 =
+  Coq_att (S (S O)) kim_meas
+
+(** val demo_phrase3 : coq_Term **)
+
+val demo_phrase3 =
+  Coq_att (S (S O)) (Coq_lseq kim_meas (Coq_att (S O) kim_meas))
+
 (** val ssl_sig : coq_Term **)
 
 val ssl_sig =

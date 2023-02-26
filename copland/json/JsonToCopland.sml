@@ -255,13 +255,13 @@ fun jsonToRequest js = case (Json.toMap js) of
         let fun get str = case Map.lookup pairs str of
                   Some x => x
                 | None   => raise Json.Exn "fromAList" "missing request field"
-         in getREQ (List.map get ["toPlace", "fromPlace", "reqNameMap", "reqTerm", "reqEvType", "reqEv"])
+         in getREQ (List.map get ["toPlace", "fromPlace", "reqNameMap", "reqTerm", "reqAuthEvType", "reqAuthEv", "reqEv"])
         end
 
     and
     getREQ data = case data of
-          [Json.Int pl1, Json.Int pl2, jBlob, t, et, ev] =>
-              REQ (natFromInt pl1) (natFromInt pl2) (JsonConfig.extract_plc_map jBlob) (jsonToTerm t) (jsonToEv et) (jsonBsListToList ev)
+          [Json.Int pl1, Json.Int pl2, jBlob, t, authEt, authEv, ev] =>
+              REQ (natFromInt pl1) (natFromInt pl2) (JsonConfig.extract_plc_map jBlob) (jsonToTerm t) (jsonToEv authEt) (jsonBsListToList authEv) (jsonBsListToList ev)
         | _ => raise Json.Exn "getREQ" "unexpected argument list"
 
 

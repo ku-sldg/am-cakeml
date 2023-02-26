@@ -1,5 +1,6 @@
 (* Depends on: util, copland, am/Measurements, am/ServerAm *)
 
-fun main () = (run_client_demo_am_comp kim_meas )
+fun main () =
+        print ( (evidenceCToString (client_demo_am_comp demo_phrase3 )) ^ "\n\n")
         
 val _ = main ()      

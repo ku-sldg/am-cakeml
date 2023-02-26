@@ -12,7 +12,7 @@ rm ${CML_DIR}/Bool.cml
 rm ${CML_DIR}/EqClass.cml
 rm ${CML_DIR}/Eqb_Evidence.cml
 rm ${CML_DIR}/Maps.cml
-rm ${CML_DIR}/Nat.cml
+#rm ${CML_DIR}/Nat.cml
 rm ${CML_DIR}/Params_Admits.cml
 rm ${CML_DIR}/PeanoNat.cml
 rm ${CML_DIR}/String.cml

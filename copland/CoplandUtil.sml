@@ -80,7 +80,6 @@ fun evToString e = concatWith " "
     end
 
 (* evidenceCToString :: coq_EvidenceC -> string *)
-(* evidenceCToString :: coq_AppResultC -> string *) 
 fun evidenceCToString e = concatWith " "
     let fun parens e = "(" ^ evidenceCToString e ^ ")"
      in case e of
@@ -97,6 +96,9 @@ fun evidenceCToString e = concatWith " "
                                 evToString et] *)
           | Coq_ssc_app ev1 ev2   => ["SSc", parens ev1, parens ev2]
     end
+
+    
+    
 
 (* rawEvToString :: coq_RawEv -> string *)
 fun rawEvToString e = listToString e BString.toString
