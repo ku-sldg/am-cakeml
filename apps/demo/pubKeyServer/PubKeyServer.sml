@@ -58,35 +58,25 @@ fun handleIncoming listener =
     handle Socket.Err s     => TextIOExtra.printLn_err ("Socket failure: " ^ s)
          | Socket.InvalidFD => TextIOExtra.printLn_err "Invalid file descriptor"
 
-(* (string, string) map -> () *)
-fun startServer (json : (string, Json.json) map) =
-    let val portStr = jsonLookupValueOrDefault json "port" "5000"
-        val portInt = case Int.fromString portStr of
-                        Some pVal => pVal
-                        | None => raise (Exception "Port is not a integer")
-        val qLenStr = jsonLookupValueOrDefault json "queueLength" "5"
-        val qLenInt = case Int.fromString qLenStr of
-                        Some qval => qval
-                        | None => raise (Exception "Queue Length is not a integer")
-     in case jsonServerAm json of 
-          Err e => TextIOExtra.printLn_err e
-        | Ok _ => (
-            (TextIOExtra.printLn ("Starting up")); 
-            (TextIOExtra.printLn (String.concat ["On port: ", portStr, "\nQueue Length: ", qLenStr]));
-            loop handleIncoming (Socket.listen portInt qLenInt)
-            )
+(* Json.json -> () *)
+fun startServer (json : Json.json) =
+    let val (port, queueLength, privateKey, plcMap) = JsonConfig.extract_pubkeyserver_config json
+        val _ = TextIOExtra.printLn ("Starting up")
+        val _ = TextIOExtra.printLn ("On port: " ^ (Int.toString port) ^ "\nQueue Length: " ^ (Int.toString queueLength))
+    in 
+      loop handleIncoming (Socket.listen port queueLength)
     end
     handle Socket.Err s => TextIO.print_err ("Socket failure on listener instantiation: " ^ s ^ "\n")
          | Crypto.Err s => TextIO.print_err ("Crypto error: " ^ s ^ "\n")
+         | JsonConfig.Excn s => TextIO.print_err ("JsonConfig Error: " ^ s ^ "\n")
          | Exception s => TextIO.print_err ("EXCEPTION: " ^ s ^ "\n")
          | _          => TextIO.print_err ("Fatal: unknown error\n")
 
 (* () -> () *)
 fun main () =
-    let val json = get_json () 
-        val jsonMap = json_config_to_map json
-      in
-        startServer jsonMap
+    let val json = JsonConfig.get_json () 
+    in
+      startServer json
     end
 
 val () = main ()

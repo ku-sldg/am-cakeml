@@ -9,16 +9,14 @@ fun term_policy_check_good p termIn = privPolicy p termIn (* TODO: invoke policy
    said error messages in JSON as well to make it easier on the client. *)
 fun evalJson s =       (* jsonToStr (responseToJson (RES O O [])) *)
     
-    let val (REQ pl1 pl2 map t et ev') = jsonToRequest (strToJson s)
+    let val (REQ pl1 pl2 pMap t et ev') = jsonToRequest (strToJson s)
         val ev = ev'
-        (* val me = O (* TODO: hardcode ok? *) *)
-
         val resev = run_am_serve_auth_tok_req t pl1 pl2 ev' et
             
     in jsonToStr (responseToJson (RES pl2 pl1 resev))
     end
     handle Json.Exn s1 s2 =>
-           (TextIO.print_err (String.concat ["JSON error", s1, ": ", s2, "\n"]);
+           (TextIO.print_err ("JSON error" ^ s1 ^ ": " ^ s2 ^ "\n");
             "Invalid JSON/Copland term")
         (*
          | USMexpn s =>
@@ -38,31 +36,25 @@ fun handleIncoming listener =
          | Socket.InvalidFD => TextIOExtra.printLn_err "Invalid file descriptor"
 
 
-(* (string, string) map -> () *)
-fun startServer (json : (string, Json.json) map) =
-    let val portStr = jsonLookupValueOrDefault json "port" "5000"
-        val portInt = case Int.fromString portStr of
-                        Some pVal => pVal
-                        | None => raise (Exception "Port is not an integer")
-        val qLenStr = jsonLookupValueOrDefault json "queueLength" "5"
-        val qLenInt = case Int.fromString qLenStr of
-                        Some qval => qval
-                        | None => raise (Exception "Queue length is not an integer")
-     in case jsonServerAm json  of 
-          Err e => TextIOExtra.printLn_err e
-        | Ok _ => loop handleIncoming (Socket.listen portInt qLenInt)
+(* Json.json -> () *)
+fun startServer (json : Json.json) =
+    let val (port, queueLength, privateKey, plcMap) = JsonConfig.extract_server_config json
+        val _ = TextIOExtra.printLn ("Starting up Server")
+        val _ = TextIOExtra.printLn ("On port: " ^ (Int.toString port) ^ "\nQueue Length: " ^ (Int.toString queueLength))
+    in 
+     loop handleIncoming (Socket.listen port queueLength)
     end
     handle Socket.Err s => TextIO.print_err ("Socket failure on listener instantiation: " ^ s ^ "\n")
          | Crypto.Err s => TextIO.print_err ("Crypto error: " ^ s ^ "\n")
+         | JsonConfig.Excn s => TextIO.print_err ("JsonConfig Error: " ^ s ^ "\n")
          | Exception s => TextIO.print_err ("EXCEPTION: " ^ s ^ "\n")
-         | _          => TextIO.print_err "Fatal: unknown error\n"
+         | _          => TextIO.print_err "Fatal: unknown error!\n"
 
 (* () -> () *)
 fun main () =
-    let val json = get_json () 
-        val jsonMap = json_config_to_map json
-      in
-        startServer jsonMap
+    let val json = JsonConfig.get_json () 
+    in
+      startServer json
     end
         
 val () = main ()
