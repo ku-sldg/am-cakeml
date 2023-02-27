@@ -7,6 +7,7 @@ fun socketDispatch (fromPl : coq_Plc) (pmap : JsonConfig.PlcMap) (toPl : coq_Plc
                                     Some m => m
                                     | None => raise DispatchErr ("Place "^ (plToString toPl) ^" not in nameserver map")
         val req  = (REQ fromPl toPl pmap t authEt authEv ev)
+        val _ = print ("Dispatching Request Term: \n'" ^ (termToString t) ^ "'\nTo address: " ^ ip ^ ":" ^ (Int.toString port) ^ "\n")
         val fd   = Socket.connect ip port
         val (RES _ _ resev) = (serverSend fd req; serverRcv fd)
      in Socket.close fd;

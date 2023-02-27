@@ -283,7 +283,15 @@ fun jsonToResponse js = case (Json.toMap js) of
               RES (natFromInt pl1) (natFromInt pl2) (jsonBsListToList ev)
         | _ => raise Json.Exn "getRES" "unexpected argument list"
 
-fun strToJson str = Result.okValOf (Json.parse str)
+fun strToJson str = 
+    let val jp = (Json.parse str)
+        val jpOk = case jp of
+                      Err e => raise (Exception ("Json Parsing Error: Attempting to parse string '" ^ str ^ "' and encountered error '" ^ e ^ "'\n"))
+                      | Ok v => v
+    in
+      jpOk
+    end
+
 fun jsonToStr js  = Json.stringify js
 
 
