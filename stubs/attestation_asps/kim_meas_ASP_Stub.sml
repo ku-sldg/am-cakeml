@@ -10,10 +10,8 @@ fun kim_meas_asp_stub ps e =
                        String.concat
                            (Option.getOpt
                                 (TextIO.b_inputLinesFrom targ_file)
-                                []) in
-
-                           (*
-		       val _ = (print ("\nRead Bytes from file '" ^ targ_file ^ "' :\n" ^ targ_file_contents)) in *)
+                                [])
+                       val _ = (print ("\nRead Bytes from file '" ^ targ_file ^ "' :\n" ^ targ_file_contents ^ "\n\n")) in
                        BString.fromString targ_file_contents
                    end
                end

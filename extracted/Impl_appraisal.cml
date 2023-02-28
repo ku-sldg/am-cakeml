@@ -41,12 +41,6 @@ fun fromSome default opt = case opt of
   Some x => x
 | None => default
 
-(** val gen_appraise_am_comp :
-    coq_Term -> coq_Plc -> coq_Evidence -> coq_RawEv -> coq_AppResultC coq_AM **)
-
-fun gen_appraise_am_comp t p et ls =
-  gen_appraise_AM (eval t p et) ls
-
 (** val run_am_app_comp : 'a1 coq_AM -> 'a1 -> 'a1 **)
 
 fun run_am_app_comp am_comp default_A =
@@ -58,13 +52,34 @@ fun run_am_app_comp am_comp default_A =
 fun am_sendReq_nonce t pFrom pTo =
   bind (am_newNonce gen_nonce_bits) (fn nid =>
     let val resev = am_sendReq t pFrom pTo Coq_mt [] (gen_nonce_bits :: []) in
-    gen_appraise_am_comp t pFrom (Coq_nn nid) resev end)
+    let val expected_et = eval t pTo (Coq_nn nid) in
+    gen_appraise_AM expected_et resev end end)
 
 (** val run_am_sendReq_nonce :
     coq_Term -> coq_Plc -> coq_Plc -> coq_AppResultC **)
 
 fun run_am_sendReq_nonce t pFrom pTo =
   let val am_comp = am_sendReq_nonce t pFrom pTo in
+  run_am_app_comp am_comp Coq_mtc_app end
+
+(** val am_sendReq_nonce_auth :
+    coq_Term -> coq_Plc -> coq_Plc -> coq_AppResultC coq_AM **)
+
+fun am_sendReq_nonce_auth t pFrom pTo =
+  bind (am_newNonce gen_nonce_bits) (fn nid =>
+    let val auth_rawev = run_cvm_rawEv ssl_sig pFrom [] in
+    let val auth_et = eval ssl_sig pFrom Coq_mt in
+    let val resev =
+      am_sendReq t pFrom pTo auth_et auth_rawev (gen_nonce_bits :: [])
+    in
+    let val expected_et = eval t pTo (Coq_nn nid) in
+    gen_appraise_AM expected_et resev end end end end)
+
+(** val run_am_sendReq_nonce_auth :
+    coq_Term -> coq_Plc -> coq_Plc -> coq_AppResultC **)
+
+fun run_am_sendReq_nonce_auth t pFrom pTo =
+  let val am_comp = am_sendReq_nonce_auth t pFrom pTo in
   run_am_app_comp am_comp Coq_mtc_app end
 
 (** val am_check_auth_tok :

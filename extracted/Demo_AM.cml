@@ -2,3 +2,8 @@
 
 fun client_demo_am_comp t =
   run_am_sendReq_nonce t dest_plc source_plc
+
+(** val client_demo_am_comp_auth : coq_Term -> coq_AppResultC **)
+
+fun client_demo_am_comp_auth t =
+  run_am_sendReq_nonce_auth t dest_plc source_plc

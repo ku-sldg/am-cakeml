@@ -15,14 +15,14 @@ fun socketDispatch (fromPl : coq_Plc) (pmap : JsonConfig.PlcMap) (toPl : coq_Plc
     end
 
 (* coq_Term -> coq_Plc -> coq_Plc -> coq_Evidence -> (bs list) -> (bs list) -> (bs list) *)
-fun am_sendReq (t : coq_Term) (fromPl : coq_Plc) (toPl : coq_Plc) (authEt : coq_Evidence) (authEv : (bs list))  (ev : (bs list)) =
+fun am_sendReq (t : coq_Term) (fromPl : coq_Plc) (toPl : coq_Plc) (authEt : coq_Evidence) (authEv : (bs list)) (ev : (bs list)) =
     let val json = JsonConfig.get_json ()
         val (port, queueLength, privKey, plcMap) = JsonConfig.extract_client_config json
         val resev = socketDispatch fromPl plcMap toPl authEt authEv ev t
     in
         (print ("Sent term:\n" ^ termToString t ^
                 "\n\nInitial raw evidence (Sent):\n" ^
-                rawEvToString ev ^ "\n\nReceived raw evidence result.\n" (* ^
-                rawEvToString resev ^ "\n" *) ));
+                rawEvToString ev ^ "\n\nReceived raw evidence result.\n"  ^
+                rawEvToString resev ^ "\n" ));
         resev
     end

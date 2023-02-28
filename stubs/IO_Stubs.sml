@@ -6,8 +6,9 @@
 (** val do_asp : coq_ASP_PARAMS -> coq_RawEv -> coq_BS **)
 
 fun do_asp ps e =
-    case ps of Coq_asp_paramsC aspid args tpl tid =>
-      let val res =
+    let val _ = print ("Running ASP with params: \n" ^ (aspParamsToString ps) ^ "\n")
+        val res = 
+            case ps of Coq_asp_paramsC aspid args tpl tid =>
               case (aspid = cal_ak_aspid) of    
                   True => cal_ak_asp_stub ps e              
                 | _ => 
@@ -35,10 +36,9 @@ fun do_asp ps e =
                                             | _ =>                     
                                               (print ("Matched OTHER aspid:  " ^ aspid ^ "\n");
                                                BString.fromString "v")
-      in
-          print ("Running ASP with params: \n" ^ (aspParamsToString ps) ^ "\n");
-          res
-      end
+    in
+        res
+    end
 (* failwith "AXIOM TO BE REALIZED" *)
 
 (** val doRemote_session : coq_Term -> coq_Plc -> coq_EvC -> coq_EvC **)
