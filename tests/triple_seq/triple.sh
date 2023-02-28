@@ -17,10 +17,11 @@ sleep 1
 (../../build/apps/demo/clientdemo ../../apps/demo/server/example_client.json > /dev/null 2> client.err) &
 client_pid=$!
 
-# Kill the processes using timeout
-timeout 5s kill $server3_pid
-timeout 5s kill $server2_pid
-timeout 5s kill $server1_pid
+# Kill the processes using after a delay
+sleep 1
+kill $server3_pid
+kill $server2_pid
+kill $server1_pid
 
 cat s1.err s2.err s3.err client.err > combined.err
 rm s1.err s2.err s3.err client.err
