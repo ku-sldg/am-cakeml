@@ -50,6 +50,9 @@ get_files(posix_src_tpm ${crypto_src_tpm}
 system/posix/sockets/SocketFFI.sml
 system/posix/time/TimeFFI.sml system/posix/meas/MeasFFI.sml)
 
+# Includes the CMakeLists for the specific asps types (modularity)
+include(./stubs/appraisal_asps/CMakeLists.txt)
+include(./stubs/attestation_asps/CMakeLists.txt)
 
 get_files(cop_src 
     stubs/BS.sml
@@ -75,26 +78,18 @@ get_files(cop_src
     extracted/privPolicy.cml
     apps/blockchain/Blockchain.sml
     apps/blockchain/HealthRecord.sml
-    stubs/attestation_asps/cal_ak_ASP_Stub.sml
-    stubs/attestation_asps/get_data_ASP_Stub.sml
-    stubs/attestation_asps/tpm_sig_ASP_Stub.sml
-    stubs/attestation_asps/ssl_enc_ASP_Stub.sml
-    stubs/attestation_asps/pub_bc_ASP_Stub.sml
-    stubs/attestation_asps/store_clientData_ASP_Stub.sml
-    stubs/attestation_asps/ssl_sig_ASP_Stub.sml
-    stubs/attestation_asps/kim_meas_ASP_Stub.sml
-    stubs/appraisal_asps/appraise_kim_meas_ASP.sml
-    stubs/appraisal_asps/appraise_ssl_sig_ASP.sml
-    stubs/appraisal_asps/appraise_tpm_sig_ASP.sml
+    ${attestation_asps}
+    ${appraisal_asps}
     stubs/Appraisal_IO_Stubs.sml
     stubs/Maps.sml
+    stubs/Axioms_Io.sml
     extracted/StMonad_Coq.cml
     extracted/AM_St.cml
     extracted/AM_Monad.cml
     extracted/Appraisal_Defs.cml
-    stubs/Axioms_Io.sml
     extracted/Evidence_Bundlers.cml
-    extracted/Cvm_St.cml extracted/IO_Type.cml
+    extracted/Cvm_St.cml 
+    extracted/IO_Type.cml
     am/ServerAm.sml
     am/CoplandCommUtil.sml
     stubs/IO_Stubs.sml
