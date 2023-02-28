@@ -75,7 +75,7 @@ function(add_hacl_camkes component)
         # DEPENDS hacl-star
     )
     # target_sources(CAmkESComponent_${component} ${hacl_sources})
-    # add_dependencies(CAmkESComponent_${component} hacl-star)
+    add_dependencies(CAmkESComponent_${component} hacl-star)
 endfunction()
 
 # Small standalone executable to generate keys for Ed25519

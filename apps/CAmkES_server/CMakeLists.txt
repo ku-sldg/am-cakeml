@@ -11,3 +11,5 @@ cakeml_component(
     LIBS
 )
 
+add_hacl_camkes(server_am)
+

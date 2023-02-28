@@ -1,5 +1,6 @@
 # Config variables
-set(CAKE_FLAGS "--stack_size=10 --heap_size=10" CACHE STRING "Arguments passed to the CakeML compiler")
+# By appending to CAKE_FLAGS here, we can set --target=T in a project that includes this project.
+set(CAKE_FLAGS "${CAKE_FLAGS} --stack_size=10 --heap_size=10" CACHE STRING "Arguments passed to the CakeML compiler")
 string(REGEX REPLACE "[ \t\r\n]+" ";" cakeflag_list "${CAKE_FLAGS}")
 
 # Find/determine cake compiler
