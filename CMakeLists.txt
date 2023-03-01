@@ -90,7 +90,6 @@ get_files(cop_src
     extracted/Evidence_Bundlers.cml
     extracted/Cvm_St.cml 
     extracted/IO_Type.cml
-    am/ServerAm.sml
     am/CoplandCommUtil.sml
     stubs/IO_Stubs.sml
     extracted/Cvm_Monad.cml

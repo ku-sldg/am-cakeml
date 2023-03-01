@@ -1,6 +1,11 @@
 
 exception DispatchErr string
 
+
+
+fun sendCoplandReq fd = Socket.output fd o jsonToStr o requestToJson
+val receiveCoplandResp = jsonToResponse o strToJson o Socket.inputAll
+
 (* coq_Plc -> nsMap -> coq_Plc -> coq_Evidence -> (bs list) -> (bs list) -> coq_Term -> (bs list) *)
 fun socketDispatch (fromPl : coq_Plc) (pmap : JsonConfig.PlcMap) (toPl : coq_Plc) (authEt : coq_Evidence) (authEv : (bs list)) (ev : (bs list)) (t : coq_Term) =
     let val (id,ip,port,pubkey) = case (Map.lookup pmap (natToInt toPl)) of
@@ -9,7 +14,7 @@ fun socketDispatch (fromPl : coq_Plc) (pmap : JsonConfig.PlcMap) (toPl : coq_Plc
         val req  = (REQ fromPl toPl pmap t authEt authEv ev)
         val _ = print ("Dispatching Request Term: \n'" ^ (termToString t) ^ "'\nTo address: " ^ ip ^ ":" ^ (Int.toString port) ^ "\n")
         val fd   = Socket.connect ip port
-        val (RES _ _ resev) = (serverSend fd req; serverRcv fd)
+        val (RES _ _ resev) = (sendCoplandReq fd req; receiveCoplandResp fd)
      in Socket.close fd;
         resev
     end
