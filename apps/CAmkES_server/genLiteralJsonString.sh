@@ -1,6 +1,13 @@
 #!/bin/bash
 
-# This file was produced in part by using the chatGPT tool.
+# Michael Neises
+# 1 March 2023
+# This file was produced iteratively using chatGPT.
+# It's purpose is to convert the contents of a text file into a cakeml string
+# literal. Unfortunately, the cakeml compiler can only handle string literals
+# of 80 characters or less. So this script takes a text file as input, and
+# returns as output a cakeml function that returns the file as a string. The
+# string is returned as a concatenation of <= 80 character strings.
 
 filename="$1"
 
