@@ -5,11 +5,14 @@ val client_data_bs = BString.fromString "client data"
 
 (** val source_plc : coq_Plc **)
 
-val source_plc = S (S (S O))
+val source_plc = "3"
 
 (** val dest_plc : coq_Plc **)
 
-val dest_plc = O
+val dest_plc = "0"
+
+val demo_plc_1 = "1"
+val demo_plc_2 = "2"
 
 (** val cal_ak_targid : coq_ASP_ID **)
 

@@ -8,7 +8,7 @@ val receiveCoplandResp = jsonToResponse o strToJson o Socket.inputAll
 
 (* coq_Plc -> nsMap -> coq_Plc -> coq_ReqAuthTok -> (bs list) -> coq_Term -> (bs list) *)
 fun socketDispatch (fromPl : coq_Plc) (pmap : JsonConfig.PlcMap) (toPl : coq_Plc) (authTok : coq_ReqAuthTok) (ev : (bs list)) (t : coq_Term) =
-    let val (id,ip,port,pubkey) = case (Map.lookup pmap (natToInt toPl)) of
+    let val (id,ip,port,pubkey) = case (Map.lookup pmap toPl) of
                                     Some m => m
                                     | None => raise DispatchErr ("Place "^ (plToString toPl) ^" not in nameserver map")
         val req  = (REQ fromPl toPl pmap t authTok ev)

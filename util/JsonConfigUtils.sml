@@ -4,7 +4,7 @@ structure JsonConfig = struct
   type port                 = int
   type queueLength          = int
   type privateKey           = BString.bstring
-  type plc                  = int
+  type plc                  = string
   type ip                   = string
   type publicKey            = BString.bstring
   type PlcConfig            = (plc * ip * port * publicKey)
@@ -65,7 +65,7 @@ structure JsonConfig = struct
   (* Attempts to extract a PlcConfig from a Json structure 
       : Json.json -> PlcConfig *)
   fun extract_plc_config (j : Json.json) =
-      let val id = (parse_and_cast j "id" Int.fromString)
+      let val id = (parse_and_cast j "id" string_cast)
           val ip = (parse_and_cast j "ip" string_cast)
           val port = (parse_and_cast j "port" Int.fromString)
           val publicKey = (parse_and_cast j "publicKey" bstring_cast)
@@ -78,7 +78,7 @@ structure JsonConfig = struct
   fun encode_plc_config (p : PlcConfig) =
       let val (id, ip, port, pubkey) = p
           val pConfJson = [
-              ("id", cast_and_encode id Int.toString), 
+              ("id", Json.fromString id), 
               ("ip", Json.fromString ip),
               ("port", cast_and_encode port Int.toString),
               ("publicKey", cast_and_encode pubkey BString.show)
@@ -99,9 +99,7 @@ structure JsonConfig = struct
           (* Now we want to convert the keys to Plcs and the values to PlcConfigs 
               (string * Json.json) -> (int * PlcConfig) *)
           fun converter ((s, j) : string * Json.json) =
-              let val key = case Int.fromString s of
-                                None => raise (Excn ("Could not convert plc key to an integer"))
-                                | Some v => v
+              let val key = s
                   val pconf = extract_plc_config j
               in
                 (key, pconf)
@@ -109,15 +107,15 @@ structure JsonConfig = struct
           val mapList = Map.toAscList mapBase (* (string * json) list *)
           val reIndexedMap = List.map converter mapList (* (int * PlcConfig ) list *)
       in
-        (Map.fromList Int.compare reIndexedMap)
+        (Map.fromList String.compare reIndexedMap)
       end
   
   (* Encodes a PlcMap into a Json structure
       : PlcMap -> Json.json *)
   fun encode_plc_map (p : PlcMap) = 
       let val unpackedMap = Map.toAscList p
-          fun encoder ((p, c) : int * PlcConfig) = 
-              (let val pStr = Int.toString p
+          fun encoder ((p, c) : plc * PlcConfig) = 
+              (let val pStr = p
                   val confJson = encode_plc_config c
               in
                 (pStr, confJson)

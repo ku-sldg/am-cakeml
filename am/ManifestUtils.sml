@@ -40,7 +40,7 @@ fun build_formalManifest asps plcs =
 
 val exampleFormalManifest = build_formalManifest
                                 ["asp11", "asp25"]
-                                [natFromInt 22, natFromInt 42]
+                                ["22", "42"]
 
 fun outputExampleFormalManifest fileString =
     let val _ = outputManifestJsonString fileString exampleFormalManifest in
@@ -53,19 +53,20 @@ fun inputAndPrintExampleFormalManifest fileString =
         (*print "hi" ; *)
         print str
     end
-fun build_concreteManifest myAddress defaultSigAsp aspList plcList pubList =
-    ManifestC myAddress
+fun build_concreteManifest (myAddress : addr) (defaultSigAsp : coq_ASP_ID) aspList plcList pubList =
+    (ManifestC myAddress
               defaultSigAsp
               (Map.fromList String.compare aspList)
-              (Map.fromList nat_compare plcList)
-              (Map.fromList nat_compare pubList)
+              (Map.fromList String.compare plcList)
+              (Map.fromList String.compare pubList)
+    ) : concreteManifest
 
 val example_demo_server_manifest =
     build_concreteManifest
         "5000"
         ssl_sig_aspid
         []
-        [((natFromInt 0), "5000"), ((natFromInt 2),"5002")]
+        [("0", "5000"), ("2","5002")]
         []
 
 val example_demo_client_manifest =
@@ -73,5 +74,5 @@ val example_demo_client_manifest =
         ""
         ssl_sig_aspid
         []
-        [((natFromInt 0), "5000"), ((natFromInt 2),"5002")]
+        [("0", "5000"), ("2","5002")]
         []

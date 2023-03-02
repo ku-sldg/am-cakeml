@@ -11,7 +11,7 @@ fun appraise_ssl_sig (ps : coq_ASP_PARAMS) (p : coq_Plc) (bs : coq_BS) (ls : coq
 
         val json = JsonConfig.get_json ()
         val (port, queueLength, privKey, plcMap) = JsonConfig.extract_client_config json
-        val (id,ip,port,pubkey) = case (Map.lookup plcMap (natToInt p)) of
+        val (id,ip,port,pubkey) = case (Map.lookup plcMap p) of
                                     Some m => m
                                     | None => raise JsonConfig.Excn ("Place "^ (plToString p) ^" not in nameserver map")
                               

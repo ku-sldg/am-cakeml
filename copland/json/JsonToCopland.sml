@@ -85,8 +85,8 @@ fun getAspParams constructor (Json.Array args) =
     and
     getAspParamsArray js = (* Coq_asp_paramsC "" [] O "" *)
       case js of
-          [Json.String aspid, arrayArgs, Json.Int plc, Json.String targid] =>
-            Coq_asp_paramsC aspid (jsonStringListToList arrayArgs)  (natFromInt plc) targid
+          [Json.String aspid, arrayArgs, Json.String plc, Json.String targid] =>
+            Coq_asp_paramsC aspid (jsonStringListToList arrayArgs) plc targid
         | _ => raise Json.Exn "getAspParamsArray" "unexpected Coq_asp_paramsC params"
 
 (* jsonToManifest : json -> coq_Manifest *)
@@ -102,7 +102,7 @@ fun jsonToManifest js =
       "Manifest" => case args of
                         [asp_ids, plc_ids] =>
                         Build_Manifest (jsonStringListToList asp_ids)
-                                       (jsonIntListToNatList plc_ids)
+                                       (jsonStringListToList plc_ids)
                       | _ => raise Json.Exn "getManifest" "unexpected argument list"
                         
       | _ => raise Json.Exn "getManifest"
@@ -174,13 +174,13 @@ fun jsonToTerm js = case (Json.toMap js) of
     (* getEnc :: json list -> coq_ASP *)             
     and
     getEnc args = case args of
-    [Json.Int q] => ENC (natFromInt q)
+    [Json.String q] => ENC q
         
                     | _ => raise Json.Exn "getAspc" "unexpected argument list"
     and
     getAtt data =
     case data of
-        [ Json.Int place, term] => Coq_att (natFromInt place) (jsonToTerm term)
+        [ Json.String place, term] => Coq_att place (jsonToTerm term)
       | _ => raise  Json.Exn "getAtt" "unexpected argument list"
                   
     and
@@ -230,8 +230,8 @@ fun jsonToEv js = case (Json.toMap js) of
     and
     getUU args =
     case args of
-        [Json.Int q, Json.String fwdStr, paramsJsonOb, e'] =>
-        Coq_uu (natFromInt q) (fwdFromString fwdStr) (json_ObToTerm paramsJsonOb getAspParams)
+        [Json.String q, Json.String fwdStr, paramsJsonOb, e'] =>
+        Coq_uu q (fwdFromString fwdStr) (json_ObToTerm paramsJsonOb getAspParams)
                (jsonToEv e')
       | _ => raise Json.Exn "getUU" "unexpected argument list"
 
@@ -287,8 +287,8 @@ fun jsonToRequest js = case (Json.toMap js) of
 
     and
     getREQ data = case data of
-          [Json.Int pl1, Json.Int pl2, jBlob, t, authTok, ev] =>
-              REQ (natFromInt pl1) (natFromInt pl2) (JsonConfig.extract_plc_map jBlob) (jsonToTerm t) (jsonToEvC authTok) (jsonBsListToList ev)
+          [Json.String pl1, Json.String pl2, jBlob, t, authTok, ev] =>
+              REQ pl1 pl2 (JsonConfig.extract_plc_map jBlob) (jsonToTerm t) (jsonToEvC authTok) (jsonBsListToList ev)
         | _ => raise Json.Exn "getREQ" "unexpected argument list"
 
 
@@ -306,8 +306,8 @@ fun jsonToResponse js = case (Json.toMap js) of
 
     and
     getRES data = case data of
-          [Json.Int pl1, Json.Int pl2, ev] =>
-              RES (natFromInt pl1) (natFromInt pl2) (jsonBsListToList ev)
+          [Json.String pl1, Json.String pl2, ev] =>
+              RES pl1 pl2 (jsonBsListToList ev)
         | _ => raise Json.Exn "getRES" "unexpected argument list"
 
 fun strToJson str = 

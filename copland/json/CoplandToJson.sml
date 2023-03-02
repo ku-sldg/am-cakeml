@@ -14,7 +14,7 @@ fun aspidListToJsonList ids = Json.fromList (List.map aspIdToJson ids)
 
 fun targIdToJson i = Json.fromString i
 
-fun placeToJson pl = Json.fromInt (natToInt pl)
+fun placeToJson pl = Json.fromString pl
 
 fun placeListToJsonList ids = Json.fromList (List.map placeToJson ids)
 
@@ -134,7 +134,7 @@ fun termToJson term = case term of
 
 fun evToJson e = case e of
                      Coq_mt => noArgConstructor "Mt"
-                   | Coq_nn nid => constructorWithArgs "NN" [placeToJson nid]
+                   | Coq_nn nid => constructorWithArgs "NN" [intToJson (natToInt nid)]
                    | Coq_uu p fwd ps e' =>
                      constructorWithArgs "UU"
                                          [ placeToJson p,
