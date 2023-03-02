@@ -110,3 +110,6 @@ To make use of sml syntax highlighting. CakeML does stray from SML syntax slight
 Primary maintainer:  [Adam Petz](https://ampetz.github.io/) (ampetz@ku.edu)
 
 Contributors:  TJ Barclay, Andrew Cousino, Anna Fritz, Ed Komp, [Grant Jurgensen](https://grant.jurgensen.dev/), [Garrett Mills](https://garrettmills.dev/), Michael Nieses, Sarah Scott, [Perry Alexander](https://perry.alexander.name/)
+
+# Notes
+This branch has been archived at `backup-am-cakeml`
