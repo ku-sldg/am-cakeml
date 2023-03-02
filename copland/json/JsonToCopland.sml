@@ -244,7 +244,34 @@ fun jsonToEv js = case (Json.toMap js) of
       | _ => raise Json.Exn "getSS" "unexpected argument list"
 
 
+(* jsonToEvC : json -> coq_EvC
+   (json object to Copland EvC Type)  *)      
+fun jsonToEvC js = case (Json.toMap js) of (* Json.toMap : json -> ((string,json) map) option *)
+                       Some m => fromJsonMap m getEvC (* js' : (string,json) map *)
+                     | None =>
+                       raise Json.Exn "jsonToTerm" "Copland term does not begin as an AList"
 
+                     and
+                     getEvC constructor (Json.Array args) =
+                     case constructor of
+                         "EvC" => getEvcArgs args
+                      | _ => raise Json.Exn "getEvC"
+                    ("Unexpected constructor for Copland EvC: " ^
+                     constructor)
+                            (*
+      | "NN" => getNN args
+      | "UU" => getUU args
+      | "SS" => getSS args
+      |  _ => raise Json.Exn "getEvidence"
+                    ("Unexpected constructor for Copland Evidence: " ^
+                     constructor) *)
+                    
+
+    (* getEvcArgs :: json list -> coq_EvC *)
+                     and                              
+                     getEvcArgs args = case args of
+                                           [ev, et] =>
+                                           Coq_evc (jsonBsListToList ev) (jsonToEv et)
 
 fun jsonToRequest js = case (Json.toMap js) of
           Some js' => fromAList js'
@@ -255,13 +282,13 @@ fun jsonToRequest js = case (Json.toMap js) of
         let fun get str = case Map.lookup pairs str of
                   Some x => x
                 | None   => raise Json.Exn "fromAList" "missing request field"
-         in getREQ (List.map get ["toPlace", "fromPlace", "reqNameMap", "reqTerm", "reqAuthEvType", "reqAuthEv", "reqEv"])
+         in getREQ (List.map get ["toPlace", "fromPlace", "reqNameMap", "reqTerm", "reqAuthTok", "reqEv"])
         end
 
     and
     getREQ data = case data of
-          [Json.Int pl1, Json.Int pl2, jBlob, t, authEt, authEv, ev] =>
-              REQ (natFromInt pl1) (natFromInt pl2) (JsonConfig.extract_plc_map jBlob) (jsonToTerm t) (jsonToEv authEt) (jsonBsListToList authEv) (jsonBsListToList ev)
+          [Json.Int pl1, Json.Int pl2, jBlob, t, authTok, ev] =>
+              REQ (natFromInt pl1) (natFromInt pl2) (JsonConfig.extract_plc_map jBlob) (jsonToTerm t) (jsonToEvC authTok) (jsonBsListToList ev)
         | _ => raise Json.Exn "getREQ" "unexpected argument list"
 
 

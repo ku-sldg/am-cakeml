@@ -46,7 +46,7 @@ fun do_asp ps e =
 fun doRemote_session t toPl e =
     let val fromPl = O (* TODO: make param *) in
         print ("Running doRemote_session\n");
-        Coq_evc (am_sendReq t fromPl toPl Coq_mt [] (get_bits e)) Coq_mt
+        Coq_evc (am_sendReq t fromPl toPl (Coq_evc [] Coq_mt) (get_bits e)) Coq_mt
     end
   (* TODO:  Is the dummy Evidence Type value (Coq_mt) ok here? *)
   (* failwith "AXIOM TO BE REALIZED" *)

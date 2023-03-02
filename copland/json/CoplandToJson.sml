@@ -132,7 +132,6 @@ fun termToJson term = case term of
        raise  Json.Exn "termToJson" "Unexpected constructor for APDT term: "
 
 
-
 fun evToJson e = case e of
                      Coq_mt => noArgConstructor "Mt"
                    | Coq_nn nid => constructorWithArgs "NN" [placeToJson nid]
@@ -147,10 +146,15 @@ fun evToJson e = case e of
                                          [ evToJson e1,
                                            evToJson e2 ]
 
+fun evcToJson e =
+    case e of
+        Coq_evc ev et => constructorWithArgs "EvC" [ bsListToJsonList ev,
+                                                     evToJson et ]
 
-fun requestToJson (REQ pl1 pl2 jpmap t authEt authEv ev) = Json.fromPairList
+
+fun requestToJson (REQ pl1 pl2 jpmap t authTok ev) = Json.fromPairList
     [("toPlace", placeToJson pl1), ("fromPlace", placeToJson pl2), ("reqNameMap", JsonConfig.encode_plc_map jpmap),
-     ("reqTerm", termToJson t), ("reqAuthEvType", evToJson authEt), ("reqAuthEv", bsListToJsonList authEv), ("reqEv", bsListToJsonList ev)]
+     ("reqTerm", termToJson t), ("reqAuthTok", evcToJson authTok), ("reqEv", bsListToJsonList ev)]
 
 fun responseToJson (RES pl1 pl2 ev) = Json.fromPairList
     [("respToPlace", placeToJson pl1), ("respFromPlace", placeToJson pl2), ("respEv", bsListToJsonList ev)]

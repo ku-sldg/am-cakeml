@@ -85,6 +85,8 @@ fun get_et e = case e of
 fun get_bits e = case e of
   Coq_evc ls _ => ls
 
+type coq_ReqAuthTok = coq_EvC
+
 (** val splitEv_T_l : coq_Split -> coq_Evidence -> coq_Evidence **)
 
 fun splitEv_T_l sp e =

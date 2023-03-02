@@ -9,7 +9,7 @@ type addr = string
 type nsMap = ((coq_Plc, addr) map)
 val emptyNsMap : nsMap = Map.empty nat_compare
                                    
-datatype requestMessage = REQ coq_Plc coq_Plc JsonConfig.PlcMap coq_Term coq_Evidence (bs list) (bs list)
+datatype requestMessage = REQ coq_Plc coq_Plc JsonConfig.PlcMap coq_Term coq_ReqAuthTok (bs list)
 
                               
 (* To place,
