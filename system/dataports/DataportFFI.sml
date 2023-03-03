@@ -1,22 +1,24 @@
 (* Depends on: Util *)
+(* These functions can be used by an am-cakeml app on LINUX
+   that wishes to communicate with CAmkES components via dataports *)
 
+    (* string -> bstring -> () *)
+    (* () -> () *)
+(*
 exception DataportErr
 
 local 
     fun ffi_writeDataport x y = #(writeDataport) x y
     fun ffi_emit_event    x y = #(emit_event)    x y
 in 
-    (* string -> bstring -> () *)
     fun writeDataport name msg =
         let val payload = FFI.nullSeparated [BString.fromString name, msg]
          in if FFI.callBool ffi_writeDataport payload then () else raise DataportErr
         end
 
-    (* () -> () *)
     fun emitEvent () = (FFI.call ffi_emit_event BString.empty; ())
 end
-
-===================
+*)
 
 
 (* Depends on: Util *)
@@ -43,6 +45,7 @@ in
             | None => raise DataportErr "read failure"
 
     (* string -> bstring *)
+    (* why does this take a 4? Did that used to be the dataport label? *)
     fun waitDataport name = 
         case FFI.callOpt ffi_waitDataport 4 (BString.fromString name) of 
               Some bs => bs

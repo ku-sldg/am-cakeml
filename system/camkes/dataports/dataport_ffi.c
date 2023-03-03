@@ -7,11 +7,6 @@
 #define FFI_SUCCESS 0
 #define FFI_FAILURE 1
 
-// Definition taken and modified from basis_ffi.c
-int byte2_to_int(const uint8_t *b){
-    return ((b[0] << 8) | b[1]);
-}
-
 // memcpy variants for volatile buffers
 volatile void * memcpy_v(volatile void *dest, const volatile void *src, size_t n) {
     for (int i = 0; i < n; i++)
@@ -42,7 +37,7 @@ typedef struct Connection {
 Connection_t conns[CONNS_LEN];
 
 void ffiinitDataports(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
-    conns[0] = (Connection_t){.data = introspect_dp, .length = 4096, .wait = &measurement_done_wait, .emit = &measurement_request_ready};
+    conns[0] = (Connection_t){.data = introspect_dp, .length = 4096, .wait = &measurement_done_wait, .emit = &measurement_request_emit};
     conns[1] = (Connection_t){.data = client_dp, .length = 4096, .wait = &client_ready_wait, .emit = NULL};
 }
 
