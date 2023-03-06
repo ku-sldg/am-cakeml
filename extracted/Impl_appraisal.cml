@@ -91,25 +91,24 @@ fun run_am_sendReq_nonce_auth t pFrom pTo =
 fun am_check_auth_tok t fromPl authTok = case authTok of
   Coq_evc auth_ev auth_et =>
   bind
-    (case requester_bound t fromPl auth_et of
+    (case requester_bound t fromPl authTok of
        True => gen_appraise_AM auth_et auth_ev
-     | False => ret Coq_mtc_app) ret
+     | False => failm) ret
 
 (** val am_serve_auth_tok_req :
     coq_Term -> coq_Plc -> coq_Plc -> coq_ReqAuthTok -> coq_RawEv ->
     coq_RawEv coq_AM **)
 
 fun am_serve_auth_tok_req t fromPl myPl authTok init_ev =
-  let val Coq_evc _ auth_et = authTok in
   bind (am_check_auth_tok t fromPl authTok) (fn v =>
-    case case requester_bound t fromPl auth_et of
+    case case requester_bound t fromPl authTok of
            True => appraise_auth_tok v
          | False => False of
       True =>
       (case privPolicy fromPl t of
          True => ret (run_cvm_rawEv t myPl init_ev)
        | False => failm)
-    | False => failm) end
+    | False => failm)
 
 (** val run_am_serve_auth_tok_req :
     coq_Term -> coq_Plc -> coq_Plc -> coq_ReqAuthTok -> coq_RawEv -> coq_RawEv **)

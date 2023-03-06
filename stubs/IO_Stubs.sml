@@ -79,9 +79,9 @@ fun do_wait_par_thread loc =
     ret (parallel_vm_thread loc)
 
 
-(** val requester_bound : coq_Term -> coq_Plc -> coq_Evidence -> bool **)
+(** val requester_bound : coq_Term -> coq_Plc -> coq_ReqAuthTok -> bool **)
 
-fun requester_bound t p et = True
+fun requester_bound t p tok = True
 
 (** val appraise_auth_tok : coq_AppResultC -> bool **)
 
