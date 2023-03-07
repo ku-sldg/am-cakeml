@@ -1,10 +1,14 @@
 #!/bin/bash
 
-COQ_DIR="/Users/adampetz/Documents/Fall_2022/copland-avm/src"
+# To configure this script, set the COPLAND_AVM__DIR environment variable to
+#   point to the src/ folder of your local copland-avm Coq development:
+#   i.e:  export COPLAND_AVM__DIR="<your-path>/copland-avm/src"
+
+
 CML_DIR="./extracted"
 
 
-cp ${COQ_DIR}/*.cml ${CML_DIR}
+cp ${COPLAND_AVM__DIR}/*.cml ${CML_DIR}
 
 rm ${CML_DIR}/Anno_Term_Defs.cml
 rm ${CML_DIR}/Ascii.cml
