@@ -105,7 +105,7 @@ fun am_serve_auth_tok_req t fromPl myPl authTok init_ev =
            True => appraise_auth_tok v
          | False => False of
       True =>
-      (case privPolicy fromPl t of
+      (case privPolicy coq_Eq_Class_ID_Type fromPl t of
          True => ret (run_cvm_rawEv t myPl init_ev)
        | False => failm)
     | False => failm)

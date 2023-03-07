@@ -59,6 +59,7 @@ get_files(cop_src
     extracted/Datatypes.cml
     extracted/List.cml
     extracted/Nat.cml
+    extracted/Eqb_Evidence.cml
     extracted/OptMonad_Coq.cml
     extracted/Term_Defs_Core.cml
     extracted/Appraisal_Evidence.cml
@@ -74,7 +75,6 @@ get_files(cop_src
     copland/json/CoplandToJson.sml
     copland/json/JsonToCopland.sml
     am/ManifestUtils.sml
-    stubs/Compare_Stub.sml
     extracted/privPolicy.cml
     apps/blockchain/Blockchain.sml
     apps/blockchain/HealthRecord.sml

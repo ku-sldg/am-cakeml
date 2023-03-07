@@ -7,7 +7,7 @@ type addr = string
    is 5000 *)
 (*                  plc     (keyName -> value for the keys "ip", "port", "publicKey") *)
 type nsMap = ((coq_Plc, addr) map)
-val emptyNsMap : nsMap = Map.empty nat_compare
+val emptyNsMap : nsMap = Map.empty String.compare
                                    
 datatype requestMessage = REQ coq_Plc coq_Plc JsonConfig.PlcMap coq_Term coq_ReqAuthTok (bs list)
 

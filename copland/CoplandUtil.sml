@@ -1,7 +1,7 @@
 (* Depends on: util, extracted *)
 
-(* plToString : coq_Plc -> string *)
-val plToString = natToString
+(* plToString : coq_Plc (coq_ID_Type = string) -> string *)
+fun plToString x = x
 
 (* aspIdToString : coq_ASP_ID -> string *)
 fun aspIdToString s = s

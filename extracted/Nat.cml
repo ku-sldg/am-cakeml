@@ -4,14 +4,3 @@ fun add n m =
   case n of
     O => m
   | S p => S (add p m)
-
-(** val eqb : nat -> nat -> bool **)
-
-fun eqb n m =
-  case n of
-    O => (case m of
-            O => True
-          | S _ => False)
-  | S n' => (case m of
-               O => False
-             | S m' => eqb n' m')

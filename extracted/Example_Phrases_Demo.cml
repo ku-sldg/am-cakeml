@@ -43,12 +43,12 @@ val demo_phrase =
 (** val demo_phrase2 : coq_Term **)
 
 val demo_phrase2 =
-  Coq_att (S (S O)) kim_meas
+  Coq_att demo_plc_2 kim_meas
 
 (** val demo_phrase3 : coq_Term **)
 
 val demo_phrase3 =
-  Coq_att (S (S O)) (Coq_lseq kim_meas (Coq_att (S O) kim_meas))
+  Coq_att demo_plc_2 (Coq_lseq kim_meas (Coq_att demo_plc_1 kim_meas))
 
 (** val ssl_sig : coq_Term **)
 

@@ -1,14 +1,14 @@
-type coq_Plc = nat
+type coq_Plc = coq_ID_Type
 
 type coq_N_ID = nat
 
 type coq_Event_ID = nat
 
-type coq_ASP_ID = string
+type coq_ASP_ID = coq_ID_Type
 
-type coq_TARG_ID = string
+type coq_TARG_ID = coq_ID_Type
 
-type coq_Arg = string
+type coq_Arg = coq_ID_Type
 
 datatype coq_ASP_PARAMS =
   Coq_asp_paramsC coq_ASP_ID (coq_Arg list) coq_Plc coq_TARG_ID

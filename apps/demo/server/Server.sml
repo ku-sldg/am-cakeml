@@ -2,7 +2,7 @@
    am/ServerAm extracted/Term_Defs_Core.cml *)
 
 (* term_policy_check_good :: Coq_Term (extracted/Term_Defs_Core.cml/) -> bool *)
-fun term_policy_check_good p termIn = privPolicy p termIn (* TODO: invoke policy code here *)
+fun term_policy_check_good (p : coq_Plc) termIn = privPolicy coq_Eq_Class_ID_Type p termIn (* TODO: invoke policy code here *)
 
 (* When things go well, this returns a JSON evidence string. When they go wrong,
    it returns a raw error message string. In the future, we may want to wrap
