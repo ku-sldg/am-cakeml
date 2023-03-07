@@ -1,6 +1,6 @@
 #!/bin/bash
 
-COQ_DIR="/home/w732t351/repos/copland-avm/src"
+COQ_DIR="/Users/adampetz/Documents/Fall_2022/copland-avm/src"
 CML_DIR="./extracted"
 
 
