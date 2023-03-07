@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # To configure this script, set the COPLAND_AVM__DIR environment variable to
-#   point to the src/ folder of your local copland-avm Coq development:
+#   point to the src folder of your local copland-avm Coq development:
 #   i.e:  export COPLAND_AVM__DIR="<your-path>/copland-avm/src"
 
 
