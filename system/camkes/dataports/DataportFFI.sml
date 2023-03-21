@@ -1,6 +1,6 @@
 (* Depends on: Util *)
 
-exception DataportErr
+exception DataportErr string
 
 local 
     fun ffi_initDataports x y = #(initDataports) x y
@@ -36,51 +36,51 @@ in
 
     (* int -> bstring -> () *)
     fun writeDataportId id msg =
-        let val payload = BString.concat (BString.n2w2 id) msg
-         in if FFI.callBool ffi_writeDataport payload then () else raise DataportErr
+        let val payload = BString.concat (FFI.n2w2 id) msg
+         in if FFI.callBool ffi_writeDataport payload then () else raise DataportErr "write failure"
         end
 
     (* string -> bstring -> () *)
     fun writeDataport name msg =
         case BiMap.lookupl (!connBiMap) name of
           Some id => writeDataportId id msg
-        | None => raise DataportErr
+        | None => raise DataportErr "write failure"
 
     (* int -> int -> bstring *)
     fun readDataportId id len =
-        case FFI.callOpt ffi_readDataport len (BString.n2w2 id) of 
+        case FFI.callOpt ffi_readDataport len (FFI.n2w2 id) of 
           Some bs => bs
-        | None => raise DataportErr
+        | None => raise DataportErr "read failure"
 
     (* string -> int -> bstring *)
     fun readDataport name len =
         case BiMap.lookupl (!connBiMap) name of
           Some id => readDataportId id len
-        | None => raise DataportErr
+        | None => raise DataportErr "read failure"
         
     (* int -> () *)
     fun waitDataportId id = 
-        if FFI.callBool ffi_waitDataport (BString.n2w2 id) then
+        if FFI.callBool ffi_waitDataport (FFI.n2w2 id) then
             ()
         else
-            raise DataportErr
+            raise DataportErr "wait failure"
 
     (* string -> () *)
     fun waitDataport name = 
         case BiMap.lookupl (!connBiMap) name of
           Some id => waitDataportId id
-        | None => raise DataportErr
+        | None => raise DataportErr "wait failure"
 
     (* int -> () *)
     fun emitDataportId id =
-        if FFI.callBool ffi_emitDataport (BString.n2w2 id) then
+        if FFI.callBool ffi_emitDataport (FFI.n2w2 id) then
             ()
         else
-            raise DataportErr
+            raise DataportErr "emit failure"
 
     (* string -> () *)
     fun emitDataport name =
         case BiMap.lookupl (!connBiMap) name of
           Some id => emitDataportId id
-        | None => raise DataportErr
+        | None => raise DataportErr "emit failure"
 end
