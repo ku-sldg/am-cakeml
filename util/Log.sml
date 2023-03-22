@@ -62,3 +62,4 @@ structure Log = struct
 end
 
 val log = Log.log
+

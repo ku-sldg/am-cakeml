@@ -259,15 +259,6 @@ structure MapExtra = struct
     fun mapPartial cmp f m = Map.fromList cmp (List.mapPartial (uncurry f) (Map.toAscList m))
 end
 
-structure MapExtra = struct 
-    (* ('a, 'b) map -> 'a -> bool *)
-    fun exists m k = Option.isSome (Map.lookup m k)
-
-    (* fun maybeInsert *)
-
-    (* fun singleton  *)
-end
-
 structure JsonExtra = struct 
     (* string -> Json.json *)
     fun fromString str = List.hd (fst (Json.parse ([], str)))
