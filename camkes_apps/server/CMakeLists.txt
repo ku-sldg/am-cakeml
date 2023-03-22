@@ -7,7 +7,7 @@ cakeml_component(
        ${CMAKE_CURRENT_LIST_DIR}/example_server-ini.sml
        ${CMAKE_CURRENT_LIST_DIR}/camkes_server.sml
     C_SOURCES
-        ${posix_c_files_camkes}
+        ${camkes_c_files}
     LIBS
 )
 
