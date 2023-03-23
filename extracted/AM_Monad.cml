@@ -1,5 +1,16 @@
 type 'a coq_AM = (coq_AM_St, 'a) coq_St
 
+(** val fromSome : 'a1 -> 'a1 option -> 'a1 **)
+
+fun fromSome default opt = case opt of
+  Some x => x
+| None => default
+
+(** val run_am_app_comp : 'a1 coq_AM -> 'a1 -> 'a1 **)
+
+fun run_am_app_comp am_comp default_A =
+  let val optRes = evalSt am_comp empty_amst in fromSome default_A optRes end
+
 (** val am_newNonce : coq_BS -> nat coq_AM **)
 
 fun am_newNonce bs =

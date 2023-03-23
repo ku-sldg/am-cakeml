@@ -1,0 +1,25 @@
+structure N =struct
+  (** val add : coq_N -> coq_N -> coq_N **)
+
+  fun add n m =
+    case n of
+      N0 => m
+    | Npos p => (case m of
+                   N0 => n
+                 | Npos q => Npos (Pos.add p q))
+
+  (** val mul : coq_N -> coq_N -> coq_N **)
+
+  fun mul n m =
+    case n of
+      N0 => N0
+    | Npos p => (case m of
+                   N0 => N0
+                 | Npos q => Npos (Pos.mul p q))
+
+  (** val to_nat : coq_N -> nat **)
+
+  fun to_nat a = case a of
+    N0 => O
+  | Npos p => Pos.to_nat p
+ end

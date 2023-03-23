@@ -1,0 +1,41 @@
+(** val gen_nonce_if_none : coq_EvC option -> coq_EvC coq_AM **)
+
+fun gen_nonce_if_none initEv = case initEv of
+  Some e => ret e
+| None =>
+  bind (am_newNonce gen_nonce_bits) (fn nid =>
+    ret (Coq_evc (gen_nonce_bits :: []) (Coq_nn nid)))
+
+(** val gen_authEvC_if_some : coq_Term option -> coq_Plc -> coq_EvC coq_AM **)
+
+fun gen_authEvC_if_some ot pFrom =
+  case ot of
+    Some auth_phrase =>
+    let val auth_rawev = run_cvm_rawEv auth_phrase pFrom [] in
+    let val auth_et = eval auth_phrase pFrom Coq_mt in
+    ret (Coq_evc auth_rawev auth_et) end end
+  | None => ret (Coq_evc [] Coq_mt)
+
+(** val am_sendReq_gen :
+    coq_Term -> coq_Plc -> coq_Plc -> coq_EvC option -> coq_Term option ->
+    coq_AppResultC coq_AM **)
+
+fun am_sendReq_gen t pFrom pTo initEv authPhrase =
+  bind (gen_nonce_if_none initEv) (fn evcIn =>
+    bind (gen_authEvC_if_some authPhrase pFrom) (fn auth_evc =>
+      let val Coq_evc init_ev init_et = evcIn in
+      let val resev = am_sendReq t pFrom pTo auth_evc init_ev in
+      let val expected_et = eval t pTo init_et in
+      gen_appraise_AM expected_et resev end end end))
+
+(** val am_sendReq_nonce :
+    coq_Term -> coq_Plc -> coq_Plc -> coq_AppResultC coq_AM **)
+
+fun am_sendReq_nonce t pFrom pTo =
+  am_sendReq_gen t pFrom pTo None None
+
+(** val am_sendReq_nonce_auth :
+    coq_Term -> coq_Plc -> coq_Plc -> coq_AppResultC coq_AM **)
+
+fun am_sendReq_nonce_auth t pFrom pTo =
+  am_sendReq_gen t pFrom pTo None (Some ssl_sig)

@@ -97,6 +97,8 @@ get_files(cop_src
     extracted/Cvm_Run.cml
     extracted/Example_Phrases_Demo.cml
     extracted/Impl_appraisal.cml
+    extracted/Client_AM.cml
+    extracted/Server_AM.cml
     extracted/Demo_AM.cml
     copland/Parser)
 
