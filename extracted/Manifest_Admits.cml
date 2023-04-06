@@ -1,0 +1,7 @@
+type coq_ASP_Address (* AXIOM TO BE REALIZED *)
+
+type coq_UUID (* AXIOM TO BE REALIZED *)
+
+type coq_PublicKey (* AXIOM TO BE REALIZED *)
+
+type coq_PolicyT (* AXIOM TO BE REALIZED *)

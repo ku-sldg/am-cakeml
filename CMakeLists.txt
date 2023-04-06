@@ -66,6 +66,8 @@ get_files(cop_src
     extracted/ConcreteEvidence.cml
     stubs/Params_Admits_hardcoded.sml
     extracted/Term_Defs.cml
+    stubs/Maps.sml
+    stubs/Manifest_Admits_Stubs.sml
     extracted/Manifest.cml
     copland/CoplandUtil.sml
     stubs/Example_Phrases_Demo_Admits.sml
@@ -81,7 +83,6 @@ get_files(cop_src
     ${attestation_asps}
     ${appraisal_asps}
     stubs/Appraisal_IO_Stubs.sml
-    stubs/Maps.sml
     stubs/Axioms_Io.sml
     extracted/StMonad_Coq.cml
     extracted/AM_St.cml

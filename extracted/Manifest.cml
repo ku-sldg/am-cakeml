@@ -1,11 +1,3 @@
-type coq_ASP_Address (* AXIOM TO BE REALIZED *)
-
-type coq_UUID (* AXIOM TO BE REALIZED *)
-
-type coq_PublicKey (* AXIOM TO BE REALIZED *)
-
-type coq_PolicyT (* AXIOM TO BE REALIZED *)
-
 type coq_CakeML_ASPCallback =
   coq_ASP_PARAMS -> coq_Plc -> coq_BS -> coq_RawEv -> coq_BS
 
@@ -30,32 +22,50 @@ datatype coq_ConcreteManifest =
 
 (** val generate_ASP_dispatcher : coq_AM_Library -> coq_CakeML_ASPCallback **)
 
-fun generate_ASP_dispatcher al par =
-  let val Build_AM_Library local_ASPS _ _ lib_ASP_Server _ _ = al in
-  let val Coq_asp_paramsC a _ _ _ = par in
-  let val o = map_get coq_Eq_Class_ID_Type local_ASPS a in
-  (case o of
-     Some a0 => a0 par
-   | None => let val Coq_pair _ b = lib_ASP_Server in b par end) end end end
+fun generate_ASP_dispatcher al =
+  let val local_asps_map =
+    let val Build_AM_Library local_ASPS _ _ _ _ _ = al in local_ASPS end
+  in
+  (fn par =>
+  let val Coq_pair _ asp_server_cb =
+    let val Build_AM_Library _ _ _ lib_ASP_Server _ _ = al in
+    lib_ASP_Server end
+  in
+  let val Coq_asp_paramsC aspid _ _ _ = par in
+  (case map_get coq_Eq_Class_ID_Type local_asps_map aspid of
+     Some cb => cb par
+   | None => asp_server_cb par) end end) end
 
 (** val generate_Plc_dispatcher : coq_AM_Library -> coq_CakeML_PlcCallback **)
 
-fun generate_Plc_dispatcher al plc =
-  let val Build_AM_Library _ local_Plcs _ _ _ lib_Plc_Server = al in
-  let val o = map_get coq_Eq_Class_ID_Type local_Plcs plc in
-  (case o of
-     Some a => a
-   | None => let val Coq_pair _ b = lib_Plc_Server in b plc end) end end
+fun generate_Plc_dispatcher al =
+  let val local_plc_map =
+    let val Build_AM_Library _ local_Plcs _ _ _ _ = al in local_Plcs end
+  in
+  (fn p =>
+  let val Coq_pair _ plc_server_cb =
+    let val Build_AM_Library _ _ _ _ _ lib_Plc_Server = al in
+    lib_Plc_Server end
+  in
+  (case map_get coq_Eq_Class_ID_Type local_plc_map p of
+     Some uuid => uuid
+   | None => plc_server_cb p) end) end
 
 (** val generate_PubKey_dispatcher :
     coq_AM_Library -> coq_CakeML_PubKeyCallback **)
 
-fun generate_PubKey_dispatcher al plc =
-  let val Build_AM_Library _ _ local_PubKeys _ lib_PubKey_Server _ = al in
-  let val o = map_get coq_Eq_Class_ID_Type local_PubKeys plc in
-  (case o of
-     Some a => a
-   | None => let val Coq_pair _ b = lib_PubKey_Server in b plc end) end end
+fun generate_PubKey_dispatcher al =
+  let val local_pubkey_map =
+    let val Build_AM_Library _ _ local_PubKeys _ _ _ = al in local_PubKeys end
+  in
+  (fn p =>
+  let val Coq_pair _ pubkey_server_cb =
+    let val Build_AM_Library _ _ _ _ lib_PubKey_Server _ = al in
+    lib_PubKey_Server end
+  in
+  (case map_get coq_Eq_Class_ID_Type local_pubkey_map p of
+     Some key => key
+   | None => pubkey_server_cb p) end) end
 
 (** val manifest_compiler :
     coq_Manifest -> coq_AM_Library -> (((coq_ConcreteManifest,
@@ -63,19 +73,21 @@ fun generate_PubKey_dispatcher al plc =
     coq_CakeML_PubKeyCallback) prod **)
 
 fun manifest_compiler m al =
-  let val x = generate_ASP_dispatcher al in
-  let val x0 = generate_Plc_dispatcher al in
-  let val x1 = generate_PubKey_dispatcher al in
-  Coq_pair (Coq_pair (Coq_pair (Build_ConcreteManifest
-  (let val Build_Manifest asps _ _ _ = m in asps end)
-  (let val Build_Manifest _ knowsOf _ _ = m in knowsOf end)
-  (let val Build_Manifest _ _ pubkeys _ = m in pubkeys end)
-  (fst
-    (let val Build_AM_Library _ _ _ lib_ASP_Server _ _ = al in
-     lib_ASP_Server end))
-  (fst
-    (let val Build_AM_Library _ _ _ _ _ lib_Plc_Server = al in
-     lib_Plc_Server end))
-  (fst
-    (let val Build_AM_Library _ _ _ _ lib_PubKey_Server _ = al in
-     lib_PubKey_Server end))) x) x0) x1 end end end
+  let val asp_cb = generate_ASP_dispatcher al in
+  let val plc_cb = generate_Plc_dispatcher al in
+  let val pubkey_cb = generate_PubKey_dispatcher al in
+  let val concrete_man = Build_ConcreteManifest
+    (let val Build_Manifest asps _ _ _ = m in asps end)
+    (let val Build_Manifest _ knowsOf _ _ = m in knowsOf end)
+    (let val Build_Manifest _ _ pubkeys _ = m in pubkeys end)
+    (fst
+      (let val Build_AM_Library _ _ _ lib_ASP_Server _ _ = al in
+       lib_ASP_Server end))
+    (fst
+      (let val Build_AM_Library _ _ _ _ _ lib_Plc_Server = al in
+       lib_Plc_Server end))
+    (fst
+      (let val Build_AM_Library _ _ _ _ lib_PubKey_Server _ = al in
+       lib_PubKey_Server end))
+  in
+  Coq_pair (Coq_pair (Coq_pair concrete_man asp_cb) plc_cb) pubkey_cb end end end end
