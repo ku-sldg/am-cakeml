@@ -82,7 +82,7 @@ fun aspParamsToJson ps =
                              placeToJson tpl,
                              targIdToJson tid]
 
-                            
+(*                             
 (* :: concreteManifest -> json *)
 fun concreteManifestToJson m =
     case m of
@@ -103,7 +103,7 @@ fun manifestToJson m =
         Build_Manifest asp_ids plc_ids =>
         constructorWithArgs "Manifest" [aspidListToJsonList asp_ids,
                                         placeListToJsonList plc_ids]
-                            
+                             *)
 (* aspToJson :: coq_ASP -> json *)                      
 fun aspToJson asp = case asp of
       NULL => noArgConstructor "Null"

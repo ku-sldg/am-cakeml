@@ -73,10 +73,10 @@ get_files(cop_src
     stubs/Example_Phrases_Demo_Admits.sml
     stubs/IO_Stubs_extra.sml
     am/CommTypes.sml
-    am/Manifest.sml
+    # am/Manifest.sml
     copland/json/CoplandToJson.sml
     copland/json/JsonToCopland.sml
-    am/ManifestUtils.sml
+    # am/ManifestUtils.sml
     extracted/privPolicy.cml
     apps/blockchain/Blockchain.sml
     apps/blockchain/HealthRecord.sml

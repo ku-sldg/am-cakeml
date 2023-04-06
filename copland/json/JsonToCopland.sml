@@ -88,7 +88,7 @@ fun getAspParams constructor (Json.Array args) =
           [Json.String aspid, arrayArgs, Json.String plc, Json.String targid] =>
             Coq_asp_paramsC aspid (jsonStringListToList arrayArgs) plc targid
         | _ => raise Json.Exn "getAspParamsArray" "unexpected Coq_asp_paramsC params"
-
+(* 
 (* jsonToManifest : json -> coq_Manifest *)
 fun jsonToManifest js =
     case (Json.toMap js) of
@@ -108,7 +108,7 @@ fun jsonToManifest js =
       | _ => raise Json.Exn "getManifest"
                    ("Unexpected constructor for Manifest JSON term: " ^
                     constructor)
-                 
+                  *)
 
                      
 
