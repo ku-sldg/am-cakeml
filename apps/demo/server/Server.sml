@@ -1,6 +1,26 @@
 (* Depends on: util, copland, system/sockets, am/Measurementsm am/CommTypes,
    am/ServerAm extracted/Term_Defs_Core.cml *)
 
+val server_formal_manifest = 
+  Build_Manifest ["testASP"] ["testPlc"] ["testPubKey"] True
+
+val server_aspMapping = (Map.fromList coq_ID_Type_ordering []) : ((coq_ASP_ID, coq_CakeML_ASPCallback) coq_MapC)
+
+val server_plcMapping = (Map.fromList coq_ID_Type_ordering [("testPlc", "UUID!")]) : ((coq_Plc, coq_UUID) coq_MapC)
+
+val server_pubKeyMapping = (Map.fromList coq_ID_Type_ordering []) : ((coq_Plc, coq_PublicKey) coq_MapC)
+
+val server_aspServerPair = (Coq_pair "aspServer" (fn _ => fn _ => fn _ => fn _ => passed_bs)) : ((coq_ASP_Address, coq_CakeML_ASPCallback) prod)
+
+val server_pubKeyServerPair = (Coq_pair "pubKeyServer" (fn _ => "OUTPUT_PUBKEY")) : ((coq_ASP_Address, coq_CakeML_PubKeyCallback) prod)
+
+val server_plcServerPair = (Coq_pair "plcServer" (fn _ => "OUTPUT_UUID")) : ((coq_ASP_Address, coq_CakeML_PlcCallback) prod)
+
+val server_am_library = 
+  Build_AM_Library 
+    server_aspMapping server_plcMapping server_pubKeyMapping 
+    server_aspServerPair server_pubKeyServerPair server_plcServerPair
+
 (* term_policy_check_good :: Coq_Term (extracted/Term_Defs_Core.cml/) -> bool *)
 fun term_policy_check_good (p : coq_Plc) termIn = privPolicy coq_Eq_Class_ID_Type p termIn (* TODO: invoke policy code here *)
 

@@ -1,8 +1,11 @@
 (* Depends on: util, copland, am/Measurements, am/ServerAm *)
 
+val formal_manifest = 
+  Build_Manifest ["testASP"] ["testPlc"] ["testPubKey"] True
+
 val aspMapping = (Map.fromList coq_ID_Type_ordering []) : ((coq_ASP_ID, coq_CakeML_ASPCallback) coq_MapC)
 
-val plcMapping = (Map.fromList coq_ID_Type_ordering []) : ((coq_Plc, coq_UUID) coq_MapC)
+val plcMapping = (Map.fromList coq_ID_Type_ordering [("testPlc", "UUID!")]) : ((coq_Plc, coq_UUID) coq_MapC)
 
 val pubKeyMapping = (Map.fromList coq_ID_Type_ordering []) : ((coq_Plc, coq_PublicKey) coq_MapC)
 
@@ -19,6 +22,12 @@ val client_am_library =
 
 fun main () =
     let val authb = True
+        val (concrete, aspDisp, plcDisp, pubKeyDisp) =
+          case (manifest_compiler formal_manifest client_am_library) of
+            Coq_pair (Coq_pair (Coq_pair concrete aspDisp) plcDisp) pubKeyDisp =>
+              (concrete, aspDisp, plcDisp, pubKeyDisp)
+        val testPlcDisp = plcDisp "testPlc"
+        val _ = TextIO.print testPlcDisp
         val main_phrase = kim_meas (*demo_phrase3*) in
         if (authb)
         then
