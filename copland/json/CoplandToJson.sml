@@ -81,29 +81,7 @@ fun aspParamsToJson ps =
                              stringListToJsonList args,
                              placeToJson tpl,
                              targIdToJson tid]
-
-(*                             
-(* :: concreteManifest -> json *)
-fun concreteManifestToJson m =
-    case m of
-        ManifestC address sigid aspmap plcmap pubmap =>
-        constructorWithArgs "ConcreteManifest"
-                            [stringToJson address,
-                             aspIdToJson sigid,
-                             aspMapToJson aspmap,
-                             nsMapToJson plcmap,
-                             pubkeyMapToJson pubmap]
-
-
-
-                            
-(* manifestToJson :: coq_Manifest -> json *)
-fun manifestToJson m =
-    case m of
-        Build_Manifest asp_ids plc_ids =>
-        constructorWithArgs "Manifest" [aspidListToJsonList asp_ids,
-                                        placeListToJsonList plc_ids]
-                             *)
+             
 (* aspToJson :: coq_ASP -> json *)                      
 fun aspToJson asp = case asp of
       NULL => noArgConstructor "Null"
@@ -152,8 +130,8 @@ fun evcToJson e =
                                                      evToJson et ]
 
 
-fun requestToJson (REQ pl1 pl2 jpmap t authTok ev) = Json.fromPairList
-    [("toPlace", placeToJson pl1), ("fromPlace", placeToJson pl2), ("reqNameMap", JsonConfig.encode_plc_map jpmap),
+fun requestToJson (REQ pl1 pl2 t authTok ev) = Json.fromPairList
+    [("toPlace", placeToJson pl1), ("fromPlace", placeToJson pl2),
      ("reqTerm", termToJson t), ("reqAuthTok", evcToJson authTok), ("reqEv", bsListToJsonList ev)]
 
 fun responseToJson (RES pl1 pl2 ev) = Json.fromPairList
