@@ -11,7 +11,7 @@ fun socketDispatch (fromPl : coq_Plc) (pmap : JsonConfig.PlcMap) (toPl : coq_Plc
     let val (id,ip,port,pubkey) = case (Map.lookup pmap toPl) of
                                     Some m => m
                                     | None => raise DispatchErr ("Place "^ (plToString toPl) ^" not in nameserver map")
-        val req  = (REQ fromPl toPl pmap t authTok ev)
+        val req  = (REQ fromPl toPl t authTok ev)
         val _ = print ("Dispatching Request Term: \n'" ^ (termToString t) ^ "'\nTo address: " ^ ip ^ ":" ^ (Int.toString port) ^ "\n")
         val fd   = Socket.connect ip port
         val (RES _ _ resev) = (sendCoplandReq fd req; receiveCoplandResp fd)
