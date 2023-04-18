@@ -8,6 +8,8 @@
 CML_DIR="./extracted"
 
 if [ -v COPLAND_AVM_DIR ]; then
+  rm ${CML_DIR}/*.cml
+
   cp ${COPLAND_AVM_DIR}/*.cml ${CML_DIR}
 
   rm ${CML_DIR}/Anno_Term_Defs.cml
