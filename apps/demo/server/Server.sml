@@ -1,8 +1,9 @@
 (* Depends on: util, copland, system/sockets, am/Measurementsm am/CommTypes,
    am/ServerAm extracted/Term_Defs_Core.cml *)
 
+(* NOTE: Hardcoding of implicit place here *)
 val server_formal_manifest = 
-  Build_Manifest ["testASP"] ["testPlc"] ["testPubKey"] True
+  Build_Manifest "1" ["testASP"] ["testPlc"] ["testPubKey"] True
 
 val server_aspMapping = (Map.fromList coq_ID_Type_ordering []) : ((coq_ASP_ID, coq_CakeML_ASPCallback) coq_MapC)
 
@@ -16,24 +17,27 @@ val server_pubKeyServerPair = (Coq_pair "pubKeyServer" (fn _ => "OUTPUT_PUBKEY")
 
 val server_plcServerPair = (Coq_pair "plcServer" (fn _ => "OUTPUT_UUID")) : ((coq_ASP_Address, coq_CakeML_PlcCallback) prod)
 
+val server_uuidServerPair = (Coq_pair "uuidServer" (fn _ => "OUTPUT_PLC")) : ((coq_ASP_Address, coq_CakeML_uuidCallback) prod)
+
 val server_am_library = 
   Build_AM_Library 
     server_aspMapping server_plcMapping server_pubKeyMapping 
-    server_aspServerPair server_pubKeyServerPair server_plcServerPair
+    server_aspServerPair server_pubKeyServerPair server_plcServerPair server_uuidServerPair
 
-(* term_policy_check_good :: Coq_Term (extracted/Term_Defs_Core.cml/) -> bool *)
-fun term_policy_check_good (p : coq_Plc) termIn = privPolicy coq_Eq_Class_ID_Type p termIn (* TODO: invoke policy code here *)
+fun run_am_serve_auth_tok_req (t : coq_Term) (fromPlc : coq_Plc) (myPl : coq_Plc) (authTok : coq_ReqAuthTok) (init_ev : coq_RawEv) =
+  run_am_app_comp (am_serve_auth_tok_req t fromPlc myPl authTok init_ev) []
 
 (* When things go well, this returns a JSON evidence string. When they go wrong,
    it returns a raw error message string. In the future, we may want to wrap
    said error messages in JSON as well to make it easier on the client. *)
-fun evalJson s =       (* jsonToStr (responseToJson (RES O O [])) *)
-    
-    let val (REQ pl1 pl2 t authTok ev) = jsonToRequest (strToJson s)
+fun evalJson s fromPlc my_plc = (* jsonToStr (responseToJson (RES O O [])) *)
+    let val _ = print fromPlc
+        val _ = print my_plc
+        val (REQ t authTok ev) = jsonToRequest (strToJson s)
         (* val ev = ev' *)
-        val resev = run_am_serve_auth_tok_req t pl1 pl2 authTok ev
+        val resev = run_am_serve_auth_tok_req t fromPlc my_plc authTok ev
             
-    in jsonToStr (responseToJson (RES pl2 pl1 resev))
+    in jsonToStr (responseToJson (RES resev))
     end
     handle Json.Exn s1 s2 =>
            (TextIO.print_err ("JSON error" ^ s1 ^ ": " ^ s2 ^ "\n");
@@ -42,14 +46,14 @@ fun evalJson s =       (* jsonToStr (responseToJson (RES O O [])) *)
          | USMexpn s =>
             (TextIO.print_err (String.concat ["USM error: ", s, "\n"]);
             "USM failure")   *)
-              
 
-fun respondToMsg client = Socket.output client (evalJson (Socket.inputAll client))
-                                           
 
-fun handleIncoming listener =
+fun respondToMsg client uuidCb my_plc = Socket.output client (evalJson (Socket.inputAll client) (uuidCb (Socket.showFd client)) my_plc)
+
+
+fun handleIncoming listener uuidCb my_plc =
     let val client = Socket.accept listener
-     in respondToMsg client;
+     in respondToMsg client uuidCb my_plc;
         Socket.close client
     end
     handle Socket.Err s     => TextIOExtra.printLn_err ("Socket failure: " ^ s)
@@ -57,12 +61,12 @@ fun handleIncoming listener =
 
 
 (* Json.json -> () *)
-fun startServer (json : Json.json) =
+fun startServer (json : Json.json) (my_plc : coq_Plc) uuidCb =
     let val (port, queueLength, privateKey, plcMap) = JsonConfig.extract_server_config json
         val _ = TextIOExtra.printLn ("Starting up Server")
         val _ = TextIOExtra.printLn ("On port: " ^ (Int.toString port) ^ "\nQueue Length: " ^ (Int.toString queueLength))
     in 
-     loop handleIncoming (Socket.listen port queueLength)
+     loop handleIncoming (Socket.listen port queueLength) uuidCb my_plc
     end
     handle Socket.Err s => TextIO.print_err ("Socket failure on listener instantiation: " ^ s ^ "\n")
          | Crypto.Err s => TextIO.print_err ("Crypto error: " ^ s ^ "\n")
@@ -76,8 +80,14 @@ fun startServer (json : Json.json) =
 (* () -> () *)
 fun main () =
     let val json = JsonConfig.get_json () 
+        val (concrete, aspDisp, plcDisp, pubKeyDisp, uuidDisp) =
+          case (manifest_compiler server_formal_manifest server_am_library) of
+            Coq_pair (Coq_pair (Coq_pair (Coq_pair concrete aspDisp) plcDisp) pubKeyDisp) uuidDisp =>
+              (concrete, aspDisp, plcDisp, pubKeyDisp, uuidDisp)
+        (* Retrieving implicit self place from manifest here *)
+        val (Build_ConcreteManifest my_plc _ _ _ _ _ _) = concrete
     in
-      startServer json
+      startServer json my_plc uuidDisp
     end
         
 val () = main ()

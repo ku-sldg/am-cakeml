@@ -1,0 +1,13 @@
+type 'a coq_EqClass =
+  'a -> 'a -> bool
+  (* singleton inductive, whose constructor was Build_EqClass *)
+
+(** val eqb : 'a1 coq_EqClass -> 'a1 -> 'a1 -> bool **)
+
+fun eqb eqClass =
+  eqClass
+
+(** val nat_EqClass : nat coq_EqClass **)
+
+val nat_EqClass =
+  Nat.eqb

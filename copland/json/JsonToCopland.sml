@@ -282,13 +282,13 @@ fun jsonToRequest js = case (Json.toMap js) of
         let fun get str = case Map.lookup pairs str of
                   Some x => x
                 | None   => raise Json.Exn "fromAList" "missing request field"
-         in getREQ (List.map get ["toPlace", "fromPlace", "reqTerm", "reqAuthTok", "reqEv"])
+         in getREQ (List.map get ["reqTerm", "reqAuthTok", "reqEv"])
         end
 
     and
     getREQ data = case data of
-          [Json.String pl1, Json.String pl2, t, authTok, ev] =>
-              REQ pl1 pl2 (jsonToTerm t) (jsonToEvC authTok) (jsonBsListToList ev)
+          [t, authTok, ev] =>
+              REQ (jsonToTerm t) (jsonToEvC authTok) (jsonBsListToList ev)
         | _ => raise Json.Exn "getREQ" "unexpected argument list"
 
 
@@ -301,13 +301,13 @@ fun jsonToResponse js = case (Json.toMap js) of
         let fun get str = case Map.lookup pairs str of
                   Some x => x
                 | None   => raise Json.Exn "fromAList" "missing request field"
-         in getRES (List.map get ["respToPlace", "respFromPlace", "respEv"])
+         in getRES (List.map get ["respEv"])
         end
 
     and
     getRES data = case data of
-          [Json.String pl1, Json.String pl2, ev] =>
-              RES pl1 pl2 (jsonBsListToList ev)
+          [ev] =>
+              RES (jsonBsListToList ev)
         | _ => raise Json.Exn "getRES" "unexpected argument list"
 
 fun strToJson str = 

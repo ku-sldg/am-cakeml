@@ -2,6 +2,11 @@ type coq_ASP_Address (* AXIOM TO BE REALIZED *)
 
 type coq_UUID (* AXIOM TO BE REALIZED *)
 
+(** val coq_Eq_Class_uuid : coq_UUID coq_EqClass **)
+
+val coq_Eq_Class_uuid =
+  failwith "AXIOM TO BE REALIZED"
+
 type coq_PublicKey (* AXIOM TO BE REALIZED *)
 
 type coq_PolicyT (* AXIOM TO BE REALIZED *)

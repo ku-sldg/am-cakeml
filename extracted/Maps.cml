@@ -1,0 +1,34 @@
+type ('a, 'b) coq_MapC = ('a, 'b) prod list
+
+(** val map_empty : 'a1 coq_EqClass -> ('a1, 'a2) coq_MapC **)
+
+fun map_empty _ =
+  []
+
+(** val map_get :
+    'a1 coq_EqClass -> ('a1, 'a2) coq_MapC -> 'a1 -> 'a2 option **)
+
+fun map_get h m x =
+  case m of
+    [] => None
+  | p :: m' =>
+    let val Coq_pair k v = p in
+    (case eqb h x k of
+       True => Some v
+     | False => map_get h m' x) end
+
+(** val map_set :
+    'a1 coq_EqClass -> ('a1, 'a2) coq_MapC -> 'a1 -> 'a2 -> ('a1, 'a2)
+    coq_MapC **)
+
+fun map_set _ m x v =
+  (Coq_pair x v) :: m
+
+(** val invert_map :
+    'a1 coq_EqClass -> 'a2 coq_EqClass -> ('a1, 'a2) coq_MapC -> ('a2, 'a1)
+    coq_MapC **)
+
+fun invert_map hA hB m = case m of
+  [] => []
+| p :: m' =>
+  let val Coq_pair k' v' = p in (Coq_pair v' k') :: (invert_map hA hB m') end

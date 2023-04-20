@@ -14,7 +14,7 @@ val parallel_vm_thread =
   failwith "AXIOM TO BE REALIZED"
 
 (** val am_sendReq :
-    coq_Term -> coq_Plc -> coq_Plc -> coq_ReqAuthTok -> coq_RawEv -> coq_RawEv **)
+    coq_Term -> coq_UUID -> coq_ReqAuthTok -> coq_RawEv -> coq_RawEv **)
 
 val am_sendReq =
   failwith "AXIOM TO BE REALIZED"

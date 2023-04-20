@@ -1,3 +1,0 @@
-datatype sumbool =
-  Coq_left 
-| Coq_right 

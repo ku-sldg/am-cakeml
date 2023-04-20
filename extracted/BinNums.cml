@@ -1,8 +1,0 @@
-datatype positive =
-  Coq_xI positive
-| Coq_xO positive
-| Coq_xH 
-
-datatype coq_N =
-  N0 
-| Npos positive

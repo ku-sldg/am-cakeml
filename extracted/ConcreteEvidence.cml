@@ -1,7 +1,0 @@
-datatype coq_EvidenceC =
-  Coq_mtc 
-| Coq_nnc coq_N_ID coq_BS
-| Coq_ggc coq_Plc coq_ASP_PARAMS coq_BS coq_EvidenceC
-| Coq_hhc coq_Plc coq_ASP_PARAMS coq_BS coq_Evidence
-| Coq_eec coq_Plc coq_ASP_PARAMS coq_BS coq_EvidenceC
-| Coq_ssc coq_EvidenceC coq_EvidenceC

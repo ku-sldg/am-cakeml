@@ -58,12 +58,12 @@ get_files(cop_src
     stubs/BS.sml
     extracted/Datatypes.cml
     extracted/List.cml
-    extracted/Nat.cml
+    # extracted/Nat.cml
     extracted/Eqb_Evidence.cml
-    extracted/OptMonad_Coq.cml
+    # extracted/OptMonad_Coq.cml
     extracted/Term_Defs_Core.cml
-    extracted/Appraisal_Evidence.cml
-    extracted/ConcreteEvidence.cml
+    # extracted/Appraisal_Evidence.cml
+    # extracted/ConcreteEvidence.cml
     stubs/Params_Admits_hardcoded.sml
     extracted/Term_Defs.cml
     stubs/Maps.sml
@@ -87,10 +87,10 @@ get_files(cop_src
     extracted/AM_Monad.cml
     extracted/Appraisal_Defs.cml
     extracted/Evidence_Bundlers.cml
-    extracted/Cvm_St.cml 
-    extracted/IO_Type.cml
+    # extracted/IO_Type.cml
     am/CoplandCommUtil.sml
     stubs/IO_Stubs.sml
+    extracted/Cvm_St.cml 
     extracted/Cvm_Monad.cml
     extracted/Cvm_Impl.cml
     extracted/Cvm_Run.cml
@@ -98,7 +98,6 @@ get_files(cop_src
     extracted/Impl_appraisal.cml
     extracted/Client_AM.cml
     extracted/Server_AM.cml
-    extracted/Demo_AM.cml
     copland/Parser)
 
 get_files(server_am_src ${util_src} ${posix_src} ${cop_src})

@@ -1,5 +1,0 @@
-(** val peel_bs : coq_RawEv -> (coq_BS, coq_RawEv) prod coq_Opt **)
-
-fun peel_bs ls = case ls of
-  [] => failm
-| bs :: ls' => ret (Coq_pair bs ls')

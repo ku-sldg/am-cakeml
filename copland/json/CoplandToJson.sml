@@ -27,7 +27,7 @@ fun spPairToJson (sp1, sp2) =
         
 (* spProdToJson : (coq_SP, coq_SP) prod -> json 
    NOTE:  `prod` is the Coq pair type extracted naively to cakeml 
-*)                             
+*)
 fun spProdToJson sp =
     case sp of
         Coq_pair sp1 sp2 => spPairToJson (sp1,sp2)                            
@@ -130,9 +130,8 @@ fun evcToJson e =
                                                      evToJson et ]
 
 
-fun requestToJson (REQ pl1 pl2 t authTok ev) = Json.fromPairList
-    [("toPlace", placeToJson pl1), ("fromPlace", placeToJson pl2),
-     ("reqTerm", termToJson t), ("reqAuthTok", evcToJson authTok), ("reqEv", bsListToJsonList ev)]
+fun requestToJson (REQ t authTok ev) = Json.fromPairList
+    [("reqTerm", termToJson t), ("reqAuthTok", evcToJson authTok), ("reqEv", bsListToJsonList ev)]
 
-fun responseToJson (RES pl1 pl2 ev) = Json.fromPairList
-    [("respToPlace", placeToJson pl1), ("respFromPlace", placeToJson pl2), ("respEv", bsListToJsonList ev)]
+fun responseToJson (RES ev) = Json.fromPairList
+    [("respEv", bsListToJsonList ev)]

@@ -8,84 +8,9 @@ val source_plc =
 val dest_plc =
   failwith "AXIOM TO BE REALIZED"
 
-(** val cal_ak_targid : coq_ASP_ID **)
-
-val cal_ak_targid =
-  failwith "AXIOM TO BE REALIZED"
-
-(** val cal_ak_aspid : coq_ASP_ID **)
-
-val cal_ak_aspid =
-  failwith "AXIOM TO BE REALIZED"
-
-(** val cal_ak_args : coq_Arg list **)
-
-val cal_ak_args =
-  failwith "AXIOM TO BE REALIZED"
-
-(** val pub_bc_targid : coq_ASP_ID **)
-
-val pub_bc_targid =
-  failwith "AXIOM TO BE REALIZED"
-
-(** val pub_bc_aspid : coq_ASP_ID **)
-
-val pub_bc_aspid =
-  failwith "AXIOM TO BE REALIZED"
-
-(** val pub_bc_args : coq_Arg list **)
-
-val pub_bc_args =
-  failwith "AXIOM TO BE REALIZED"
-
-(** val get_data_targid : coq_ASP_ID **)
-
-val get_data_targid =
-  failwith "AXIOM TO BE REALIZED"
-
 (** val get_data_aspid : coq_ASP_ID **)
 
 val get_data_aspid =
-  failwith "AXIOM TO BE REALIZED"
-
-(** val tpm_sig_targid : coq_ASP_ID **)
-
-val tpm_sig_targid =
-  failwith "AXIOM TO BE REALIZED"
-
-(** val tpm_sig_aspid : coq_ASP_ID **)
-
-val tpm_sig_aspid =
-  failwith "AXIOM TO BE REALIZED"
-
-(** val ssl_enc_targid : coq_ASP_ID **)
-
-val ssl_enc_targid =
-  failwith "AXIOM TO BE REALIZED"
-
-(** val ssl_enc_aspid : coq_ASP_ID **)
-
-val ssl_enc_aspid =
-  failwith "AXIOM TO BE REALIZED"
-
-(** val ssl_enc_args : coq_Arg list **)
-
-val ssl_enc_args =
-  failwith "AXIOM TO BE REALIZED"
-
-(** val store_clientData_targid : coq_ASP_ID **)
-
-val store_clientData_targid =
-  failwith "AXIOM TO BE REALIZED"
-
-(** val store_clientData_aspid : coq_ASP_ID **)
-
-val store_clientData_aspid =
-  failwith "AXIOM TO BE REALIZED"
-
-(** val store_clientData_args : coq_Arg list **)
-
-val store_clientData_args =
   failwith "AXIOM TO BE REALIZED"
 
 (** val ssl_sig_targid : coq_ASP_ID **)
@@ -101,24 +26,4 @@ val ssl_sig_aspid =
 (** val ssl_sig_args : coq_Arg list **)
 
 val ssl_sig_args =
-  failwith "AXIOM TO BE REALIZED"
-
-(** val demo_plc_1 : coq_ID_Type **)
-
-val demo_plc_1 =
-  failwith "AXIOM TO BE REALIZED"
-
-(** val demo_plc_2 : coq_ID_Type **)
-
-val demo_plc_2 =
-  failwith "AXIOM TO BE REALIZED"
-
-(** val kim_meas_targid : coq_ASP_ID **)
-
-val kim_meas_targid =
-  failwith "AXIOM TO BE REALIZED"
-
-(** val kim_meas_aspid : coq_ASP_ID **)
-
-val kim_meas_aspid =
   failwith "AXIOM TO BE REALIZED"
