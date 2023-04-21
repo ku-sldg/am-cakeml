@@ -69,6 +69,7 @@ get_files(cop_src
     stubs/Maps.sml
     stubs/Manifest_Admits_Stubs.sml
     extracted/Manifest.cml
+    util/ManifestUtils.sml
     copland/CoplandUtil.sml
     stubs/Example_Phrases_Demo_Admits.sml
     stubs/IO_Stubs_extra.sml
@@ -97,8 +98,7 @@ get_files(cop_src
     extracted/Example_Phrases_Demo.cml
     extracted/Impl_appraisal.cml
     extracted/Client_AM.cml
-    extracted/Server_AM.cml
-    copland/Parser)
+    extracted/Server_AM.cml)
 
 get_files(server_am_src ${util_src} ${posix_src} ${cop_src})
 get_files(server_am_src_hacl ${util_src} ${posix_src_hacl} ${cop_src})

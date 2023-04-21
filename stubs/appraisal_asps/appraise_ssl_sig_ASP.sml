@@ -7,19 +7,9 @@
 fun appraise_ssl_sig (ps : coq_ASP_PARAMS) (p : coq_Plc) (bs : coq_BS) (ls : coq_RawEv)  =
     let
         val msg = encode_RawEv ls
-        val signGood_loc = bs   
+        val signGood_loc = bs
 
-        val json = JsonConfig.get_json ()
-        val (port, queueLength, privKey, plcMap) = JsonConfig.extract_client_config json
-        val (id,ip,port,pubkey) = case (Map.lookup plcMap p) of
-                                    Some m => m
-                                    | None => raise JsonConfig.Excn ("Place "^ (plToString p) ^" not in nameserver map")
-                              
-                              (*
-	val _ = print ("\ntheirPubkey bytes: \n" ^ (BString.toString theirPubkey) ^ "\n\n")
-	val _ = print ("\nmsg: " ^ (BString.show msg) ^ "\n\n")
-	val _ = print ("\nsignGood: " ^ (BString.show signGood_loc) ^ "\n\n")
-                              *)
+        val pubkey = (ManifestUtils.get_PubKeyCallback() p) : BString.bstring
                               
         val pub_len = BString.length pubkey
         val sig_len = BString.length signGood_loc
