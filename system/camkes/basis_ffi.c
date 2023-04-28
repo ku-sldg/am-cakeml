@@ -275,23 +275,7 @@ int run (void) {
    *  see `get_stack_heap_limit` in stack_removeProof
    **/
 
-    /*
-    for(int i=1; i<1024*1024*10; i+=1024)
-    {
-        cml_heap = malloc(i);
-        printf("no fail on %d\n", i);
-        if(cml_heap == NULL)
-        {
-            printf("malloc return null\n");
-            free(cml_heap);
-            break;
-        }
-        free(cml_heap);
-    }
-    */
-
-  //cml_heap = malloc(cml_heap_sz + cml_stack_sz); // allocate both heap and stack at once
-  cml_heap = heapystacky;
+  cml_heap = cakeML_heap_and_stack_space;
 
   if(cml_heap == NULL)
   {
