@@ -76,11 +76,11 @@ in
         if FFI.callBool ffi_emitDataport (FFI.n2w2 id) then
             ()
         else
-            raise DataportErr "emit failure"
+            raise DataportErr ("Emit Failed: Could not emit to that dataport ID: " ^ (Int.toString id))
 
     (* string -> () *)
     fun emitDataport name =
         case BiMap.lookupl (!connBiMap) name of
           Some id => emitDataportId id
-        | None => raise DataportErr "emit failure"
+        | None => raise DataportErr ("Emit Failed: Could not find string in connection map: " ^ name)
 end
