@@ -227,7 +227,6 @@ int run (void) {
   unsigned long cml_heap_sz = 1 * sz;    // Default: 1 MB heap
   unsigned long cml_stack_sz = 1 * sz;   // Default: 1 MB stack
 
-    printf("2\n");
   // Read CML_HEAP_SIZE env variable (if present)
   // Warning: strtoul may overflow!
   if(heap_env != NULL)
@@ -241,7 +240,6 @@ int run (void) {
     cml_stack_sz = strtoul(stack_env, &temp, 10);
     cml_stack_sz *= sz; //stack size is read in units of MBs
   }
-    printf("3\n");
 
   if(cml_heap_sz < sz || cml_stack_sz < sz) //At least 1MB heap and stack size
   {
@@ -258,7 +256,6 @@ int run (void) {
     #endif
     exit(3);
   }
-    printf("4\n");
 
   /**
    *  CakeML and its default assembly wrapper expects the following memory layout:
@@ -293,10 +290,8 @@ int run (void) {
     }
     */
 
-  printf("mallocing\n");
   //cml_heap = malloc(cml_heap_sz + cml_stack_sz); // allocate both heap and stack at once
   cml_heap = heapystacky;
-  printf("malloced\n");
 
   if(cml_heap == NULL)
   {
@@ -310,7 +305,7 @@ int run (void) {
   cml_stack = cml_heap + cml_heap_sz;
   cml_stackend = cml_stack + cml_stack_sz;
 
-  printf("passing to cakeml\n");
+  printf("CakeML Stack and Heap space Allocated. Passing control.\n");
   cml_main(); // Passing control to CakeML
 
   return 0;
