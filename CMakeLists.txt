@@ -40,15 +40,17 @@ system/crypto/tpm/Random.sml)
 
 
 get_files(posix_src ${crypto_src} system/posix/sockets/SocketFFI.sml
-system/posix/time/TimeFFI.sml system/posix/meas/MeasFFI.sml)
+system/posix/time/TimeFFI.sml system/posix/meas/MeasFFI.sml system/posix/sys/SysFFI.sml)
 
 get_files(posix_src_hacl ${crypto_src_hacl}
 system/posix/sockets/SocketFFI.sml
-system/posix/time/TimeFFI.sml system/posix/meas/MeasFFI.sml)
+system/posix/time/TimeFFI.sml system/posix/meas/MeasFFI.sml
+system/posix/sys/SysFFI.sml)
 
 get_files(posix_src_tpm ${crypto_src_tpm}
 system/posix/sockets/SocketFFI.sml
-system/posix/time/TimeFFI.sml system/posix/meas/MeasFFI.sml)
+system/posix/time/TimeFFI.sml system/posix/meas/MeasFFI.sml
+system/posix/sys/SysFFI.sml)
 
 # Includes the CMakeLists for the specific asps types (modularity)
 include(./stubs/appraisal_asps/CMakeLists.txt)
@@ -112,6 +114,7 @@ get_files(posix_c_files
     system/posix/sockets/socket_ffi.c
     system/posix/time/time_ffi.c
     system/posix/meas/meas_ffi.c
+    system/posix/sys/sys_ffi.c
 )
 get_files(posix_c_files_hacl
     ${BASIS_FILE}
@@ -119,6 +122,7 @@ get_files(posix_c_files_hacl
     system/posix/sockets/socket_ffi.c
     system/posix/time/time_ffi.c
     system/posix/meas/meas_ffi.c
+    system/posix/sys/sys_ffi.c
 )
 get_files(posix_c_files_tpm
     ${BASIS_FILE}
@@ -126,6 +130,7 @@ get_files(posix_c_files_tpm
     system/posix/sockets/socket_ffi.c
     system/posix/time/time_ffi.c
     system/posix/meas/meas_ffi.c
+    system/posix/sys/sys_ffi.c
 )
 
 # OS Config

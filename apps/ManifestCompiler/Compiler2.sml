@@ -1,9 +1,8 @@
-(* fun ffi_system           x y = #(system) x y *)
 
 (* () -> () *)
 fun main () =
-  let val _ = (#(system) (BString.unshow "10") (BString.unshow "ls"))
-  in 
+  let val _ = c_system "make manComp_demo && echo 'done'"
+  in
     ()
   end
 
