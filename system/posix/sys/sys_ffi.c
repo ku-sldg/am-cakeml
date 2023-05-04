@@ -4,7 +4,6 @@
 
 void ffisystem(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
   int out = system((char*)c);
-  printf("\n OUTPUT: %d\n", out);
   // Cast down to a uint8_t return address
   uint8_t truncatedErrCode = (out & 0xff);
   if (truncatedErrCode > 0) {
