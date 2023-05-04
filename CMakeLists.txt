@@ -6,7 +6,9 @@ include(CakeMLHelper.cmake)
 
 function(get_real_file file real_name)
     if(EXISTS ${file})
-        set(${real_name} ${file} PARENT_SCOPE)
+        get_filename_component(TESTVAR "${file}" REALPATH)
+        set(${real_name} ${TESTVAR} PARENT_SCOPE)
+
     elseif(EXISTS ${CMAKE_CURRENT_LIST_DIR}/${file})
         set(${real_name} "${CMAKE_CURRENT_LIST_DIR}/${file}" PARENT_SCOPE)
     endif()
@@ -206,3 +208,5 @@ foreach(appdir ${appdirs})
         add_subdirectory(${appdir})
     endif()
 endforeach()
+
+add_subdirectory("build")

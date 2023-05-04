@@ -40,6 +40,18 @@ structure ListExtra = struct
           (Some x) :: xs' => x :: (filterSome xs')
         | None :: xs' => filterSome xs'
         | [] => []
+
+    (* The actual recursive implementation of find_index 
+        : 'a list -> 'a -> int -> int *)
+    fun find_index_rec xs x curInd =
+        case xs of
+          h::t =>  if (h = x) then curInd else (find_index_rec t x (curInd + 1))
+        | [] => ~1
+
+    (* finds the index of an item in a list, and -1 if it is not in
+        will always return the first index it can find
+        : 'a list -> 'a -> int *)
+    fun find_index xs x = find_index_rec xs x 0
 end
 
 structure OptionExtra = struct 

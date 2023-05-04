@@ -91,4 +91,9 @@ fun main () =
           | ManifestUtils.Excn e => TextIO.print_err ("ManifestUtils Error: " ^ e)
           | _          => TextIO.print_err "Fatal: unknown error!\n"
 
+fun makeCmakeFile am_library_path = "cmake_minimum_required(VERSION 3.10.2)
+get_files(client_src ${server_am_src_tpm}" ^ am_library_path ^ "client/Client.sml)
+build_posix_am_tpm(\"COMPILED_AM\" ${client_src})"
+
+
 val () = main ()
