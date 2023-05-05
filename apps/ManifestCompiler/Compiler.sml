@@ -53,10 +53,6 @@ fun main () =
       val cmakefile = makeCmakeFile fmPath libPath
       val _ = c_system ("echo '" ^ cmakefile ^ "' > CMakeLists.txt")
       val _ = c_system ("make COMPILED_AM")
-      (* val x = c_system "ajsks" *)
-      (* val _ = print (Int.toString x)
-      val y = c_system "echo 'test'" *)
-      (* val _ = print (Int.toString y) *)
   in
     ()
   end

@@ -23,5 +23,11 @@ fun main () =
           | ManifestUtils.Excn e => TextIO.print_err ("ManifestUtils Error: " ^ e)
           | ManifestJsonConfig.Excn e => TextIO.print_err ("ManifestUtils Error: " ^ e)
           | Word8Extra.InvalidHex => TextIO.print_err "BSTRING UNSHOW ERROR"
+          | Socket.Err s => TextIO.print_err ("Socket failure on listener instantiation: " ^ s ^ "\n")
+          | Crypto.Err s => TextIO.print_err ("Crypto error: " ^ s ^ "\n")
+          | Json.Exn s1 s2 => TextIO.print_err ("Json Exception: " ^ s1 ^ "\n" ^ s2 ^ "\n")
+          | Result.Exn => TextIO.print_err ("Result Exn:\n")
+          | Undef => TextIO.print_err ("Undefined Exception:\n")
+          | _ => TextIO.print_err "Unknown Error Encountered!\n"
 
 val _ = main ()

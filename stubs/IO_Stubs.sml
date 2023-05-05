@@ -5,7 +5,6 @@
 fun do_asp ps e = 
   let val asp_cb = ManifestUtils.get_ASPCallback()
       val my_plc = ManifestUtils.get_myPlc()
-      val _ = print "testinasihsda\n"
   in
     (* Need BS *)
     asp_cb ps my_plc (encode_RawEv e) e

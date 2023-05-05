@@ -41,7 +41,15 @@ val aspServer_cb = (fn aspServerAddr => fn aspParams => fn plc => fn bs => fn ra
 
 val pubKeyServer_cb = (fn _ => fn _ => BString.unshow "OUTPUT_PUBKEY") :  (coq_ASP_Address -> coq_CakeML_PubKeyCallback)
 
-val plcServer_cb = (fn _ => fn _ => "OUTPUT_UUID") : (coq_ASP_Address ->  coq_CakeML_PlcCallback)
+val plcServer_cb = (fn plcServerAddr => fn plc => 
+  case (plc = "1") of
+    True => "localhost:5001"
+    | _ => 
+      let val _ = print ("Encountered Plc not in Local Plcs: '" ^ plc ^ "'\n") 
+      in 
+        raise (Exception ("TODO: Dispatch this request to Plc server at '" ^ plcServerAddr ^ "'\n"))
+      end
+  ) : (coq_ASP_Address ->  coq_CakeML_PlcCallback)
 
 val uuidServer_cb = (fn _ => fn _ => "OUTPUT_PLC") : (coq_ASP_Address -> coq_CakeML_uuidCallback)
 
