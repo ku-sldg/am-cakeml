@@ -44,7 +44,7 @@ structure ManCompConfig = struct
 
 end
 
-fun makeCmakeFile fm_path am_library_path = "cmake_minimum_required(VERSION 3.10.2)\nget_files(client_src ${server_am_src_tpm} " ^ fm_path ^ " " ^ am_library_path ^ " ./Client.sml)\nbuild_posix_am_tpm(\"COMPILED_AM\" ${client_src})\n"
+fun makeCmakeFile fm_path am_library_path = "cmake_minimum_required(VERSION 3.10.2)\nget_files(client_src ${server_am_src_tpm} " ^ fm_path ^ " " ^ am_library_path ^ " ../apps/ManifestCompiler/Client.sml)\nbuild_posix_am_tpm(\"COMPILED_AM\" ${client_src})\n"
 
 (* () -> () *)
 fun main () =
@@ -52,6 +52,7 @@ fun main () =
       val _ = (print ("Formal Manifest: " ^ fmPath ^ "\nAM Library: " ^ libPath ^ "\n\n"))
       val cmakefile = makeCmakeFile fmPath libPath
       val _ = c_system ("echo '" ^ cmakefile ^ "' > CMakeLists.txt")
+      val _ = c_system ("make COMPILED_AM")
       (* val x = c_system "ajsks" *)
       (* val _ = print (Int.toString x)
       val y = c_system "echo 'test'" *)
