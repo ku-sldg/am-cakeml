@@ -7,7 +7,7 @@ fun sendCoplandReq fd = Socket.output fd o jsonToStr o requestToJson
 val receiveCoplandResp = jsonToResponse o strToJson o Socket.inputAll
 
 fun decodeUUID (u : coq_UUID) = 
-  (* Splits at ";" character, into (ip, port) *)
+  (* Splits at ":" character, into (ip, port) *)
   let val colonInt = 
         case (String.findi (fn c => (Char.chr 58) = c) 0 u) of
           None => raise Exception "Unable to decode UUID, no splitting ':' found"

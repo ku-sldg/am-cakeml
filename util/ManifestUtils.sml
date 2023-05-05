@@ -270,6 +270,15 @@ structure ManifestUtils = struct
       my_plc
     end) : coq_Plc
 
+  
+  (* Retrieves the uuid corresponding to this processes Manifest/AM_Config
+      throws an exception if configuration not completed
+    : _ -> coq_UUID *)
+  fun get_myUUID _ = 
+    (let val (Build_ConcreteManifest _ my_uuid _ _ _ _ _ _ _) = get_ConcreteManifest() in
+      my_uuid
+    end) : coq_UUID
+
   (* Retrieves the private key corresponding to this processes Manifest/AM_Config
       throws an exception if configuration not completed
     : _ -> coq_PrivateKey *)
