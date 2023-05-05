@@ -9,4 +9,6 @@ val coq_Eq_Class_uuid =
 
 type coq_PublicKey (* AXIOM TO BE REALIZED *)
 
+type coq_PrivateKey (* AXIOM TO BE REALIZED *)
+
 type coq_PolicyT (* AXIOM TO BE REALIZED *)

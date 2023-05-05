@@ -2,6 +2,8 @@
 
 type ('a, 'b) coq_MapC = ('a, 'b) map (* ('a, 'b) prod list *)
 
+type ('a, 'b) coq_MapD = ('a, 'b) map
+
 type 'a coq_eqClass = unit
 
 val nat_EqClass = ()
@@ -18,3 +20,6 @@ fun invert_map heq1 heq2 m =
       val revPairList = List.map flipper pairList in
     Map.fromList String.compare revPairList
   end
+
+fun mapD_get_key heq1 heq2 m v =
+  map_get heq2 (invert_map heq1 heq2 m) v

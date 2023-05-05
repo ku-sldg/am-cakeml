@@ -1,7 +1,11 @@
 structure ManifestUtils = struct
   exception Excn string
 
-  type AM_Config = (coq_ConcreteManifest * coq_CakeML_ASPCallback * coq_CakeML_PlcCallback * coq_CakeML_PubKeyCallback * coq_CakeML_uuidCallback)
+  type AM_Config = (coq_ConcreteManifest * 
+      (coq_CakeML_ASPCallback) * 
+      (coq_CakeML_PlcCallback) * 
+      (coq_CakeML_PubKeyCallback) * 
+      (coq_CakeML_uuidCallback))
 
   val local_formal_manifest = Ref (Err "Formal Manifest not set") : ((coq_Manifest, string) result) ref
 
@@ -22,10 +26,10 @@ structure ManifestUtils = struct
       Coq_pair (Coq_pair (Coq_pair (Coq_pair concrete aspDisp) plcDisp) pubKeyDisp) uuidDisp =>
         let val _ = local_formal_manifest := Ok fm
             val _ = local_concreteManifest := Ok concrete
-            val _ = local_aspCb := Ok aspDisp
-            val _ = local_plcCb := Ok plcDisp
-            val _ = local_pubKeyCb := Ok pubKeyDisp
-            val _ = local_uuidCb := Ok uuidDisp
+            val _ = local_aspCb := Ok (aspDisp concrete)
+            val _ = local_plcCb := Ok (plcDisp concrete)
+            val _ = local_pubKeyCb := Ok (pubKeyDisp concrete)
+            val _ = local_uuidCb := Ok (uuidDisp concrete)
         in
           ()
         end) : unit
@@ -63,7 +67,7 @@ structure ManifestUtils = struct
       throws an exception if configuration not completed
     : _ -> coq_Plc *)
   fun get_myPlc _ = 
-    (let val (Build_ConcreteManifest my_plc _ _ _ _ _ _) = get_ConcreteManifest() in
+    (let val (Build_ConcreteManifest my_plc _ _ _ _ _ _ _ _) = get_ConcreteManifest() in
       my_plc
     end) : coq_Plc
 
