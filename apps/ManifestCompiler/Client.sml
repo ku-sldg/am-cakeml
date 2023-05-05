@@ -5,7 +5,10 @@ val kim_meas = Coq_asp (ASPC ALL EXTD (Coq_asp_paramsC kim_meas_aspid [] dest_pl
 
 fun main () =
     let val authb = True
-        val (concrete, aspDisp, plcDisp, pubKeyDisp, uuidDisp) = ManifestUtils.setup_and_get_AM_config formal_manifest client_am_library
+        val concreteMan = ManifestJsonConfig.retrieve_concrete_manifest () 
+        val (concrete, aspDisp, plcDisp, pubKeyDisp, uuidDisp) = ManifestUtils.setup_and_get_AM_config formal_manifest client_am_library concreteMan
+        val (Build_ConcreteManifest plc uuid privateKey plcMap pubKeyMap aspServer_addr pubKeyServer_addr plcServer_addr uuidServer_addr) = concrete
+        val _ = print plc
         val main_phrase = kim_meas (*demo_phrase3*)
         (* Retrieving implicit self place from manifest here *)
         val my_plc = ManifestUtils.get_myPlc()
@@ -17,5 +20,7 @@ fun main () =
     end
     handle Exception e => TextIO.print_err e 
           | ManifestUtils.Excn e => TextIO.print_err ("ManifestUtils Error: " ^ e)
+          | ManifestJsonConfig.Excn e => TextIO.print_err ("ManifestUtils Error: " ^ e)
+          | Word8Extra.InvalidHex => TextIO.print_err "BSTRING UNSHOW ERROR"
 
 val _ = main ()
