@@ -270,6 +270,14 @@ structure ManifestUtils = struct
       my_plc
     end) : coq_Plc
 
+  (* Retrieves the private key corresponding to this processes Manifest/AM_Config
+      throws an exception if configuration not completed
+    : _ -> coq_PrivateKey *)
+  fun get_myPrivateKey _ = 
+    (let val (Build_ConcreteManifest _ _ my_privKey _ _ _ _ _ _) = get_ConcreteManifest() in
+      my_privKey
+    end) : coq_PrivateKey
+
   (* Retrieves the asp callback, or exception if not configured 
     : _ -> coq_CakeML_ASPCallback *)
   fun get_ASPCallback _ =

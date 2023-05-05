@@ -2,9 +2,15 @@
      stubs/BS.sml, stubs, Example_Phrases_Demo_Admits.sml, 
      am/CoplandCommUtil.sml, ... (TODO: more IO dependencies?) *)
 
-
-(** val do_asp : coq_ASP_PARAMS -> coq_RawEv -> coq_BS **)
-
+fun do_asp ps e = 
+  let val asp_cb = ManifestUtils.get_ASPCallback()
+      val my_plc = ManifestUtils.get_myPlc()
+      val _ = print "testinasihsda\n"
+  in
+    (* Need BS *)
+    asp_cb ps my_plc (encode_RawEv e) e
+  end
+(* 
 fun do_asp ps e =
     let val _ = print ("Running ASP with params: \n" ^ (aspParamsToString ps) ^ "\n")
         val res = 
@@ -38,7 +44,7 @@ fun do_asp ps e =
                                                BString.fromString "v")
     in
         res
-    end
+    end *)
 (* failwith "AXIOM TO BE REALIZED" *)
 
 (** val doRemote_session : coq_Term -> coq_UUID -> coq_EvC -> coq_EvC **)

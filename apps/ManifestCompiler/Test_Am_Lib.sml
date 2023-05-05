@@ -1,7 +1,43 @@
 
 val aspMapping = (Map.fromList coq_ID_Type_ordering []) : ((coq_ASP_ID, coq_CakeML_ASPCallback) coq_MapC)
 
-val aspServer_cb = (fn _ => fn _ => fn _ => fn _ => fn _ => passed_bs) : (coq_ASP_Address -> coq_CakeML_ASPCallback)
+
+(** val do_asp : coq_ASP_Address -> coq_ASP_PARAMS -> coq_RawEv -> coq_BS **)
+fun do_asp asp_server_addr ps e =
+    let val _ = print ("Running ASP with params: \n" ^ (aspParamsToString ps) ^ "\n")
+        val res = 
+            case ps of Coq_asp_paramsC aspid args tpl tid =>
+              case (aspid = cal_ak_aspid) of    
+                  True => cal_ak_asp_stub ps e              
+                | _ => 
+                  case (aspid = get_data_aspid) of
+                      True => get_data_asp_stub ps e                
+                    | _ =>
+                      case (aspid = tpm_sig_aspid) of
+                          True => tpm_sig_asp_stub ps e
+                        | _ =>
+                          case (aspid = ssl_enc_aspid) of
+                              True => ssl_enc_asp_stub ps e                  
+                            | _ =>
+                              case (aspid = pub_bc_aspid) of
+                                  True => pub_bc_asp_stub ps e
+                                | _ => 
+                                  case (aspid = store_clientData_aspid) of
+                                      True => store_clientData_asp_stub ps e
+                                    | _ => 
+                                      case (aspid = ssl_sig_aspid) of
+                                          True => ssl_sig_asp_stub ps e
+                                        | _ => 
+                                          case (aspid = kim_meas_aspid) of
+                                              True => kim_meas_asp_stub ps e
+                                            | _ =>                     
+                                              (print ("Matched OTHER aspid:  " ^ aspid ^ "\n");
+                                                raise (Exception ("TODO: Dispatch this request to ASP server at '" ^ asp_server_addr ^ "'\n")))
+    in
+        res
+    end
+
+val aspServer_cb = (fn aspServerAddr => fn aspParams => fn plc => fn bs => fn rawEv => do_asp aspServerAddr aspParams rawEv) : (coq_ASP_Address -> coq_CakeML_ASPCallback)
 
 val pubKeyServer_cb = (fn _ => fn _ => BString.unshow "OUTPUT_PUBKEY") :  (coq_ASP_Address -> coq_CakeML_PubKeyCallback)
 
