@@ -15,9 +15,9 @@ val aspMapping = (Map.fromList coq_ID_Type_ordering
       fn par => fn plc => fn bs => fn rawEv => store_clientData_asp_stub par rawEv),
     (ssl_sig_aspid,
       fn par => fn plc => fn bs => fn rawEv => 
-        let val _ = print "\nORIGINAL SSL ASP STUB\n"
+        let val _ = print "\nNEW SSL ASP STUB\n"
         in
-          ssl_sig_asp_stub par rawEv
+          ssl_sig_asp_stub_two par rawEv
         end),
     (kim_meas_aspid,
       fn par => fn plc => fn bs => fn rawEv => kim_meas_asp_stub par rawEv)
