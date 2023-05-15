@@ -9,42 +9,6 @@ fun do_asp ps e =
     (* Need BS *)
     asp_cb ps my_plc (encode_RawEv e) e
   end
-(* 
-fun do_asp ps e =
-    let val _ = print ("Running ASP with params: \n" ^ (aspParamsToString ps) ^ "\n")
-        val res = 
-            case ps of Coq_asp_paramsC aspid args tpl tid =>
-              case (aspid = cal_ak_aspid) of    
-                  True => cal_ak_asp_stub ps e              
-                | _ => 
-                  case (aspid = get_data_aspid) of
-                      True => get_data_asp_stub ps e                
-                    | _ =>
-                      case (aspid = tpm_sig_aspid) of
-                          True => tpm_sig_asp_stub ps e
-                        | _ =>
-                          case (aspid = ssl_enc_aspid) of
-                              True => ssl_enc_asp_stub ps e                  
-                            | _ =>
-                              case (aspid = pub_bc_aspid) of
-                                  True => pub_bc_asp_stub ps e                          
-                                | _ => 
-                                  case (aspid = store_clientData_aspid) of
-                                      True => store_clientData_asp_stub ps e
-
-                                    | _ => 
-                                      case (aspid = ssl_sig_aspid) of
-                                          True => ssl_sig_asp_stub ps e
-                                        | _ => 
-                                          case (aspid = kim_meas_aspid) of
-                                              True => kim_meas_asp_stub ps e
-                                            | _ =>                     
-                                              (print ("Matched OTHER aspid:  " ^ aspid ^ "\n");
-                                               BString.fromString "v")
-    in
-        res
-    end *)
-(* failwith "AXIOM TO BE REALIZED" *)
 
 (** val doRemote_session : coq_Term -> coq_UUID -> coq_EvC -> coq_EvC **)
 
