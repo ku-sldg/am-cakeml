@@ -9,7 +9,7 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   make manifest_compiler
 
   # First let us setup the server
-  tmux new-session -d -s ServerProcess '(./apps/demo/serverdemo -m ../apps/demo/server/example_Manifest.json)'
+  tmux new-session -d -s ServerProcess '(./apps/demo/serverdemo -m ../apps/demo/server/example_Manifest.json -k ../apps/ManifestCompiler/example_PrivKey)'
 
 
   # Setup tmux windows
@@ -18,7 +18,7 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   
   # Now run the manifest compilations
   # Sending a chain of first AM comp, run, second AM comp, run
-  tmux send-keys -t 1 '(./apps/ManifestCompiler/manComp_demo -m ../apps/ManifestCompiler/Test_FormMan.sml -l ../apps/ManifestCompiler/Test_Am_Lib.sml) && (./build/COMPILED_AM -m ../apps/ManifestCompiler/example_Manifest.json) && (./apps/ManifestCompiler/manComp_demo -m ../apps/ManifestCompiler/Test_FormMan.sml -l ../apps/ManifestCompiler/Test_Am_Lib2.sml) && (./build/COMPILED_AM -m ../apps/ManifestCompiler/example_Manifest.json)' Enter
+  tmux send-keys -t 1 '(./apps/ManifestCompiler/manComp_demo -m ../apps/ManifestCompiler/Test_FormMan.sml -l ../apps/ManifestCompiler/Test_Am_Lib.sml) && (./build/COMPILED_AM -m ../apps/ManifestCompiler/example_Manifest.json -k ../apps/ManifestCompiler/example_PrivKey) && (./apps/ManifestCompiler/manComp_demo -m ../apps/ManifestCompiler/Test_FormMan.sml -l ../apps/ManifestCompiler/Test_Am_Lib2.sml) && (./build/COMPILED_AM -m ../apps/ManifestCompiler/example_Manifest.json -k ../apps/ManifestCompiler/example_PrivKey)' Enter
 
   tmux attach-session -d -t ServerProcess
 

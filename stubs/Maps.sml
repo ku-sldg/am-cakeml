@@ -1,25 +1,26 @@
 (* custom Maps impl in cakeml to match the Coq version:  coq_MapC *)
-
+(* 
 type ('a, 'b) coq_MapC = ('a, 'b) map (* ('a, 'b) prod list *)
 
-type ('a, 'b) coq_MapD = ('a, 'b) map
+type ('a, 'b) coq_MapD = ('a, 'b) map *)
 
 type 'a coq_eqClass = unit
 
-val nat_EqClass = ()
-
-fun map_empty _ = Map.empty nat_compare
-
-fun map_get h m x = Map.lookup m x
-
-fun map_set h m x v = Map.insert m x v
-
-fun invert_map heq1 heq2 m = 
-  let val pairList = Map.toAscList m 
-      val flipper = fn kv => case kv of (k,v) => (v,k) 
-      val revPairList = List.map flipper pairList in
-    Map.fromList String.compare revPairList
+fun pair_to_Coq_pair p =
+  let val (f,s) = p
+  in
+    Coq_pair f s
   end
 
-fun mapD_get_key heq1 heq2 m v =
-  map_get heq2 (invert_map heq1 heq2 m) v
+fun mapD_from_pairList pList = 
+  List.map pair_to_Coq_pair pList
+
+fun mapC_from_pairList pList = 
+  List.map pair_to_Coq_pair pList
+
+
+fun map_to_mapC m =
+  let val mList = Map.toAscList m
+  in
+    mList
+  end

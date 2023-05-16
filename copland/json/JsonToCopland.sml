@@ -87,30 +87,7 @@ fun getAspParams constructor (Json.Array args) =
       case js of
           [Json.String aspid, arrayArgs, Json.String plc, Json.String targid] =>
             Coq_asp_paramsC aspid (jsonStringListToList arrayArgs) plc targid
-        | _ => raise Json.Exn "getAspParamsArray" "unexpected Coq_asp_paramsC params"
-(* 
-(* jsonToManifest : json -> coq_Manifest *)
-fun jsonToManifest js =
-    case (Json.toMap js) of
-        Some m => fromJsonMap m getManifest
-      | None =>
-        raise Json.Exn "jsonToManifest" "Copland Manifest JSON does not begin as an AList"
-
-  and
-  getManifest constructor (Json.Array args) =
-  case constructor of
-      "Manifest" => case args of
-                        [asp_ids, plc_ids] =>
-                        Build_Manifest (jsonStringListToList asp_ids)
-                                       (jsonStringListToList plc_ids)
-                      | _ => raise Json.Exn "getManifest" "unexpected argument list"
-                        
-      | _ => raise Json.Exn "getManifest"
-                   ("Unexpected constructor for Manifest JSON term: " ^
-                    constructor)
-                  *)
-
-                     
+        | _ => raise Json.Exn "getAspParamsArray" "unexpected Coq_asp_paramsC params"                     
 
 (* jsonToTerm : json -> coq_Term 
    (json object to Copland phrase)  *)      

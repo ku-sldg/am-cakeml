@@ -5,8 +5,8 @@ structure ManifestJsonConfig = struct
   type uuid_t                 = coq_UUID
   type privateKey_t           = coq_PrivateKey
   type pubKey_t               = coq_PublicKey
-  type plcMap_t               = ((plc_t, uuid_t) map)
-  type pubKeyMap_t            = ((plc_t, pubKey_t) map)
+  type plcMap_t               = ((plc_t, uuid_t) coq_MapD)
+  type pubKeyMap_t            = ((plc_t, pubKey_t) coq_MapD)
   type aspServer_t            = coq_ASP_Address
   type pubKeyServer_t         = coq_ASP_Address
   type plcServer_t            = coq_ASP_Address
@@ -49,7 +49,7 @@ structure ManifestJsonConfig = struct
   (* Attempts to extract a plcMap from a Json structure of a concrete manifest
     : Json.json -> plcMap_t *)
   fun extract_plcMap (j : Json.json) =
-      let val gatherPlcs = case (Json.lookup "plcMap" j) of
+      (let val gatherPlcs = case (Json.lookup "plcMap" j) of
                               None => raise (Excn ("Could not find 'plcMap' field in JSON"))
                               | Some v => v
           val jsonPlcPairList = case (Json.toList gatherPlcs) of
@@ -69,21 +69,23 @@ structure ManifestJsonConfig = struct
                               None => raise (Excn "Could not convert uuid in mapping to a string")
                               | Some v => v)
               in
-                (plc, uuid)
-              end) : (plc_t * uuid_t)
-          val plcPairList = (List.map converter jsonPlcPairList) : ((plc_t * uuid_t) list)
+                (Coq_pair plc uuid)
+              end) : (plc_t, uuid_t) prod
+          val plcPairList = (List.map converter jsonPlcPairList) : (((plc_t, uuid_t) prod) list)
       in
-        (Map.fromList String.compare plcPairList)
-      end
+        plcPairList
+      end) : plcMap_t
 
   (* Encodes the plc Map as Json.json
     : plcMap_t -> Json.json *)
   fun encode_plcMap (p : plcMap_t) =
-      let val unpackedMap = Map.toAscList p (* (plc_t * uuid_t) list *)
-          fun encoder ((p, u) : (plc_t * uuid_t)) = 
-            (* Converts the pair to a Json list representing the pair *)
-            (Json.fromList [Json.fromString p, Json.fromString u])
-          val newList = (List.map encoder unpackedMap)
+      let fun encoder pu_pair = 
+              let val Coq_pair plc uuid = pu_pair
+              in
+                (* Converts the pair to a Json list representing the pair *)
+                (Json.fromList [Json.fromString plc, Json.fromString uuid])
+              end
+          val newList = (List.map encoder p)
       in
         (Json.fromList newList)
       end
@@ -91,7 +93,7 @@ structure ManifestJsonConfig = struct
   (* Attempts to extract a pubKeyMap from a Json structure of a concrete manifest
     : Json.json -> pubKeyMap_t *)
   fun extract_pubKeyMap (j : Json.json) =
-      let val gatherPlcs = case (Json.lookup "pubKeyMap" j) of
+      (let val gatherPlcs = case (Json.lookup "pubKeyMap" j) of
                               None => raise (Excn ("Could not find 'pubKeyMap' field in JSON"))
                               | Some v => v
           val jsonPlcPairList = case (Json.toList gatherPlcs) of
@@ -112,22 +114,24 @@ structure ManifestJsonConfig = struct
                               | Some v => v)
                   val binPubKey = BString.unshow pubKey
               in
-                (plc, binPubKey)
-              end) : (plc_t * pubKey_t)
-          val plcPairList = (List.map converter jsonPlcPairList) : ((plc_t * pubKey_t) list)
+                (Coq_pair plc binPubKey)
+              end) : ((plc_t, pubKey_t) prod)
+          val plcPairList = (List.map converter jsonPlcPairList) : (((plc_t, pubKey_t) prod) list)
       in
-        (Map.fromList String.compare plcPairList)
-      end
+        plcPairList
+      end) : pubKeyMap_t
 
 
   (* Encodes the pubKey Map as Json.json
     : pubKeyMap_t -> Json.json *)
   fun encode_pubKeyMap (p : pubKeyMap_t) =
-      let val unpackedMap = Map.toAscList p (* (plc_t * pubKey_t) list *)
-          fun encoder ((p, pk) : (plc_t * pubKey_t)) = 
-            (* Converts the pair to a Json list representing the pair *)
-            (Json.fromList [Json.fromString p, Json.fromString (BString.show pk)])
-          val newList = (List.map encoder unpackedMap)
+      let fun encoder ppk_pair = 
+            let val Coq_pair plc pubkey = ppk_pair
+            in
+              (* Converts the pair to a Json list representing the pair *)
+              (Json.fromList [Json.fromString plc, Json.fromString (BString.show pubkey)])
+            end
+          val newList = (List.map encoder p)
       in
         (Json.fromList newList)
       end
@@ -136,8 +140,8 @@ structure ManifestJsonConfig = struct
     : Json.json -> coq_ConcreteManifest *)
   fun extract_ConcreteManifest (j : Json.json) =
     let val plc = (parse_and_cast j "plc" string_cast)
-        val uuid = (parse_and_cast j "uuid" string_cast)
-        val privateKey = (parse_and_cast j "privateKey" bstring_cast)
+        (* val uuid = (parse_and_cast j "uuid" string_cast)
+        val privateKey = (parse_and_cast j "privateKey" bstring_cast) *)
         val plcMap = extract_plcMap j
         val pubKeyMap = extract_pubKeyMap j
         val aspServer_addr = (parse_and_cast j "aspServer" string_cast)
@@ -145,18 +149,18 @@ structure ManifestJsonConfig = struct
         val plcServer_addr = (parse_and_cast j "plcServer" string_cast)
         val uuidServer_addr = (parse_and_cast j "uuidServer" string_cast)
     in
-      (Build_ConcreteManifest plc uuid privateKey plcMap pubKeyMap
+      (Build_ConcreteManifest plc plcMap pubKeyMap
         aspServer_addr pubKeyServer_addr plcServer_addr uuidServer_addr)
     end
 
   (* Encodes a coq_ConcreteManifest into its JSON representation 
     : coq_ConcreteManifest -> Json.json *)
   fun encode_ConcreteManifest (cm : coq_ConcreteManifest) =
-    let val (Build_ConcreteManifest plc uuid privateKey plcMap pubKeyMap aspServer_addr pubKeyServer_addr plcServer_addr uuidServer_addr) = cm
+    let val (Build_ConcreteManifest plc plcMap pubKeyMap aspServer_addr pubKeyServer_addr plcServer_addr uuidServer_addr) = cm
         val cmJson = [
           ("plc", Json.fromString plc),
-          ("uuid", Json.fromString uuid),
-          ("privateKey", (cast_and_encode privateKey BString.show)),
+          (* ("uuid", Json.fromString uuid),
+          ("privateKey", (cast_and_encode privateKey BString.show)), *)
           ("plcMap", (encode_plcMap plcMap)),
           ("pubKeyMap", (encode_pubKeyMap pubKeyMap)),
           ("aspServer", Json.fromString aspServer_addr),
@@ -169,31 +173,42 @@ structure ManifestJsonConfig = struct
     end
 
 
-  (* Retrieves the concrete manifest based upon Command Line arguments
+  fun parse_private_key file =
+    BString.unshow (TextIOExtra.readFile file)
+
+  (* Retrieves the concrete manifest and private key 
+    based upon Command Line arguments
     : () -> coq_ConcreteManifest *)
-  fun retrieve_concrete_manifest _ =
+  fun retrieve_CLI_args _ =
     let val name = CommandLine.name ()
-        val usage = ("Usage: " ^ name ^ " -m <concreteManifestFile>.json\n" ^
-                      "e.g.\t" ^ name ^ " -m concMan.json\n")
-        val jsonFile = (case CommandLine.arguments () of 
-                          argList => (
-                            let val manInd = ListExtra.find_index argList "-m"
+        val usage = ("Usage: " ^ name ^ " -m <concreteManifestFile>.json -k <privateKeyFile>\n" ^
+                      "e.g.\t" ^ name ^ " -m concMan.json -k ~/.ssh/id_ed25519\n")
+        val (jsonFile, privKey) = 
+                (case CommandLine.arguments () of 
+                    argList => (
+                      let val manInd = ListExtra.find_index argList "-m"
+                          val keyInd = ListExtra.find_index argList "-k"
+                      in
+                        if (manInd = ~1)
+                        then raise (Excn ("Invalid Arguments\n" ^ usage))
+                        else (
+                          if (keyInd = ~1)
+                          then raise (Excn ("Invalid Arguments\n" ^ usage))
+                            else (
+                            let val fileName = List.nth argList (manInd + 1)
+                                val privKeyFile = List.nth argList (keyInd + 1)
                             in
-                              if (manInd = ~1)
-                              then raise (Excn ("Invalid Arguments\n" ^ usage))
-                              else (
-                                let val fileName = List.nth argList (manInd + 1)
-                                in
-                                  case (parseJsonFile fileName) of
-                                    Err e => raise (Excn ("Could not parse JSON file: " ^ e ^ "\n"))
-                                    | Ok j => j
-                                end
-                              )
+                              case (parseJsonFile fileName) of
+                                Err e => raise (Excn ("Could not parse JSON file: " ^ e ^ "\n"))
+                                | Ok j => (j, parse_private_key privKeyFile)
                             end
-                          ))
+                            )
+                        )
+                      end
+                    ))
         val cm = extract_ConcreteManifest jsonFile
     in
-      cm
+      (cm, privKey)
     end
 end
 
@@ -202,12 +217,13 @@ end
 structure ManifestUtils = struct
   exception Excn string
 
+  type privateKey_t       = coq_PrivateKey
   type Partial_ASP_CB     = coq_ConcreteManifest -> coq_CakeML_ASPCallback
   type Partial_Plc_CB     = coq_ConcreteManifest -> coq_CakeML_PlcCallback
   type Partial_PubKey_CB  = coq_ConcreteManifest -> coq_CakeML_PubKeyCallback
   type Partial_UUID_CB    = coq_ConcreteManifest -> coq_CakeML_uuidCallback
 
-  type AM_Config = (coq_ConcreteManifest * 
+  type AM_Config = (coq_ConcreteManifest * privateKey_t *
       (coq_CakeML_ASPCallback) * 
       (coq_CakeML_PlcCallback) * 
       (coq_CakeML_PubKeyCallback) * 
@@ -225,9 +241,11 @@ structure ManifestUtils = struct
 
   val local_uuidCb = Ref (Err "UUID callback not set") : ((Partial_UUID_CB, string) result) ref
 
+  val local_PrivKey = Ref (Err "Private Key not set") : ((privateKey_t, string) result) ref
+
   (* Setups up the relevant information and compiles the manifest
       : coq_Manifest -> coq_AM_Library -> () *)
-  fun setup_AM_config (fm : coq_Manifest) (al : coq_AM_Library) =
+  fun setup_AM_config (fm : coq_Manifest) (al : coq_AM_Library) (privKey : privateKey_t) =
     (case (manifest_compiler fm al) of
       Coq_pair (Coq_pair (Coq_pair (Coq_pair concrete aspDisp) plcDisp) pubKeyDisp) uuidDisp =>
         let val _ = local_formal_manifest := Ok fm
@@ -236,6 +254,7 @@ structure ManifestUtils = struct
             val _ = local_plcCb := Ok plcDisp
             val _ = local_pubKeyCb := Ok pubKeyDisp
             val _ = local_uuidCb := Ok uuidDisp
+            val _ = local_PrivKey := Ok privKey
         in
           ()
         end) : unit
@@ -266,26 +285,9 @@ structure ManifestUtils = struct
       throws an exception if configuration not completed
     : _ -> coq_Plc *)
   fun get_myPlc _ = 
-    (let val (Build_ConcreteManifest my_plc _ _ _ _ _ _ _ _) = get_ConcreteManifest() in
+    (let val (Build_ConcreteManifest my_plc _ _ _ _ _ _) = get_ConcreteManifest() in
       my_plc
     end) : coq_Plc
-
-  
-  (* Retrieves the uuid corresponding to this processes Manifest/AM_Config
-      throws an exception if configuration not completed
-    : _ -> coq_UUID *)
-  fun get_myUUID _ = 
-    (let val (Build_ConcreteManifest _ my_uuid _ _ _ _ _ _ _) = get_ConcreteManifest() in
-      my_uuid
-    end) : coq_UUID
-
-  (* Retrieves the private key corresponding to this processes Manifest/AM_Config
-      throws an exception if configuration not completed
-    : _ -> coq_PrivateKey *)
-  fun get_myPrivateKey _ = 
-    (let val (Build_ConcreteManifest _ _ my_privKey _ _ _ _ _ _) = get_ConcreteManifest() in
-      my_privKey
-    end) : coq_PrivateKey
 
   (* Retrieves the asp callback, or exception if not configured 
     : _ -> coq_CakeML_ASPCallback *)
@@ -327,25 +329,46 @@ structure ManifestUtils = struct
       | Err e => raise Excn e
     end) : coq_CakeML_uuidCallback
 
+  
+  (* Retrieves the uuid corresponding to this processes Manifest/AM_Config
+      throws an exception if configuration not completed
+    : _ -> coq_UUID *)
+  fun get_myUUID _ = 
+    (let val my_plc = get_myPlc()
+        val plc_to_uuid = get_PlcCallback()
+        val my_uuid = plc_to_uuid my_plc
+    in
+      my_uuid
+    end) : coq_UUID
+
+  (* Retrieves the private key corresponding to this processes Manifest/AM_Config
+      throws an exception if configuration not completed
+    : _ -> coq_PrivateKey *)
+  fun get_myPrivateKey _ = 
+    (case (!local_PrivKey) of
+      (Ok v) => v
+      | Err e => raise Excn e) : coq_PrivateKey
+
   (* Retrieves all AM config information, 
       if a Manifest has not be compiled yet it will throw an error
     : _ -> AM_Config *)
   fun get_AM_config _ =
     (let val cm = get_ConcreteManifest()
+        val privKey = get_myPrivateKey()
         val aspCb = get_ASPCallback()
         val plcCb = get_PlcCallback()
         val pubKeyCb = get_PubKeyCallback()
         val uuidCb = get_UUIDCallback()
     in
-      (cm, aspCb, plcCb, pubKeyCb, uuidCb)
+      (cm, privKey, aspCb, plcCb, pubKeyCb, uuidCb)
     end) : AM_Config
 
   (* Directly combines setup and get steps in one function call. 
       Additionally, we must provide a "fresh" Concrete Manifest to 
       use for manifest operations
     : coq_Manifest -> coq_AM_Library -> AM_Config *)
-  fun setup_and_get_AM_config (fm : coq_Manifest) (al : coq_AM_Library) (cm : coq_ConcreteManifest) =
-    (let val _ = setup_AM_config fm al
+  fun setup_and_get_AM_config (fm : coq_Manifest) (al : coq_AM_Library) (cm : coq_ConcreteManifest) (privKey : privateKey_t) =
+    (let val _ = setup_AM_config fm al privKey
          val _ = set_ConcreteManifest cm in
       get_AM_config()
     end) : AM_Config

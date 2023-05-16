@@ -7,6 +7,13 @@ type 'a coq_EqClass =
 fun eqb eqClass =
   eqClass
 
+(** val coq_EqClass_impl_DecEq : 'a1 coq_EqClass -> 'a1 -> 'a1 -> sumbool **)
+
+fun coq_EqClass_impl_DecEq h x y =
+  let val b = h x y in (case b of
+                          True => Coq_left
+                        | False => Coq_right) end
+
 (** val nat_EqClass : nat coq_EqClass **)
 
 val nat_EqClass =

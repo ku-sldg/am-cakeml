@@ -5,12 +5,13 @@ val kim_meas = Coq_asp (ASPC ALL EXTD (Coq_asp_paramsC kim_meas_aspid [] dest_pl
 
 fun main () =
     let val authb = True
-        val concreteMan = ManifestJsonConfig.retrieve_concrete_manifest () 
-        val (concrete, aspDisp, plcDisp, pubKeyDisp, uuidDisp) = ManifestUtils.setup_and_get_AM_config formal_manifest client_am_library concreteMan
-        val (Build_ConcreteManifest plc uuid privateKey plcMap pubKeyMap aspServer_addr pubKeyServer_addr plcServer_addr uuidServer_addr) = concrete
+        val (concreteMan, privKey) = ManifestJsonConfig.retrieve_CLI_args () 
+        val (concrete, privKey, aspDisp, plcDisp, pubKeyDisp, uuidDisp) = ManifestUtils.setup_and_get_AM_config formal_manifest client_am_library concreteMan privKey
+        val (Build_ConcreteManifest plc plcMap pubKeyMap aspServer_addr pubKeyServer_addr plcServer_addr uuidServer_addr) = concrete
         val main_phrase = kim_meas (*demo_phrase3*)
         (* Retrieving implicit self place from manifest here *)
         val my_plc = ManifestUtils.get_myPlc()
+        val uuid = ManifestUtils.get_myUUID()
         (* NOTE: The dest plc is hardcoded here! *)
         val _ = TextIO.print ("Client Launched!\nLoaded following implicit place from Manifest: '" ^ my_plc ^ "'\n\n")
         val _ = TextIO.print ("Loaded following implicit UUID from Manifest: '" ^ uuid ^ "'\n\n")

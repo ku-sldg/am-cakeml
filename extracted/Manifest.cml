@@ -8,101 +8,162 @@ type coq_CakeML_PlcCallback = coq_Plc -> coq_UUID
 type coq_CakeML_uuidCallback = coq_UUID -> coq_Plc
 
 datatype coq_Manifest =
-  Build_Manifest coq_Plc coq_UUID coq_PrivateKey (coq_ASP_ID list)
-   (coq_Plc list) (coq_PublicKey list) coq_PolicyT coq_ASP_Address
-   coq_ASP_Address coq_ASP_Address coq_ASP_Address
-   ((coq_Plc, coq_UUID) coq_MapD) ((coq_Plc, coq_PublicKey) coq_MapD)
+  Build_Manifest coq_Plc (coq_ASP_ID list) (coq_Plc list) (coq_Plc list)
+   coq_PolicyT
 
 datatype coq_AM_Library =
-  Build_AM_Library ((coq_ASP_ID, coq_CakeML_ASPCallback) coq_MapC)
-   ((coq_ASP_Address -> coq_CakeML_ASPCallback))
+  Build_AM_Library ((coq_ASP_Address -> coq_CakeML_ASPCallback))
    ((coq_ASP_Address -> coq_CakeML_PubKeyCallback))
    ((coq_ASP_Address -> coq_CakeML_PlcCallback))
-   ((coq_ASP_Address -> coq_CakeML_uuidCallback))
+   ((coq_ASP_Address -> coq_CakeML_uuidCallback)) coq_ASP_Address
+   coq_ASP_Address coq_ASP_Address coq_ASP_Address
+   ((coq_ASP_ID, coq_CakeML_ASPCallback) coq_MapC)
+   ((coq_Plc, coq_UUID) coq_MapD) ((coq_Plc, coq_PublicKey) coq_MapD)
 
 datatype coq_ConcreteManifest =
-  Build_ConcreteManifest coq_Plc coq_UUID coq_PrivateKey
-   ((coq_Plc, coq_UUID) coq_MapD) ((coq_Plc, coq_PublicKey) coq_MapD)
-   coq_ASP_Address coq_ASP_Address coq_ASP_Address coq_ASP_Address
+  Build_ConcreteManifest coq_Plc ((coq_Plc, coq_UUID) coq_MapD)
+   ((coq_Plc, coq_PublicKey) coq_MapD) coq_ASP_Address coq_ASP_Address
+   coq_ASP_Address coq_ASP_Address
+
+(** val minify_mapC :
+    'a1 coq_EqClass -> ('a1, 'a2) coq_MapC -> ('a1 -> bool) -> ('a1, 'a2)
+    coq_MapC **)
+
+fun minify_mapC hA m f =
+  case m of
+    [] => []
+  | p :: tl =>
+    let val Coq_pair k v = p in
+    (case f k of
+       True => (Coq_pair k v) :: (minify_mapC hA tl f)
+     | False => minify_mapC hA tl f) end
+
+(** val minify_mapD :
+    'a1 coq_EqClass -> 'a2 coq_EqClass -> ('a1, 'a2) coq_MapD -> ('a1 ->
+    bool) -> ('a1, 'a2) coq_MapD **)
+
+fun minify_mapD hA hB m f =
+  case m of
+    [] => []
+  | p :: tl =>
+    let val Coq_pair k v = p in
+    (case f k of
+       True => (Coq_pair k v) :: (minify_mapD hA hB tl f)
+     | False => minify_mapD hA hB tl f) end
 
 (** val generate_ASP_dispatcher :
-    coq_AM_Library -> coq_ConcreteManifest -> coq_CakeML_ASPCallback **)
+    coq_ID_Type coq_EqClass -> coq_AM_Library -> coq_Manifest ->
+    coq_ConcreteManifest -> coq_CakeML_ASPCallback **)
 
-fun generate_ASP_dispatcher al =
+fun generate_ASP_dispatcher hID al am =
   let val local_asps_map =
-    let val Build_AM_Library local_ASPS _ _ _ _ = al in local_ASPS end
+    let val Build_AM_Library _ _ _ _ _ _ _ _ local_ASPS _ _ = al in
+    local_ASPS end
+  in
+  let val abstract_asps = let val Build_Manifest _ asps _ _ _ = am in asps end
+  in
+  let val shrunk_map =
+    minify_mapC coq_Eq_Class_ID_Type local_asps_map (fn x =>
+      case in_dec (coq_EqClass_impl_DecEq hID) x abstract_asps of
+        Coq_left => True
+      | Coq_right => False)
   in
   let val asp_server_cb =
-    let val Build_AM_Library _ aSPServer_Cb _ _ _ = al in aSPServer_Cb end
+    let val Build_AM_Library aSPServer_Cb _ _ _ _ _ _ _ _ _ _ = al in
+    aSPServer_Cb end
   in
   (fn cman =>
   let val asp_server_addr =
-    let val Build_ConcreteManifest _ _ _ _ _ aSP_Server _ _ _ = cman in
+    let val Build_ConcreteManifest _ _ _ aSP_Server _ _ _ = cman in
     aSP_Server end
   in
   (fn par =>
   let val Coq_asp_paramsC aspid _ _ _ = par in
-  (case map_get coq_Eq_Class_ID_Type local_asps_map aspid of
+  (case map_get coq_Eq_Class_ID_Type shrunk_map aspid of
      Some cb => cb par
-   | None => asp_server_cb asp_server_addr par) end) end) end end
+   | None => asp_server_cb asp_server_addr par) end) end) end end end end
 
 (** val generate_Plc_dispatcher :
-    coq_AM_Library -> coq_ConcreteManifest -> coq_CakeML_PlcCallback **)
+    coq_ID_Type coq_EqClass -> coq_AM_Library -> coq_Manifest ->
+    coq_ConcreteManifest -> coq_CakeML_PlcCallback **)
 
-fun generate_Plc_dispatcher al =
+fun generate_Plc_dispatcher hID al am =
   let val plc_server_cb =
-    let val Build_AM_Library _ _ _ plcServer_Cb _ = al in plcServer_Cb end
+    let val Build_AM_Library _ _ plcServer_Cb _ _ _ _ _ _ _ _ = al in
+    plcServer_Cb end
   in
   (fn cman =>
   let val local_plc_map =
-    let val Build_ConcreteManifest _ _ _ concrete_Plcs _ _ _ _ _ = cman in
+    let val Build_ConcreteManifest _ concrete_Plcs _ _ _ _ _ = cman in
     concrete_Plcs end
   in
+  let val abstract_plcs =
+    let val Build_Manifest _ _ uuidPlcs _ _ = am in uuidPlcs end
+  in
+  let val shrunk_map =
+    minify_mapD coq_Eq_Class_ID_Type coq_Eq_Class_uuid local_plc_map (fn x =>
+      case in_dec (coq_EqClass_impl_DecEq hID) x abstract_plcs of
+        Coq_left => True
+      | Coq_right => False)
+  in
   let val plc_server_addr =
-    let val Build_ConcreteManifest _ _ _ _ _ _ _ plc_Server _ = cman in
+    let val Build_ConcreteManifest _ _ _ _ _ plc_Server _ = cman in
     plc_Server end
   in
   (fn p =>
-  case map_get coq_Eq_Class_ID_Type local_plc_map p of
+  case map_get hID shrunk_map p of
     Some uuid => uuid
-  | None => plc_server_cb plc_server_addr p) end end) end
+  | None => plc_server_cb plc_server_addr p) end end end end) end
 
 (** val generate_PubKey_dispatcher :
-    coq_AM_Library -> coq_ConcreteManifest -> coq_CakeML_PubKeyCallback **)
+    coq_ID_Type coq_EqClass -> coq_AM_Library -> coq_Manifest ->
+    coq_ConcreteManifest -> coq_CakeML_PubKeyCallback **)
 
-fun generate_PubKey_dispatcher al =
+fun generate_PubKey_dispatcher hID al am =
   let val pubkey_server_cb =
-    let val Build_AM_Library _ _ pubKeyServer_Cb _ _ = al in
+    let val Build_AM_Library _ pubKeyServer_Cb _ _ _ _ _ _ _ _ _ = al in
     pubKeyServer_Cb end
   in
   (fn cman =>
   let val local_pubkey_map =
-    let val Build_ConcreteManifest _ _ _ _ concrete_PubKeys _ _ _ _ = cman in
+    let val Build_ConcreteManifest _ _ concrete_PubKeys _ _ _ _ = cman in
     concrete_PubKeys end
   in
+  let val abstract_plcs =
+    let val Build_Manifest _ _ _ pubKeyPlcs _ = am in pubKeyPlcs end
+  in
+  let val shrunk_map =
+    minify_mapD coq_Eq_Class_ID_Type coq_Eq_Class_public_key local_pubkey_map
+      (fn x =>
+      case in_dec (coq_EqClass_impl_DecEq hID) x abstract_plcs of
+        Coq_left => True
+      | Coq_right => False)
+  in
   let val pubkey_server_addr =
-    let val Build_ConcreteManifest _ _ _ _ _ _ pubKey_Server _ _ = cman in
+    let val Build_ConcreteManifest _ _ _ _ pubKey_Server _ _ = cman in
     pubKey_Server end
   in
   (fn p =>
-  case map_get coq_Eq_Class_ID_Type local_pubkey_map p of
+  case map_get hID shrunk_map p of
     Some key => key
-  | None => pubkey_server_cb pubkey_server_addr p) end end) end
+  | None => pubkey_server_cb pubkey_server_addr p) end end end end) end
 
 (** val generate_UUUID_dispatcher :
-    coq_AM_Library -> coq_ConcreteManifest -> coq_CakeML_uuidCallback **)
+    coq_ID_Type coq_EqClass -> coq_AM_Library -> coq_Manifest ->
+    coq_ConcreteManifest -> coq_CakeML_uuidCallback **)
 
-fun generate_UUUID_dispatcher al =
+fun generate_UUUID_dispatcher _ al _ =
   let val uuid_server_cb =
-    let val Build_AM_Library _ _ _ _ uUIDServer_Cb = al in uUIDServer_Cb end
+    let val Build_AM_Library _ _ _ uUIDServer_Cb _ _ _ _ _ _ _ = al in
+    uUIDServer_Cb end
   in
   (fn cman =>
   let val local_plc_map =
-    let val Build_ConcreteManifest _ _ _ concrete_Plcs _ _ _ _ _ = cman in
+    let val Build_ConcreteManifest _ concrete_Plcs _ _ _ _ _ = cman in
     concrete_Plcs end
   in
   let val local_uuid_addr =
-    let val Build_ConcreteManifest _ _ _ _ _ _ _ _ uUID_Server = cman in
+    let val Build_ConcreteManifest _ _ _ _ _ _ uUID_Server = cman in
     uUID_Server end
   in
   (fn u =>
@@ -118,28 +179,23 @@ fun generate_UUUID_dispatcher al =
     coq_ConcreteManifest -> coq_CakeML_uuidCallback) prod **)
 
 fun manifest_compiler m al =
-  let val asp_cb = generate_ASP_dispatcher al in
-  let val plc_cb = generate_Plc_dispatcher al in
-  let val pubkey_cb = generate_PubKey_dispatcher al in
-  let val uuid_cb = generate_UUUID_dispatcher al in
+  let val asp_cb = generate_ASP_dispatcher coq_Eq_Class_ID_Type al m in
+  let val plc_cb = generate_Plc_dispatcher coq_Eq_Class_ID_Type al m in
+  let val pubkey_cb = generate_PubKey_dispatcher coq_Eq_Class_ID_Type al m in
+  let val uuid_cb = generate_UUUID_dispatcher coq_Eq_Class_ID_Type al m in
   let val concrete_man = Build_ConcreteManifest
-    (let val Build_Manifest my_abstract_plc _ _ _ _ _ _ _ _ _ _ _ _ = m in
-     my_abstract_plc end)
-    (let val Build_Manifest _ my_abstract_uuid _ _ _ _ _ _ _ _ _ _ _ = m in
-     my_abstract_uuid end)
-    (let val Build_Manifest _ _ my_abstract_privkey _ _ _ _ _ _ _ _ _ _ = m in
-     my_abstract_privkey end)
-    (let val Build_Manifest _ _ _ _ _ _ _ _ _ _ _ local_Plcs _ = m in
+    (let val Build_Manifest my_abstract_plc _ _ _ _ = m in my_abstract_plc end)
+    (let val Build_AM_Library _ _ _ _ _ _ _ _ _ local_Plcs _ = al in
      local_Plcs end)
-    (let val Build_Manifest _ _ _ _ _ _ _ _ _ _ _ _ local_PubKeys = m in
+    (let val Build_AM_Library _ _ _ _ _ _ _ _ _ _ local_PubKeys = al in
      local_PubKeys end)
-    (let val Build_Manifest _ _ _ _ _ _ _ aSPServer_Addr _ _ _ _ _ = m in
+    (let val Build_AM_Library _ _ _ _ aSPServer_Addr _ _ _ _ _ _ = al in
      aSPServer_Addr end)
-    (let val Build_Manifest _ _ _ _ _ _ _ _ pubKeyServer_Addr _ _ _ _ = m in
+    (let val Build_AM_Library _ _ _ _ _ pubKeyServer_Addr _ _ _ _ _ = al in
      pubKeyServer_Addr end)
-    (let val Build_Manifest _ _ _ _ _ _ _ _ _ plcServer_Addr _ _ _ = m in
+    (let val Build_AM_Library _ _ _ _ _ _ plcServer_Addr _ _ _ _ = al in
      plcServer_Addr end)
-    (let val Build_Manifest _ _ _ _ _ _ _ _ _ _ uUIDServer_Addr _ _ = m in
+    (let val Build_AM_Library _ _ _ _ _ _ _ uUIDServer_Addr _ _ _ = al in
      uUIDServer_Addr end)
   in
   Coq_pair (Coq_pair (Coq_pair (Coq_pair concrete_man asp_cb) plc_cb)

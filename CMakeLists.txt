@@ -60,6 +60,8 @@ include(./stubs/attestation_asps/CMakeLists.txt)
 
 get_files(cop_src 
     stubs/BS.sml
+    extracted/Specif.cml
+    extracted/EqClass.cml
     extracted/Datatypes.cml
     extracted/List.cml
     # extracted/Nat.cml
@@ -70,6 +72,7 @@ get_files(cop_src
     # extracted/ConcreteEvidence.cml
     stubs/Params_Admits_hardcoded.sml
     extracted/Term_Defs.cml
+    extracted/Maps.cml
     stubs/Maps.sml
     stubs/Manifest_Admits_Stubs.sml
     extracted/Manifest.cml
