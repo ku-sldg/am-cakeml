@@ -52,6 +52,7 @@ fun main () =
       val _ = (print ("Formal Manifest: " ^ fmPath ^ "\nAM Library: " ^ libPath ^ "\n\n"))
       val cmakefile = makeCmakeFile fmPath libPath
       val _ = c_system ("echo '" ^ cmakefile ^ "' > CMakeLists.txt")
+      val _ = c_system ("cmake ..")
       val _ = c_system ("make COMPILED_AM")
   in
     ()
