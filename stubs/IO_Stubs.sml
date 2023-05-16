@@ -10,10 +10,12 @@ fun do_asp ps e =
     asp_cb ps my_plc (encode_RawEv e) e
   end
 
-(** val doRemote_session : coq_Term -> coq_UUID -> coq_EvC -> coq_EvC **)
+(** val doRemote_session : coq_Term -> coq_Plc -> coq_EvC -> coq_EvC **)
 
-fun doRemote_session t targUUID e =
-    let val _ = print ("Running doRemote_session\n") in
+fun doRemote_session t targPlc e =
+    let val _ = print ("Running doRemote_session\n") 
+        val targUUID = (ManifestUtils.get_PlcCallback() targPlc)
+    in
       Coq_evc (am_sendReq t targUUID (Coq_evc [] Coq_mt) (get_bits e)) Coq_mt
     end
   (* TODO:  Is the dummy Evidence Type value (Coq_mt) ok here? *)
