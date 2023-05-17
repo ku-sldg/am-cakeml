@@ -233,6 +233,13 @@ structure TextIOExtra = struct
         in TextIO.closeIn fd;
             text
         end
+
+    fun writeFile (filename : string) (text : string) =
+        (let val fd = TextIO.openOut filename
+        in
+          TextIO.output fd text;
+          TextIO.closeOut fd
+        end) : unit
 end
 
 structure MapExtra = struct

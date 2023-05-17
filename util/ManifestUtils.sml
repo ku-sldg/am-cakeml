@@ -46,6 +46,14 @@ structure ManifestJsonConfig = struct
           | TextIO.InvalidFD   => Err "Invalid file descriptor"
           (* TODO: Handle JSON parsing exceptions *)
 
+  (* Writes json to a file
+    : Json.json -> string -> unit *)
+  fun writeJsonFile (j : Json.json) (file : string) =
+      (TextIOExtra.writeFile file (Json.stringify j)
+      handle 
+          TextIO.BadFileName => raise Excn "Bad file name"
+          | TextIO.InvalidFD   => raise Excn "Invalid file descriptor") : unit
+
   (* Attempts to extract a plcMap from a Json structure of a concrete manifest
     : Json.json -> plcMap_t *)
   fun extract_plcMap (j : Json.json) =
@@ -242,6 +250,13 @@ structure ManifestUtils = struct
   val local_uuidCb = Ref (Err "UUID callback not set") : ((Partial_UUID_CB, string) result) ref
 
   val local_PrivKey = Ref (Err "Private Key not set") : ((privateKey_t, string) result) ref
+
+  (* Compiles a concrete manifest from a Formal Manifest and AM Lib
+    : coq_Manifest -> coq_AM_Library -> coq_ConcreteManifest *)
+  fun compile_manifest (fm : coq_Manifest) (al : coq_AM_Library) =
+    (case (manifest_compiler fm al) of
+      Coq_pair (Coq_pair (Coq_pair (Coq_pair concrete _) _) _) _ => concrete
+    ) : coq_ConcreteManifest
 
   (* Setups up the relevant information and compiles the manifest
       : coq_Manifest -> coq_AM_Library -> () *)

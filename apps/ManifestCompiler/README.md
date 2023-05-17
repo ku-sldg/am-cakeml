@@ -14,6 +14,9 @@ The outputs of this compilation process are:
 
 ## Usage:
 
+**Important**:
+The Manifest Compiler expects the formal manifest to be named `formal_manifest` and the AM_Library to be named `client_am_library`. This would be a good place to make configurable in the future, but not yet.
+
 (All file locations are relative to the top-level of the repo)
 
 First, make sure you have made the Manifest Compiler target.

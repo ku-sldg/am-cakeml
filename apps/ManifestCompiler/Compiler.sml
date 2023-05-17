@@ -44,14 +44,22 @@ structure ManCompConfig = struct
 
 end
 
-fun makeCmakeFile fm_path am_library_path = "cmake_minimum_required(VERSION 3.10.2)\nget_files(client_src ${server_am_src_tpm} " ^ fm_path ^ " " ^ am_library_path ^ " ../apps/ManifestCompiler/Client.sml)\nbuild_posix_am_tpm(\"COMPILED_AM\" ${client_src})\n"
+fun makeAM_CmakeFile fm_path am_library_path = "cmake_minimum_required(VERSION 3.10.2)\nget_files(client_src ${server_am_src_tpm} " ^ fm_path ^ " " ^ am_library_path ^ " ../apps/ManifestCompiler/Client.sml)\nbuild_posix_am_tpm(\"COMPILED_AM\" ${client_src})\n"
+
+fun makeConcMan_CmakeFile fm_path am_library_path = "cmake_minimum_required(VERSION 3.10.2)\nget_files(client_src ${server_am_src_tpm} " ^ fm_path ^ " " ^ am_library_path ^ " ../apps/ManifestCompiler/ManifestBuilder.sml)\nbuild_posix_am_tpm(\"CONC_MAN_BUILDER\" ${client_src})\n"
+
 
 (* () -> () *)
 fun main () =
   let val (fmPath, libPath, _, _) = ManCompConfig.get_args()
       val _ = (print ("Formal Manifest: " ^ fmPath ^ "\nAM Library: " ^ libPath ^ "\n\n"))
-      val cmakefile = makeCmakeFile fmPath libPath
-      val _ = c_system ("echo '" ^ cmakefile ^ "' > CMakeLists.txt")
+      val am_cmakefile = makeAM_CmakeFile fmPath libPath
+      val concman_cmakefile = makeConcMan_CmakeFile fmPath libPath
+      val _ = c_system ("echo '" ^ concman_cmakefile ^ "' > CMakeLists.txt")
+      val _ = c_system ("cmake ..")
+      val _ = c_system ("make CONC_MAN_BUILDER")
+      val _ = c_system ("./build/CONC_MAN_BUILDER")
+      val _ = c_system ("echo '" ^ am_cmakefile ^ "' > CMakeLists.txt")
       val _ = c_system ("cmake ..")
       val _ = c_system ("make COMPILED_AM")
   in
