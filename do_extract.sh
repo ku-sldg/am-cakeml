@@ -7,7 +7,7 @@
 
 CML_DIR="./extracted"
 
-if [ -v COPLAND_AVM_DIR ]; then
+if [ -n "${COPLAND_AVM_DIR}" ]; then
   rm ${CML_DIR}/*.cml
 
   cp ${COPLAND_AVM_DIR}/*.cml ${CML_DIR}
