@@ -4,8 +4,13 @@ fun main () =
     (* Retrieve the provided "formal_manifest" and "client_am_library" *)
     let val concrete = ManifestUtils.compile_manifest formal_manifest client_am_library 
         val concreteJson = ManifestJsonConfig.encode_ConcreteManifest concrete
+        (* TODO: Note that the name is hardcoded right now *)
+        val concManFile = "concrete_manifest.json"
+        (* Write out the JSON file *)
+        val _ = ManifestJsonConfig.writeJsonFile concreteJson concManFile
+        val _ = c_system ("chmod 777 " ^ concManFile)
     in
-      ManifestJsonConfig.writeJsonFile concreteJson "concrete_manifest.json"
+      ()
     end
     handle Exception e => TextIO.print_err e 
           | ManifestUtils.Excn e => TextIO.print_err ("ManifestUtils Error: " ^ e)
