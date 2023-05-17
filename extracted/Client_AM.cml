@@ -18,10 +18,9 @@ fun gen_authEvC_if_some ot pFrom =
 
 (** val am_sendReq_gen :
     coq_Term -> coq_Plc -> coq_Plc -> coq_EvC option -> coq_Term option ->
-    coq_CakeML_ASPCallback -> coq_CakeML_PubKeyCallback ->
     coq_CakeML_PlcCallback -> coq_AppResultC coq_AM **)
 
-fun am_sendReq_gen t pFrom pTo initEv authPhrase _ _ plcCb =
+fun am_sendReq_gen t pFrom pTo initEv authPhrase plcCb =
   bind (gen_nonce_if_none initEv) (fn evcIn =>
     bind (gen_authEvC_if_some authPhrase pFrom) (fn auth_evc =>
       let val Coq_evc init_ev init_et = evcIn in
@@ -31,27 +30,24 @@ fun am_sendReq_gen t pFrom pTo initEv authPhrase _ _ plcCb =
       gen_appraise_AM expected_et resev end end end end))
 
 (** val am_sendReq_nonce :
-    coq_Term -> coq_Plc -> coq_Plc -> coq_CakeML_ASPCallback ->
-    coq_CakeML_PubKeyCallback -> coq_CakeML_PlcCallback -> coq_AppResultC
-    coq_AM **)
+    coq_Term -> coq_Plc -> coq_Plc -> coq_CakeML_PlcCallback ->
+    coq_AppResultC coq_AM **)
 
-fun am_sendReq_nonce t pFrom pTo aspCb pubKeyCb plcCb =
-  am_sendReq_gen t pFrom pTo None None aspCb pubKeyCb plcCb
+fun am_sendReq_nonce t pFrom pTo plcCb =
+  am_sendReq_gen t pFrom pTo None None plcCb
 
 (** val am_sendReq_nonce_auth :
-    coq_Term -> coq_Plc -> coq_Plc -> coq_CakeML_ASPCallback ->
-    coq_CakeML_PubKeyCallback -> coq_CakeML_PlcCallback -> coq_AppResultC
-    coq_AM **)
+    coq_Term -> coq_Plc -> coq_Plc -> coq_CakeML_PlcCallback ->
+    coq_AppResultC coq_AM **)
 
-fun am_sendReq_nonce_auth t pFrom pTo aspCb pubKeyCb plcCb =
-  am_sendReq_gen t pFrom pTo None (Some ssl_sig) aspCb pubKeyCb plcCb
+fun am_sendReq_nonce_auth t pFrom pTo plcCb =
+  am_sendReq_gen t pFrom pTo None (Some ssl_sig) plcCb
 
 (** val am_sendReq_dispatch :
-    bool -> coq_Term -> coq_Plc -> coq_Plc -> coq_CakeML_ASPCallback ->
-    coq_CakeML_PubKeyCallback -> coq_CakeML_PlcCallback -> coq_AppResultC
-    coq_AM **)
+    bool -> coq_Term -> coq_Plc -> coq_Plc -> coq_CakeML_PlcCallback ->
+    coq_AppResultC coq_AM **)
 
-fun am_sendReq_dispatch auth t source dest aspCb pubKeyCb plcCb =
+fun am_sendReq_dispatch auth t source dest plcCb =
   case auth of
-    True => am_sendReq_nonce_auth t source dest aspCb pubKeyCb plcCb
-  | False => am_sendReq_nonce t source dest aspCb pubKeyCb plcCb
+    True => am_sendReq_nonce_auth t source dest plcCb
+  | False => am_sendReq_nonce t source dest plcCb

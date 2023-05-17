@@ -81,7 +81,7 @@ fun main () =
         val my_plc = ManifestUtils.get_myPlc()
         (* NOTE: The dest plc is hardcoded here! *)
         val _ = TextIO.print ("Client Launched!\nLoaded following implicit place from Manifest: '" ^ my_plc ^ "'\n\n")
-        val am_comp = (am_sendReq_dispatch authb main_phrase my_plc dest_plc aspDisp plcDisp plcDisp) in
+        val am_comp = (am_sendReq_dispatch authb main_phrase my_plc dest_plc  plcDisp) in
         print ( (evidenceCToString (run_am_app_comp am_comp Coq_mtc_app)
           ) ^ "\n\n")
     end
