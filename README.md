@@ -49,6 +49,9 @@ From the build directory, type `ccmake ..` to bring up the configuration GUI. Ho
 
 This manual configuration should not be necessary for most builds. It may be necessary if you want to use a C compiler other than your default compiler, change the compile flags, cross-compile, etc.
 
+To add custom arguments to the C compiler (without requiring manual changes via ccmake) export the `CMAKE_C_ARGS` environment variable to a string with all arguments.  For example, to point to dynamic openssl libraries:  
+>`export CMAKE_C_ARGS="-I/usr/local/opt/openssl@1.1/include -L/usr/local/opt/openssl@1.1/lib"`.
+
 # Source File Layout
 
 ## Top-level files/scripts

@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.10.2)
 set(CMAKE_USER_MAKE_RULES_OVERRIDE "DefaultConfig.cmake")
+
+
+set(CMAKE_OSX_ARCHITECTURES "x86_64" CACHE STRING "Used for MacOS to configure the architecture")
 project(CakemlAM C ASM)
 
 include(CakeMLHelper.cmake)
