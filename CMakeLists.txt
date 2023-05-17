@@ -1,12 +1,17 @@
 cmake_minimum_required(VERSION 3.10.2)
 set(CMAKE_USER_MAKE_RULES_OVERRIDE "DefaultConfig.cmake")
+
+
+set(CMAKE_OSX_ARCHITECTURES "x86_64" CACHE STRING "Used for MacOS to configure the architecture")
 project(CakemlAM C ASM)
 
 include(CakeMLHelper.cmake)
 
 function(get_real_file file real_name)
     if(EXISTS ${file})
-        set(${real_name} ${file} PARENT_SCOPE)
+        get_filename_component(TESTVAR "${file}" REALPATH)
+        set(${real_name} ${TESTVAR} PARENT_SCOPE)
+
     elseif(EXISTS ${CMAKE_CURRENT_LIST_DIR}/${file})
         set(${real_name} "${CMAKE_CURRENT_LIST_DIR}/${file}" PARENT_SCOPE)
     endif()
@@ -24,18 +29,92 @@ endfunction()
 
 set(BASIS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/system/basis_ffi.c" CACHE PATH "Filepath of basis_ffi.c to use (associated with the compiler version).")
 
-get_files(util_src util/Extra.sml util/ByteString.sml util/Misc.sml util/CoqDefaults.sml util/Parser.sml util/Json.sml util/Ini.sml)
-get_files(cop_src ${util_src} copland/Instr.sml copland/AM.sml copland/VM.sml
-    copland/json/CoplandToJson.sml copland/json/JsonToCopland.sml copland/Parser.sml)
-get_files(crypto_src system/crypto/openssl/CryptoFFI.sml system/crypto/openssl/Random.sml)
-get_files(crypto_src_hacl system/crypto/evercrypt/CryptoFFI.sml system/crypto/evercrypt/Random.sml)
-get_files(crypto_src_tpm system/crypto/tpm/CryptoFFI.sml system/crypto/tpm/Random.sml)
-get_files(posix_src ${crypto_src} system/posix/sockets/SocketFFI.sml system/posix/time/TimeFFI.sml system/posix/meas/MeasFFI.sml)
-get_files(posix_src_hacl ${crypto_src_hacl} system/posix/sockets/SocketFFI.sml system/posix/time/TimeFFI.sml system/posix/meas/MeasFFI.sml)
-get_files(posix_src_tpm ${crypto_src_tpm} system/posix/sockets/SocketFFI.sml system/posix/time/TimeFFI.sml system/posix/meas/MeasFFI.sml)
-get_files(server_am_src ${cop_src} ${posix_src} am/Measurements.sml am/CommTypes.sml am/ServerAm.sml)
-get_files(server_am_src_hacl ${cop_src} ${posix_src_hacl} am/Measurements.sml am/CommTypes.sml am/ServerAm.sml)
-get_files(server_am_src_tpm ${cop_src} ${posix_src_tpm} am/Measurements.sml am/CommTypes.sml am/ServerAm.sml)
+get_files(util_src util/CoqDefaults.sml util/Extra.sml
+    util/ByteString.sml util/Misc.sml util/Parser.sml util/Json.sml
+    util/BinaryParser.sml util/Http.sml)
+
+get_files(crypto_src system/crypto/openssl/CryptoFFI.sml
+system/crypto/openssl/Random.sml)
+
+get_files(crypto_src_hacl system/crypto/evercrypt/CryptoFFI.sml
+system/crypto/evercrypt/Random.sml)
+
+get_files(crypto_src_tpm system/crypto/tpm/CryptoFFI.sml
+system/crypto/tpm/Random.sml)
+
+
+
+get_files(posix_src ${crypto_src} system/posix/sockets/SocketFFI.sml
+system/posix/time/TimeFFI.sml system/posix/meas/MeasFFI.sml system/posix/sys/SysFFI.sml)
+
+get_files(posix_src_hacl ${crypto_src_hacl}
+system/posix/sockets/SocketFFI.sml
+system/posix/time/TimeFFI.sml system/posix/meas/MeasFFI.sml
+system/posix/sys/SysFFI.sml)
+
+get_files(posix_src_tpm ${crypto_src_tpm}
+system/posix/sockets/SocketFFI.sml
+system/posix/time/TimeFFI.sml system/posix/meas/MeasFFI.sml
+system/posix/sys/SysFFI.sml)
+
+# Includes the CMakeLists for the specific asps types (modularity)
+include(./stubs/appraisal_asps/CMakeLists.txt)
+include(./stubs/attestation_asps/CMakeLists.txt)
+
+get_files(cop_src 
+    stubs/BS.sml
+    extracted/Specif.cml
+    extracted/EqClass.cml
+    extracted/Datatypes.cml
+    extracted/List.cml
+    # extracted/Nat.cml
+    extracted/Eqb_Evidence.cml
+    # extracted/OptMonad_Coq.cml
+    extracted/Term_Defs_Core.cml
+    # extracted/Appraisal_Evidence.cml
+    # extracted/ConcreteEvidence.cml
+    stubs/Params_Admits_hardcoded.sml
+    extracted/Term_Defs.cml
+    extracted/Maps.cml
+    stubs/Maps.sml
+    stubs/Manifest_Admits_Stubs.sml
+    extracted/Manifest.cml
+    util/ManifestUtils.sml
+    copland/CoplandUtil.sml
+    stubs/Example_Phrases_Demo_Admits.sml
+    stubs/IO_Stubs_extra.sml
+    am/CommTypes.sml
+    copland/json/CoplandToJson.sml
+    copland/json/JsonToCopland.sml
+    extracted/privPolicy.cml
+    apps/blockchain/Blockchain.sml
+    apps/blockchain/HealthRecord.sml
+    ${attestation_asps}
+    ${appraisal_asps}
+    stubs/Appraisal_IO_Stubs.sml
+    stubs/Axioms_Io.sml
+    extracted/StMonad_Coq.cml
+    extracted/AM_St.cml
+    extracted/AM_Monad.cml
+    extracted/Appraisal_Defs.cml
+    extracted/Evidence_Bundlers.cml
+    # extracted/IO_Type.cml
+    am/CoplandCommUtil.sml
+    stubs/IO_Stubs.sml
+    extracted/Cvm_St.cml 
+    extracted/Cvm_Monad.cml
+    extracted/Cvm_Impl.cml
+    extracted/Cvm_Run.cml
+    extracted/Example_Phrases_Demo.cml
+    extracted/Impl_appraisal.cml
+    extracted/Client_AM.cml
+    extracted/Server_AM.cml)
+
+get_files(server_am_src ${util_src} ${posix_src} ${cop_src})
+get_files(server_am_src_hacl ${util_src} ${posix_src_hacl} ${cop_src})
+get_files(server_am_src_tpm ${util_src} ${posix_src_tpm} ${cop_src})
+
+
 
 get_files(posix_c_files
     ${BASIS_FILE}
@@ -43,6 +122,7 @@ get_files(posix_c_files
     system/posix/sockets/socket_ffi.c
     system/posix/time/time_ffi.c
     system/posix/meas/meas_ffi.c
+    system/posix/sys/sys_ffi.c
 )
 get_files(posix_c_files_hacl
     ${BASIS_FILE}
@@ -50,6 +130,7 @@ get_files(posix_c_files_hacl
     system/posix/sockets/socket_ffi.c
     system/posix/time/time_ffi.c
     system/posix/meas/meas_ffi.c
+    system/posix/sys/sys_ffi.c
 )
 get_files(posix_c_files_tpm
     ${BASIS_FILE}
@@ -57,6 +138,7 @@ get_files(posix_c_files_tpm
     system/posix/sockets/socket_ffi.c
     system/posix/time/time_ffi.c
     system/posix/meas/meas_ffi.c
+    system/posix/sys/sys_ffi.c
 )
 
 # OS Config
@@ -132,3 +214,8 @@ foreach(appdir ${appdirs})
         add_subdirectory(${appdir})
     endif()
 endforeach()
+
+get_real_file("./build/CMakeLists.txt" temp)
+if (EXISTS ${temp})
+  add_subdirectory("build")
+endif()

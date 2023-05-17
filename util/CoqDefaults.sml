@@ -2,6 +2,12 @@
 
 (* Default Coq *)
 
+(*
+datatype 'a option = None
+                   | Some 'a
+*)
+                     
+
 datatype nat = O
              | S nat
 
@@ -21,6 +27,10 @@ val natToString = Int.toString o natToInt
 fun nat_plus n m =
     case n of O => m
             | S n' => S (nat_plus n' m)
+
+
+(* add alias added as temp fix for extraction purposes *)
+fun add n m = nat_plus n m
 
 fun nat_minus n m =
     case n of O => O
@@ -69,6 +79,9 @@ fun concatWith s l =
 
 (* Map functions *)
 
+
+(*
+
 type ('a, 'b) mymap = ('a * 'b) list
 
 val map_empty = []
@@ -82,6 +95,10 @@ fun map_set m k v = (k,v)::m
 fun map_dom m = case m
                  of [] => []
                   | ((i,a)::ms) => i :: map_dom ms
+
+*)
+
+                             
 
 (* It'd be nice if this could work *)
 (* 'f = 'a -> 'a -> order *)

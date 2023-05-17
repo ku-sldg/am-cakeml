@@ -1,0 +1,27 @@
+(** val in_dec : ('a1 -> 'a1 -> sumbool) -> 'a1 -> 'a1 list -> sumbool **)
+
+fun in_dec h a l = case l of
+  [] => Coq_right
+| y :: l0 =>
+  let val s = h y a in
+  (case s of
+     Coq_left => Coq_left
+   | Coq_right => in_dec h a l0) end
+
+(** val firstn : nat -> 'a1 list -> 'a1 list **)
+
+fun firstn n l =
+  case n of
+    O => []
+  | S n0 => (case l of
+               [] => []
+             | a :: l0 => a :: (firstn n0 l0))
+
+(** val skipn : nat -> 'a1 list -> 'a1 list **)
+
+fun skipn n l =
+  case n of
+    O => l
+  | S n0 => (case l of
+               [] => []
+             | _ :: l0 => skipn n0 l0)

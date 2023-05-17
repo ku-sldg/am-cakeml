@@ -1,0 +1,50 @@
+type ('s, 'a) coq_St = 's -> ('a option, 's) prod
+
+(** val ret : 'a2 -> ('a1, 'a2) coq_St **)
+
+fun ret a s =
+  Coq_pair (Some a) s
+
+(** val bind :
+    ('a1, 'a2) coq_St -> ('a2 -> ('a1, 'a3) coq_St) -> ('a1, 'a3) coq_St **)
+
+fun bind m f s =
+  let val Coq_pair a s' = m s in
+  (case a of
+     Some v => f v s'
+   | None => Coq_pair None s') end
+
+(** val failm : ('a1, 'a2) coq_St **)
+
+fun failm s =
+  Coq_pair None s
+
+(** val modify : ('a1 -> 'a1) -> ('a1, unit) coq_St **)
+
+fun modify f s =
+  Coq_pair (Some ()) (f s)
+
+(** val put : 'a1 -> ('a1, unit) coq_St **)
+
+fun put s _ =
+  Coq_pair (Some ()) s
+
+(** val get : ('a1, 'a1) coq_St **)
+
+fun get s =
+  Coq_pair (Some s) s
+
+(** val runSt : ('a1, 'a2) coq_St -> 'a1 -> ('a2 option, 'a1) prod **)
+
+fun runSt h =
+  h
+
+(** val evalSt : ('a1, 'a2) coq_St -> 'a1 -> 'a2 option **)
+
+fun evalSt h s =
+  fst (runSt h s)
+
+(** val execSt : ('a1, 'a2) coq_St -> 'a1 -> 'a1 **)
+
+fun execSt h s =
+  snd (h s)

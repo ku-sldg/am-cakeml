@@ -17,3 +17,17 @@ CMakeCache.txt
 # Editor stuff
 /.vscode
 *.code-workspace
+
+# Config files
+*src-prikey-handle.txt
+*src-prikey-wrap.bin
+*src-pub.bin
+*src-pub.pem
+*src-parentkey-handle.txt
+*client_data.txt
+#stubs/IO_Stubs_extra*
+#stubs/IO_Stubs_extra_orig.sml
+do_extract.sh
+
+# Backup files
+*backup.*

@@ -3,7 +3,7 @@ include(CMakePrintHelpers)
 
 ExternalProject_Add(tpm-tss
     GIT_REPOSITORY https://github.com/ku-sldg/am-tpm/
-    GIT_TAG origin/master
+    GIT_TAG origin/main
     GIT_PROGRESS True
     SOURCE_DIR ${CMAKE_BINARY_DIR}/tpm-tss
     CONFIGURE_COMMAND ""
@@ -38,7 +38,15 @@ function(add_tpm target)
         ${tpm_path}/ibmtss/Implementation.h
         ${tpm_path}/tss20.h
         ${tpm_path}/tssauth20.h
-        ${tpm_path}/sign.h)
+        ${tpm_path}/powerup.h
+        ${tpm_path}/startup.h 
+        ${tpm_path}/createprimary.h 
+        ${tpm_path}/create.h
+        ${tpm_path}/load.h
+        ${tpm_path}/sign.h
+        ${tpm_path}/flushcontext.h
+        ${tpm_path}/verifysignature.h
+        ${tpm_path}/objecttemplates.h)
     set(tss_files
         ${tpm_path}/tssfile.c
         ${tpm_path}/tsscryptoh.c
@@ -68,14 +76,23 @@ function(add_tpm target)
         ${tpm_path}/imalib.c
         ${tpm_path}/eventlib.c
         ${tpm_path}/efilib.c
-        ${tpm_path}/sign.c)
+        ${tpm_path}/powerup.c
+        ${tpm_path}/startup.c 
+        ${tpm_path}/createprimary.c 
+        ${tpm_path}/create.c 
+        ${tpm_path}/load.c 
+        ${tpm_path}/sign.c
+        ${tpm_path}/flushcontext.c 
+        ${tpm_path}/verifysignature.c 
+        ${tpm_path}/objecttemplates.c)
     set_source_files_properties(${tss_headers} PROPERTIES GENERATED True)
     set_source_files_properties(${tss_files} PROPERTIES GENERATED True)
     set_source_files_properties(${tss_util_files} PROPERTIES GENERATED True)
     target_sources(${target} PRIVATE ${tss_headers} ${tss_files} ${tss_util_files})
     add_compile_definitions(TPM_POSIX TPM_TPM20)
-    add_library(ibmtss ${tss_headers} ${tss_files})
-    add_library(ibmtssutils ${tss_headers} ${tss_util_files})
+    # add_library(ibmtss ${tss_headers} ${tss_files})
+    # add_library(ibmtssutils ${tss_headers} ${tss_util_files})
     target_include_directories(${target} BEFORE PRIVATE ${tpm_path})
+    target_sources(${target} PRIVATE ${tss_headers} ${tss_files} ${tss_util_files})
     add_dependencies(${target} tpm-tss)
 endfunction()

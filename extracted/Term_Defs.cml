@@ -1,0 +1,147 @@
+(** val asp_term_to_core : coq_ASP -> coq_Core_Term **)
+
+fun asp_term_to_core a = case a of
+  NULL => Coq_aspc NULLC
+| CPY => Coq_aspc CPYC
+| ASPC sp fwd params =>
+  (case sp of
+     ALL => Coq_aspc (ASPCC fwd params)
+   | NONE => Coq_lseqc (Coq_aspc CLEAR) (Coq_aspc (ASPCC fwd params)))
+| SIG => Coq_aspc (ASPCC EXTD sig_params)
+| HSH => Coq_aspc (ASPCC COMP hsh_params)
+| ENC q => Coq_aspc (ASPCC ENCR (enc_params q))
+
+(** val copland_compile : coq_Term -> coq_Core_Term **)
+
+fun copland_compile t = case t of
+  Coq_asp a => asp_term_to_core a
+| Coq_att q t' => Coq_attc q t'
+| Coq_lseq t1 t2 => Coq_lseqc (copland_compile t1) (copland_compile t2)
+| Coq_bseq s t1 t2 =>
+  let val Coq_pair s0 s1 = s in
+  (case s0 of
+     ALL =>
+     (case s1 of
+        ALL => Coq_bseqc (copland_compile t1) (copland_compile t2)
+      | NONE =>
+        Coq_bseqc (copland_compile t1) (Coq_lseqc (Coq_aspc CLEAR)
+          (copland_compile t2)))
+   | NONE =>
+     (case s1 of
+        ALL =>
+        Coq_bseqc (Coq_lseqc (Coq_aspc CLEAR) (copland_compile t1))
+          (copland_compile t2)
+      | NONE =>
+        Coq_bseqc (Coq_lseqc (Coq_aspc CLEAR) (copland_compile t1))
+          (Coq_lseqc (Coq_aspc CLEAR) (copland_compile t2)))) end
+| Coq_bpar s t1 t2 =>
+  let val Coq_pair s0 s1 = s in
+  (case s0 of
+     ALL =>
+     (case s1 of
+        ALL => Coq_bparc O (copland_compile t1) (copland_compile t2)
+      | NONE =>
+        Coq_bparc O (copland_compile t1) (Coq_lseqc (Coq_aspc CLEAR)
+          (copland_compile t2)))
+   | NONE =>
+     (case s1 of
+        ALL =>
+        Coq_bparc O (Coq_lseqc (Coq_aspc CLEAR) (copland_compile t1))
+          (copland_compile t2)
+      | NONE =>
+        Coq_bparc O (Coq_lseqc (Coq_aspc CLEAR) (copland_compile t1))
+          (Coq_lseqc (Coq_aspc CLEAR) (copland_compile t2)))) end
+
+(** val et_size : coq_Evidence -> nat **)
+
+fun et_size e = case e of
+  Coq_mt => O
+| Coq_nn _ => S O
+| Coq_uu _ fwd _ e' =>
+  (case fwd of
+     EXTD => add (S O) (et_size e')
+   | KILL => O
+   | KEEP => et_size e'
+   | _ => S O)
+| Coq_ss e1 e2 => add (et_size e1) (et_size e2)
+
+type coq_RawEv = coq_BS list
+
+datatype coq_EvC =
+  Coq_evc coq_RawEv coq_Evidence
+
+(** val mt_evc : coq_EvC **)
+
+val mt_evc =
+  Coq_evc [] Coq_mt
+
+(** val get_et : coq_EvC -> coq_Evidence **)
+
+fun get_et e = case e of
+  Coq_evc _ et => et
+
+(** val get_bits : coq_EvC -> coq_BS list **)
+
+fun get_bits e = case e of
+  Coq_evc ls _ => ls
+
+type coq_ReqAuthTok = coq_EvC
+
+(** val splitEv_T_l : coq_Split -> coq_Evidence -> coq_Evidence **)
+
+fun splitEv_T_l sp e =
+  let val Coq_pair s _ = sp in (case s of
+                                  ALL => e
+                                | NONE => Coq_mt) end
+
+(** val splitEv_T_r : coq_Split -> coq_Evidence -> coq_Evidence **)
+
+fun splitEv_T_r sp e =
+  let val Coq_pair _ s0 = sp in (case s0 of
+                                   ALL => e
+                                 | NONE => Coq_mt) end
+
+(** val sp_ev : coq_SP -> coq_Evidence -> coq_Evidence **)
+
+fun sp_ev sp e =
+  case sp of
+    ALL => e
+  | NONE => Coq_mt
+
+(** val eval_asp : coq_ASP -> coq_Plc -> coq_Evidence -> coq_Evidence **)
+
+fun eval_asp t p e =
+  case t of
+    NULL => Coq_mt
+  | CPY => e
+  | ASPC sp fwd params =>
+    (case fwd of
+       KILL => Coq_mt
+     | KEEP => sp_ev sp e
+     | _ => Coq_uu p fwd params (sp_ev sp e))
+  | SIG => Coq_uu p EXTD sig_params e
+  | HSH => Coq_uu p COMP hsh_params e
+  | ENC q => Coq_uu p ENCR (enc_params q) e
+
+(** val eval : coq_Term -> coq_Plc -> coq_Evidence -> coq_Evidence **)
+
+fun eval t p e =
+  case t of
+    Coq_asp a => eval_asp a p e
+  | Coq_att q t1 => eval t1 q e
+  | Coq_lseq t1 t2 => eval t2 p (eval t1 p e)
+  | Coq_bseq s t1 t2 =>
+    Coq_ss (eval t1 p (splitEv_T_l s e)) (eval t2 p (splitEv_T_r s e))
+  | Coq_bpar s t1 t2 =>
+    Coq_ss (eval t1 p (splitEv_T_l s e)) (eval t2 p (splitEv_T_r s e))
+
+datatype coq_Ev =
+  Coq_null nat coq_Plc
+| Coq_copy nat coq_Plc
+| Coq_umeas nat coq_Plc coq_ASP_PARAMS coq_Evidence
+| Coq_req nat coq_Plc coq_Plc coq_Term coq_Evidence
+| Coq_rpy nat coq_Plc coq_Plc coq_Evidence
+| Coq_split nat coq_Plc
+| Coq_join nat coq_Plc
+| Coq_cvm_thread_start coq_Loc coq_Plc coq_Core_Term coq_Evidence
+| Coq_cvm_thread_end coq_Loc

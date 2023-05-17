@@ -1,0 +1,20 @@
+(** val gen_nonce_bits : coq_BS **)
+
+val gen_nonce_bits =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val decrypt_bs_to_rawev : coq_BS -> coq_ASP_PARAMS -> coq_RawEv **)
+
+val decrypt_bs_to_rawev =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val check_asp_EXTD :
+    coq_ASP_PARAMS -> coq_Plc -> coq_BS -> coq_RawEv -> coq_BS **)
+
+val check_asp_EXTD =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val checkNonce : coq_BS -> coq_BS -> coq_BS **)
+
+val checkNonce =
+  failwith "AXIOM TO BE REALIZED"

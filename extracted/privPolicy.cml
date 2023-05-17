@@ -1,0 +1,28 @@
+(** val privPolicy :
+    coq_ID_Type coq_EqClass -> coq_Plc -> coq_Term -> bool **)
+
+fun privPolicy h sendPlc t = case t of
+  Coq_asp a =>
+  (case a of
+     ASPC _ _ a0 =>
+     let val Coq_asp_paramsC aspid _ rp _ = a0 in
+     (case eqb_aspid h aspid get_data_aspid of
+        True =>
+        (case eqb h sendPlc dest_plc of
+           True => eqb h rp source_plc
+         | False => False)
+      | False => True) end
+   | _ => True)
+| Coq_att _ t0 => privPolicy h sendPlc t0
+| Coq_lseq t1 t2 =>
+  (case privPolicy h sendPlc t1 of
+     True => privPolicy h sendPlc t2
+   | False => False)
+| Coq_bseq _ t1 t2 =>
+  (case privPolicy h sendPlc t1 of
+     True => privPolicy h sendPlc t2
+   | False => False)
+| Coq_bpar _ t1 t2 =>
+  (case privPolicy h sendPlc t1 of
+     True => privPolicy h sendPlc t2
+   | False => False)

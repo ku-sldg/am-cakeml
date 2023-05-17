@@ -1,0 +1,5 @@
+(** val eqb_aspid :
+    coq_ID_Type coq_EqClass -> coq_ASP_ID -> coq_ASP_ID -> bool **)
+
+val eqb_aspid =
+  eqb

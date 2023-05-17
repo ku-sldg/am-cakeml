@@ -175,9 +175,14 @@ fun healthRecordDemo globalMap =
                     | Ok msg =>
                         let
                             val healthRecordNotSigned =
-                                HealthRecord.healthRecord id
-                                    term (Json.fromBool True) None
-                                    serverId (HealthRecord.TcpIp host port)
+                                HealthRecord.healthRecord
+                                    id
+                                    term
+                                    (Json.fromBool True)
+                                    None
+                                    serverId
+                                    (HealthRecord.TcpIp host port)
+                                    signingKey
                                     (timestamp ())
                             val healthRecordSignedJSON =
                                 HealthRecord.signAndToJson

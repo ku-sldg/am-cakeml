@@ -1,3 +1,4 @@
+(* util/BinaryParser.sml *)
 structure BinaryParser =
 struct
     type stream = BString.bstring * int

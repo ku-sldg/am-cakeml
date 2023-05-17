@@ -1,0 +1,173 @@
+(** val put_ev : coq_EvC -> unit coq_CVM **)
+
+fun put_ev e =
+  bind get (fn st =>
+    let val tr' = let val Coq_mk_st _ st_trace _ _ = st in st_trace end in
+    let val p' = let val Coq_mk_st _ _ st_pl _ = st in st_pl end in
+    let val i = let val Coq_mk_st _ _ _ st_evid = st in st_evid end in
+    put (Coq_mk_st e tr' p' i) end end end)
+
+(** val get_ev : coq_EvC coq_CVM **)
+
+val get_ev =
+  bind get (fn st => ret (let val Coq_mk_st st_ev _ _ _ = st in st_ev end))
+
+(** val get_pl : coq_Plc coq_CVM **)
+
+val get_pl =
+  bind get (fn st => ret (let val Coq_mk_st _ _ st_pl _ = st in st_pl end))
+
+(** val inc_id : coq_Event_ID coq_CVM **)
+
+val inc_id =
+  bind get (fn st =>
+    let val tr' = let val Coq_mk_st _ st_trace _ _ = st in st_trace end in
+    let val e' = let val Coq_mk_st st_ev _ _ _ = st in st_ev end in
+    let val p' = let val Coq_mk_st _ _ st_pl _ = st in st_pl end in
+    let val i = let val Coq_mk_st _ _ _ st_evid = st in st_evid end in
+    bind (put (Coq_mk_st e' tr' p' (add i (S O)))) (fn _ => ret i) end end end end)
+
+(** val add_trace : coq_Ev list -> cvm_st -> cvm_st **)
+
+fun add_trace tr' pat =
+  let val Coq_mk_st e tr p i = pat in Coq_mk_st e (app tr tr') p i end
+
+(** val add_tracem : coq_Ev list -> unit coq_CVM **)
+
+fun add_tracem tr =
+  modify (add_trace tr)
+
+(** val split_ev : unit coq_CVM **)
+
+val split_ev =
+  bind get_pl (fn p =>
+    bind inc_id (fn i => add_tracem ((Coq_split i p) :: [])))
+
+(** val tag_ASP :
+    coq_ASP_PARAMS -> coq_Plc -> coq_EvC -> coq_Event_ID coq_CVM **)
+
+fun tag_ASP params mpl e =
+  bind inc_id (fn x =>
+    bind (add_tracem ((Coq_umeas x mpl params (get_et e)) :: [])) (fn _ =>
+      ret x))
+
+(** val fwd_asp :
+    coq_FWD -> coq_BS -> coq_EvC -> coq_Plc -> coq_ASP_PARAMS -> coq_EvC **)
+
+fun fwd_asp fwd bs e p ps =
+  case fwd of
+    COMP => cons_hsh bs e p ps
+  | ENCR => cons_enc bs e p ps
+  | EXTD => cons_gg bs e p ps
+  | KILL => mt_evc
+  | KEEP => e
+
+(** val invoke_ASP : coq_FWD -> coq_ASP_PARAMS -> coq_EvC coq_CVM **)
+
+fun invoke_ASP fwd params =
+  bind get_ev (fn e =>
+    bind get_pl (fn p =>
+      bind (tag_ASP params p e) (fn _ =>
+        bind (do_asp' params (get_bits e)) (fn bs =>
+          ret (fwd_asp fwd bs e p params)))))
+
+(** val copyEv : coq_EvC coq_CVM **)
+
+val copyEv =
+  bind get_pl (fn p =>
+    bind inc_id (fn x =>
+      bind (add_tracem ((Coq_copy x p) :: [])) (fn _ => get_ev)))
+
+(** val nullEv : coq_EvC coq_CVM **)
+
+val nullEv =
+  bind get_pl (fn p =>
+    bind inc_id (fn x =>
+      bind (add_tracem ((Coq_null x p) :: [])) (fn _ => ret mt_evc)))
+
+(** val clearEv : unit -> coq_EvC coq_CVM **)
+
+fun clearEv _ =
+  ret mt_evc
+
+(** val do_prim : coq_ASP_Core -> coq_EvC coq_CVM **)
+
+fun do_prim a = case a of
+  NULLC => nullEv
+| CLEAR => clearEv ()
+| CPYC => copyEv
+| ASPCC fwd params => invoke_ASP fwd params
+
+(** val inc_remote_event_ids : coq_Term -> unit coq_CVM **)
+
+fun inc_remote_event_ids t =
+  bind get (fn st =>
+    let val tr' = let val Coq_mk_st _ st_trace _ _ = st in st_trace end in
+    let val e' = let val Coq_mk_st st_ev _ _ _ = st in st_ev end in
+    let val p' = let val Coq_mk_st _ _ st_pl _ = st in st_pl end in
+    let val i = let val Coq_mk_st _ _ _ st_evid = st in st_evid end in
+    let val new_i = add i (event_id_span' t) in
+    put (Coq_mk_st e' tr' p' new_i) end end end end end)
+
+(** val inc_par_event_ids : coq_Core_Term -> unit coq_CVM **)
+
+fun inc_par_event_ids t =
+  bind get (fn st =>
+    let val tr' = let val Coq_mk_st _ st_trace _ _ = st in st_trace end in
+    let val e' = let val Coq_mk_st st_ev _ _ _ = st in st_ev end in
+    let val p' = let val Coq_mk_st _ _ st_pl _ = st in st_pl end in
+    let val i = let val Coq_mk_st _ _ _ st_evid = st in st_evid end in
+    let val new_i = add i (event_id_span t) in
+    put (Coq_mk_st e' tr' p' new_i) end end end end end)
+
+(** val tag_REQ :
+    coq_Term -> coq_Plc -> coq_Plc -> coq_EvC -> unit coq_CVM **)
+
+fun tag_REQ t p q e =
+  bind inc_id (fn reqi => add_tracem ((Coq_req reqi p q t (get_et e)) :: []))
+
+(** val tag_RPY : coq_Plc -> coq_Plc -> coq_EvC -> unit coq_CVM **)
+
+fun tag_RPY p q e =
+  bind inc_id (fn rpyi => add_tracem ((Coq_rpy rpyi p q (get_et e)) :: []))
+
+(** val remote_session :
+    coq_Term -> coq_Plc -> coq_Plc -> coq_EvC -> coq_EvC coq_CVM **)
+
+fun remote_session t p q e =
+  bind (tag_REQ t p q e) (fn _ =>
+    bind (doRemote_session' t q e) (fn e' =>
+      bind (add_tracem (cvm_events t q (get_et e))) (fn _ =>
+        bind (inc_remote_event_ids t) (fn _ => ret e'))))
+
+(** val doRemote : coq_Term -> coq_Plc -> coq_EvC -> coq_EvC coq_CVM **)
+
+fun doRemote t q e =
+  bind get_pl (fn p =>
+    bind (remote_session t p q e) (fn e' =>
+      bind (tag_RPY p q e') (fn _ => ret e')))
+
+(** val join_seq : coq_EvC -> coq_EvC -> unit coq_CVM **)
+
+fun join_seq e1 e2 =
+  bind get_pl (fn p =>
+    bind inc_id (fn n =>
+      bind (put_ev (ss_cons e1 e2)) (fn _ =>
+        add_tracem ((Coq_join n p) :: []))))
+
+(** val start_par_thread :
+    coq_Loc -> coq_Core_Term -> coq_EvC -> unit coq_CVM **)
+
+fun start_par_thread loc t e =
+  bind get_pl (fn p =>
+    bind (do_start_par_thread loc t (get_bits e)) (fn _ =>
+      add_tracem ((Coq_cvm_thread_start loc p t (get_et e)) :: [])))
+
+(** val wait_par_thread :
+    coq_Loc -> coq_Core_Term -> coq_EvC -> coq_EvC coq_CVM **)
+
+fun wait_par_thread loc t _ =
+  bind get_pl (fn _ =>
+    bind (do_wait_par_thread loc) (fn e' =>
+      bind (add_tracem ((Coq_cvm_thread_end loc) :: [])) (fn _ =>
+        bind (inc_par_event_ids t) (fn _ => ret e'))))

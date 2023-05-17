@@ -1,7 +1,7 @@
 (* No dependencies *)
 
 (* Extensions to structures in the standard library *)
-
+exception Exception string
 structure ListExtra = struct
     (* int -> 'a -> 'a list *)
     fun replicate len a = List.genlist (const a) len
@@ -40,6 +40,18 @@ structure ListExtra = struct
           (Some x) :: xs' => x :: (filterSome xs')
         | None :: xs' => filterSome xs'
         | [] => []
+
+    (* The actual recursive implementation of find_index 
+        : 'a list -> 'a -> int -> int *)
+    fun find_index_rec xs x curInd =
+        case xs of
+          h::t =>  if (h = x) then curInd else (find_index_rec t x (curInd + 1))
+        | [] => ~1
+
+    (* finds the index of an item in a list, and -1 if it is not in
+        will always return the first index it can find
+        : 'a list -> 'a -> int *)
+    fun find_index xs x = find_index_rec xs x 0
 end
 
 structure OptionExtra = struct 
@@ -116,8 +128,7 @@ structure StringExtra = struct
     fun foldl f z s = List.foldl f z (String.explode s)
 
     (* (int -> 'a -> char -> 'a) -> 'a -> string -> 'a *)
-    (* Seems to be a typo in the standard library. Should be "List.foldli" *)
-    fun foldli f z s = List.foldi f z (String.explode s)
+    fun foldli f z s = List.foldli f z (String.explode s)
 
     (* crlfLines : string -> string list
      * Takes a string and splits it into a list of substrings at whereever the
@@ -222,6 +233,13 @@ structure TextIOExtra = struct
         in TextIO.closeIn fd;
             text
         end
+
+    fun writeFile (filename : string) (text : string) =
+        (let val fd = TextIO.openOut filename
+        in
+          TextIO.output fd text;
+          TextIO.closeOut fd
+        end) : unit
 end
 
 structure MapExtra = struct
