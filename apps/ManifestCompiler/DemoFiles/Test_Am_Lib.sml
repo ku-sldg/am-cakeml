@@ -52,7 +52,7 @@ val plcServer_cb = (fn plcServerAddr => fn plc =>
 
 val uuidServer_cb = (fn _ => fn _ => "OUTPUT_PLC") : (coq_ASP_Address -> coq_CakeML_uuidCallback)
 
-val client_am_library = 
+val am_library = 
   (Build_AM_Library 
     aspServer_cb pubKeyServer_cb plcServer_cb uuidServer_cb
     
