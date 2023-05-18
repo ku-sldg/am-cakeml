@@ -30,8 +30,6 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   # First let us compile the server and then run it
   tmux new-session -d -s ServerProcess 'bash -i'
   tmux send-keys -t 0 "( $BUILT_AM -m $BUILT_CONC_MAN -k $SERVER_PRIV_KEY )" Enter
-    # '(./build/COMPILED_AM -m ./concrete_manifest.json -k ../apps/ManifestCompiler/DemoFiles/Test_Server_PrivKey)'
-
 
   # Setup tmux windows
   tmux split-window -h 'bash -i'
@@ -41,8 +39,6 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   # Sending a chain of first AM comp, run, second AM comp, run
   tmux send-keys -t 1 \
     "($MAN_COMP -c -m $CLIENT_FORM_MAN -l $CLIENT_AM_LIB) && ($BUILT_AM -m $BUILT_CONC_MAN -k $CLIENT_PRIV_KEY) && ($MAN_COMP -c -m $CLIENT_FORM_MAN -l $CLIENT_AM_LIB2) && ($BUILT_AM -m $BUILT_CONC_MAN -k $CLIENT_PRIV_KEY)" Enter
-    # '(./apps/ManifestCompiler/manComp_demo -c -m ../apps/ManifestCompiler/DemoFiles/Test_FormMan.sml -l ../apps/ManifestCompiler/DemoFiles/Test_Am_Lib2.sml) && (./build/COMPILED_AM -m ./concrete_manifest.json -k ../apps/ManifestCompiler/DemoFiles/Test_PrivKey)' Enter
-
   tmux attach-session -d -t ServerProcess
 
 else

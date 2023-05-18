@@ -41,7 +41,7 @@ structure ManCompConfig = struct
                   let val formManFile = List.nth argList (formManInd + 1)
                       val amLibFile = List.nth argList (amLibInd + 1)
                       (* If we have the client compile flag, it will <> -1 *)
-                      val buildClient = not (clientCompileInd = ~1)
+                      val buildClient = clientCompileInd <> ~1
                   in
                     ((formManFile, amLibFile, defaultExecOut, defaultConcreteOut, (if buildClient then "CLIENT" else "SERVER")) : ManCompArgs)
                   end
