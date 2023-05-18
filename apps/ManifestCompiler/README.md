@@ -22,7 +22,8 @@ The Manifest Compiler expects the cakeml vairables for the formal manifest and t
 First, make sure you have made the Manifest Compiler target.
 This will be done via `make manifest_compiler` (within the build folder), which will output the
 ManifestCompiler executable (currently called manComp_demo).
-This file will be run from `./build/apps/ManifestCompiler/manComp_demo -m <manifest> -l <am_library>`.
+This file will be run from `./build/apps/ManifestCompiler/manComp_demo -m <manifest> -l <am_library> [-c | -s]`.
+The options `-c` will set it to compile as a client, and `-s` will make it compile as a server.
 
 This will create the actual AM executable (and it does not currently output a Concrete Manifest, due to the Concrete and Formal being so similar some re-work may be merited).
 This executable will be dropped in `./build/build/COMPILED_AM` and can be run as `COMPILED_AM -m <concrete_manifest>.json`.
