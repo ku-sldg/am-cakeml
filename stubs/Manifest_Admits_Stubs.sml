@@ -13,3 +13,7 @@ type coq_PrivateKey = BString.bstring (* AXIOM TO BE REALIZED *)
 fun coq_Eq_Class_private_key x y = (x = y)
 
 type coq_PolicyT = bool (* AXIOM TO BE REALIZED *)
+
+val empty_PolicyT = True
+
+val empty_Manifest_Plc = "empty_Plc"

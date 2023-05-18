@@ -81,6 +81,7 @@ get_files(cop_src
     extracted/Manifest.cml
     util/ManifestUtils.sml
     copland/CoplandUtil.sml
+    stubs/Example_Phrases_Admits.sml
     stubs/Example_Phrases_Demo_Admits.sml
     stubs/IO_Stubs_extra.sml
     am/CommTypes.sml
@@ -105,7 +106,9 @@ get_files(cop_src
     extracted/Cvm_Monad.cml
     extracted/Cvm_Impl.cml
     extracted/Cvm_Run.cml
+    extracted/Example_Phrases.cml
     extracted/Example_Phrases_Demo.cml
+    extracted/Negotiation_Dec.cml
     extracted/Impl_appraisal.cml
     extracted/Client_AM.cml
     extracted/Server_AM.cml)

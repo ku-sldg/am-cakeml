@@ -15,3 +15,13 @@ val coq_Eq_Class_public_key =
   failwith "AXIOM TO BE REALIZED"
 
 type coq_PolicyT (* AXIOM TO BE REALIZED *)
+
+(** val empty_PolicyT : coq_PolicyT **)
+
+val empty_PolicyT =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val empty_Manifest_Plc : coq_Plc **)
+
+val empty_Manifest_Plc =
+  failwith "AXIOM TO BE REALIZED"

@@ -11,6 +11,11 @@ datatype coq_Manifest =
   Build_Manifest coq_Plc (coq_ASP_ID list) (coq_Plc list) (coq_Plc list)
    coq_PolicyT
 
+(** val empty_Manifest : coq_Manifest **)
+
+val empty_Manifest =
+  Build_Manifest empty_Manifest_Plc [] [] [] empty_PolicyT
+
 datatype coq_AM_Library =
   Build_AM_Library ((coq_ASP_Address -> coq_CakeML_ASPCallback))
    ((coq_ASP_Address -> coq_CakeML_PubKeyCallback))

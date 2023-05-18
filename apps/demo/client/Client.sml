@@ -1,5 +1,7 @@
 (* Depends on: util, copland, am/Measurements, am/ServerAm *)
 
+val generated_formal_manifest = man_gen_res
+
 (* NOTE: Hardcoding of source place is here now *)
 val formal_manifest = 
   (Build_Manifest 

@@ -1,0 +1,11 @@
+datatype coq_Permission =
+  READ 
+| WRITE 
+| EXECUTE 
+
+datatype coq_Object =
+  Coq_asp_obj coq_Plc coq_ASP_ID
+| Coq_plc_obj coq_Plc
+| Coq_targ_obj coq_Plc coq_TARG_ID
+
+type coq_AC_Policy = coq_Permission -> coq_Object -> bool
