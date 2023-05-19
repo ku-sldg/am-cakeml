@@ -8,6 +8,12 @@ fun in_dec h a l = case l of
      Coq_left => Coq_left
    | Coq_right => in_dec h a l0) end
 
+(** val map : ('a1 -> 'a2) -> 'a1 list -> 'a2 list **)
+
+fun map f l = case l of
+  [] => []
+| a :: t => (f a) :: (map f t)
+
 (** val firstn : nat -> 'a1 list -> 'a1 list **)
 
 fun firstn n l =

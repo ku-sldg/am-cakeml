@@ -181,6 +181,45 @@ structure ManifestJsonConfig = struct
     end
 
 
+  (* Encodes a coq_Manifest into its JSON representation 
+    : coq_Manifest -> Json.json *)
+  fun encode_Manifest (cm : coq_Manifest) =
+    let val (Build_Manifest myplc aspidList uuidPlcList pubkeyPlcList policyVal) = cm
+        val cmJson = [
+          ("myplc", Json.fromString myplc),
+          (* ("uuid", Json.fromString uuid),
+          ("privateKey", (cast_and_encode privateKey BString.show)), *)
+          ("aspidList", (aspidListToJsonList aspidList)),
+          ("uuidPlcList", (placeListToJsonList uuidPlcList)),
+          ("pubkeyPlcList", (placeListToJsonList pubkeyPlcList)),
+          ("policyVal", Json.fromBool policyVal)
+        ]
+    in
+      Json.fromMap (Map.fromList String.compare cmJson)
+    end
+
+(*
+
+  (* Parses Json representation of a formal manifest into a coq_Manifest 
+    : Json.json -> coq_Manifest *)
+  fun extract_Manifest (j : Json.json) =
+    let val plc = (parse_and_cast j "myplc" string_cast)
+        (* val uuid = (parse_and_cast j "uuid" string_cast)
+        val privateKey = (parse_and_cast j "privateKey" bstring_cast) *)
+        val plcMap = extract_plcMap j
+        val pubKeyMap = extract_pubKeyMap j
+        val aspServer_addr = (parse_and_cast j "aspServer" string_cast)
+        val pubKeyServer_addr = (parse_and_cast j "pubKeyServer" string_cast)
+        val plcServer_addr = (parse_and_cast j "plcServer" string_cast)
+        val uuidServer_addr = (parse_and_cast j "uuidServer" string_cast)
+    in
+      (Build_ConcreteManifest plc plcMap pubKeyMap
+        aspServer_addr pubKeyServer_addr plcServer_addr uuidServer_addr)
+    end
+    *)
+    
+
+
   fun parse_private_key file =
     BString.unshow (TextIOExtra.readFile file)
 

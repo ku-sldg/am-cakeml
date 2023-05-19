@@ -1,6 +1,49 @@
 (* Depends on: util, copland, am/Measurements, am/ServerAm *)
 
-val generated_formal_manifest = man_gen_res
+(* val generated_formal_manifest = man_gen_res *)
+
+(*
+List.map: ('a -> 'b) -> 'a list -> 'b list
+*)
+
+fun print_json_man_id (m:coq_Manifest) =
+    let val _ = print ("\n" ^ (Json.stringify (ManifestJsonConfig.encode_Manifest m)) ^ "\n") in
+    m
+    end
+
+fun print_json_man_list (ls: coq_Manifest list) =
+    List.map print_json_man_id ls
+
+
+(* 
+val manifest_env : coq_Environment = man_gen_run
+
+val man_list : coq_Manifest list = environment_to_manifest_list manifest_env
+
+val fst_man : coq_Manifest = List.hd man_list
+
+val snd_man : coq_Manifest = List.hd (List.tl man_list)
+
+val json_fst_man : Json.json = ManifestJsonConfig.encode_Manifest fst_man
+
+val json_snd_man : Json.json = ManifestJsonConfig.encode_Manifest snd_man
+
+val json_fst_man_string : string = Json.stringify json_fst_man
+
+val json_snd_man_string : string = Json.stringify json_snd_man
+
+*)
+
+val _ = print_json_man_list example_man_gen_run (* man_list *)
+
+
+(*
+
+val _ = print ("\n\n" ^ "Manifest json string(fst):  \n" ^ json_fst_man_string ^ "\n\n")
+
+val _ = print ("\n\n" ^ "Manifest json string(snd):  \n" ^ json_snd_man_string ^ "\n\n")
+
+*)
 
 (* NOTE: Hardcoding of source place is here now *)
 val formal_manifest = 

@@ -13,8 +13,14 @@ fun appraise p targ =
 fun certificate p targ =
   Coq_asp (ASPC ALL EXTD (Coq_asp_paramsC cert_id [] p targ))
 
-(** val cert_style : coq_Term **)
+(** val store : coq_Plc -> coq_TARG_ID -> coq_Term **)
 
-val cert_style =
-  Coq_att coq_P1 (Coq_lseq (attest coq_P1 sys) (Coq_att coq_P2 (Coq_lseq
-    (appraise coq_P2 sys) (certificate coq_P2 sys))))
+fun store p targ =
+  Coq_asp (ASPC ALL EXTD (Coq_asp_paramsC cache_id store_args p targ))
+
+(** val cert_style_test : coq_Term **)
+
+val cert_style_test =
+  Coq_att coq_P1 (Coq_lseq (attest coq_P1 sys) (Coq_lseq (Coq_att coq_P2
+    (Coq_lseq (appraise coq_P2 sys) (certificate coq_P2 sys))) (Coq_att
+    coq_P3 (store coq_P1 cache))))
