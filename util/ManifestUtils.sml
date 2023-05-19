@@ -228,11 +228,35 @@ structure ManifestJsonConfig = struct
         val asps = extract_list_items j "asps"
         val uuidPlcs = extract_list_items j "uuidPlcs"
         val pubKeyPlcs = extract_list_items j "pubKeyPlcs"
-        val policy = (parse_and_cast j "policy" bool_cast)
+        val policy = case (Json.lookup "policy" j) of
+                        None => raise (Excn "Cannot find policy in Json for formal manifest\n")
+                        | Some p => 
+                            case (Json.toBool p) of
+                              None => raise (Excn "Policy found but was not a bool")
+                              | Some v => v
     in
       (Build_Manifest plc asps uuidPlcs pubKeyPlcs policy)
     end
 
+
+  fun write_FormalManifest_file (c : coq_Manifest) =
+    (let val (Build_Manifest my_plc asps uuidPlcs pubKeyPlcs policy) = c
+        val fileName = ("FormalManifest_" ^ my_plc ^ ".sml")
+        val _ = TextIOExtra.writeFile fileName ("val formal_manifest = \n\t(Build_Manifest \n\t\t\"" ^ my_plc ^ 
+          "\"\n\t\t" ^ (listToString asps (fn a => a)) ^ 
+          "\n\t\t" ^ (listToString uuidPlcs (fn a => ("\"" ^ a ^ "\""))) ^ 
+          "\n\t\t" ^ (listToString pubKeyPlcs (fn a => ("\"" ^ a ^ "\""))) ^ 
+          "\n\t\t" ^ (Bool.toString policy) ^ "\n\t) : coq_Manifest")
+        val _ = c_system ("chmod 777 " ^ fileName)
+    in
+      ()
+    end
+    handle 
+      TextIO.BadFileName => raise Excn "Bad file name"
+      | TextIO.InvalidFD   => raise Excn "Invalid file descriptor") : unit
+
+  fun write_FormalManifestList (cl : coq_Manifest list) =
+    List.map write_FormalManifest_file cl
 
   fun parse_private_key file =
     BString.unshow (TextIOExtra.readFile file)

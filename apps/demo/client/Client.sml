@@ -6,7 +6,10 @@ fun print_json_man_id (m:coq_Manifest) =
     end
 
 fun print_json_man_list (ls: coq_Manifest list) =
-    List.map print_json_man_id ls
+    let val _ = List.map print_json_man_id ls
+    in
+      ()
+    end
 
 (*  
   Extracted helper function used in print_json_man_list_verbose below:
@@ -18,10 +21,13 @@ fun print_json_man_list (ls: coq_Manifest list) =
 *)
 
 fun print_json_man_list_verbose (t:coq_Term) (p:coq_Plc) = 
-   let val _ = print ("\nFormal Manifests generated from phrase: \n\n'" ^ (termToString t) ^ "'\n\nat top-level place: \n'" ^ p ^ "': \n")
-       val demo_man_list : coq_Manifest list = demo_man_gen_run t p in
-   print_json_man_list demo_man_list
-   end
+  let val _ = print ("\nFormal Manifests generated from phrase: \n\n'" ^ (termToString t) ^ "'\n\nat top-level place: \n'" ^ p ^ "': \n")
+      val demo_man_list : coq_Manifest list = demo_man_gen_run t p 
+      val _ = ManifestJsonConfig.write_FormalManifestList demo_man_list
+  in
+    (print_json_man_list demo_man_list) : unit
+  end
+  handle ManifestJsonConfig.Excn e => TextIOExtra.printLn e
 
 
 val _ = print_json_man_list_verbose cert_style coq_P0
