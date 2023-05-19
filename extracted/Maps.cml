@@ -24,12 +24,6 @@ fun map_get h m x =
 fun map_set _ m x v =
   (Coq_pair x v) :: m
 
-(** val map_vals : 'a1 coq_EqClass -> ('a1, 'a2) coq_MapC -> 'a2 list **)
-
-fun map_vals h m = case m of
-  [] => []
-| p :: m' => let val Coq_pair _ v = p in v :: (map_vals h m') end
-
 type ('a, 'b) coq_MapD = ('a, 'b) prod list
 
 (** val mapD_get_key :
