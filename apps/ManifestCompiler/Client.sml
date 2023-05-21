@@ -6,7 +6,7 @@ val kim_meas = Coq_asp (ASPC ALL EXTD (Coq_asp_paramsC kim_meas_aspid [] dest_pl
 fun main () =
     let val authb = True
         val (concreteMan, privKey) = ManifestJsonConfig.retrieve_CLI_args () 
-        val (concrete, privKey, aspDisp, plcDisp, pubKeyDisp, uuidDisp) = ManifestUtils.setup_and_get_AM_config formal_manifest client_am_library concreteMan privKey
+        val (concrete, privKey, aspDisp, plcDisp, pubKeyDisp, uuidDisp) = ManifestUtils.setup_and_get_AM_config formal_manifest am_library concreteMan privKey
         val (Build_ConcreteManifest plc plcMap pubKeyMap aspServer_addr pubKeyServer_addr plcServer_addr uuidServer_addr) = concrete
         val main_phrase = kim_meas (*demo_phrase3*)
         (* Retrieving implicit self place from manifest here *)

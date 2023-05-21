@@ -1,8 +1,8 @@
 (* Depends on: util, copland, am/Measurements, am/ServerAm *)
 
 fun main () =
-    (* Retrieve the provided "formal_manifest" and "client_am_library" *)
-    let val concrete = ManifestUtils.compile_manifest formal_manifest client_am_library 
+    (* Retrieve the provided "formal_manifest" and "am_library" *)
+    let val concrete = ManifestUtils.compile_manifest formal_manifest am_library 
         val concreteJson = ManifestJsonConfig.encode_ConcreteManifest concrete
         (* TODO: Note that the name is hardcoded right now *)
         val concManFile = "concrete_manifest.json"

@@ -15,7 +15,7 @@ val aspMapping = (mapC_from_pairList
       fn par => fn plc => fn bs => fn rawEv => store_clientData_asp_stub par rawEv),
     (ssl_sig_aspid,
       fn par => fn plc => fn bs => fn rawEv => 
-        let val _ = print "\nNew SSL ASP STUB\n"
+        let val _ = print "\nORIGINAL SSL ASP STUB\n"
         in
           ssl_sig_asp_stub par rawEv
         end),
@@ -52,7 +52,7 @@ val plcServer_cb = (fn plcServerAddr => fn plc =>
 
 val uuidServer_cb = (fn _ => fn _ => "OUTPUT_PLC") : (coq_ASP_Address -> coq_CakeML_uuidCallback)
 
-val client_am_library = 
+val am_library = 
   (Build_AM_Library 
     aspServer_cb pubKeyServer_cb plcServer_cb uuidServer_cb
     
