@@ -13,6 +13,9 @@ val coq_P1 = "P1"
 val coq_P2 = "P2"
   (* failwith "AXIOM TO BE REALIZED" *)
 
+val coq_P3 = "P3"
+  (* failwith "AXIOM TO BE REALIZED" *)
+
 (** val attest_id : coq_ASP_ID **)
 
 val attest_id = "attest_aspid"
@@ -28,7 +31,16 @@ val appraise_id = "appraise_aspid"
 val cert_id = "cert_aspid"
   (* failwith "AXIOM TO BE REALIZED" *)
 
+val cache_id = "cache_aspid"
+  (* failwith "AXIOM TO BE REALIZED" *)
+
+val store_args = []
+  (* failwith "AXIOM TO BE REALIZED" *)
+
 (** val sys : coq_TARG_ID **)
 
 val sys = "sys_targid"
+  (* failwith "AXIOM TO BE REALIZED" *)
+
+val cache = "cache_targid"
   (* failwith "AXIOM TO BE REALIZED" *)

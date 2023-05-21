@@ -11,6 +11,18 @@ fun aspid_manifest_update i m =
   let val Build_Manifest oldPlc oldasps oldKnowsOf oldContext oldPolicy = m in
   Build_Manifest oldPlc (i :: oldasps) oldKnowsOf oldContext oldPolicy end
 
+(** val knowsof_manifest_update : coq_Plc -> coq_Manifest -> coq_Manifest **)
+
+fun knowsof_manifest_update toPlc m =
+  let val Build_Manifest oldPlc oldasps oldKnowsOf oldContext oldPolicy = m in
+  Build_Manifest oldPlc oldasps (toPlc :: oldKnowsOf) oldContext oldPolicy end
+
+(** val myPlc_manifest_update : coq_Plc -> coq_Manifest -> coq_Manifest **)
+
+fun myPlc_manifest_update p m =
+  let val Build_Manifest _ oldasps oldKnowsOf oldContext oldPolicy = m in
+  Build_Manifest p oldasps oldKnowsOf oldContext oldPolicy end
+
 (** val asp_manifest_update : coq_ASP -> coq_Manifest -> coq_Manifest **)
 
 fun asp_manifest_update a m =
@@ -31,13 +43,27 @@ fun asp_manifest_generator a p e =
     let val m' = asp_manifest_update a empty_Manifest in
     map_set coq_Eq_Class_ID_Type e p m' end
 
+(** val plc_manifest_generator :
+    coq_Plc -> coq_Plc -> coq_Environment -> coq_Environment **)
+
+fun plc_manifest_generator fromPlc toPlc e =
+  case map_get coq_Eq_Class_ID_Type e fromPlc of
+    Some m =>
+    let val m' = knowsof_manifest_update toPlc m in
+    map_set coq_Eq_Class_ID_Type e fromPlc m' end
+  | None =>
+    let val m' = knowsof_manifest_update toPlc empty_Manifest in
+    map_set coq_Eq_Class_ID_Type e fromPlc m' end
+
 (** val manifest_generator' :
     coq_Term -> coq_Plc -> coq_Environment -> coq_Environment **)
 
 fun manifest_generator' t p e =
   case t of
     Coq_asp a => asp_manifest_generator a p e
-  | Coq_att q t' => manifest_generator' t' q e
+  | Coq_att q t' =>
+    let val e' = plc_manifest_generator p q e in
+    manifest_generator' t' q e' end
   | Coq_lseq t1 t2 => manifest_generator' t2 p (manifest_generator' t1 p e)
   | Coq_bseq _ t1 t2 => manifest_generator' t2 p (manifest_generator' t1 p e)
   | Coq_bpar _ t1 t2 => manifest_generator' t2 p (manifest_generator' t1 p e)
@@ -47,10 +73,20 @@ fun manifest_generator' t p e =
 fun manifest_generator t p =
   manifest_generator' t p e_empty
 
-(** val man_gen_run : coq_Environment **)
+(** val places' : coq_Term -> coq_Plc list -> coq_Plc list **)
 
-val man_gen_run =
-  manifest_generator cert_style coq_P0
+fun places' t ls =
+  case t of
+    Coq_asp _ => ls
+  | Coq_att q t' => q :: (places' t' ls)
+  | Coq_lseq t1 t2 => places' t2 (places' t1 ls)
+  | Coq_bseq _ t1 t2 => places' t2 (places' t1 ls)
+  | Coq_bpar _ t1 t2 => places' t2 (places' t1 ls)
+
+(** val places : coq_Term -> coq_Plc -> coq_Plc list **)
+
+fun places t p =
+  p :: (places' t [])
 
 (** val fromSome : 'a1 option -> 'a1 -> 'a1 **)
 
@@ -59,7 +95,31 @@ fun fromSome v a =
     Some v' => v'
   | None => a
 
-(** val man_gen_res : coq_Manifest **)
+(** val get_manifest_env_default :
+    coq_Environment -> coq_Plc -> coq_Manifest **)
 
-val man_gen_res =
-  fromSome (map_get coq_Eq_Class_ID_Type man_gen_run coq_P1) empty_Manifest
+fun get_manifest_env_default e p =
+  let val m' = fromSome (map_get coq_Eq_Class_ID_Type e p) empty_Manifest in
+  myPlc_manifest_update p m' end
+
+(** val get_unique_manifests_env' :
+    coq_Plc list -> coq_Environment -> coq_Manifest list **)
+
+fun get_unique_manifests_env' ps e =
+  map (get_manifest_env_default e) ps
+
+(** val get_unique_manifests_env :
+    coq_Term -> coq_Plc -> coq_Environment -> coq_Manifest list **)
+
+fun get_unique_manifests_env t p e =
+  let val ps = places t p in get_unique_manifests_env' ps e end
+
+(** val man_gen_run : coq_Term -> coq_Plc -> coq_Environment **)
+
+val man_gen_run =
+  manifest_generator
+
+(** val demo_man_gen_run : coq_Term -> coq_Plc -> coq_Manifest list **)
+
+fun demo_man_gen_run t p =
+  get_unique_manifests_env t p (man_gen_run t p)

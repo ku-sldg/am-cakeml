@@ -79,7 +79,6 @@ get_files(cop_src
     stubs/Maps.sml
     stubs/Manifest_Admits_Stubs.sml
     extracted/Manifest.cml
-    util/ManifestUtils.sml
     copland/CoplandUtil.sml
     stubs/Example_Phrases_Admits.sml
     stubs/Example_Phrases_Demo_Admits.sml
@@ -87,6 +86,7 @@ get_files(cop_src
     am/CommTypes.sml
     copland/json/CoplandToJson.sml
     copland/json/JsonToCopland.sml
+    util/ManifestUtils.sml
     extracted/privPolicy.cml
     apps/blockchain/Blockchain.sml
     apps/blockchain/HealthRecord.sml

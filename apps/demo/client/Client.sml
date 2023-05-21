@@ -1,6 +1,37 @@
 (* Depends on: util, copland, am/Measurements, am/ServerAm *)
 
-val generated_formal_manifest = man_gen_res
+fun print_json_man_id (m:coq_Manifest) =
+    let val _ = print ("\n" ^ (Json.stringify (ManifestJsonConfig.encode_Manifest m)) ^ "\n") in
+    m
+    end
+
+fun print_json_man_list (ls: coq_Manifest list) =
+    let val _ = List.map print_json_man_id ls
+    in
+      ()
+    end
+
+(*  
+  Extracted helper function used in print_json_man_list_verbose below:
+
+  demo_man_gen_run :: coq_Term -> coq_Plc -> coq_Manifest list 
+      demo_man_gen_run is a function extracted from Coq that uses the manifest generator to transform 
+      its inputs (a copland phrase and top-level place) to a list of formal manifests 
+      (one for each place mentioned in the phrase).
+*)
+
+fun print_json_man_list_verbose (t:coq_Term) (p:coq_Plc) = 
+  let val _ = print ("\nFormal Manifests generated from phrase: \n\n'" ^ (termToString t) ^ "'\n\nat top-level place: \n'" ^ p ^ "': \n")
+      val demo_man_list : coq_Manifest list = demo_man_gen_run t p 
+      val _ = ManifestJsonConfig.write_FormalManifestList demo_man_list
+  in
+    (print_json_man_list demo_man_list) : unit
+  end
+  handle ManifestJsonConfig.Excn e => TextIOExtra.printLn e
+
+
+val _ = print_json_man_list_verbose cert_style_test coq_P0
+
 
 (* NOTE: Hardcoding of source place is here now *)
 val formal_manifest = 
