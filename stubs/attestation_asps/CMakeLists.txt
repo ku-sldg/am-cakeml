@@ -8,4 +8,8 @@ get_files(attestation_asps cal_ak_ASP_Stub.sml
     store_clientData_ASP_Stub.sml
     ssl_sig_ASP_Stub.sml
     ssl_sig_ASP_Stub_two.sml
-    kim_meas_ASP_Stub.sml)
+    kim_meas_ASP_Stub.sml
+    attest_ASP_Stub.sml
+    appraise_ASP_Stub.sml
+    cert_ASP_Stub.sml
+)

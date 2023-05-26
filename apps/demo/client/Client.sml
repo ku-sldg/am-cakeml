@@ -30,7 +30,7 @@ fun print_json_man_list_verbose (t:coq_Term) (p:coq_Plc) =
   handle ManifestJsonConfig.Excn e => TextIOExtra.printLn e
 
 
-val _ = print_json_man_list_verbose cert_style_test coq_P0
+val _ = print_json_man_list_verbose cert_style coq_P0
 
 
 (* NOTE: Hardcoding of source place is here now *)

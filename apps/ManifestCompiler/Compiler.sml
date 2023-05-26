@@ -3,10 +3,10 @@ structure ManCompConfig = struct
 
   type FormalManifestPath   = string
   type AmLibraryPath        = string
-  type AmExecutablePath     = string
+  type AmExecutableName     = string
   type ConcreteManifestPath = string
   type CompileTarget        = string
-  type ManCompArgs          = (FormalManifestPath * AmLibraryPath * AmExecutablePath * ConcreteManifestPath * CompileTarget)
+  type ManCompArgs          = (FormalManifestPath * AmLibraryPath * AmExecutableName * ConcreteManifestPath * CompileTarget)
 
   (**
     gets the command line arguments used to configure the manifest compiler
@@ -41,9 +41,17 @@ structure ManCompConfig = struct
                   let val formManFile = List.nth argList (formManInd + 1)
                       val amLibFile = List.nth argList (amLibInd + 1)
                       (* If we have the client compile flag, it will <> -1 *)
+                      val execOutFile : AmExecutableName = 
+                        if (execOutInd = ~1)
+                        then defaultExecOut
+                        else List.nth argList (execOutInd + 1)
+                      val concOutFile : ConcreteManifestPath = 
+                        if (concManOutInd = ~1)
+                        then defaultConcreteOut
+                        else List.nth argList (concManOutInd + 1)
                       val buildClient = clientCompileInd <> ~1
                   in
-                    ((formManFile, amLibFile, defaultExecOut, defaultConcreteOut, (if buildClient then "CLIENT" else "SERVER")) : ManCompArgs)
+                    ((formManFile, amLibFile, execOutFile, concOutFile, (if buildClient then "CLIENT" else "SERVER")) : ManCompArgs)
                   end
                 )
               )
@@ -60,7 +68,7 @@ fun makeConcMan_CmakeFile fm_path am_library_path = "cmake_minimum_required(VERS
 
 (* () -> () *)
 fun main () =
-  let val (fmPath, libPath, _, _, targetType) = ManCompConfig.get_args()
+  let val (fmPath, libPath, execOutFileName, _, targetType) = ManCompConfig.get_args()
       val targetFile = if (targetType = "CLIENT") then "../apps/ManifestCompiler/Client.sml" else "../apps/ManifestCompiler/Server.sml"
       val _ = (print ("Formal Manifest: " ^ fmPath ^ "\nAM Library: " ^ libPath ^ "\n\n"))
       val am_cmakefile = makeAM_CmakeFile fmPath libPath targetFile
@@ -72,6 +80,10 @@ fun main () =
       val _ = c_system ("echo '" ^ am_cmakefile ^ "' > CMakeLists.txt")
       val _ = c_system ("cmake ..")
       val _ = c_system ("make COMPILED_AM")
+      val am_cakeml_path_prefix = "/Users/adampetz/Documents/Spring_2023/am-cakeml"
+      val am_exe_path = am_cakeml_path_prefix ^ "/build/build"
+      (* TODO: get rid of this hard-coded path...ENV var? *)
+      val _ = c_system ("mv " ^ am_exe_path ^ "/COMPILED_AM" ^ " " ^ am_exe_path ^ "/" ^ execOutFileName)
   in
     ()
   end

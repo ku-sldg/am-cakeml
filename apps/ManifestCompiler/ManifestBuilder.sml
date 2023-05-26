@@ -1,5 +1,24 @@
 (* Depends on: util, copland, am/Measurements, am/ServerAm *)
 
+type ConcreteManifestPath = string
+type ManBuildArgs = ConcreteManifestPath
+
+fun get_args () =  (* : ManBuildArgs *) 
+    let val name = CommandLine.name()
+        val usage = ("Usage: " ^ name ^ "(-om <concrete manifest_output_path>)\n" ^ 
+        "e.g\t" ^ name ^ "-om concrete_manifest.json")
+    in
+      case (CommandLine.arguments()) of
+        argList =>
+          let val concManOutInd = ListExtra.find_index argList "-om"
+              val defaultConcreteOut = "concrete_manifest.json"
+          in
+            if (concManOutInd = ~1)
+            then defaultConcreteOut
+            else List.nth argList concManOutInd
+            end
+      end
+
 fun main () =
     (* Retrieve the provided "formal_manifest" and "am_library" *)
     let val concrete = ManifestUtils.compile_manifest formal_manifest am_library 

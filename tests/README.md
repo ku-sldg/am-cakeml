@@ -8,3 +8,4 @@ This folder contains some tests and demo scripts to run.
 - Ensure `tmux` is installed
 - Next run `./manifest_demo.sh`
 - To close this afterwards, make sure you close all `tmux` panes using `PREFIX + x` where the prefix is typically (Ctrl + b)
+  (To kill all tmux panes at once, type 'tmux kill-server' in one of the open panes)
