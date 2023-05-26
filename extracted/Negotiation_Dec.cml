@@ -17,6 +17,12 @@ fun knowsof_manifest_update toPlc m =
   let val Build_Manifest oldPlc oldasps oldKnowsOf oldContext oldPolicy = m in
   Build_Manifest oldPlc oldasps (toPlc :: oldKnowsOf) oldContext oldPolicy end
 
+(** val knowsof_myPlc_manifest_update : coq_Manifest -> coq_Manifest **)
+
+fun knowsof_myPlc_manifest_update m =
+  let val Build_Manifest oldPlc oldasps oldKnowsOf oldContext oldPolicy = m in
+  Build_Manifest oldPlc oldasps (oldPlc :: oldKnowsOf) oldContext oldPolicy end
+
 (** val myPlc_manifest_update : coq_Plc -> coq_Manifest -> coq_Manifest **)
 
 fun myPlc_manifest_update p m =
@@ -114,6 +120,13 @@ fun get_unique_manifests_env' ps e =
 fun get_unique_manifests_env t p e =
   let val ps = places t p in get_unique_manifests_env' ps e end
 
+(** val get_final_manifests_env :
+    coq_Term -> coq_Plc -> coq_Environment -> coq_Manifest list **)
+
+fun get_final_manifests_env t p e =
+  let val ms = get_unique_manifests_env t p e in
+  map knowsof_myPlc_manifest_update ms end
+
 (** val man_gen_run : coq_Term -> coq_Plc -> coq_Environment **)
 
 val man_gen_run =
@@ -122,4 +135,4 @@ val man_gen_run =
 (** val demo_man_gen_run : coq_Term -> coq_Plc -> coq_Manifest list **)
 
 fun demo_man_gen_run t p =
-  get_unique_manifests_env t p (man_gen_run t p)
+  get_final_manifests_env t p (man_gen_run t p)

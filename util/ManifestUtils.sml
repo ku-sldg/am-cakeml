@@ -243,7 +243,7 @@ structure ManifestJsonConfig = struct
     (let val (Build_Manifest my_plc asps uuidPlcs pubKeyPlcs policy) = c
         val fileName = ("FormalManifest_" ^ my_plc ^ ".sml")
         val _ = TextIOExtra.writeFile fileName ("val formal_manifest = \n\t(Build_Manifest \n\t\t\"" ^ my_plc ^ 
-          "\"\n\t\t" ^ (listToString asps (fn a => a)) ^ 
+          "\"\n\t\t" ^ (listToString asps (fn a => ("\"" ^ a ^ "\""))) ^ 
           "\n\t\t" ^ (listToString uuidPlcs (fn a => ("\"" ^ a ^ "\""))) ^ 
           "\n\t\t" ^ (listToString pubKeyPlcs (fn a => ("\"" ^ a ^ "\""))) ^ 
           "\n\t\t" ^ (Bool.toString policy) ^ "\n\t) : coq_Manifest")

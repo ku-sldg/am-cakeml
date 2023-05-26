@@ -68,7 +68,7 @@ fun makeConcMan_CmakeFile fm_path am_library_path = "cmake_minimum_required(VERS
 
 (* () -> () *)
 fun main () =
-  let val (fmPath, libPath, execOutFileName, _, targetType) = ManCompConfig.get_args()
+  let val (fmPath, libPath, execOutFileName, concOutFileName, targetType) = ManCompConfig.get_args()
       val targetFile = if (targetType = "CLIENT") then "../apps/ManifestCompiler/Client.sml" else "../apps/ManifestCompiler/Server.sml"
       val _ = (print ("Formal Manifest: " ^ fmPath ^ "\nAM Library: " ^ libPath ^ "\n\n"))
       val am_cmakefile = makeAM_CmakeFile fmPath libPath targetFile
@@ -76,7 +76,7 @@ fun main () =
       val _ = c_system ("echo '" ^ concman_cmakefile ^ "' > CMakeLists.txt")
       val _ = c_system ("cmake ..")
       val _ = c_system ("make CONC_MAN_BUILDER")
-      val _ = c_system ("./build/CONC_MAN_BUILDER")
+      val _ = c_system ("./build/CONC_MAN_BUILDER -om " ^ concOutFileName)
       val _ = c_system ("echo '" ^ am_cmakefile ^ "' > CMakeLists.txt")
       val _ = c_system ("cmake ..")
       val _ = c_system ("make COMPILED_AM")

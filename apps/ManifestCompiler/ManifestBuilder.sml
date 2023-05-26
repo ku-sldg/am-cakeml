@@ -15,16 +15,17 @@ fun get_args () =  (* : ManBuildArgs *)
           in
             if (concManOutInd = ~1)
             then defaultConcreteOut
-            else List.nth argList concManOutInd
+            else List.nth argList (concManOutInd + 1)
             end
       end
 
 fun main () =
     (* Retrieve the provided "formal_manifest" and "am_library" *)
-    let val concrete = ManifestUtils.compile_manifest formal_manifest am_library 
+    let val concManFile : ManBuildArgs = get_args()
+        val concrete = ManifestUtils.compile_manifest formal_manifest am_library 
         val concreteJson = ManifestJsonConfig.encode_ConcreteManifest concrete
         (* TODO: Note that the name is hardcoded right now *)
-        val concManFile = "concrete_manifest.json"
+        (* val concManFile = "concrete_manifest.json" *)
         (* Write out the JSON file *)
         val _ = ManifestJsonConfig.writeJsonFile concreteJson concManFile
         val _ = c_system ("chmod 777 " ^ concManFile)
