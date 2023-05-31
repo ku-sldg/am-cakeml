@@ -145,3 +145,12 @@ datatype coq_Ev =
 | Coq_join nat coq_Plc
 | Coq_cvm_thread_start coq_Loc coq_Plc coq_Core_Term coq_Evidence
 | Coq_cvm_thread_end coq_Loc
+
+datatype coq_AM_Result =
+  Coq_am_rawev coq_RawEv
+| Coq_am_appev coq_AppResultC
+
+(** val empty_am_result : coq_AM_Result **)
+
+val empty_am_result =
+  Coq_am_rawev []

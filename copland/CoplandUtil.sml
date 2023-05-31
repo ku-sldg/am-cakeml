@@ -109,6 +109,13 @@ fun evCToString evc =
         Coq_evc rawEv et =>
         concatWith " " ["(EvC", rawEvToString rawEv, evToString et, ")"]
 
+(* am_result_ToString :: coq_AM_Result -> string *)
+fun am_result_ToString e = 
+  case e of 
+      Coq_am_rawev e' => "RawEv AM result: \n" ^ (rawEvToString e')
+    | Coq_am_appev e' => "AppResultC AM result: \n" ^ (evidenceCToString e')
+
+
 (*
 (* ev -> bstring *)
 val encodeEv =

@@ -6,8 +6,10 @@ val kim_meas = Coq_asp (ASPC ALL EXTD (Coq_asp_paramsC kim_meas_aspid [] dest_pl
 fun run_am_serve_auth_tok_req (t : coq_Term) (fromPlc : coq_Plc) (myPl : coq_Plc) (authTok : coq_ReqAuthTok) (init_ev : coq_RawEv) =
   run_am_app_comp (am_serve_auth_tok_req t fromPlc myPl authTok init_ev) []
 
+fun run_am_client_auth_tok_req (t : coq_Term) (myPl : coq_Plc) (init_ev : coq_RawEv) (app_bool:bool) =
+  run_am_app_comp (am_client_auth_tok_req t myPl init_ev app_bool) empty_am_result
 
-val ssl_demo = False (* True *)
+val ssl_demo = True (* True *)
 
 
 fun main_ssl () =
@@ -54,9 +56,10 @@ fun main_cert () =
         (* NOTE: The dest plc is hardcoded here! *)
         val _ = TextIO.print ("Client Launched!\nLoaded following implicit place from Manifest: '" ^ my_plc ^ "'\n\n")
         val _ = TextIO.print ("Loaded following implicit UUID from Manifest: '" ^ uuid ^ "'\n\n")
-        val am_comp = run_am_serve_auth_tok_req main_phrase my_plc my_plc mt_evc []
+        val appraise_resultB = True
+        val am_comp = run_am_client_auth_tok_req main_phrase my_plc [] appraise_resultB
     in
-        print ( (rawEvToString (am_comp))  ^ "\n\n")
+        print ( ("\n\nClient Result:\n" ^ am_result_ToString (am_comp))  ^ "\n\n")
     end
     handle Exception e => TextIO.print_err e 
           | ManifestUtils.Excn e => TextIO.print_err ("ManifestUtils Error: " ^ e)
