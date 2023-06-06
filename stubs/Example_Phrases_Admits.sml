@@ -44,3 +44,6 @@ val sys = "sys_targid"
 
 val cache = "cache_targid"
   (* failwith "AXIOM TO BE REALIZED" *)
+
+(** val retrieve_args : coq_Arg list **)
+val retrieve_args = []

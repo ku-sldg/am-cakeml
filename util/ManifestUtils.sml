@@ -276,6 +276,8 @@ structure ManifestJsonConfig = struct
                           val keyInd = ListExtra.find_index argList "-k"
                           val cert_style_Ind = ListExtra.find_index argList "-cs"
                           val ssl_sig_Ind = ListExtra.find_index argList "-ss"
+                          val cert_style_cache_p0_Ind = ListExtra.find_index argList "-csc"
+                          val cert_style_cache_p1_Ind = ListExtra.find_index argList "-csc"
                       in
                       (
                         if (manInd = ~1)
@@ -295,7 +297,21 @@ structure ManifestJsonConfig = struct
                                                then (
                                                   if (ssl_sig_Ind = ~1)
                                                   then (kim_meas dest_plc kim_meas_targid)
-                                                  else (kim_meas dest_plc kim_meas_targid))
+                                                  else (
+                                                    if (cert_style_cache_p0_Ind = ~1)
+                                                    then (
+                                                      if (cert_style_cache_p1_Ind = ~1)
+                                                      then (kim_meas dest_plc kim_meas_targid)
+                                                      else (cert_cache_p1)
+                                                    )
+                                                    else (cert_cache_p0_trimmed)
+                                                    
+                                                    
+                                                    
+                                                    
+                                                    
+                                                    
+                                                    ))
                                                else (cert_style_trimmed) in
                                             (j, parse_private_key privKeyFile, main_term)
                                           end
