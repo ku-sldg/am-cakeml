@@ -241,7 +241,8 @@ structure ManifestJsonConfig = struct
 
   fun write_FormalManifest_file (c : coq_Manifest) =
     (let val (Build_Manifest my_plc asps uuidPlcs pubKeyPlcs policy) = c
-        val fileName = ("FormalManifest_" ^ my_plc ^ ".sml")
+        val am_cakeml_path_prefix = "/Users/adampetz/Documents/Spring_2023/am-cakeml"
+        val fileName = (am_cakeml_path_prefix ^ "/apps/ManifestCompiler/DemoFiles/" ^ "FormalManifest_" ^ my_plc ^ ".sml")
         val _ = TextIOExtra.writeFile fileName ("val formal_manifest = \n\t(Build_Manifest \n\t\t\"" ^ my_plc ^ 
           "\"\n\t\t" ^ (listToString asps (fn a => ("\"" ^ a ^ "\""))) ^ 
           "\n\t\t" ^ (listToString uuidPlcs (fn a => ("\"" ^ a ^ "\""))) ^ 
@@ -263,40 +264,60 @@ structure ManifestJsonConfig = struct
 
   (* Retrieves the concrete manifest and private key 
     based upon Command Line arguments
-    : () -> coq_ConcreteManifest *)
+    : () -> (coq_ConcreteManifest, string, coq_Term)*)
   fun retrieve_CLI_args _ =
     let val name = CommandLine.name ()
         val usage = ("Usage: " ^ name ^ " -m <concreteManifestFile>.json -k <privateKeyFile>\n" ^
                       "e.g.\t" ^ name ^ " -m concMan.json -k ~/.ssh/id_ed25519\n")
-        val (jsonFile, privKey) = 
+        val (jsonFile, privKey, t) = 
                 (case CommandLine.arguments () of 
                     argList => (
                       let val manInd = ListExtra.find_index argList "-m"
                           val keyInd = ListExtra.find_index argList "-k"
+                          val cert_style_Ind = ListExtra.find_index argList "-cs"
+                          val ssl_sig_Ind = ListExtra.find_index argList "-ss"
                       in
+                      (
                         if (manInd = ~1)
                         then raise (Excn ("Invalid Arguments\n" ^ usage))
                         else (
                           if (keyInd = ~1)
                           then raise (Excn ("Invalid Arguments\n" ^ usage))
                             else (
-                            let val fileName = List.nth argList (manInd + 1)
-                                val privKeyFile = List.nth argList (keyInd + 1)
-                            in
-                              case (parseJsonFile fileName) of
-                                Err e => raise (Excn ("Could not parse JSON file: " ^ e ^ "\n"))
-                                | Ok j => (j, parse_private_key privKeyFile)
-                            end
+                                let val fileName = List.nth argList (manInd + 1)
+                                    val privKeyFile = List.nth argList (keyInd + 1) in
+                                    (
+                                      case (parseJsonFile fileName) of
+                                        Err e => raise (Excn ("Could not parse JSON file: " ^ e ^ "\n"))
+                                      | Ok j =>
+                                         let val main_term = 
+                                               if (cert_style_Ind = ~1)
+                                               then (
+                                                  if (ssl_sig_Ind = ~1)
+                                                  then (kim_meas dest_plc kim_meas_targid)
+                                                  else (kim_meas dest_plc kim_meas_targid))
+                                               else (cert_style_trimmed) in
+                                            (j, parse_private_key privKeyFile, main_term)
+                                          end
+                                    )
+                                    end
+
                             )
                         )
+                      )
                       end
-                    ))
+                    )
+                )
         val cm = extract_ConcreteManifest jsonFile
-    in
-      (cm, privKey)
-    end
+         in
+           (cm, privKey, t)
+        end
 end
 
+(*
+   then (kim_meas dest_plc kim_meas_targid)
+          else cert_style_trimmed 
+*)
 
 
 structure ManifestUtils = struct
@@ -328,6 +349,25 @@ structure ManifestUtils = struct
 
   val local_PrivKey = Ref (Err "Private Key not set") : ((privateKey_t, string) result) ref
 
+  val local_authTerm = Ref (Err "Auth Term not set") : ((coq_Term, string) result) ref
+
+  val local_authEv = Ref (Err "Auth Raw Evidence not set") : ((coq_RawEv, string) result) ref
+
+  (* Retrieves the concrete manifest, or exception if not configured 
+    : _ -> coq_ConcreteManifest *)
+  fun get_ConcreteManifest _ =
+    (case (!local_concreteManifest) of
+      (Ok v) => v
+      | Err e => raise Excn e) : coq_ConcreteManifest
+
+    (* Retrieves the plc corresponding to this processes Manifest/AM_Config
+      throws an exception if configuration not completed
+    : _ -> coq_Plc *)
+  fun get_myPlc _ = 
+    (let val (Build_ConcreteManifest my_plc _ _ _ _ _ _) = get_ConcreteManifest() in
+      my_plc
+    end) : coq_Plc
+
   (* Compiles a concrete manifest from a Formal Manifest and AM Lib
     : coq_Manifest -> coq_AM_Library -> coq_ConcreteManifest *)
   fun compile_manifest (fm : coq_Manifest) (al : coq_AM_Library) =
@@ -337,7 +377,7 @@ structure ManifestUtils = struct
 
   (* Setups up the relevant information and compiles the manifest
       : coq_Manifest -> coq_AM_Library -> () *)
-  fun setup_AM_config (fm : coq_Manifest) (al : coq_AM_Library) (privKey : privateKey_t) =
+  fun setup_AM_config (fm : coq_Manifest) (al : coq_AM_Library) (privKey : privateKey_t) (t:coq_Term) =
     (case (manifest_compiler fm al) of
       Coq_pair (Coq_pair (Coq_pair (Coq_pair concrete aspDisp) plcDisp) pubKeyDisp) uuidDisp =>
         let val _ = local_formal_manifest := Ok fm
@@ -347,6 +387,13 @@ structure ManifestUtils = struct
             val _ = local_pubKeyCb := Ok pubKeyDisp
             val _ = local_uuidCb := Ok uuidDisp
             val _ = local_PrivKey := Ok privKey
+            val _ = local_authTerm := Ok t
+            (*
+            val _ = local_authEv := 
+              let val myPlc = get_myPlc () in 
+                run_cvm_rawEv t myPlc coq_mt
+              end
+              *)
         in
           ()
         end) : unit
@@ -357,13 +404,20 @@ structure ManifestUtils = struct
     (case (!local_formal_manifest) of
       (Ok v) => v
       | Err e => raise Excn e) : coq_Manifest
-    
-  (* Retrieves the concrete manifest, or exception if not configured 
-    : _ -> coq_ConcreteManifest *)
-  fun get_ConcreteManifest _ =
-    (case (!local_concreteManifest) of
+
+  (* Retrieves the Copland phrase for request Authorization, or exception if not configured 
+    : _ -> coq_Manifest *)
+  fun get_authTerm _ =
+    (case (!local_authTerm) of
       (Ok v) => v
-      | Err e => raise Excn e) : coq_ConcreteManifest
+      | Err e => raise Excn e) : coq_Term
+
+  (* Retrieves the Raw Evidence for request Authorization, or exception if not configured 
+    : _ -> coq_Manifest *)
+  fun get_AuthEv _ =
+    (case (!local_authEv) of
+      (Ok v) => v
+      | Err e => raise Excn e) : coq_RawEv
 
   (* Sets the concrete manifest, should not throw
     : coq_ConcreteManifest -> () *)
@@ -372,14 +426,6 @@ structure ManifestUtils = struct
     in 
       ()
     end
-
-  (* Retrieves the plc corresponding to this processes Manifest/AM_Config
-      throws an exception if configuration not completed
-    : _ -> coq_Plc *)
-  fun get_myPlc _ = 
-    (let val (Build_ConcreteManifest my_plc _ _ _ _ _ _) = get_ConcreteManifest() in
-      my_plc
-    end) : coq_Plc
 
   (* Retrieves the asp callback, or exception if not configured 
     : _ -> coq_CakeML_ASPCallback *)
@@ -407,7 +453,10 @@ structure ManifestUtils = struct
     (let val cm = get_ConcreteManifest()
     in
       case (!local_pubKeyCb) of
-      (Ok v) => (v cm)
+      (Ok v) =>
+      let val _ = print "\n\nLooking up pubkey callback\n\n" in
+        (v cm)
+      end
       | Err e => raise Excn e
     end) : coq_CakeML_PubKeyCallback
 
@@ -459,8 +508,8 @@ structure ManifestUtils = struct
       Additionally, we must provide a "fresh" Concrete Manifest to 
       use for manifest operations
     : coq_Manifest -> coq_AM_Library -> AM_Config *)
-  fun setup_and_get_AM_config (fm : coq_Manifest) (al : coq_AM_Library) (cm : coq_ConcreteManifest) (privKey : privateKey_t) =
-    (let val _ = setup_AM_config fm al privKey
+  fun setup_and_get_AM_config (fm : coq_Manifest) (al : coq_AM_Library) (cm : coq_ConcreteManifest) (privKey : privateKey_t) (t:coq_Term) =
+    (let val _ = setup_AM_config fm al privKey t
          val _ = set_ConcreteManifest cm in
       get_AM_config()
     end) : AM_Config

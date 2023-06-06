@@ -108,4 +108,4 @@ val kim_meas_aspid = "kim_meas_aspid"
 
 (** val kim_meas_args : coq_Arg list **)
 
-val kim_meas_args = [""]
+val kim_meas_args = ["/Users/adampetz/Documents/Spring_2023/am-cakeml/apps/demo/server/kim_targ.txt"]

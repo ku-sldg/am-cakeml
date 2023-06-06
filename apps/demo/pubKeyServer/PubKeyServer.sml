@@ -130,8 +130,9 @@ fun handleIncoming listener =
 (* () -> () *)
 fun startServer () =
     let val queueLength = 5 (* TODO: Hardcoded queue length *)
-        val (concreteMan, privKey) = ManifestJsonConfig.retrieve_CLI_args () 
-        val (concrete, privKey, aspDisp, plcDisp, pubKeyDisp, uuidDisp) = ManifestUtils.setup_and_get_AM_config formal_manifest client_am_library concreteMan privKey
+        val auth_phrase = ssl_sig_parameterized coq_P0
+        val (concreteMan, privKey, _) = ManifestJsonConfig.retrieve_CLI_args () 
+        val (concrete, privKey, aspDisp, plcDisp, pubKeyDisp, uuidDisp) = ManifestUtils.setup_and_get_AM_config formal_manifest client_am_library concreteMan privKey auth_phrase
         val (Build_ConcreteManifest plc plcMap pubKeyMap aspServer_addr pubKeyServer_addr plcServer_addr uuidServer_addr) = concrete
         val uuid = ManifestUtils.get_myUUID()
         val (ip, port) = decodeUUID uuid

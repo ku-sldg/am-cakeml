@@ -18,36 +18,29 @@ fun gen_authEvC_if_some ot pFrom =
 
 (** val am_sendReq_gen :
     coq_Term -> coq_Plc -> coq_Plc -> coq_EvC option -> coq_Term option ->
-    coq_CakeML_PlcCallback -> coq_AppResultC coq_AM **)
+    coq_CakeML_PlcCallback -> bool -> coq_AM_Result coq_AM **)
 
-fun am_sendReq_gen t pFrom pTo initEv authPhrase plcCb =
+fun am_sendReq_gen t pFrom pTo initEv authPhrase plcCb app_bool =
   bind (gen_nonce_if_none initEv) (fn evcIn =>
     bind (gen_authEvC_if_some authPhrase pFrom) (fn auth_evc =>
       let val Coq_evc init_ev init_et = evcIn in
       let val targetUUID = plcCb pTo in
       let val resev = am_sendReq t targetUUID auth_evc init_ev in
-      let val expected_et = eval t pTo init_et in
-      gen_appraise_AM expected_et resev end end end end))
-
-(** val am_sendReq_nonce :
-    coq_Term -> coq_Plc -> coq_Plc -> coq_CakeML_PlcCallback ->
-    coq_AppResultC coq_AM **)
-
-fun am_sendReq_nonce t pFrom pTo plcCb =
-  am_sendReq_gen t pFrom pTo None None plcCb
-
-(** val am_sendReq_nonce_auth :
-    coq_Term -> coq_Plc -> coq_Plc -> coq_CakeML_PlcCallback ->
-    coq_AppResultC coq_AM **)
-
-fun am_sendReq_nonce_auth t pFrom pTo plcCb =
-  am_sendReq_gen t pFrom pTo None (Some ssl_sig) plcCb
+      (case app_bool of
+         True =>
+         let val expected_et = eval t pTo init_et in
+         bind (gen_appraise_AM expected_et resev) (fn app_res =>
+           ret (Coq_am_appev app_res)) end
+       | False => ret (Coq_am_rawev resev)) end end end))
 
 (** val am_sendReq_dispatch :
-    bool -> coq_Term -> coq_Plc -> coq_Plc -> coq_CakeML_PlcCallback ->
-    coq_AppResultC coq_AM **)
+    coq_Term option -> bool -> coq_Term -> coq_Plc -> coq_Plc -> bool ->
+    coq_CakeML_PlcCallback -> coq_AM_Result coq_AM **)
 
-fun am_sendReq_dispatch auth t source dest plcCb =
-  case auth of
-    True => am_sendReq_nonce_auth t source dest plcCb
-  | False => am_sendReq_nonce t source dest plcCb
+fun am_sendReq_dispatch maybeAuthTerm nonceB t source dest app_bool plcCb =
+  let val nonce_param =
+    case nonceB of
+      True => None
+    | False => Some (Coq_evc [] Coq_mt)
+  in
+  am_sendReq_gen t source dest nonce_param maybeAuthTerm plcCb app_bool end

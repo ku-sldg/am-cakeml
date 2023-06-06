@@ -12,6 +12,10 @@ fun evalJson s  = (* jsonToStr (responseToJson (RES O O [])) *)
     let val fromPlc = "10"
         val my_plc = "0"
         val (REQ t authTok ev) = jsonToRequest (strToJson s)
+        (*
+        val _ = print "\n\nGOT past REQ decoding\n"
+        *)
+        val _ = print ("Auth Tok Received in REQ: \n" ^ (evCToString authTok) ^ "\n\n")
         (* val ev = ev' *)
         val resev = run_am_serve_auth_tok_req t fromPlc my_plc authTok ev
             
@@ -54,12 +58,36 @@ fun startServer () =
          | Json.Exn s1 s2 => TextIO.print_err ("Json Exception: " ^ s1 ^ "\n" ^ s2 ^ "\n")
          | Result.Exn => TextIO.print_err ("Result Exn:\n")
          | Undef => TextIO.print_err ("Undefined Exception:\n")
-         
+
+
+fun print_json_man_id (m:coq_Manifest) =
+    let val _ = print ("\n" ^ (Json.stringify (ManifestJsonConfig.encode_Manifest m)) ^ "\n") in
+    m
+    end
+
+fun print_json_man_list (ls: coq_Manifest list) =
+    let val _ = List.map print_json_man_id ls
+    in
+      ()
+    end
+
+fun print_json_man_list_verbose (ts:coq_Term list) (p:coq_Plc) = 
+  let (* val _ = print ("\nFormal Manifests generated from phrase: \n\n'" ^ (termToString t) ^ "'\n\nat top-level place: \n'" ^ p ^ "': \n") *)
+      val demo_man_list : coq_Manifest list = demo_man_gen_run ts p 
+      val _ = ManifestJsonConfig.write_FormalManifestList demo_man_list
+  in
+    (print_json_man_list demo_man_list) : unit
+  end
+  handle ManifestJsonConfig.Excn e => TextIOExtra.printLn e        
 
 (* () -> () *)
 fun main () =
-  let val (concreteMan, privKey) = ManifestJsonConfig.retrieve_CLI_args () 
-      val (concrete, privKey, aspDisp, plcDisp, pubKeyDisp, uuidDisp) = ManifestUtils.setup_and_get_AM_config formal_manifest am_library concreteMan privKey
+  let val auth_phrase = ssl_sig_parameterized coq_P0
+      val kim_phrase = Coq_att coq_P1 (kim_meas dest_plc kim_meas_targid)
+      val cert_phrase = cert_style
+      val _ = print_json_man_list_verbose [auth_phrase, kim_phrase, cert_phrase] coq_P0
+      val (concreteMan, privKey, _) = ManifestJsonConfig.retrieve_CLI_args () 
+      val (concrete, privKey, aspDisp, plcDisp, pubKeyDisp, uuidDisp) = ManifestUtils.setup_and_get_AM_config formal_manifest am_library concreteMan privKey auth_phrase
       val (Build_ConcreteManifest plc plcMap pubKeyMap aspServer_addr pubKeyServer_addr plcServer_addr uuidServer_addr) = concrete
       (* Retrieving implicit self place from manifest here *)
       val my_plc = ManifestUtils.get_myPlc()

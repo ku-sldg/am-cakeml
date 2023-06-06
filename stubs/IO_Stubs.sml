@@ -15,8 +15,15 @@ fun do_asp ps e =
 fun doRemote_session t targPlc e =
     let val _ = print ("Running doRemote_session\n") 
         val targUUID = (ManifestUtils.get_PlcCallback() targPlc)
+        val authEv = []
+        val authEt = Coq_mt
+        (*
+        val authPhrase = ManifestUtils.get_authTerm ()
+        val myPlc = ManifestUtils.get_myPlc ()
+        val resev = run_cvm_rawEv authPhrase myPlc []
+        val authEt = eval authPhrase myPlc coq_mt *)
     in
-      Coq_evc (am_sendReq t targUUID (Coq_evc [] Coq_mt) (get_bits e)) Coq_mt
+      Coq_evc (am_sendReq t targUUID (Coq_evc authEv authEt) (get_bits e)) Coq_mt
     end
   (* TODO:  Is the dummy Evidence Type value (Coq_mt) ok here? *)
   (* failwith "AXIOM TO BE REALIZED" *)

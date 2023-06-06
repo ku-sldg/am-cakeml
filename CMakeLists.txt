@@ -82,6 +82,8 @@ get_files(cop_src
     copland/CoplandUtil.sml
     stubs/Example_Phrases_Admits.sml
     stubs/Example_Phrases_Demo_Admits.sml
+    extracted/Example_Phrases.cml
+    extracted/Example_Phrases_Demo.cml
     stubs/IO_Stubs_extra.sml
     am/CommTypes.sml
     copland/json/CoplandToJson.sml
@@ -106,8 +108,6 @@ get_files(cop_src
     extracted/Cvm_Monad.cml
     extracted/Cvm_Impl.cml
     extracted/Cvm_Run.cml
-    extracted/Example_Phrases.cml
-    extracted/Example_Phrases_Demo.cml
     extracted/Negotiation_Dec.cml
     extracted/Impl_appraisal.cml
     extracted/Client_AM.cml

@@ -1,5 +1,11 @@
-(** val ssl_sig : coq_Term **)
+(** val kim_meas : coq_Plc -> coq_TARG_ID -> coq_Term **)
 
-val ssl_sig =
-  Coq_asp (ASPC ALL EXTD (Coq_asp_paramsC ssl_sig_aspid ssl_sig_args dest_plc
+fun kim_meas p targ =
+  Coq_asp (ASPC ALL EXTD (Coq_asp_paramsC kim_meas_aspid kim_meas_args p
+    targ))
+
+(** val ssl_sig_parameterized : coq_Plc -> coq_Term **)
+
+fun ssl_sig_parameterized p =
+  Coq_asp (ASPC ALL EXTD (Coq_asp_paramsC ssl_sig_aspid ssl_sig_args p
     ssl_sig_targid))

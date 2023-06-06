@@ -5,7 +5,7 @@ fun appraise_kim_meas_asp_stub ps p bs ls =
     case ps of Coq_asp_paramsC aspid args tpl tid =>
                (* let val _ = () in ()
                   print ("Appraising ASP with ID:  " ^ aspid ^ "\n"); *)
-                   let val targ_file = "kim_targ_golden.txt"
+                   let val targ_file = "/Users/adampetz/Documents/Spring_2023/am-cakeml/apps/demo/server/kim_targ_golden.txt"(* "kim_targ_golden.txt" *)
                        val targ_file_contents =
                        String.concat
                            (Option.getOpt

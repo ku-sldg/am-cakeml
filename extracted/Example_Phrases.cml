@@ -24,6 +24,12 @@ val cert_style =
   Coq_att coq_P1 (Coq_lseq (attest coq_P1 sys) (Coq_att coq_P2 (Coq_lseq
     (appraise coq_P2 sys) (certificate coq_P2 sys))))
 
+(** val cert_style_trimmed : coq_Term **)
+
+val cert_style_trimmed =
+  Coq_lseq (attest coq_P1 sys) (Coq_att coq_P2 (Coq_lseq
+    (appraise coq_P2 sys) (certificate coq_P2 sys)))
+
 (** val cert_style_test : coq_Term **)
 
 val cert_style_test =

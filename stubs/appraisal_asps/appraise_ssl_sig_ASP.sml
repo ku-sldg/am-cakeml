@@ -9,8 +9,11 @@ fun appraise_ssl_sig (ps : coq_ASP_PARAMS) (p : coq_Plc) (bs : coq_BS) (ls : coq
         val msg = encode_RawEv ls
         val signGood_loc = bs
 
+        val _ = print ("Looking up Pubkey for place " ^ (plToString p) ^ "\n"  (*^ (BString.show pubkey) ^  "\n\n" *))
+
         val pubkey = (ManifestUtils.get_PubKeyCallback() p) : BString.bstring
-                              
+
+        (* val _ = print "\n\nPast looking up pubkey\n\n" *)
         val pub_len = BString.length pubkey
         val sig_len = BString.length signGood_loc
         val msg_len = BString.length msg
