@@ -109,9 +109,11 @@ fun main' ()(* (main_phrase:coq_Term) *) =
         val nonceB = True
         val appraiseB = True
         (* val _ = print_json_man_list_verbose [auth_phrase, main_phrase] coq_P0  *)
-        val am_comp' = (am_sendReq_dispatch (Some auth_phrase) nonceB main_phrase my_plc to_plc appraiseB plcDisp)
-        val am_comp = run_am_app_comp am_comp' empty_am_result
-        (* val am_comp = run_am_client_auth_tok_req main_phrase my_plc [] appraise_resultB *)
+
+
+        (* val am_comp' = (am_sendReq_dispatch (Some auth_phrase) nonceB main_phrase my_plc to_plc appraiseB plcDisp)
+        val am_comp = run_am_app_comp am_comp' empty_am_result *)
+        val am_comp = run_am_client_auth_tok_req main_phrase my_plc [] appraiseB
     in
         print ( ("\n\nClient Result:\n" ^ am_result_ToString (am_comp))  ^ "\n\n")
     end

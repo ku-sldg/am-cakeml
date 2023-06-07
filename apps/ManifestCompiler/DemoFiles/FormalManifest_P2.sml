@@ -3,6 +3,6 @@ val formal_manifest =
 		"P2"
 		["cert_aspid", "appraise_aspid"]
 		["P2"]
-		["P1", "P2"]
+		["P0", "P1", "P2"]
 		True
 	) : coq_Manifest
