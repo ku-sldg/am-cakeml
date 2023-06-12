@@ -29,6 +29,8 @@ CLIENT_PRIV_KEY=$DEMO_FILES/Test_PrivKey
 CLIENT_ONE_EXE_NAME=TEST_CLIENT_AM_ONE_EXE
 CLIENT_TWO_EXE_NAME=TEST_CLIENT_AM_TWO_EXE
 
+CLIENT_TERM_FILE=$DEMO_FILES/ClientCvmTermKim.sml
+
 CLIENT_P0_CONC_MAN=$DEMO_FILES/concrete_Manifest_P0.json
 
 if [[ "$PWD" == */am-cakeml/tests ]]; then
@@ -58,9 +60,9 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   # Now run the manifest compilations
   # Sending a chain of first AM comp, run, second AM comp, run
   tmux send-keys -t 1 \
-    "($MAN_COMP -c -o $CLIENT_ONE_EXE_NAME -om $CLIENT_P0_CONC_MAN -m $CLIENT_FORM_MAN -l $CLIENT_AM_LIB) && \
+    "($MAN_COMP -c $CLIENT_TERM_FILE -o $CLIENT_ONE_EXE_NAME -om $CLIENT_P0_CONC_MAN -m $CLIENT_FORM_MAN -l $CLIENT_AM_LIB) && \
      ($BUILT_CLIENT_AM_ONE -m $CLIENT_P0_CONC_MAN -k $CLIENT_PRIV_KEY) && \
-     ($MAN_COMP -c -o $CLIENT_TWO_EXE_NAME -om $CLIENT_P0_CONC_MAN -m $CLIENT_FORM_MAN -l $CLIENT_AM_LIB2) && \
+     ($MAN_COMP -c $CLIENT_TERM_FILE -o $CLIENT_TWO_EXE_NAME -om $CLIENT_P0_CONC_MAN -m $CLIENT_FORM_MAN -l $CLIENT_AM_LIB2) && \
      ($BUILT_CLIENT_AM_TWO -m $CLIENT_P0_CONC_MAN -k $CLIENT_PRIV_KEY)" Enter
   tmux attach-session -d -t ServerProcess
 
