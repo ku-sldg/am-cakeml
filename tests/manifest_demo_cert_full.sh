@@ -34,6 +34,17 @@ CLIENT_PRIV_KEY=$DEMO_FILES/Test_PrivKey
 CLIENT_ONE_EXE_NAME=TEST_CLIENT_AM_ONE_EXE
 #CLIENT_TWO_EXE_NAME=TEST_CLIENT_AM_TWO_EXE
 
+
+
+
+CLIENT_TERM_FILE=$DEMO_FILES/ClientCvmTermCert.sml
+
+SERVER_P1_TERMS_FILE=$DEMO_FILES/ServerCvmTermsCert.sml
+SERVER_P2_TERMS_FILE=$DEMO_FILES/ServerCvmTermsCert.sml
+
+
+
+
 if [[ "$PWD" == */am-cakeml/tests ]]; then
   repoRoot=$(dirname "$PWD")
   # Move to build folder
@@ -42,25 +53,25 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   make manifest_compiler
 
   # First we need to compile the server(s), before starting tmux (to prevent race condition)
-  $MAN_COMP -s -o $SERVER_P1_EXE_NAME -om $SERVER_P1_CONC_MAN -m $SERVER_P1_FORM_MAN -l $SERVER_AM_LIB
-  $MAN_COMP -s -o $SERVER_P2_EXE_NAME -om $SERVER_P2_CONC_MAN -m $SERVER_P2_FORM_MAN -l $SERVER_AM_LIB
+  $MAN_COMP -s $SERVER_P1_TERMS_FILE -o $SERVER_P1_EXE_NAME -om $SERVER_P1_CONC_MAN -m $SERVER_P1_FORM_MAN -l $SERVER_AM_LIB
+  $MAN_COMP -s $SERVER_P2_TERMS_FILE -o $SERVER_P2_EXE_NAME -om $SERVER_P2_CONC_MAN -m $SERVER_P2_FORM_MAN -l $SERVER_AM_LIB
 
-  BUILT_SERVER_AM_ONE=./build/$SERVER_P1_EXE_NAME
-  BUILT_SERVER_AM_TWO=./build/$SERVER_P2_EXE_NAME
+  BUILT_SERVER_AM_P1=./build/$SERVER_P1_EXE_NAME
+  BUILT_SERVER_AM_P2=./build/$SERVER_P2_EXE_NAME
 
   BUILT_CLIENT_AM_ONE=./build/$CLIENT_ONE_EXE_NAME
   #BUILT_CLIENT_AM_TWO=./build/$CLIENT_TWO_EXE_NAME
 
-  CLIENT_TERM_FILE=$DEMO_FILES/ClientCvmTermCert.sml
+
 
 
   # First let us compile the server and then run it
   tmux new-session -d -s ServerProcess 'bash -i'
-  tmux send-keys -t 0 "( $BUILT_SERVER_AM_ONE -m $SERVER_P1_CONC_MAN -k $SERVER_PRIV_KEY )" Enter
+  tmux send-keys -t 0 "( $BUILT_SERVER_AM_P1 -m $SERVER_P1_CONC_MAN -k $SERVER_PRIV_KEY )" Enter
 
   tmux split-window -v 'bash -i'
 
-  tmux send-keys -t 1 "( $BUILT_SERVER_AM_TWO -m $SERVER_P2_CONC_MAN -k $SERVER_PRIV_KEY )" Enter
+  tmux send-keys -t 1 "( $BUILT_SERVER_AM_P2 -m $SERVER_P2_CONC_MAN -k $SERVER_PRIV_KEY )" Enter
 
   # Setup tmux windows
   tmux split-window -h 'bash -i'

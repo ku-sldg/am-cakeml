@@ -26,7 +26,11 @@ val aspMapping = (mapC_from_pairList
     (appraise_id,
       fn par => fn plc => fn bs => fn rawEv => appraise_asp_stub par rawEv),
     (cert_id,
-      fn par => fn plc => fn bs => fn rawEv => cert_asp_stub par rawEv)
+      fn par => fn plc => fn bs => fn rawEv => cert_asp_stub par rawEv),
+    (cache_id,
+      fn par => fn plc => fn bs => fn rawEv => cache_asp_stub par rawEv),
+    (sig_aspid,
+      fn par => fn plc => fn bs => fn rawEv => sig_asp_stub par rawEv)
   ]
   ) : ((coq_ASP_ID, coq_CakeML_ASPCallback) coq_MapC)
 

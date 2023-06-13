@@ -83,10 +83,11 @@ fun print_json_man_list_verbose (ts:coq_Term list) (p:coq_Plc) =
 
 (* () -> () *)
 fun main () =
-  let val auth_phrase = ssl_sig_parameterized coq_P0
+  (* let val auth_phrase = ssl_sig_parameterized coq_P0
       val kim_phrase = Coq_att coq_P1 (kim_meas dest_plc kim_meas_targid)
-      val cert_phrase = cert_style
-      val _ = ManifestJsonConfig.write_form_man_list_and_print_json [auth_phrase, kim_phrase, cert_phrase] coq_P0
+      val cert_phrase = cert_style *)
+  let val auth_phrase = ssl_sig_parameterized coq_P0
+      val _ = ManifestJsonConfig.write_form_man_list_and_print_json serverCvmTerms serverCvmPlc
       val (concreteMan, privKey) = ManifestJsonConfig.retrieve_CLI_args () 
       val (concrete, privKey, aspDisp, plcDisp, pubKeyDisp, uuidDisp) = ManifestUtils.setup_and_get_AM_config formal_manifest am_library concreteMan privKey auth_phrase
       val (Build_ConcreteManifest plc plcMap pubKeyMap aspServer_addr pubKeyServer_addr plcServer_addr uuidServer_addr) = concrete

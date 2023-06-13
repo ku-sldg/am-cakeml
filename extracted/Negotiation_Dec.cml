@@ -42,6 +42,7 @@ fun asp_manifest_update a m =
   case a of
     ASPC _ _ params =>
     let val Coq_asp_paramsC i _ _ _ = params in aspid_manifest_update i m end
+  | SIG => aspid_manifest_update sig_aspid m
   | _ => m
 
 (** val asp_manifest_generator :
