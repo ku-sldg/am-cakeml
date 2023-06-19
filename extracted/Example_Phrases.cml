@@ -59,3 +59,15 @@ val cert_cache_p0 =
 val cert_cache_p0_trimmed =
   Coq_lseq (Coq_bseq (Coq_pair NONE ALL) (retrieve coq_P1 cache) (Coq_asp
     CPY)) (Coq_asp SIG)
+
+(** val par_mut_p0 : coq_Term **)
+
+val par_mut_p0 =
+  Coq_lseq (Coq_att coq_P1 (attest coq_P1 sys)) (Coq_att coq_P2
+    (appraise coq_P2 sys))
+
+(** val par_mut_p1 : coq_Term **)
+
+val par_mut_p1 =
+  Coq_lseq (Coq_att coq_P0 (attest coq_P0 sys)) (Coq_att coq_P2
+    (appraise coq_P2 sys))

@@ -16,6 +16,12 @@ val coq_P2 = "P2"
 val coq_P3 = "P3"
   (* failwith "AXIOM TO BE REALIZED" *)
 
+val coq_P4 = "P4"
+  (* failwith "AXIOM TO BE REALIZED" *)
+
+val default_place = "default_place"
+  (* failwith "AXIOM TO BE REALIZED" *)
+
 (** val attest_id : coq_ASP_ID **)
 
 val attest_id = "attest_aspid"

@@ -165,3 +165,24 @@ fun man_gen_run ts p =
 
 fun demo_man_gen_run ts p =
   get_final_manifests_env ts p (man_gen_run ts p)
+
+(** val attify : coq_Term -> coq_Plc -> coq_Term **)
+
+fun attify t p =
+  Coq_att p t
+
+(** val attify_terms' : (coq_Term, coq_Plc) prod -> coq_Term **)
+
+fun attify_terms' pr = case pr of
+  Coq_pair t p => attify t p
+
+(** val attify_terms : (coq_Term, coq_Plc) prod list -> coq_Term list **)
+
+fun attify_terms ls =
+  map attify_terms' ls
+
+(** val man_gen_run_attify :
+    (coq_Term, coq_Plc) prod list -> coq_Manifest list **)
+
+fun man_gen_run_attify ls =
+  let val ts = attify_terms ls in demo_man_gen_run ts default_place end

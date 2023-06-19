@@ -272,8 +272,8 @@ fun print_json_man_list (ls: coq_Manifest list) =
       ()
     end
 
-fun write_form_man_list_and_print_json (ts:coq_Term list) (p:coq_Plc) = 
-  let val demo_man_list : coq_Manifest list = demo_man_gen_run ts p 
+fun write_form_man_list_and_print_json (ls:(coq_Term, coq_Plc) prod list) = 
+  let val demo_man_list : coq_Manifest list = man_gen_run_attify ls  (* demo_man_gen_run ts p  *)
       val _ = write_FormalManifestList demo_man_list
       (* val _ = print ("\nFormal Manifests generated from phrase: \n\n'" ^ (termToString t) ^ "'\n\nat top-level place: \n'" ^ p ^ "': \n") *)
   in

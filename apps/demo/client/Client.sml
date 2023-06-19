@@ -37,13 +37,6 @@ fun print_json_man_list_verbose (ts:coq_Term list) (p:coq_Plc) =
   *)
 
 
-val _ = ManifestJsonConfig.write_form_man_list_and_print_json [cert_cache_p1] coq_P1 
-
-val _ = print "\n\n\n\n"
-val _ = ManifestJsonConfig.write_form_man_list_and_print_json [cert_cache_p0] coq_P0
-(* [cert_style, (ssl_sig_parameterized coq_P0)] *)
-
-
 (* NOTE: Hardcoding of source place is here now *)
 val formal_manifest = 
   (Build_Manifest 

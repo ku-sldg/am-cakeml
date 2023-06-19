@@ -2,6 +2,7 @@
 
 # Common Variables
 MAN_COMP=./apps/ManifestCompiler/manComp_demo
+MAN_GEN=./apps/ManifestGenerator/manGen_demo
 #BUILT_AM=./build/COMPILED_AM
 #BUILT_CONC_MAN=./concrete_manifest.json
 DEMO_FILES=../apps/ManifestCompiler/DemoFiles
@@ -40,7 +41,12 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   # Move to build folder
   cd $repoRoot/build
   # Make targets
+  make manifest_generator
   make manifest_compiler
+
+
+  # First, generate the formal manifests
+  $MAN_GEN -om "" -t "kim"
 
   # First we need to compile the server, before starting tmux (to prevent race condition)
   $MAN_COMP -s $SERVER_P1_TERMS_FILE -o $SERVER_EXE_NAME -om $SERVER_P1_CONC_MAN -m $SERVER_FORM_MAN -l $SERVER_AM_LIB
@@ -63,9 +69,9 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   # Sending a chain of first AM comp, run, second AM comp, run
   tmux send-keys -t 1 \
     "($MAN_COMP -c $CLIENT_TERM_FILE -o $CLIENT_ONE_EXE_NAME -om $CLIENT_P0_CONC_MAN -m $CLIENT_FORM_MAN -l $CLIENT_AM_LIB) && \
-     ($BUILT_CLIENT_AM_ONE -m $CLIENT_P0_CONC_MAN -k $CLIENT_PRIV_KEY) && \
-     ($MAN_COMP -c $CLIENT_TERM_FILE -o $CLIENT_TWO_EXE_NAME -om $CLIENT_P0_CONC_MAN -m $CLIENT_FORM_MAN -l $CLIENT_AM_LIB2) && \
-     ($BUILT_CLIENT_AM_TWO -m $CLIENT_P0_CONC_MAN -k $CLIENT_PRIV_KEY)" Enter
+     ($BUILT_CLIENT_AM_ONE -m $CLIENT_P0_CONC_MAN -k $CLIENT_PRIV_KEY)" Enter # && \
+     #($MAN_COMP -c $CLIENT_TERM_FILE -o $CLIENT_TWO_EXE_NAME -om $CLIENT_P0_CONC_MAN -m $CLIENT_FORM_MAN -l $CLIENT_AM_LIB2) && \
+     #($BUILT_CLIENT_AM_TWO -m $CLIENT_P0_CONC_MAN -k $CLIENT_PRIV_KEY)" Enter
   tmux attach-session -d -t ServerProcess
 
 else
