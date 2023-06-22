@@ -1,6 +1,6 @@
-type coq_Environment = (coq_Plc, coq_Manifest) coq_MapC
+type coq_EnvironmentM = (coq_Plc, coq_Manifest) coq_MapC
 
-(** val e_empty : coq_Environment **)
+(** val e_empty : coq_EnvironmentM **)
 
 val e_empty =
   []
@@ -46,7 +46,7 @@ fun asp_manifest_update a m =
   | _ => m
 
 (** val asp_manifest_generator :
-    coq_ASP -> coq_Plc -> coq_Environment -> coq_Environment **)
+    coq_ASP -> coq_Plc -> coq_EnvironmentM -> coq_EnvironmentM **)
 
 fun asp_manifest_generator a p e =
   case map_get coq_Eq_Class_ID_Type e p of
@@ -58,7 +58,7 @@ fun asp_manifest_generator a p e =
     map_set coq_Eq_Class_ID_Type e p m' end
 
 (** val plc_manifest_generator :
-    coq_Plc -> coq_Plc -> coq_Environment -> coq_Environment **)
+    coq_Plc -> coq_Plc -> coq_EnvironmentM -> coq_EnvironmentM **)
 
 fun plc_manifest_generator fromPlc toPlc e =
   case map_get coq_Eq_Class_ID_Type e fromPlc of
@@ -70,7 +70,7 @@ fun plc_manifest_generator fromPlc toPlc e =
     map_set coq_Eq_Class_ID_Type e fromPlc m' end
 
 (** val manifest_generator' :
-    coq_Plc -> coq_Term -> coq_Environment -> coq_Environment **)
+    coq_Plc -> coq_Term -> coq_EnvironmentM -> coq_EnvironmentM **)
 
 fun manifest_generator' p t e =
   case t of
@@ -92,7 +92,7 @@ fun dedup_list ps = case ps of
    | False => dedup_list ps')
 
 (** val manifest_generator_terms :
-    coq_Plc -> coq_Term list -> coq_Environment **)
+    coq_Plc -> coq_Term list -> coq_EnvironmentM **)
 
 fun manifest_generator_terms p ts =
   fold_right (manifest_generator' p) e_empty ts
@@ -130,33 +130,33 @@ fun fromSome v a =
   | None => a
 
 (** val get_manifest_env_default :
-    coq_Environment -> coq_Plc -> coq_Manifest **)
+    coq_EnvironmentM -> coq_Plc -> coq_Manifest **)
 
 fun get_manifest_env_default e p =
   let val m' = fromSome (map_get coq_Eq_Class_ID_Type e p) empty_Manifest in
   myPlc_manifest_update p m' end
 
 (** val get_unique_manifests_env' :
-    coq_Plc list -> coq_Environment -> coq_Manifest list **)
+    coq_Plc list -> coq_EnvironmentM -> coq_Manifest list **)
 
 fun get_unique_manifests_env' ps e =
   map (get_manifest_env_default e) ps
 
 (** val get_unique_manifests_env :
-    coq_Term list -> coq_Plc -> coq_Environment -> coq_Manifest list **)
+    coq_Term list -> coq_Plc -> coq_EnvironmentM -> coq_Manifest list **)
 
 fun get_unique_manifests_env ts p e =
   let val ps = places_terms ts p in get_unique_manifests_env' ps e end
 
 (** val get_final_manifests_env :
-    coq_Term list -> coq_Plc -> coq_Environment -> coq_Manifest list **)
+    coq_Term list -> coq_Plc -> coq_EnvironmentM -> coq_Manifest list **)
 
 fun get_final_manifests_env ts p e =
   let val ms = get_unique_manifests_env ts p e in
   let val ms' = map knowsof_myPlc_manifest_update ms in
   map (pubkeys_manifest_update (places_terms ts p)) ms' end end
 
-(** val man_gen_run : coq_Term list -> coq_Plc -> coq_Environment **)
+(** val man_gen_run : coq_Term list -> coq_Plc -> coq_EnvironmentM **)
 
 fun man_gen_run ts p =
   manifest_generator_terms p ts

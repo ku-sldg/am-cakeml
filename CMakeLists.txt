@@ -88,7 +88,7 @@ get_files(cop_src
     am/CommTypes.sml
     copland/json/CoplandToJson.sml
     copland/json/JsonToCopland.sml
-    extracted/Negotiation_Dec.cml
+    extracted/Manifest_Generator.cml
     util/ManifestUtils.sml
     extracted/privPolicy.cml
     apps/blockchain/Blockchain.sml
