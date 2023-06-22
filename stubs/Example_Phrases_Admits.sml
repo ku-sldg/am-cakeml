@@ -48,6 +48,19 @@ val store_args = []
 val sys = "sys_targid"
   (* failwith "AXIOM TO BE REALIZED" *)
 
+(** val att_tid : coq_TARG_ID **)
+
+val att_tid = "att_targid"
+  (* failwith "AXIOM TO BE REALIZED" *)
+
+
+(** val it : coq_TARG_ID **)
+
+val it = "it_targid"
+  (* failwith "AXIOM TO BE REALIZED" *)
+
+(** val cahce : coq_TARG_ID **)
+
 val cache = "cache_targid"
   (* failwith "AXIOM TO BE REALIZED" *)
 

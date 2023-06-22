@@ -18,6 +18,11 @@ val coq_P2 =
 val coq_P3 =
   failwith "AXIOM TO BE REALIZED"
 
+(** val coq_P4 : coq_Plc **)
+
+val coq_P4 =
+  failwith "AXIOM TO BE REALIZED"
+
 (** val default_place : coq_Plc **)
 
 val default_place =
@@ -61,4 +66,14 @@ val sys =
 (** val cache : coq_TARG_ID **)
 
 val cache =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val att_tid : coq_TARG_ID **)
+
+val att_tid =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val it : coq_TARG_ID **)
+
+val it =
   failwith "AXIOM TO BE REALIZED"

@@ -38,6 +38,7 @@ fun main () =
         val cert_phrases =  [(Coq_pair cert_style coq_P0)]
         val cache_phrases = [(Coq_pair cert_cache_p0 coq_P0), (Coq_pair cert_cache_p1 coq_P1)]
         val parmut_phrases = [(Coq_pair par_mut_p0 coq_P3), (Coq_pair par_mut_p0 coq_P0), (Coq_pair par_mut_p1 coq_P1), (Coq_pair par_mut_p1 coq_P4)]
+        val layered_bg_phrases =  [(Coq_pair layered_bg_strong coq_P0)]
         val _ = print "\n\n"
         val phrases = 
           if (arg2 = "kim")
@@ -51,7 +52,10 @@ fun main () =
               else (
                 if (arg2 = "parmut")
                 then (parmut_phrases)
-                else (kim_phrases))))
+                else (
+                  if (arg2 = "lbg")
+                  then (layered_bg_phrases)
+                  else (kim_phrases)))))
         val _ = ManifestJsonConfig.write_form_man_list_and_print_json 
                   phrases
         val _ = print "\n\n" in
