@@ -241,7 +241,7 @@ structure ManifestJsonConfig = struct
 
   fun write_FormalManifest_file (c : coq_Manifest) =
     (let val (Build_Manifest my_plc asps uuidPlcs pubKeyPlcs policy) = c
-        val am_cakeml_path_prefix = "/Users/adampetz/Documents/Spring_2023/am-cakeml"
+        val am_cakeml_path_prefix = "../"
         val fileName = (am_cakeml_path_prefix ^ "/apps/ManifestCompiler/DemoFiles/" ^ "FormalManifest_" ^ my_plc ^ ".sml")
         val _ = TextIOExtra.writeFile fileName ("val formal_manifest = \n\t(Build_Manifest \n\t\t\"" ^ my_plc ^ 
           "\"\n\t\t" ^ (listToString asps (fn a => ("\"" ^ a ^ "\""))) ^ 

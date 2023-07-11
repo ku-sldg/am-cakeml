@@ -103,9 +103,7 @@ fun main () =
       val _ = c_system ("echo '" ^ am_cmakefile ^ "' > CMakeLists.txt")
       val _ = c_system ("cmake ..")
       val _ = c_system ("make COMPILED_AM")
-      val am_cakeml_path_prefix = "/Users/adampetz/Documents/Spring_2023/am-cakeml"
-      val am_exe_path = am_cakeml_path_prefix ^ "/build/build"
-      (* TODO: get rid of this hard-coded path...ENV var? *)
+      val am_exe_path = "./build"
       val _ = c_system ("mv " ^ am_exe_path ^ "/COMPILED_AM" ^ " " ^ am_exe_path ^ "/" ^ execOutFileName)
   in
     ()
