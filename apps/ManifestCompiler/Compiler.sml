@@ -7,7 +7,7 @@ structure ManCompConfig = struct
   type ConcreteManifestPath = string
   type CompileTarget        = string
   type CvmTermFilePath      = string
-  type ManCompArgs          = (FormalManifestPath * AmLibraryPath * AmExecutableName * ConcreteManifestPath * CompileTarget * CvmTermFilePath * CvmTermFilePath)
+  type ManCompArgs          = (FormalManifestPath * AmLibraryPath * AmExecutableName * ConcreteManifestPath * CompileTarget * CvmTermFilePath (* * CvmTermFilePath  *))
 
   (**
     gets the command line arguments used to configure the manifest compiler
@@ -56,18 +56,20 @@ structure ManCompConfig = struct
                         if (buildClient) 
                         then (List.nth argList (clientCompileInd + 1))
                         else ""
+                      (*
                       val serverCvmTermsFile : CvmTermFilePath = 
                         if (buildServer) 
                         then (List.nth argList (serverCompileInd + 1))
                         else ""
+                        *)
                   in
                     (( formManFile, 
                        amLibFile, 
                        execOutFile, 
                        concOutFile, 
                        (if buildClient then "CLIENT" else "SERVER"), 
-                       clientCvmTermFile,
-                       serverCvmTermsFile ) : ManCompArgs)
+                       clientCvmTermFile (* , 
+                       serverCvmTermsFile *) ) : ManCompArgs)
                   end
                 )
               )
@@ -84,14 +86,15 @@ fun makeConcMan_CmakeFile fm_path am_library_path = "cmake_minimum_required(VERS
 
 (* () -> () *)
 fun main () =
-  let val (fmPath, libPath, execOutFileName, concOutFileName, targetType, cvmClientTermFile, cvmServerTermsFile) = ManCompConfig.get_args()
+  let val (fmPath, libPath, execOutFileName, concOutFileName, targetType, cvmClientTermFile (* , cvmServerTermsFile *) ) = ManCompConfig.get_args()
       val targetFile = if (targetType = "CLIENT") then "../apps/ManifestCompiler/Client.sml" else "../apps/ManifestCompiler/Server.sml"
       val cvmTermFilePath = if (targetType = "CLIENT") 
                             then cvmClientTermFile (* "../apps/ManifestCompiler/ClientCvmTerm.sml" *)
-                            else (
+                            else ( ""
+                              (*
                               if (targetType = "SERVER")
                               then cvmServerTermsFile
-                              else ""
+                              else "" *)
                             )
       val _ = (print ("Formal Manifest: " ^ fmPath ^ "\nAM Library: " ^ libPath ^ "\n\n"))
       val am_cmakefile = makeAM_CmakeFile fmPath libPath cvmTermFilePath targetFile

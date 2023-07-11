@@ -40,8 +40,8 @@ CLIENT_ONE_EXE_NAME=TEST_CLIENT_AM_ONE_EXE
 
 CLIENT_TERM_FILE=$DEMO_FILES/ClientCvmTermCert.sml
 
-SERVER_P1_TERMS_FILE=$DEMO_FILES/ServerCvmTermsCert.sml
-SERVER_P2_TERMS_FILE=$DEMO_FILES/ServerCvmTermsCert.sml
+#SERVER_P1_TERMS_FILE=$DEMO_FILES/ServerCvmTermsCert.sml
+#SERVER_P2_TERMS_FILE=$DEMO_FILES/ServerCvmTermsCert.sml
 
 
 
@@ -58,8 +58,8 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   $MAN_GEN -om "" -t "cert"
 
   # First we need to compile the server(s), before starting tmux (to prevent race condition)
-  $MAN_COMP -s $SERVER_P1_TERMS_FILE -o $SERVER_P1_EXE_NAME -om $SERVER_P1_CONC_MAN -m $SERVER_P1_FORM_MAN -l $SERVER_AM_LIB
-  $MAN_COMP -s $SERVER_P2_TERMS_FILE -o $SERVER_P2_EXE_NAME -om $SERVER_P2_CONC_MAN -m $SERVER_P2_FORM_MAN -l $SERVER_AM_LIB
+  $MAN_COMP -s -o $SERVER_P1_EXE_NAME -om $SERVER_P1_CONC_MAN -m $SERVER_P1_FORM_MAN -l $SERVER_AM_LIB
+  $MAN_COMP -s -o $SERVER_P2_EXE_NAME -om $SERVER_P2_CONC_MAN -m $SERVER_P2_FORM_MAN -l $SERVER_AM_LIB
 
   BUILT_SERVER_AM_P1=./build/$SERVER_P1_EXE_NAME
   BUILT_SERVER_AM_P2=./build/$SERVER_P2_EXE_NAME

@@ -32,7 +32,7 @@ CLIENT_TWO_EXE_NAME=TEST_CLIENT_AM_TWO_EXE
 
 CLIENT_TERM_FILE=$DEMO_FILES/ClientCvmTermKim.sml
 
-SERVER_P1_TERMS_FILE=$DEMO_FILES/ServerCvmTermsCert.sml
+# SERVER_P1_TERMS_FILE=$DEMO_FILES/ServerCvmTermsCert.sml
 
 CLIENT_P0_CONC_MAN=$DEMO_FILES/concrete_Manifest_P0.json
 
@@ -49,7 +49,7 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   $MAN_GEN -om "" -t "kim"
 
   # First we need to compile the server, before starting tmux (to prevent race condition)
-  $MAN_COMP -s $SERVER_P1_TERMS_FILE -o $SERVER_EXE_NAME -om $SERVER_P1_CONC_MAN -m $SERVER_FORM_MAN -l $SERVER_AM_LIB
+  $MAN_COMP -s -o $SERVER_EXE_NAME -om $SERVER_P1_CONC_MAN -m $SERVER_FORM_MAN -l $SERVER_AM_LIB
 
   BUILT_SERVER_AM_ONE=./build/$SERVER_EXE_NAME
 

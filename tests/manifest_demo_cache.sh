@@ -38,8 +38,8 @@ CLIENT_P0_TERM_FILE=$DEMO_FILES/ClientCvmTermCacheP0.sml
 CLIENT_P1_TERM_FILE=$DEMO_FILES/ClientCvmTermCacheP1.sml
 
 
-SERVER_P1_TERMS_FILE=$DEMO_FILES/ServerCvmTermsCacheP1.sml
-SERVER_P2_TERMS_FILE=$DEMO_FILES/ServerCvmTermsCacheP2.sml
+#SERVER_P1_TERMS_FILE=$DEMO_FILES/ServerCvmTermsCacheP1.sml
+#SERVER_P2_TERMS_FILE=$DEMO_FILES/ServerCvmTermsCacheP2.sml
 
 if [[ "$PWD" == */am-cakeml/tests ]]; then
   repoRoot=$(dirname "$PWD")
@@ -53,8 +53,8 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   $MAN_GEN -om "" -t "cache"
 
   # First we need to compile the server(s), before starting tmux (to prevent race condition)
-  $MAN_COMP -s $SERVER_P1_TERMS_FILE -o $SERVER_P1_EXE_NAME -om $SERVER_P1_CONC_MAN -m $SERVER_P1_FORM_MAN -l $SERVER_AM_LIB
-  $MAN_COMP -s $SERVER_P2_TERMS_FILE -o $SERVER_P2_EXE_NAME -om $SERVER_P2_CONC_MAN -m $SERVER_P2_FORM_MAN -l $SERVER_AM_LIB
+  $MAN_COMP -s -o $SERVER_P1_EXE_NAME -om $SERVER_P1_CONC_MAN -m $SERVER_P1_FORM_MAN -l $SERVER_AM_LIB
+  $MAN_COMP -s -o $SERVER_P2_EXE_NAME -om $SERVER_P2_CONC_MAN -m $SERVER_P2_FORM_MAN -l $SERVER_AM_LIB
 
   $MAN_COMP -c $CLIENT_P0_TERM_FILE -o $CLIENT_P0_EXE_NAME -om $CLIENT_P0_CONC_MAN -m $CLIENT_P0_FORM_MAN -l $CLIENT_AM_LIB
   $MAN_COMP -c $CLIENT_P1_TERM_FILE -o $CLIENT_P1_EXE_NAME -om $CLIENT_P1_CONC_MAN -m $CLIENT_P1_FORM_MAN -l $CLIENT_AM_LIB
