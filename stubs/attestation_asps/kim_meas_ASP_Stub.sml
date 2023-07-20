@@ -5,7 +5,7 @@ fun kim_meas_asp_stub ps e =
     case ps of Coq_asp_paramsC aspid args tpl tid =>
                let val _ = () in
                    print ("Matched aspid:  " ^ aspid ^ "\n");
-                   let val targ_file = List.hd args (* "/Users/adampetz/Documents/Spring_2023/am-cakeml/apps/demo/server/kim_targ.txt" *)   (* "kim_targ.txt" *)
+                   let val targ_file = List.hd args
                        val _ = (print ("\nREADING Bytes from file '" ^ targ_file ^ "'\n\n"))
                        val targ_file_contents =
                        String.concat

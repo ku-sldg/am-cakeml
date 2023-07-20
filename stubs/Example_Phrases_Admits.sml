@@ -16,6 +16,12 @@ val coq_P2 = "P2"
 val coq_P3 = "P3"
   (* failwith "AXIOM TO BE REALIZED" *)
 
+val coq_P4 = "P4"
+  (* failwith "AXIOM TO BE REALIZED" *)
+
+val default_place = "default_place"
+  (* failwith "AXIOM TO BE REALIZED" *)
+
 (** val attest_id : coq_ASP_ID **)
 
 val attest_id = "attest_aspid"
@@ -42,5 +48,21 @@ val store_args = []
 val sys = "sys_targid"
   (* failwith "AXIOM TO BE REALIZED" *)
 
+(** val att_tid : coq_TARG_ID **)
+
+val att_tid = "att_targid"
+  (* failwith "AXIOM TO BE REALIZED" *)
+
+
+(** val it : coq_TARG_ID **)
+
+val it = "it_targid"
+  (* failwith "AXIOM TO BE REALIZED" *)
+
+(** val cahce : coq_TARG_ID **)
+
 val cache = "cache_targid"
   (* failwith "AXIOM TO BE REALIZED" *)
+
+(** val retrieve_args : coq_Arg list **)
+val retrieve_args = []

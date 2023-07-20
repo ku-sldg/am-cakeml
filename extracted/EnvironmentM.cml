@@ -1,0 +1,6 @@
+type coq_EnvironmentM = (coq_Plc, coq_Manifest) coq_MapC
+
+(** val e_empty : coq_EnvironmentM **)
+
+val e_empty =
+  []

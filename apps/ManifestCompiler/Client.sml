@@ -14,7 +14,7 @@ fun run_am_client_auth_tok_req (t : coq_Term) (myPl : coq_Plc) (init_ev : coq_Ra
 val ssl_demo = True (* True *)
 *)
 
-
+(*
 
 fun print_json_man_id (m:coq_Manifest) =
     let val _ = print ("\n" ^ (Json.stringify (ManifestJsonConfig.encode_Manifest m)) ^ "\n") in
@@ -35,6 +35,8 @@ fun print_json_man_list_verbose (ts:coq_Term list) (p:coq_Plc) =
     (print_json_man_list demo_man_list) : unit
   end
   handle ManifestJsonConfig.Excn e => TextIOExtra.printLn e
+*)
+
 
 
 (* val _ = print_json_man_list_verbose [cert_style, ssl_sig] coq_P0 *)
@@ -95,7 +97,8 @@ fun main_ssl () =
 fun main' ()(* (main_phrase:coq_Term) *) =
     let val auth_phrase = ssl_sig_parameterized coq_P0
         (* val main_phrase = cert_style (*kim_meas*) (*demo_phrase3*) *)
-        val (concreteMan, privKey, main_phrase) = ManifestJsonConfig.retrieve_CLI_args () 
+        val main_phrase = clientCvmTerm (* TODO:  remove this hard-coded val via manifest compiler build *)
+        val (concreteMan, privKey) = ManifestJsonConfig.retrieve_CLI_args () 
         val (concrete, privKey, aspDisp, plcDisp, pubKeyDisp, uuidDisp) = ManifestUtils.setup_and_get_AM_config formal_manifest am_library concreteMan privKey auth_phrase
         val (Build_ConcreteManifest plc plcMap pubKeyMap aspServer_addr pubKeyServer_addr plcServer_addr uuidServer_addr) = concrete
         (* Retrieving implicit self place from manifest here *)
@@ -109,9 +112,11 @@ fun main' ()(* (main_phrase:coq_Term) *) =
         val nonceB = True
         val appraiseB = True
         (* val _ = print_json_man_list_verbose [auth_phrase, main_phrase] coq_P0  *)
-        val am_comp' = (am_sendReq_dispatch (Some auth_phrase) nonceB main_phrase my_plc to_plc appraiseB plcDisp)
-        val am_comp = run_am_app_comp am_comp' empty_am_result
-        (* val am_comp = run_am_client_auth_tok_req main_phrase my_plc [] appraise_resultB *)
+
+
+        (* val am_comp' = (am_sendReq_dispatch (Some auth_phrase) nonceB main_phrase my_plc to_plc appraiseB plcDisp)
+        val am_comp = run_am_app_comp am_comp' empty_am_result *)
+        val am_comp = run_am_client_auth_tok_req main_phrase my_plc [] appraiseB
     in
         print ( ("\n\nClient Result:\n" ^ am_result_ToString (am_comp))  ^ "\n\n")
     end

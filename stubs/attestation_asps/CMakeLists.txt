@@ -12,4 +12,6 @@ get_files(attestation_asps cal_ak_ASP_Stub.sml
     attest_ASP_Stub.sml
     appraise_ASP_Stub.sml
     cert_ASP_Stub.sml
+    cache_ASP_Stub.sml
+    sig_ASP_Stub.sml
 )

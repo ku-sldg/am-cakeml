@@ -241,7 +241,7 @@ structure ManifestJsonConfig = struct
 
   fun write_FormalManifest_file (c : coq_Manifest) =
     (let val (Build_Manifest my_plc asps uuidPlcs pubKeyPlcs policy) = c
-        val am_cakeml_path_prefix = "/Users/adampetz/Documents/Spring_2023/am-cakeml"
+        val am_cakeml_path_prefix = "../"
         val fileName = (am_cakeml_path_prefix ^ "/apps/ManifestCompiler/DemoFiles/" ^ "FormalManifest_" ^ my_plc ^ ".sml")
         val _ = TextIOExtra.writeFile fileName ("val formal_manifest = \n\t(Build_Manifest \n\t\t\"" ^ my_plc ^ 
           "\"\n\t\t" ^ (listToString asps (fn a => ("\"" ^ a ^ "\""))) ^ 
@@ -256,11 +256,43 @@ structure ManifestJsonConfig = struct
       TextIO.BadFileName => raise Excn "Bad file name"
       | TextIO.InvalidFD   => raise Excn "Invalid file descriptor") : unit
 
-  fun write_FormalManifestList (cl : coq_Manifest list) =
+fun write_FormalManifestList (cl : coq_Manifest list) =
     List.map write_FormalManifest_file cl
+
+  
+
+fun print_json_man_id (m:coq_Manifest) =
+    let val _ = print ("\n" ^ (Json.stringify (encode_Manifest m)) ^ "\n") in
+    m
+    end
+
+fun print_json_man_list (ls: coq_Manifest list) =
+    let val _ = List.map print_json_man_id ls
+    in
+      ()
+    end
+
+fun write_form_man_list_and_print_json (ls:(coq_Term, coq_Plc) prod list) = 
+  let val demo_man_list : coq_Manifest list = man_gen_run_attify ls  (* demo_man_gen_run ts p  *)
+      val _ = write_FormalManifestList demo_man_list
+      (* val _ = print ("\nFormal Manifests generated from phrase: \n\n'" ^ (termToString t) ^ "'\n\nat top-level place: \n'" ^ p ^ "': \n") *)
+  in
+    (print_json_man_list demo_man_list) : unit
+  end
+  handle Excn e => TextIOExtra.printLn e
 
   fun parse_private_key file =
     BString.unshow (TextIOExtra.readFile file)
+
+  fun argIndPresent (i:int) = (i <> ~1)
+
+(*
+  fun cli_arg_found (s:string) (argList:string list) = 
+    let val ind = ListExtra.find_index argList s in
+      argIndPresent ind 
+    end
+*)
+  
 
   (* Retrieves the concrete manifest and private key 
     based upon Command Line arguments
@@ -269,19 +301,34 @@ structure ManifestJsonConfig = struct
     let val name = CommandLine.name ()
         val usage = ("Usage: " ^ name ^ " -m <concreteManifestFile>.json -k <privateKeyFile>\n" ^
                       "e.g.\t" ^ name ^ " -m concMan.json -k ~/.ssh/id_ed25519\n")
-        val (jsonFile, privKey, t) = 
+        val (jsonFile, privKey) = 
                 (case CommandLine.arguments () of 
                     argList => (
                       let val manInd = ListExtra.find_index argList "-m"
                           val keyInd = ListExtra.find_index argList "-k"
+
+                          (*
                           val cert_style_Ind = ListExtra.find_index argList "-cs"
                           val ssl_sig_Ind = ListExtra.find_index argList "-ss"
+                          val cert_style_cache_p0_Ind = ListExtra.find_index argList "-csc"
+                          val cert_style_cache_p1_Ind = ListExtra.find_index argList "-csc"
+                          *)
+
+                          val manIndBool = argIndPresent manInd 
+                          val keyIndBool = argIndPresent keyInd
+                          (*
+                          val cert_style_IndBool = argIndPresent cert_style_Ind
+                          val ssl_sig_IndBool = argIndPresent ssl_sig_Ind
+                          val cscp0_IndBool = argIndPresent cert_style_cache_p0_Ind
+                          val cscp1_IndBool = argIndPresent cert_style_cache_p1_Ind
+                          *)
+
                       in
                       (
-                        if (manInd = ~1)
+                        if (manIndBool = False)
                         then raise (Excn ("Invalid Arguments\n" ^ usage))
                         else (
-                          if (keyInd = ~1)
+                          if (keyIndBool = False)
                           then raise (Excn ("Invalid Arguments\n" ^ usage))
                             else (
                                 let val fileName = List.nth argList (manInd + 1)
@@ -289,35 +336,35 @@ structure ManifestJsonConfig = struct
                                     (
                                       case (parseJsonFile fileName) of
                                         Err e => raise (Excn ("Could not parse JSON file: " ^ e ^ "\n"))
-                                      | Ok j =>
-                                         let val main_term = 
-                                               if (cert_style_Ind = ~1)
-                                               then (
-                                                  if (ssl_sig_Ind = ~1)
-                                                  then (kim_meas dest_plc kim_meas_targid)
-                                                  else (kim_meas dest_plc kim_meas_targid))
-                                               else (cert_style_trimmed) in
-                                            (j, parse_private_key privKeyFile, main_term)
-                                          end
-                                    )
-                                    end
+                                      | Ok j => (j, parse_private_key privKeyFile)
 
-                            )
-                        )
-                      )
-                      end
-                    )
-                )
+                                      (*
+                                         let val main_term = 
+                                               if (cert_style_IndBool)
+                                               then (cert_style)
+                                               else (
+                                                  if (ssl_sig_IndBool)
+                                                  then (kim_meas dest_plc kim_meas_targid)
+                                                  else (
+                                                      if (cscp0_IndBool)
+                                                      then (cert_cache_p0_trimmed)
+                                                      else (
+                                                          if (cscp1_IndBool)
+                                                          then (cert_cache_p1)
+                                                          else (kim_meas dest_plc kim_meas_targid)
+                                                          )
+                                                      )
+                                                  ) in
+                                                (j, parse_private_key privKeyFile, main_term)
+                                           end *)
+                                    )
+                                  end )))
+                    end ))
         val cm = extract_ConcreteManifest jsonFile
          in
-           (cm, privKey, t)
+           (cm, privKey)
         end
 end
-
-(*
-   then (kim_meas dest_plc kim_meas_targid)
-          else cert_style_trimmed 
-*)
 
 
 structure ManifestUtils = struct
@@ -514,3 +561,82 @@ structure ManifestUtils = struct
       get_AM_config()
     end) : AM_Config
 end
+
+
+
+
+
+
+
+
+
+
+
+(* 
+
+  (* Retrieves the concrete manifest and private key 
+    based upon Command Line arguments
+    : () -> (coq_ConcreteManifest, string, coq_Term)*)
+  fun retrieve_CLI_args _ =
+    let val name = CommandLine.name ()
+        val usage = ("Usage: " ^ name ^ " -m <concreteManifestFile>.json -k <privateKeyFile>\n" ^
+                      "e.g.\t" ^ name ^ " -m concMan.json -k ~/.ssh/id_ed25519\n")
+        val (jsonFile, privKey, t) = 
+                (case CommandLine.arguments () of 
+                    argList => (
+                      let val manInd = ListExtra.find_index argList "-m"
+                          val keyInd = ListExtra.find_index argList "-k"
+                          val cert_style_Ind = ListExtra.find_index argList "-cs"
+                          val ssl_sig_Ind = ListExtra.find_index argList "-ss"
+                          val cert_style_cache_p0_Ind = ListExtra.find_index argList "-csc"
+                          val cert_style_cache_p1_Ind = ListExtra.find_index argList "-csc"
+
+                          val manIndBool = argIndPresent manInd 
+                          val keyIndBool = argIndPresent keyInd
+                          val cert_style_IndBool = argIndPresent cert_style_Ind
+                          val ssl_sig_IndBool = argIndPresent ssl_sig_Ind
+                          val cscp0_IndBool = argIndPresent cert_style_cache_p0_Ind
+                          val cscp1_IndBool = argIndPresent cert_style_cache_p1_Ind
+
+                      in
+                      (
+                        if (manIndBool = False)
+                        then raise (Excn ("Invalid Arguments\n" ^ usage))
+                        else (
+                          if (keyIndBool = False)
+                          then raise (Excn ("Invalid Arguments\n" ^ usage))
+                            else (
+                                let val fileName = List.nth argList (manInd + 1)
+                                    val privKeyFile = List.nth argList (keyInd + 1) in
+                                    (
+                                      case (parseJsonFile fileName) of
+                                        Err e => raise (Excn ("Could not parse JSON file: " ^ e ^ "\n"))
+                                      | Ok j =>
+                                         let val main_term = 
+                                               if (cert_style_IndBool)
+                                               then (cert_style)
+                                               else (
+                                                  if (ssl_sig_IndBool)
+                                                  then (kim_meas dest_plc kim_meas_targid)
+                                                  else (
+                                                      if (cscp0_IndBool)
+                                                      then (cert_cache_p0_trimmed)
+                                                      else (
+                                                          if (cscp1_IndBool)
+                                                          then (cert_cache_p1)
+                                                          else (kim_meas dest_plc kim_meas_targid)
+                                                          )
+                                                      )
+                                                  ) in
+                                                (j, parse_private_key privKeyFile, main_term)
+                                           end
+                                    )
+                                  end )))
+                    end ))
+        val cm = extract_ConcreteManifest jsonFile
+         in
+           (cm, privKey, t)
+        end
+
+
+        *)

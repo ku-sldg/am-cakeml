@@ -1,5 +1,9 @@
 (* Depends on: util, copland, am/Measurements, am/ServerAm *)
 
+
+
+
+(*
 fun print_json_man_id (m:coq_Manifest) =
     let val _ = print ("\n" ^ (Json.stringify (ManifestJsonConfig.encode_Manifest m)) ^ "\n") in
     m
@@ -30,7 +34,7 @@ fun print_json_man_list_verbose (ts:coq_Term list) (p:coq_Plc) =
   handle ManifestJsonConfig.Excn e => TextIOExtra.printLn e
 
 
-val _ = print_json_man_list_verbose [cert_style, (ssl_sig_parameterized coq_P0)] coq_P0
+  *)
 
 
 (* NOTE: Hardcoding of source place is here now *)
@@ -110,7 +114,7 @@ fun main () =
         val auth_phrase = ssl_sig_parameterized coq_P0 (* TODO: fix this hardcoding *)
         val nonceB = True
         val appraiseB = True
-        val (concreteMan, privKey, _) = ManifestJsonConfig.retrieve_CLI_args () 
+        val (concreteMan, privKey) = ManifestJsonConfig.retrieve_CLI_args () 
         val (concrete, privKey, aspDisp, plcDisp, pubKeyDisp, uuidDisp) = ManifestUtils.setup_and_get_AM_config formal_manifest client_am_library concreteMan privKey auth_phrase
         val (Build_ConcreteManifest plc plcMap pubKeyMap aspServer_addr pubKeyServer_addr plcServer_addr uuidServer_addr) = concrete
         val main_phrase = (kim_meas dest_plc kim_meas_targid)

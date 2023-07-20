@@ -79,6 +79,8 @@ get_files(cop_src
     stubs/Maps.sml
     stubs/Manifest_Admits_Stubs.sml
     extracted/Manifest.cml
+    extracted/Manifest_Compiler.cml
+    extracted/EnvironmentM.cml
     copland/CoplandUtil.sml
     stubs/Example_Phrases_Admits.sml
     stubs/Example_Phrases_Demo_Admits.sml
@@ -88,6 +90,7 @@ get_files(cop_src
     am/CommTypes.sml
     copland/json/CoplandToJson.sml
     copland/json/JsonToCopland.sml
+    extracted/Manifest_Generator.cml
     util/ManifestUtils.sml
     extracted/privPolicy.cml
     apps/blockchain/Blockchain.sml
@@ -108,7 +111,6 @@ get_files(cop_src
     extracted/Cvm_Monad.cml
     extracted/Cvm_Impl.cml
     extracted/Cvm_Run.cml
-    extracted/Negotiation_Dec.cml
     extracted/Impl_appraisal.cml
     extracted/Client_AM.cml
     extracted/Server_AM.cml)

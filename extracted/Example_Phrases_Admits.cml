@@ -1,3 +1,8 @@
+(** val coq_P0 : coq_Plc **)
+
+val coq_P0 =
+  failwith "AXIOM TO BE REALIZED"
+
 (** val coq_P1 : coq_Plc **)
 
 val coq_P1 =
@@ -11,6 +16,16 @@ val coq_P2 =
 (** val coq_P3 : coq_Plc **)
 
 val coq_P3 =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val coq_P4 : coq_Plc **)
+
+val coq_P4 =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val default_place : coq_Plc **)
+
+val default_place =
   failwith "AXIOM TO BE REALIZED"
 
 (** val attest_id : coq_ASP_ID **)
@@ -38,6 +53,11 @@ val cache_id =
 val store_args =
   failwith "AXIOM TO BE REALIZED"
 
+(** val retrieve_args : coq_Arg list **)
+
+val retrieve_args =
+  failwith "AXIOM TO BE REALIZED"
+
 (** val sys : coq_TARG_ID **)
 
 val sys =
@@ -46,4 +66,14 @@ val sys =
 (** val cache : coq_TARG_ID **)
 
 val cache =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val att_tid : coq_TARG_ID **)
+
+val att_tid =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val it : coq_TARG_ID **)
+
+val it =
   failwith "AXIOM TO BE REALIZED"

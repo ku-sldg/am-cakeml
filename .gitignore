@@ -28,6 +28,8 @@ CMakeCache.txt
 #stubs/IO_Stubs_extra*
 #stubs/IO_Stubs_extra_orig.sml
 do_extract.sh
+apps/ManifestCompiler/DemoFiles/FormalManifest_*
+apps/ManifestCompiler/DemoFiles/concrete_Manifest_*
 
 # Backup files
 *backup.*
