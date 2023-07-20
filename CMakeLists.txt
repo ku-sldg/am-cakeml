@@ -79,6 +79,8 @@ get_files(cop_src
     stubs/Maps.sml
     stubs/Manifest_Admits_Stubs.sml
     extracted/Manifest.cml
+    extracted/Manifest_Compiler.cml
+    extracted/EnvironmentM.cml
     copland/CoplandUtil.sml
     stubs/Example_Phrases_Admits.sml
     stubs/Example_Phrases_Demo_Admits.sml

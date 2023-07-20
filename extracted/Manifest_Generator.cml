@@ -1,11 +1,5 @@
-type coq_EnvironmentM = (coq_Plc, coq_Manifest) coq_MapC
-
-(** val e_empty : coq_EnvironmentM **)
-
-val e_empty =
-  []
-
-(** val aspid_manifest_update : coq_ASP_ID -> coq_Manifest -> coq_Manifest **)
+(** val aspid_manifest_update :
+    coq_ASP_ID -> coq_Manifest -> coq_Manifest **)
 
 fun aspid_manifest_update i m =
   let val Build_Manifest oldPlc oldasps oldKnowsOf oldContext oldPolicy = m in
@@ -20,14 +14,21 @@ fun knowsof_manifest_update toPlc m =
 (** val knowsof_myPlc_manifest_update : coq_Manifest -> coq_Manifest **)
 
 fun knowsof_myPlc_manifest_update m =
-  let val Build_Manifest oldPlc oldasps oldKnowsOf oldContext oldPolicy = m in
-  Build_Manifest oldPlc oldasps (oldPlc :: oldKnowsOf) oldContext oldPolicy end
+  knowsof_manifest_update
+    (let val Build_Manifest my_abstract_plc _ _ _ _ = m in my_abstract_plc end)
+    m
 
 (** val myPlc_manifest_update : coq_Plc -> coq_Manifest -> coq_Manifest **)
 
 fun myPlc_manifest_update p m =
   let val Build_Manifest _ oldasps oldKnowsOf oldContext oldPolicy = m in
   Build_Manifest p oldasps oldKnowsOf oldContext oldPolicy end
+
+(** val pubkey_manifest_update : coq_Plc -> coq_Manifest -> coq_Manifest **)
+
+fun pubkey_manifest_update p m =
+  let val Build_Manifest oldPlc oldasps oldKnowsOf oldContext oldPolicy = m in
+  Build_Manifest oldPlc oldasps oldKnowsOf (p :: oldContext) oldPolicy end
 
 (** val pubkeys_manifest_update :
     coq_Plc list -> coq_Manifest -> coq_Manifest **)
@@ -36,38 +37,50 @@ fun pubkeys_manifest_update ps m =
   let val Build_Manifest oldMyPlc oldasps oldKnowsOf _ oldPolicy = m in
   Build_Manifest oldMyPlc oldasps oldKnowsOf ps oldPolicy end
 
+(** val update_manifest_policy_targ :
+    coq_Plc -> coq_Plc -> coq_Manifest -> coq_Manifest **)
+
+fun update_manifest_policy_targ _ _ m =
+  m
+
 (** val asp_manifest_update : coq_ASP -> coq_Manifest -> coq_Manifest **)
 
 fun asp_manifest_update a m =
   case a of
     ASPC _ _ params =>
-    let val Coq_asp_paramsC i _ _ _ = params in aspid_manifest_update i m end
+    let val Coq_asp_paramsC i _ targp targid = params in
+    let val m' = update_manifest_policy_targ targp targid m in
+    aspid_manifest_update i m' end end
   | SIG => aspid_manifest_update sig_aspid m
+  | HSH => aspid_manifest_update hsh_aspid m
+  | ENC p =>
+    let val m' = pubkey_manifest_update p m in
+    aspid_manifest_update enc_aspid m' end
   | _ => m
+
+(** val manifest_update_env :
+    coq_Plc -> coq_EnvironmentM -> (coq_Manifest -> coq_Manifest) ->
+    coq_EnvironmentM **)
+
+fun manifest_update_env p e f =
+  let val m =
+    case map_get coq_Eq_Class_ID_Type e p of
+      Some mm => mm
+    | None => empty_Manifest
+  in
+  let val m' = f m in map_set coq_Eq_Class_ID_Type e p m' end end
 
 (** val asp_manifest_generator :
     coq_ASP -> coq_Plc -> coq_EnvironmentM -> coq_EnvironmentM **)
 
 fun asp_manifest_generator a p e =
-  case map_get coq_Eq_Class_ID_Type e p of
-    Some m =>
-    let val m' = asp_manifest_update a m in
-    map_set coq_Eq_Class_ID_Type e p m' end
-  | None =>
-    let val m' = asp_manifest_update a empty_Manifest in
-    map_set coq_Eq_Class_ID_Type e p m' end
+  manifest_update_env p e (asp_manifest_update a)
 
-(** val plc_manifest_generator :
+(** val at_manifest_generator :
     coq_Plc -> coq_Plc -> coq_EnvironmentM -> coq_EnvironmentM **)
 
-fun plc_manifest_generator fromPlc toPlc e =
-  case map_get coq_Eq_Class_ID_Type e fromPlc of
-    Some m =>
-    let val m' = knowsof_manifest_update toPlc m in
-    map_set coq_Eq_Class_ID_Type e fromPlc m' end
-  | None =>
-    let val m' = knowsof_manifest_update toPlc empty_Manifest in
-    map_set coq_Eq_Class_ID_Type e fromPlc m' end
+fun at_manifest_generator fromPlc toPlc e =
+  manifest_update_env fromPlc e (knowsof_manifest_update toPlc)
 
 (** val manifest_generator' :
     coq_Plc -> coq_Term -> coq_EnvironmentM -> coq_EnvironmentM **)
@@ -76,7 +89,7 @@ fun manifest_generator' p t e =
   case t of
     Coq_asp a => asp_manifest_generator a p e
   | Coq_att q t' =>
-    let val e' = plc_manifest_generator p q e in
+    let val e' = at_manifest_generator p q e in
     manifest_generator' q t' e' end
   | Coq_lseq t1 t2 => manifest_generator' p t2 (manifest_generator' p t1 e)
   | Coq_bseq _ t1 t2 => manifest_generator' p t2 (manifest_generator' p t1 e)
