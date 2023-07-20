@@ -1,0 +1,21 @@
+type coq_JsonT (* AXIOM TO BE REALIZED *)
+
+(** val jsonToCvmIn : coq_JsonT -> coq_CvmInMessage **)
+
+val jsonToCvmIn =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val jsonToCvmOut : coq_JsonT -> coq_CvmOutMessage **)
+
+val jsonToCvmOut =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val cvmInMessageToJson : coq_CvmInMessage -> coq_JsonT **)
+
+val cvmInMessageToJson =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val cvmOutMessageToJson : coq_CvmOutMessage -> coq_JsonT **)
+
+val cvmOutMessageToJson =
+  failwith "AXIOM TO BE REALIZED"

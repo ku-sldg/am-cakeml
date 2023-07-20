@@ -3,8 +3,10 @@
 (* val kim_meas = Coq_asp (ASPC ALL EXTD (Coq_asp_paramsC kim_meas_aspid [] dest_plc
     kim_meas_targid)) *)
 
+(*
 fun run_am_serve_auth_tok_req (t : coq_Term) (fromPlc : coq_Plc) (myPl : coq_Plc) (authTok : coq_ReqAuthTok) (init_ev : coq_RawEv) =
   run_am_app_comp (am_serve_auth_tok_req t fromPlc myPl authTok init_ev) []
+*)
 
 fun run_am_client_auth_tok_req (t : coq_Term) (myPl : coq_Plc) (init_ev : coq_RawEv) (app_bool:bool) =
   run_am_app_comp (am_client_auth_tok_req t myPl init_ev app_bool) empty_am_result

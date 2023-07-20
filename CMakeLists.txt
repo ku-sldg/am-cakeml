@@ -111,6 +111,8 @@ get_files(cop_src
     extracted/Cvm_Monad.cml
     extracted/Cvm_Impl.cml
     extracted/Cvm_Run.cml
+    stubs/CvmJson_Admits.sml
+    extracted/CvmJson.cml
     extracted/Impl_appraisal.cml
     extracted/Client_AM.cml
     extracted/Server_AM.cml)

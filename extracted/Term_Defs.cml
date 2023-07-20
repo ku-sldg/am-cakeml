@@ -87,6 +87,13 @@ fun get_bits e = case e of
 
 type coq_ReqAuthTok = coq_EvC
 
+datatype coq_CvmInMessage =
+  CVM_IN coq_Term coq_RawEv
+
+type coq_CvmOutMessage =
+  coq_RawEv
+  (* singleton inductive, whose constructor was CVM_OUT *)
+
 (** val splitEv_T_l : coq_Split -> coq_Evidence -> coq_Evidence **)
 
 fun splitEv_T_l sp e =

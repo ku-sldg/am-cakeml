@@ -11,3 +11,6 @@ datatype requestMessage = REQ coq_Term coq_ReqAuthTok (bs list)
 
 (* Gathered evidence *)
 datatype responseMessage = RES (bs list)
+
+datatype cvmInMessage  = CVM_IN coq_Term (bs list) 
+datatype cvmOutMessage = CVM_OUT (bs list)

@@ -12,14 +12,14 @@ fun am_check_auth_tok t fromPl authTok = case authTok of
     coq_Term -> coq_Plc -> coq_Plc -> coq_ReqAuthTok -> coq_RawEv ->
     coq_RawEv coq_AM **)
 
-fun am_serve_auth_tok_req t fromPl myPl authTok init_ev =
+fun am_serve_auth_tok_req t fromPl _ authTok init_ev =
   bind (am_check_auth_tok t fromPl authTok) (fn v =>
     case case requester_bound t fromPl authTok of
            True => appraise_auth_tok v
          | False => False of
       True =>
       (case privPolicy coq_Eq_Class_ID_Type fromPl t of
-         True => ret (run_cvm_rawEv t myPl init_ev)
+         True => ret (run_cvm_json_full t init_ev)
        | False => failm)
     | False => failm)
 
@@ -27,7 +27,7 @@ fun am_serve_auth_tok_req t fromPl myPl authTok init_ev =
     coq_Term -> coq_Plc -> coq_RawEv -> bool -> coq_AM_Result coq_AM **)
 
 fun am_client_auth_tok_req t myPl init_ev app_bool =
-  let val att_res = run_cvm_rawEv t myPl init_ev in
+  let val att_res = run_cvm_json_full t init_ev in
   (case app_bool of
      True =>
      let val att_et = eval t myPl Coq_mt in
