@@ -87,6 +87,13 @@ fun get_bits e = case e of
 
 type coq_ReqAuthTok = coq_EvC
 
+datatype coq_CvmRequestMessage =
+  REQ coq_Term coq_ReqAuthTok coq_RawEv
+
+type coq_CvmResponseMessage =
+  coq_RawEv
+  (* singleton inductive, whose constructor was RES *)
+
 datatype coq_CvmInMessage =
   CVM_IN coq_Term coq_RawEv
 

@@ -2,6 +2,8 @@
 
 type coq_JsonT = Json.json
 
+type coq_StringT = string
+
 (** val jsonToCvmIn : coq_JsonT -> coq_CvmInMessage **)
 fun jsonToCvmIn js = case (Json.toMap js) of
           Some js' => fromAList js'

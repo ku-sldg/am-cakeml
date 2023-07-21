@@ -133,5 +133,5 @@ fun evcToJson e =
 fun requestToJson (REQ t authTok ev) = Json.fromPairList
     [("reqTerm", termToJson t), ("reqAuthTok", evcToJson authTok), ("reqEv", bsListToJsonList ev)]
 
-fun responseToJson (RES ev) = Json.fromPairList
+fun responseToJson ev (* (RES ev) *) = Json.fromPairList
     [("respEv", bsListToJsonList ev)]

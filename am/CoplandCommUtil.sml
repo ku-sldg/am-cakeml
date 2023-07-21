@@ -28,7 +28,7 @@ fun socketDispatch (target : coq_UUID) (authTok : coq_ReqAuthTok) (ev : (bs list
         val req  = (REQ t authTok ev)
         val _ = print ("Dispatching Request Term: \n'" ^ (termToString t) ^ "'\nTo address: " ^ ip ^ ":" ^ (Int.toString port) ^ "\n")
         val fd   = Socket.connect ip port
-        val (RES resev) = (sendCoplandReq fd req; receiveCoplandResp fd)
+        val resev = (sendCoplandReq fd req; receiveCoplandResp fd)
      in Socket.close fd;
         resev
     end

@@ -283,8 +283,8 @@ fun jsonToResponse js = case (Json.toMap js) of
 
     and
     getRES data = case data of
-          [ev] =>
-              RES (jsonBsListToList ev)
+          [ev] => (jsonBsListToList ev)
+              (* RES (jsonBsListToList ev) *)
         | _ => raise Json.Exn "getRES" "unexpected argument list"
 
 fun strToJson str = 

@@ -23,6 +23,23 @@ fun am_serve_auth_tok_req t fromPl _ authTok init_ev =
        | False => failm)
     | False => failm)
 
+(** val run_am_server_auth_tok_req :
+    coq_Term -> coq_Plc -> coq_Plc -> coq_ReqAuthTok -> coq_RawEv -> coq_RawEv **)
+
+fun run_am_server_auth_tok_req t fromPlc myPl authTok init_ev =
+  run_am_app_comp (am_serve_auth_tok_req t fromPlc myPl authTok init_ev) []
+
+(** val evalJson : coq_StringT -> coq_JsonT **)
+
+fun evalJson s =
+  let val js = strToJson s in
+  let val req = jsonToRequest js in
+  let val REQ t tok ev = req in
+  let val resev =
+    run_am_server_auth_tok_req t default_place default_place tok ev
+  in
+  responseToJson resev end end end end
+
 (** val am_client_auth_tok_req :
     coq_Term -> coq_Plc -> coq_RawEv -> bool -> coq_AM_Result coq_AM **)
 

@@ -69,32 +69,22 @@ val server_am_library =
     (mapD_from_pairList [("0", (BString.unshow "3082010a0282010100c822fb2b7842e61fa6a779a48f2164793e21d640687146b48ac4e977a4a69f90383c94f3ea5e5336052b728f0a83151603edef890b2a6099376ae87a384a6b236ed51c7f19d94c8b4acb9b00de6cb1c6fc40ff9fec7967ebdbc48cd9b15103411a3b8978d93e59988a7baa21dd3e6fa220359e228f847b81be77bf2467bea40496135a8d06a42c3416bffec3646c8fda7eee19a74275fa2b21bfaa5c8b0dc8e82511b2d8b9a7b760b1d0ae0be03cd98615f3e6c2bc51b1ab11f5b87aad9b44264a2470f26a3a55e4dbd1fa6ea52e66093b4a3eae73bcd7237f07b1ea394a9f893b32d6da15a46f5d7e77c5a6b12ebf41cc7743f4cc241266e58566645dfbbd210203010001")),("1", (BString.unshow "3082010a0282010100c822fb2b7842e61fa6a779a48f2164793e21d640687146b48ac4e977a4a69f90383c94f3ea5e5336052b728f0a83151603edef890b2a6099376ae87a384a6b236ed51c7f19d94c8b4acb9b00de6cb1c6fc40ff9fec7967ebdbc48cd9b15103411a3b8978d93e59988a7baa21dd3e6fa220359e228f847b81be77bf2467bea40496135a8d06a42c3416bffec3646c8fda7eee19a74275fa2b21bfaa5c8b0dc8e82511b2d8b9a7b760b1d0ae0be03cd98615f3e6c2bc51b1ab11f5b87aad9b44264a2470f26a3a55e4dbd1fa6ea52e66093b4a3eae73bcd7237f07b1ea394a9f893b32d6da15a46f5d7e77c5a6b12ebf41cc7743f4cc241266e58566645dfbbd210203010001")), ("2", (BString.unshow "3082010a0282010100c822fb2b7842e61fa6a779a48f2164793e21d640687146b48ac4e977a4a69f90383c94f3ea5e5336052b728f0a83151603edef890b2a6099376ae87a384a6b236ed51c7f19d94c8b4acb9b00de6cb1c6fc40ff9fec7967ebdbc48cd9b15103411a3b8978d93e59988a7baa21dd3e6fa220359e228f847b81be77bf2467bea40496135a8d06a42c3416bffec3646c8fda7eee19a74275fa2b21bfaa5c8b0dc8e82511b2d8b9a7b760b1d0ae0be03cd98615f3e6c2bc51b1ab11f5b87aad9b44264a2470f26a3a55e4dbd1fa6ea52e66093b4a3eae73bcd7237f07b1ea394a9f893b32d6da15a46f5d7e77c5a6b12ebf41cc7743f4cc241266e58566645dfbbd210203010001"))])
     ) : coq_AM_Library
 
-fun run_am_serve_auth_tok_req (t : coq_Term) (fromPlc : coq_Plc) (myPl : coq_Plc) (authTok : coq_ReqAuthTok) (init_ev : coq_RawEv) =
-  run_am_app_comp (am_serve_auth_tok_req t fromPlc myPl authTok init_ev) []
 
-(* When things go well, this returns a JSON evidence string. When they go wrong,
+
+(* 
+For evalJson (now extracted from Coq):
+
+When things go well, this returns a JSON object. When they go wrong,
    it returns a raw error message string. In the future, we may want to wrap
    said error messages in JSON as well to make it easier on the client. *)
-fun evalJson s  = (* jsonToStr (responseToJson (RES O O [])) *)
-    let val fromPlc = "10"
-        val my_plc = "0"
-        val (REQ t authTok ev) = jsonToRequest (strToJson s)
-        (* val ev = ev' *)
-        val resev = run_am_serve_auth_tok_req t fromPlc my_plc authTok ev
-            
-    in jsonToStr (responseToJson (RES resev))
-    end
+fun respondToMsg client = Socket.output client (jsonToStr (evalJson (Socket.inputAll client)))
     handle Json.Exn s1 s2 =>
-           (TextIO.print_err ("JSON error" ^ s1 ^ ": " ^ s2 ^ "\n");
-            "Invalid JSON/Copland term")
+           (TextIO.print_err ("JSON error" ^ s1 ^ ": " ^ s2 ^ "\n"); ()
+            )
         (*
          | USMexpn s =>
             (TextIO.print_err (String.concat ["USM error: ", s, "\n"]);
             "USM failure")   *)
-
-
-fun respondToMsg client = Socket.output client (evalJson (Socket.inputAll client))
-
 
 fun handleIncoming listener =
     let val client = Socket.accept listener
