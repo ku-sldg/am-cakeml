@@ -44,7 +44,7 @@ fun evalJson s =
     coq_Term -> coq_Plc -> coq_RawEv -> bool -> coq_AM_Result coq_AM **)
 
 fun am_client_auth_tok_req t myPl init_ev app_bool =
-  let val att_res = run_cvm_json_full t init_ev in
+  let val att_res = am_sendReq t myPl mt_evc init_ev in
   (case app_bool of
      True =>
      let val att_et = eval t myPl Coq_mt in

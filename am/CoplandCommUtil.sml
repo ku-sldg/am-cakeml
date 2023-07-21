@@ -33,8 +33,9 @@ fun socketDispatch (target : coq_UUID) (authTok : coq_ReqAuthTok) (ev : (bs list
         resev
     end
 
-(* coq_Term -> coq_UUID coq_ReqAuthTok -> (bs list) -> (bs list) *)
-fun am_sendReq (t : coq_Term) (targUUID : coq_UUID) (authTok : coq_ReqAuthTok) (ev : (bs list))  =
+
+(* coq_Term -> coq_UUID -> coq_ReqAuthTok -> (bs list) -> (bs list) *)
+fun am_sendReq' (t : coq_Term) (targUUID : coq_UUID) (authTok : coq_ReqAuthTok) (ev : (bs list))  =
     let val _ = TextIO.print ("Received Request to Dispatch term to UUID: '" ^ targUUID ^ "'\n\n")
         val resev = socketDispatch targUUID authTok ev t
     in
@@ -44,3 +45,9 @@ fun am_sendReq (t : coq_Term) (targUUID : coq_UUID) (authTok : coq_ReqAuthTok) (
                 rawEvToString resev ^ "\n" ));
         resev
     end
+
+(* coq_Term -> coq_Plc -> coq_ReqAuthTok -> (bs list) -> (bs list) *)
+fun am_sendReq (t : coq_Term) (targPlc : coq_Plc) (authTok : coq_ReqAuthTok) (ev : (bs list)) =
+  let val uuid = ManifestUtils.get_PlcCallback() targPlc in 
+    am_sendReq' t uuid authTok ev 
+  end
