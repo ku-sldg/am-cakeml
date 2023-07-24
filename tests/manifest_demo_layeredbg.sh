@@ -58,7 +58,7 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   $MAN_COMP -s -o $SERVER_P3_EXE_NAME -om $SERVER_P3_CONC_MAN -m $SERVER_P3_FORM_MAN -l $SERVER_AM_LIB
   $MAN_COMP -s -o $SERVER_P4_EXE_NAME -om $SERVER_P4_CONC_MAN -m $SERVER_P4_FORM_MAN -l $SERVER_AM_LIB
 
-  $MAN_COMP -c $CLIENT_P0_TERM_FILE -o $CLIENT_P0_EXE_NAME -om $CLIENT_P0_CONC_MAN -m $CLIENT_P0_FORM_MAN -l $CLIENT_AM_LIB
+  
   #$MAN_COMP -c $CLIENT_P1_TERM_FILE -o $CLIENT_P1_EXE_NAME -om $CLIENT_P1_CONC_MAN -m $CLIENT_P1_FORM_MAN -l $CLIENT_AM_LIB
 
   BUILT_SERVER_AM_P1=./build/$SERVER_P1_EXE_NAME
@@ -91,7 +91,7 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   
   # Now run the manifest compilations
   # Sending a chain of first AM comp, run, second AM comp, run
-  tmux send-keys -t 4 "($BUILT_CLIENT_AM_P0 -m $CLIENT_P0_CONC_MAN -k $CLIENT_PRIV_KEY -cs)" Enter
+  tmux send-keys -t 4 "($MAN_COMP -c $CLIENT_P0_TERM_FILE -o $CLIENT_P0_EXE_NAME -om $CLIENT_P0_CONC_MAN -m $CLIENT_P0_FORM_MAN -l $CLIENT_AM_LIB) && ($BUILT_CLIENT_AM_P0 -m $CLIENT_P0_CONC_MAN -k $CLIENT_PRIV_KEY -cs)" Enter
   #tmux send-keys -t 3 "($BUILT_CLIENT_AM_P0 -m $CLIENT_P0_CONC_MAN -k $CLIENT_PRIV_KEY -cs)" Enter
 
   tmux attach-session -d -t ServerProcess
