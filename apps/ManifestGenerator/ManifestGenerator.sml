@@ -32,7 +32,7 @@ fun get_args () =
      end
 
 fun main () =
-    let val (arg1, arg2) = get_args ()
+    let val (outFilePathPrefix, typeSwitch) = get_args ()
         val kim_phrase = Coq_att coq_P1 (kim_meas dest_plc kim_meas_targid)
         val kim_phrases =   [(Coq_pair kim_phrase coq_P0)]
         val cert_phrases =  [(Coq_pair cert_style coq_P0)]
@@ -41,23 +41,22 @@ fun main () =
         val layered_bg_phrases =  [(Coq_pair layered_bg_strong coq_P0)]
         val _ = print "\n\n"
         val phrases = 
-          if (arg2 = "kim")
+          if (typeSwitch = "kim")
           then (kim_phrases)
           else (
-            if (arg2 = "cert")
+            if (typeSwitch = "cert")
             then (cert_phrases)
             else (
-              if (arg2 = "cache")
+              if (typeSwitch = "cache")
               then (cache_phrases)
               else (
-                if (arg2 = "parmut")
+                if (typeSwitch = "parmut")
                 then (parmut_phrases)
                 else (
-                  if (arg2 = "lbg")
+                  if (typeSwitch = "lbg")
                   then (layered_bg_phrases)
                   else (kim_phrases)))))
-        val _ = ManifestJsonConfig.write_form_man_list_and_print_json 
-                  phrases
+        val _ = ManifestJsonConfig.write_form_man_list_and_print_json outFilePathPrefix phrases
         val _ = print "\n\n" in
       ()
     end

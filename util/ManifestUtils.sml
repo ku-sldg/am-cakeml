@@ -53,7 +53,7 @@ structure ManifestJsonConfig = struct
   fun parseJsonFile (file : string) =
       Result.mapErr (op ^ "Parsing error: ") (Json.parse (TextIOExtra.readFile file))
       handle 
-          TextIO.BadFileName => Err "Bad file name"
+          TextIO.BadFileName => Err ("Bad file name: " ^ file)
           | TextIO.InvalidFD   => Err "Invalid file descriptor"
           (* TODO: Handle JSON parsing exceptions *)
 
@@ -62,7 +62,7 @@ structure ManifestJsonConfig = struct
   fun writeJsonFile (j : Json.json) (file : string) =
       (TextIOExtra.writeFile file (Json.stringify j)
       handle 
-          TextIO.BadFileName => raise Excn "Bad file name"
+          TextIO.BadFileName => raise Excn ("Bad file name: " ^ file)
           | TextIO.InvalidFD   => raise Excn "Invalid file descriptor") : unit
 
   (* Attempts to extract a plcMap from a Json structure of a concrete manifest
@@ -239,25 +239,24 @@ structure ManifestJsonConfig = struct
     end
 
 
-  fun write_FormalManifest_file (c : coq_Manifest) =
+  fun write_FormalManifest_file (pathPrefix : string) (c : coq_Manifest) =
     (let val (Build_Manifest my_plc asps uuidPlcs pubKeyPlcs policy) = c
-        val am_cakeml_path_prefix = "../"
-        val fileName = (am_cakeml_path_prefix ^ "/apps/ManifestCompiler/DemoFiles/" ^ "FormalManifest_" ^ my_plc ^ ".sml")
+        val fileName = (pathPrefix ^ "/FormalManifest_" ^ my_plc ^ ".sml")
         val _ = TextIOExtra.writeFile fileName ("val formal_manifest = \n\t(Build_Manifest \n\t\t\"" ^ my_plc ^ 
           "\"\n\t\t" ^ (listToString asps (fn a => ("\"" ^ a ^ "\""))) ^ 
           "\n\t\t" ^ (listToString uuidPlcs (fn a => ("\"" ^ a ^ "\""))) ^ 
           "\n\t\t" ^ (listToString pubKeyPlcs (fn a => ("\"" ^ a ^ "\""))) ^ 
-          "\n\t\t" ^ (Bool.toString policy) ^ "\n\t) : coq_Manifest")
+          "\n\t\t" ^ (Bool.toString policy) ^ "\n\t) : coq_Manifest\n")
         val _ = c_system ("chmod 777 " ^ fileName)
     in
       ()
     end
     handle 
-      TextIO.BadFileName => raise Excn "Bad file name"
+      TextIO.BadFileName => raise Excn ("Bad file name: " ^ (pathPrefix ^ "FormalManifest_<PLCNAMEHERE>.sml"))
       | TextIO.InvalidFD   => raise Excn "Invalid file descriptor") : unit
 
-fun write_FormalManifestList (cl : coq_Manifest list) =
-    List.map write_FormalManifest_file cl
+fun write_FormalManifestList (pathPrefix : string) (cl : coq_Manifest list) =
+    List.map (write_FormalManifest_file pathPrefix) cl
 
   
 
@@ -272,9 +271,9 @@ fun print_json_man_list (ls: coq_Manifest list) =
       ()
     end
 
-fun write_form_man_list_and_print_json (ls:(coq_Term, coq_Plc) prod list) = 
+fun write_form_man_list_and_print_json (pathPrefix : string) (ls:(coq_Term, coq_Plc) prod list) = 
   let val demo_man_list : coq_Manifest list = man_gen_run_attify ls  (* demo_man_gen_run ts p  *)
-      val _ = write_FormalManifestList demo_man_list
+      val _ = write_FormalManifestList pathPrefix demo_man_list
       (* val _ = print ("\nFormal Manifests generated from phrase: \n\n'" ^ (termToString t) ^ "'\n\nat top-level place: \n'" ^ p ^ "': \n") *)
   in
     (print_json_man_list demo_man_list) : unit

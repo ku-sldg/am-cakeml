@@ -3,6 +3,6 @@ val formal_manifest =
 		"P0"
 		[]
 		["P0", "P1"]
-		["default_place", "P0", "P1", "P2", "P4", "P3"]
+		["P0", "default_place", "P1", "P2"]
 		True
 	) : coq_Manifest

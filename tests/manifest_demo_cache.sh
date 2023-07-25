@@ -5,7 +5,7 @@ MAN_COMP=./apps/ManifestCompiler/manComp_demo
 MAN_GEN=./apps/ManifestGenerator/manGen_demo
 #BUILT_AM=./build/COMPILED_AM
 #BUILT_CONC_MAN=./concrete_manifest.json
-DEMO_FILES=../apps/ManifestCompiler/DemoFiles
+DEMO_FILES=../tests/DemoFiles/Cache
 
 # Server Variables
 SERVER_P1_FORM_MAN=$DEMO_FILES/FormalManifest_P1.sml
@@ -50,7 +50,7 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   make manifest_compiler
 
   # First, generate the formal manifests
-  $MAN_GEN -om "" -t "cache"
+  $MAN_GEN -om $DEMO_FILES -t "cache"
 
   # First we need to compile the server(s), before starting tmux (to prevent race condition)
   $MAN_COMP -s -o $SERVER_P1_EXE_NAME -om $SERVER_P1_CONC_MAN -m $SERVER_P1_FORM_MAN -l $SERVER_AM_LIB
@@ -92,3 +92,4 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
 else
   echo "You are not in the 'am-cakeml/tests' directory"
 fi
+
