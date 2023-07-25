@@ -45,25 +45,12 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   repoRoot=$(dirname "$PWD")
   # Move to build folder
   cd $repoRoot/build
-  # Make targets
-  make manifest_generator
-  make manifest_compiler
 
-  # First, generate the formal manifests
-  $MAN_GEN -om $DEMO_FILES -t "cache"
+  BUILT_SERVER_AM_P1=$DEMO_FILES/$SERVER_P1_EXE_NAME
+  BUILT_SERVER_AM_P2=$DEMO_FILES/$SERVER_P2_EXE_NAME
 
-  # First we need to compile the server(s), before starting tmux (to prevent race condition)
-  $MAN_COMP -s -o $SERVER_P1_EXE_NAME -om $SERVER_P1_CONC_MAN -m $SERVER_P1_FORM_MAN -l $SERVER_AM_LIB
-  $MAN_COMP -s -o $SERVER_P2_EXE_NAME -om $SERVER_P2_CONC_MAN -m $SERVER_P2_FORM_MAN -l $SERVER_AM_LIB
-
-  $MAN_COMP -c $CLIENT_P0_TERM_FILE -o $CLIENT_P0_EXE_NAME -om $CLIENT_P0_CONC_MAN -m $CLIENT_P0_FORM_MAN -l $CLIENT_AM_LIB
-  $MAN_COMP -c $CLIENT_P1_TERM_FILE -o $CLIENT_P1_EXE_NAME -om $CLIENT_P1_CONC_MAN -m $CLIENT_P1_FORM_MAN -l $CLIENT_AM_LIB
-
-  BUILT_SERVER_AM_P1=./build/$SERVER_P1_EXE_NAME
-  BUILT_SERVER_AM_P2=./build/$SERVER_P2_EXE_NAME
-
-  BUILT_CLIENT_AM_P0=./build/$CLIENT_P0_EXE_NAME
-  BUILT_CLIENT_AM_P1=./build/$CLIENT_P1_EXE_NAME
+  BUILT_CLIENT_AM_P0=$DEMO_FILES/$CLIENT_P0_EXE_NAME
+  BUILT_CLIENT_AM_P1=$DEMO_FILES/$CLIENT_P1_EXE_NAME
 
 
   # First let us compile the server and then run it

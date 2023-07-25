@@ -3,8 +3,6 @@
 # Common Variables
 MAN_COMP=./apps/ManifestCompiler/manComp_demo
 MAN_GEN=./apps/ManifestGenerator/manGen_demo
-#BUILT_AM=./build/COMPILED_AM
-#BUILT_CONC_MAN=./concrete_manifest.json
 DEMO_FILES=../tests/DemoFiles/Kim
 
 # Server Variables
@@ -32,20 +30,10 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   repoRoot=$(dirname "$PWD")
   # Move to build folder
   cd $repoRoot/build
-  # Make targets
-  make manifest_generator
-  make manifest_compiler
-
-
-  # First, generate the formal manifests
-  $MAN_GEN -om $DEMO_FILES -t "kim"
-
-  # First we need to compile the server, before starting tmux (to prevent race condition)
-  $MAN_COMP -s -o $SERVER_EXE_NAME -om $SERVER_P1_CONC_MAN -m $SERVER_FORM_MAN -l $SERVER_AM_LIB
-
-  BUILT_SERVER_AM_ONE=./build/$SERVER_EXE_NAME
-
-  BUILT_CLIENT_AM_ONE=./build/$CLIENT_ONE_EXE_NAME
+  
+  BUILT_SERVER_AM_ONE=$DEMO_FILES/$SERVER_EXE_NAME
+  
+  BUILT_CLIENT_AM_ONE=$DEMO_FILES/$CLIENT_ONE_EXE_NAME
 
   # First let us compile the server and then run it
   tmux new-session -d -s ServerProcess 'bash -i'
@@ -57,9 +45,8 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   
   # Now run the manifest compilations
   # Sending a chain of first AM comp, run, second AM comp, run
-  tmux send-keys -t 1 \
-    "($MAN_COMP -c $CLIENT_TERM_FILE -o $CLIENT_ONE_EXE_NAME -om $CLIENT_P0_CONC_MAN -m $CLIENT_FORM_MAN -l $CLIENT_AM_LIB) && \
-     ($BUILT_CLIENT_AM_ONE -m $CLIENT_P0_CONC_MAN -k $CLIENT_PRIV_KEY)" Enter
+  tmux send-keys -t 1 "sleep 1 && ($BUILT_CLIENT_AM_ONE -m $CLIENT_P0_CONC_MAN -k $CLIENT_PRIV_KEY)" Enter 
+  
   tmux attach-session -d -t ServerProcess
 
 else
