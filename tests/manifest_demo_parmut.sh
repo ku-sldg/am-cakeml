@@ -5,13 +5,13 @@ MAN_COMP=./apps/ManifestCompiler/manComp_demo
 MAN_GEN=./apps/ManifestGenerator/manGen_demo
 #BUILT_AM=./build/COMPILED_AM
 #BUILT_CONC_MAN=./concrete_manifest.json
-DEMO_FILES=../apps/ManifestCompiler/DemoFiles
+DEMO_FILES=../tests/DemoFiles/Parmut
 
 # Server Variables
 SERVER_P0_FORM_MAN=$DEMO_FILES/FormalManifest_P0.sml
 SERVER_P1_FORM_MAN=$DEMO_FILES/FormalManifest_P1.sml
 SERVER_P2_FORM_MAN=$DEMO_FILES/FormalManifest_P2.sml
-SERVER_AM_LIB=$DEMO_FILES/Test_Am_Lib_Cache.sml
+SERVER_AM_LIB=$DEMO_FILES/Test_Am_Lib_Parmut.sml
 SERVER_PRIV_KEY=$DEMO_FILES/Test_Server_PrivKey
 
 SERVER_P0_CONC_MAN=$DEMO_FILES/concrete_Manifest_P0.json
@@ -26,7 +26,7 @@ SERVER_P2_EXE_NAME=TEST_SERVER_P2_AM_EXE
 CLIENT_P0_FORM_MAN=$DEMO_FILES/FormalManifest_P3.sml
 CLIENT_P1_FORM_MAN=$DEMO_FILES/FormalManifest_P4.sml
 
-CLIENT_AM_LIB=$DEMO_FILES/Test_Am_Lib_Cache.sml
+CLIENT_AM_LIB=$DEMO_FILES/Test_Am_Lib_Parmut.sml
 
 CLIENT_PRIV_KEY=$DEMO_FILES/Test_PrivKey
 
@@ -40,10 +40,6 @@ CLIENT_P1_EXE_NAME=TEST_CLIENT_AM_TWO_EXE
 CLIENT_P0_TERM_FILE=$DEMO_FILES/ClientCvmTermParmutP0.sml
 CLIENT_P1_TERM_FILE=$DEMO_FILES/ClientCvmTermParmutP1.sml
 
-#SERVER_P0_TERMS_FILE=$DEMO_FILES/ServerCvmTermsCacheP0.sml
-#SERVER_P1_TERMS_FILE=$DEMO_FILES/ServerCvmTermsCacheP1.sml
-#SERVER_P2_TERMS_FILE=$DEMO_FILES/ServerCvmTermsCacheP2.sml
-
 if [[ "$PWD" == */am-cakeml/tests ]]; then
   repoRoot=$(dirname "$PWD")
   # Move to build folder
@@ -53,7 +49,7 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   make manifest_compiler
 
   # First, generate the formal manifests
-  $MAN_GEN -om "" -t "parmut"
+  $MAN_GEN -om $DEMO_FILES -t "parmut"
 
   # First we need to compile the server(s), before starting tmux (to prevent race condition)
   $MAN_COMP -s -o $SERVER_P0_EXE_NAME -om $SERVER_P0_CONC_MAN -m $SERVER_P0_FORM_MAN -l $SERVER_AM_LIB
@@ -105,3 +101,4 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
 else
   echo "You are not in the 'am-cakeml/tests' directory"
 fi
+
