@@ -185,7 +185,7 @@ fun jsonToEv js = case (Json.toMap js) of
                     (* Json.toMap : json -> ((string,json) map) option *)
       Some m => fromJsonMap m getEvidence (* js' : (string,json) map *)
     | None =>
-        raise Json.Exn "jsonToTerm" "Copland term does not begin as an AList"
+        raise Json.Exn "jsonToEv" "Copland Evidence does not begin as an AList"
 
     and
     getEvidence constructor (Json.Array args) =
@@ -218,6 +218,63 @@ fun jsonToEv js = case (Json.toMap js) of
 
         [e1, e2] =>
         Coq_ss (jsonToEv e1) (jsonToEv e2)
+      | _ => raise Json.Exn "getSS" "unexpected argument list"
+
+
+(* jsonToEv : json -> coq_AppResultC
+   (json object to Copland Appraisal Result Type)  *)      
+fun jsonToAppResultC js = case (Json.toMap js) of
+                    (* Json.toMap : json -> ((string,json) map) option *)
+      Some m => fromJsonMap m getEvidence (* js' : (string,json) map *)
+    | None =>
+        raise Json.Exn "jsonToAppResultC" "Copland Appraisal Result does not begin as an AList"
+
+    and
+    getEvidence constructor (Json.Array args) =
+    case constructor of
+        "mtc_app" => Coq_mtc_app
+      | "nnc_app" => getNN args
+      | "ggc_app" => getGG args
+      | "hhc_app" => getHH args
+      | "eec_app" => getEE args
+      | "ssc_app" => getSS args
+      |  _ => raise Json.Exn "getEvidence"
+                    ("Unexpected constructor for Copland Appraisal Result: " ^
+                     constructor)
+                    
+
+    (* getAspc :: json list -> coq_Evidence *)
+    and                              
+    getNN args =  case args of
+    [Json.Int q, bs] => Coq_nnc_app (natFromInt q) (jsonStringToBS bs)
+
+    and
+    getGG args =
+    case args of
+        [Json.String q, paramsJsonOb, bs, e'] =>
+        Coq_ggc_app q (json_ObToTerm paramsJsonOb getAspParams)
+                      (jsonStringToBS bs) (jsonToAppResultC e')
+      | _ => raise Json.Exn "getGG" "unexpected argument list for AppResultC"
+    and
+    getHH args =
+    case args of
+        [Json.String q, paramsJsonOb, bs, e'] =>
+        Coq_hhc_app q (json_ObToTerm paramsJsonOb getAspParams)
+                      (jsonStringToBS bs) (jsonToAppResultC e')
+      | _ => raise Json.Exn "getHH" "unexpected argument list for AppResultC"
+    and
+    getEE args =
+    case args of
+        [Json.String q, paramsJsonOb, bs, e'] =>
+        Coq_eec_app q (json_ObToTerm paramsJsonOb getAspParams)
+                      (jsonStringToBS bs) (jsonToAppResultC e')
+      | _ => raise Json.Exn "getEE" "unexpected argument list for AppResultC"
+    and
+    getSS args =
+    case args of
+
+        [e1, e2] =>
+        Coq_ssc_app (jsonToAppResultC e1) (jsonToAppResultC e2)
       | _ => raise Json.Exn "getSS" "unexpected argument list"
 
 

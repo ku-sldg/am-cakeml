@@ -124,6 +124,35 @@ fun evToJson e = case e of
                                          [ evToJson e1,
                                            evToJson e2 ]
 
+fun appResultToJson e = case e of
+                      Coq_mtc_app => noArgConstructor "mtc_app"
+                    | Coq_nnc_app nid bs => 
+                      constructorWithArgs "nnc_app" [intToJson (natToInt nid), 
+                                                     (byteStringToJson bs)]
+                    | Coq_ggc_app p ps bs e' =>
+                     constructorWithArgs "ggc_app"
+                                         [ placeToJson p,
+                                           aspParamsToJson ps,
+                                           byteStringToJson bs,
+                                           appResultToJson e' ]
+                    | Coq_hhc_app p ps bs e' =>
+                     constructorWithArgs "hhc_app"
+                                         [ placeToJson p,
+                                           aspParamsToJson ps,
+                                           byteStringToJson bs,
+                                           appResultToJson e' ]
+                    | Coq_eec_app p ps bs e' =>
+                     constructorWithArgs "eec_app"
+                                         [ placeToJson p,
+                                           aspParamsToJson ps,
+                                           byteStringToJson bs,
+                                           appResultToJson e' ]
+                  
+                   | Coq_ssc_app e1 e2 =>
+                     constructorWithArgs "ssc_app"
+                                         [ appResultToJson e1,
+                                           appResultToJson e2 ]
+
 fun evcToJson e =
     case e of
         Coq_evc ev et => constructorWithArgs "EvC" [ bsListToJsonList ev,

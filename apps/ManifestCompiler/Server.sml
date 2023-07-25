@@ -4,7 +4,7 @@
 (* 
 For evalJson (now extracted from Coq):
 
-When things go well, this returns a JSON object. When they go wrong,
+When things go well, this returns a JSON response object. When they go wrong,
    it returns a raw error message string. In the future, we may want to wrap
    said error messages in JSON as well to make it easier on the client. *)
 fun respondToMsg client = Socket.output client (jsonToStr (evalJson (Socket.inputAll client)))

@@ -94,6 +94,17 @@ type coq_CvmResponseMessage =
   coq_RawEv
   (* singleton inductive, whose constructor was RES *)
 
+datatype coq_AppraisalRequestMessage =
+  REQ_APP coq_Term coq_Plc coq_Evidence coq_RawEv
+
+type coq_AppraisalResponseMessage =
+  coq_AppResultC
+  (* singleton inductive, whose constructor was RES_APP *)
+
+datatype coq_AM_RequestMessage =
+  CVM_REQ coq_CvmRequestMessage
+| APP_REQ coq_AppraisalRequestMessage
+
 datatype coq_CvmInMessage =
   CVM_IN coq_Term coq_RawEv
 
