@@ -42,7 +42,7 @@ fun check_asp_EXTD (ps : coq_ASP_PARAMS) (p : coq_Plc) (bs : coq_BS) (ls : coq_R
                    | _ => case (aspid = kim_meas_aspid) of
                               True => appraise_kim_meas_asp_stub ps p bs ls
                                                  
-                            | _ => let val _ = () (* (print ("\n\nChecking ASP with ID: " ^ aspid ^ "\n\n")) *) in
+                            | _ => let val _ = print ("\nAppraisal Check of ASP with ID: " ^ aspid ^ "\n") in
                                        BString.fromString ("check(" ^ aspid ^ ")") (* TODO: check data val here? *)
                                    end
                                        

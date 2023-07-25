@@ -66,7 +66,7 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
 
   tmux split-window -v 'bash -i'
 
- # Start the P0 server (in the background)
+ # Start the P0 server
   tmux send-keys -t 0 "( $BUILT_SERVER_AM_P0 -m $SERVER_P0_CONC_MAN -k $SERVER_PRIV_KEY )" Enter
  
  

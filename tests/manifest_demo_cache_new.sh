@@ -18,7 +18,7 @@ SERVER_P0_CONC_MAN=$DEMO_FILES/concrete_Manifest_P0.json
 SERVER_P1_CONC_MAN=$DEMO_FILES/concrete_Manifest_P1.json
 SERVER_P2_CONC_MAN=$DEMO_FILES/concrete_Manifest_P2.json
 
-SERVER_P0_EXE_NAME=TEST_SERVER_P1_AM_EXE
+SERVER_P0_EXE_NAME=TEST_SERVER_P0_AM_EXE
 SERVER_P1_EXE_NAME=TEST_SERVER_P1_AM_EXE
 SERVER_P2_EXE_NAME=TEST_SERVER_P2_AM_EXE
 
@@ -71,15 +71,21 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   BUILT_CLIENT_AM_P1=./build/$CLIENT_P1_EXE_NAME
 
   tmux new-session -d -s ServerProcess 'bash -i'
-  # Start the P0 server (in the background)
-  $BUILT_SERVER_AM_P0 -m $SERVER_P0_CONC_MAN -k $SERVER_PRIV_KEY > /dev/null &
-
-  # First let us run the P1 server
-  tmux send-keys -t 0 "( $BUILT_SERVER_AM_P1 -m $SERVER_P1_CONC_MAN -k $SERVER_PRIV_KEY )" Enter
 
   tmux split-window -v 'bash -i'
 
-  tmux send-keys -t 1 "($BUILT_SERVER_AM_P2 -m $SERVER_P2_CONC_MAN -k $SERVER_PRIV_KEY )" Enter
+   # Start the P0 server
+  tmux send-keys -t 0 "( $BUILT_SERVER_AM_P0 -m $SERVER_P0_CONC_MAN -k $SERVER_PRIV_KEY )" Enter
+
+  # Start the P0 server (in the background)
+  #$BUILT_SERVER_AM_P0 -m $SERVER_P0_CONC_MAN -k $SERVER_PRIV_KEY > /dev/null &
+
+  # Start the P1 server
+  tmux send-keys -t 1 "( $BUILT_SERVER_AM_P1 -m $SERVER_P1_CONC_MAN -k $SERVER_PRIV_KEY )" Enter
+
+  tmux split-window -v 'bash -i'
+
+  tmux send-keys -t 2 "($BUILT_SERVER_AM_P2 -m $SERVER_P2_CONC_MAN -k $SERVER_PRIV_KEY )" Enter
 
   # Setup tmux windows
   tmux split-window -h 'bash -i'
@@ -87,11 +93,11 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   
   # Now run the manifest compilations
   # Sending a chain of first AM comp, run, second AM comp, run
-  tmux send-keys -t 2 "($BUILT_CLIENT_AM_P0 -m $CLIENT_P0_CONC_MAN -k $CLIENT_PRIV_KEY -cs)" Enter
+  tmux send-keys -t 3 "($BUILT_CLIENT_AM_P0 -m $CLIENT_P0_CONC_MAN -k $CLIENT_PRIV_KEY -cs)" Enter
 
   tmux split-window -v 'bash -i'
 
-  tmux send-keys -t 3 "($BUILT_CLIENT_AM_P1 -m $CLIENT_P1_CONC_MAN -k $CLIENT_PRIV_KEY -cs)" Enter
+  tmux send-keys -t 4 "($BUILT_CLIENT_AM_P1 -m $CLIENT_P1_CONC_MAN -k $CLIENT_PRIV_KEY -cs)" Enter
 
 
   tmux attach-session -d -t ServerProcess
