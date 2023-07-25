@@ -5,13 +5,13 @@ MAN_COMP=./apps/ManifestCompiler/manComp_demo
 MAN_GEN=./apps/ManifestGenerator/manGen_demo
 #BUILT_AM=./build/COMPILED_AM
 #BUILT_CONC_MAN=./concrete_manifest.json
-DEMO_FILES=../apps/ManifestCompiler/DemoFiles
+DEMO_FILES=../tests/DemoFiles/Kim
 
 # Server Variables
 #SERVER_FORM_MAN=$DEMO_FILES/Test_Server_FormMan.sml
 #SERVER_AM_LIB=$DEMO_FILES/Test_Server_Am_Lib.sml
 SERVER_FORM_MAN=$DEMO_FILES/FormalManifest_P1.sml
-SERVER_AM_LIB=$DEMO_FILES/Test_Am_Lib_Cert.sml
+SERVER_AM_LIB=$DEMO_FILES/Test_Am_Lib_Kim.sml
 SERVER_PRIV_KEY=$DEMO_FILES/Test_Server_PrivKey
 
 SERVER_EXE_NAME=TEST_SERVER_AM_EXE
@@ -20,19 +20,14 @@ SERVER_P1_CONC_MAN=$DEMO_FILES/concrete_Manifest_P1.json
 
 # Client Variables
 CLIENT_FORM_MAN=$DEMO_FILES/FormalManifest_P0.sml
-CLIENT_AM_LIB=$DEMO_FILES/Test_Am_Lib_Cert.sml
-#CLIENT_FORM_MAN=$DEMO_FILES/Test_FormMan.sml
-#CLIENT_AM_LIB=$DEMO_FILES/Test_Am_Lib.sml
-#CLIENT_AM_LIB=$DEMO_FILES/Test_Am_Lib_Cert.sml
-CLIENT_AM_LIB2=$DEMO_FILES/Test_Am_Lib_Cert2.sml
+CLIENT_AM_LIB=$DEMO_FILES/Test_Am_Lib_Kim.sml
+CLIENT_AM_LIB2=$DEMO_FILES/Test_Am_Lib_Kim2.sml
 CLIENT_PRIV_KEY=$DEMO_FILES/Test_PrivKey
 
 CLIENT_ONE_EXE_NAME=TEST_CLIENT_AM_ONE_EXE
 CLIENT_TWO_EXE_NAME=TEST_CLIENT_AM_TWO_EXE
 
 CLIENT_TERM_FILE=$DEMO_FILES/ClientCvmTermKim.sml
-
-# SERVER_P1_TERMS_FILE=$DEMO_FILES/ServerCvmTermsCert.sml
 
 CLIENT_P0_CONC_MAN=$DEMO_FILES/concrete_Manifest_P0.json
 
@@ -46,7 +41,7 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
 
 
   # First, generate the formal manifests
-  $MAN_GEN -om "" -t "kim"
+  $MAN_GEN -om $DEMO_FILES -t "kim"
 
   # First we need to compile the server, before starting tmux (to prevent race condition)
   $MAN_COMP -s -o $SERVER_EXE_NAME -om $SERVER_P1_CONC_MAN -m $SERVER_FORM_MAN -l $SERVER_AM_LIB
@@ -77,3 +72,4 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
 else
   echo "You are not in the 'am-cakeml/tests' directory"
 fi
+
