@@ -80,11 +80,11 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   
   # Now run the manifest compilations
   # Sending a chain of first AM comp, run, second AM comp, run
-  tmux send-keys -t 2 "($BUILT_CLIENT_AM_P0 -m $CLIENT_P0_CONC_MAN -k $CLIENT_PRIV_KEY -cs)" Enter
+  tmux send-keys -t 2 "sleep 1 && ($BUILT_CLIENT_AM_P0 -m $CLIENT_P0_CONC_MAN -k $CLIENT_PRIV_KEY -cs)" Enter
 
   tmux split-window -v 'bash -i'
 
-  tmux send-keys -t 3 "($BUILT_CLIENT_AM_P1 -m $CLIENT_P1_CONC_MAN -k $CLIENT_PRIV_KEY -cs)" Enter
+  tmux send-keys -t 3 "sleep 1 && ($BUILT_CLIENT_AM_P1 -m $CLIENT_P1_CONC_MAN -k $CLIENT_PRIV_KEY -cs)" Enter
 
 
   tmux attach-session -d -t ServerProcess
