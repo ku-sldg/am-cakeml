@@ -73,30 +73,32 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
 
   # First let us compile the server and then run it
   tmux new-session -d -s ServerProcess 'bash -i'
-  tmux send-keys -t 0 "( $BUILT_SERVER_AM_P0 -m $SERVER_P0_CONC_MAN -k $SERVER_PRIV_KEY )" Enter
-
-  tmux split-window -v 'bash -i'
-
-  tmux send-keys -t 1 "($BUILT_SERVER_AM_P1 -m $SERVER_P1_CONC_MAN -k $SERVER_PRIV_KEY )" Enter
-
-  tmux split-window -v 'bash -i'
-
-  tmux send-keys -t 2 "($BUILT_SERVER_AM_P2 -m $SERVER_P2_CONC_MAN -k $SERVER_PRIV_KEY )" Enter
+  tmux split-window -v 'bash -i' # Pane 0
+  tmux split-window -v 'bash -i' # Pane 1
+  tmux split-window -v 'bash -i' # Pane 2
+  tmux split-window -h 'bash -i' # Pane 3
 
   # Setup tmux windows
-  tmux split-window -h 'bash -i'
   tmux select-layout even-horizontal
-  
-  # Now run the manifest compilations
-  # Sending a chain of first AM comp, run, second AM comp, run
-  tmux send-keys -t 3 "($BUILT_CLIENT_AM_P1 -m $CLIENT_P1_CONC_MAN -k $CLIENT_PRIV_KEY -cs)" Enter
-  #tmux send-keys -t 3 "($BUILT_CLIENT_AM_P0 -m $CLIENT_P0_CONC_MAN -k $CLIENT_PRIV_KEY -cs)" Enter
 
-  tmux split-window -v 'bash -i'
+  tmux send-keys -t 0 "( $BUILT_SERVER_AM_P0 -m $SERVER_P0_CONC_MAN -k $SERVER_PRIV_KEY )" Enter
+  tmux send-keys -t 1 "($BUILT_SERVER_AM_P1 -m $SERVER_P1_CONC_MAN -k $SERVER_PRIV_KEY )" Enter
+  tmux send-keys -t 2 "($BUILT_SERVER_AM_P2 -m $SERVER_P2_CONC_MAN -k $SERVER_PRIV_KEY )" Enter
 
-  tmux send-keys -t 4 "($BUILT_CLIENT_AM_P0 -m $CLIENT_P0_CONC_MAN -k $CLIENT_PRIV_KEY -cs)" Enter
-  #tmux send-keys -t 4 "($BUILT_CLIENT_AM_P1 -m $CLIENT_P1_CONC_MAN -k $CLIENT_PRIV_KEY -cs)" Enter
+  # Setting up Race Flags
+  # tmux wait-for -L server0ready -t 0 "Starting up Server"
+  # tmux wait-for -L server1ready -t 1 "Starting up Server"
+  # tmux wait-for -L server2ready -t 2 "Starting up Server"
 
+  # # Now run the manifest compilations
+  # # Sending a chain of first AM comp, run, second AM comp, run
+  # tmux wait-for -U server0ready
+  # tmux wait-for -U server1ready
+  # tmux wait-for -U server2ready
+
+  tmux send-keys -t 3 "sleep 1 && ($BUILT_CLIENT_AM_P1 -m $CLIENT_P1_CONC_MAN -k $CLIENT_PRIV_KEY -cs)" Enter
+
+  tmux send-keys -t 4 "sleep 1 && ($BUILT_CLIENT_AM_P0 -m $CLIENT_P0_CONC_MAN -k $CLIENT_PRIV_KEY -cs)" Enter
 
   tmux attach-session -d -t ServerProcess
 
