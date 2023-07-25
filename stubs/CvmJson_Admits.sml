@@ -62,3 +62,65 @@ fun cvmOutMessageToJson x = Json.Null
   (* failwith "AXIOM TO BE REALIZED" *)
 
 *)
+
+
+(* fun isCvmReqJson : coq_JsonT -> bool *)
+fun isCvmReqJson js = case (Json.toMap js) of 
+    Some js' => fromAList js'
+  | None => False
+
+  and
+  fromAList pairs =
+        let fun get str = case Map.lookup pairs str of
+                  Some x => True
+                | None   => False
+         in getREQ (List.map get ["reqTerm", "reqAuthTok", "reqEv"])
+        end
+
+  and
+  getREQ data = case data of
+          [True, True, True] => True
+        | _ => False
+
+
+(* fun isAppReqJson : coq_JsonT -> bool *)
+fun isAppReqJson js = case (Json.toMap js) of 
+    Some js' => fromAList js'
+  | None => False
+
+  and
+  fromAList pairs =
+        let fun get str = case Map.lookup pairs str of
+                  Some x => True
+                | None   => False
+         in getREQ (List.map get ["appReqTerm", "appReqPlc", "appReqEt", "appReqEv"])
+        end
+
+  and
+  getREQ data = case data of
+          [True, True, True, True] => True
+        | _ => False
+
+
+(** val jsonToAmRequest : coq_JsonT -> coq_AM_RequestMessage **)
+
+fun jsonToAmRequest js =  
+(*
+      let val cvmreq = jsonToRequest js in 
+            (CVM_REQ cvmreq)
+      end 
+      *)
+      case (isCvmReqJson js) of 
+        True => 
+          let val cvmreq = jsonToRequest js in 
+            (CVM_REQ cvmreq)
+          end 
+      | False => 
+          case (isAppReqJson js) of 
+            True =>  
+              let val appreq = jsonToAppRequest js in 
+                (APP_REQ appreq) 
+              end
+          | False => 
+              raise Json.Exn "jsonToAmRequest" "Request is NOT one of the expected AM Requests:  CVM | Appraisal"
+            

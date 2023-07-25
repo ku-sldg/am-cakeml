@@ -12,14 +12,14 @@ fun am_check_auth_tok t fromPl authTok = case authTok of
     coq_Term -> coq_Plc -> coq_Plc -> coq_ReqAuthTok -> coq_RawEv ->
     coq_RawEv coq_AM **)
 
-fun am_serve_auth_tok_req t fromPl _ authTok init_ev =
+fun am_serve_auth_tok_req t fromPl myPl authTok init_ev =
   bind (am_check_auth_tok t fromPl authTok) (fn v =>
     case case requester_bound t fromPl authTok of
            True => appraise_auth_tok v
          | False => False of
       True =>
       (case privPolicy coq_Eq_Class_ID_Type fromPl t of
-         True => ret (run_cvm_json_full t init_ev)
+         True => ret (run_cvm_rawEv t myPl init_ev)
        | False => failm)
     | False => failm)
 
@@ -29,16 +29,32 @@ fun am_serve_auth_tok_req t fromPl _ authTok init_ev =
 fun run_am_server_auth_tok_req t fromPlc myPl authTok init_ev =
   run_am_app_comp (am_serve_auth_tok_req t fromPlc myPl authTok init_ev) []
 
+(** val do_cvm_session : coq_CvmRequestMessage -> coq_CvmResponseMessage **)
+
+fun do_cvm_session req = case req of
+  REQ t tok ev =>
+  run_am_server_auth_tok_req t default_place default_place tok ev
+
+(** val do_appraisal_session :
+    coq_AppraisalRequestMessage -> coq_AppraisalResponseMessage **)
+
+fun do_appraisal_session appreq = case appreq of
+  REQ_APP t p et ev =>
+  let val expected_et = eval t p et in
+  let val comp = gen_appraise_AM expected_et ev in
+  run_am_app_comp comp Coq_mtc_app end end
+
 (** val evalJson : coq_StringT -> coq_JsonT **)
 
 fun evalJson s =
   let val js = strToJson s in
-  let val req = jsonToRequest js in
-  let val REQ t tok ev = req in
-  let val resev =
-    run_am_server_auth_tok_req t default_place default_place tok ev
-  in
-  responseToJson resev end end end end
+  let val am_req = jsonToAmRequest js in
+  (case am_req of
+     CVM_REQ r =>
+     let val cvm_resp = do_cvm_session r in responseToJson cvm_resp end
+   | APP_REQ appreq =>
+     let val app_resp = do_appraisal_session appreq in
+     appResponseToJson app_resp end) end end
 
 (** val am_client_auth_tok_req :
     coq_Term -> coq_Plc -> coq_RawEv -> bool -> coq_AM_Result coq_AM **)
@@ -47,7 +63,6 @@ fun am_client_auth_tok_req t myPl init_ev app_bool =
   let val att_res = am_sendReq t myPl mt_evc init_ev in
   (case app_bool of
      True =>
-     let val att_et = eval t myPl Coq_mt in
-     bind (gen_appraise_AM att_et att_res) (fn app_res =>
-       ret (Coq_am_appev app_res)) end
+     let val app_res = am_sendReq_app t myPl Coq_mt att_res in
+     ret (Coq_am_appev app_res) end
    | False => ret (Coq_am_rawev att_res)) end

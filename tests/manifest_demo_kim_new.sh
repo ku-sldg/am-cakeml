@@ -63,12 +63,19 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   BUILT_CLIENT_AM_TWO=./build/$CLIENT_TWO_EXE_NAME
 
   tmux new-session -d -s ServerProcess 'bash -i'
+
+  tmux split-window -v 'bash -i'
+
+ # Start the P0 server (in the background)
+  tmux send-keys -t 0 "( $BUILT_SERVER_AM_P0 -m $SERVER_P0_CONC_MAN -k $SERVER_PRIV_KEY )" Enter
+ 
+ 
   # Start the P0 server (in the background)
-  $BUILT_SERVER_AM_P0 -m $SERVER_P0_CONC_MAN -k $SERVER_PRIV_KEY > /dev/null &
+  #$BUILT_SERVER_AM_P0 -m $SERVER_P0_CONC_MAN -k $SERVER_PRIV_KEY # > /dev/null &
 
 
   # First let us compile the P1 server and then run it in a new tmux window
-  tmux send-keys -t 0 "( $BUILT_SERVER_AM_ONE -m $SERVER_P1_CONC_MAN -k $SERVER_PRIV_KEY )" Enter
+  tmux send-keys -t 1 "( $BUILT_SERVER_AM_ONE -m $SERVER_P1_CONC_MAN -k $SERVER_PRIV_KEY )" Enter
 
   # Setup tmux windows
   tmux split-window -h 'bash -i'
@@ -76,7 +83,7 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   
   # Now run the manifest compilations
   # Sending a chain of first AM comp, run, second AM comp, run
-  tmux send-keys -t 1 \
+  tmux send-keys -t 2 \
     "($MAN_COMP -c $CLIENT_TERM_FILE -o $CLIENT_ONE_EXE_NAME -om $CLIENT_P0_CONC_MAN -m $CLIENT_FORM_MAN -l $CLIENT_AM_LIB) && \
      ($BUILT_CLIENT_AM_ONE -m $CLIENT_P0_CONC_MAN -k $CLIENT_PRIV_KEY)" Enter # && \
      #($MAN_COMP -c $CLIENT_TERM_FILE -o $CLIENT_TWO_EXE_NAME -om $CLIENT_P0_CONC_MAN -m $CLIENT_FORM_MAN -l $CLIENT_AM_LIB2) && \

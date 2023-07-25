@@ -32,7 +32,12 @@ val cvmOutMessageToJson =
 val responseToJson =
   failwith "AXIOM TO BE REALIZED"
 
-(** val jsonToRequest : coq_JsonT -> coq_CvmRequestMessage **)
+(** val appResponseToJson : coq_AppraisalResponseMessage -> coq_JsonT **)
 
-val jsonToRequest =
+val appResponseToJson =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val jsonToAmRequest : coq_JsonT -> coq_AM_RequestMessage **)
+
+val jsonToAmRequest =
   failwith "AXIOM TO BE REALIZED"

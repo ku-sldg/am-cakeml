@@ -307,6 +307,8 @@ fun jsonToEvC js = case (Json.toMap js) of (* Json.toMap : json -> ((string,json
                                            [ev, et] =>
                                            Coq_evc (jsonBsListToList ev) (jsonToEv et)
 
+
+(* fun jsonToRequest : coq_JsonT -> coq_CvmRequestMessage  *)
 fun jsonToRequest js = case (Json.toMap js) of
           Some js' => fromAList js'
         | None => raise Json.Exn "JsonToRequest" "Request message does not begin as an object."
@@ -315,7 +317,7 @@ fun jsonToRequest js = case (Json.toMap js) of
     fromAList pairs =
         let fun get str = case Map.lookup pairs str of
                   Some x => x
-                | None   => raise Json.Exn "fromAList" "missing request field"
+                | None   => raise Json.Exn "fromAList (REQ)" "missing request field"
          in getREQ (List.map get ["reqTerm", "reqAuthTok", "reqEv"])
         end
 
@@ -325,7 +327,7 @@ fun jsonToRequest js = case (Json.toMap js) of
               REQ (jsonToTerm t) (jsonToEvC authTok) (jsonBsListToList ev)
         | _ => raise Json.Exn "getREQ" "unexpected argument list"
 
-
+(* fun jsonToResponse : coq_JsonT -> coq_CvmResponseMessage  *)
 fun jsonToResponse js = case (Json.toMap js) of
           Some js' => fromAList js'
         | _ => raise Json.Exn "JsonToResponse" "Response message does not begin as an AList"
@@ -343,6 +345,49 @@ fun jsonToResponse js = case (Json.toMap js) of
           [ev] => (jsonBsListToList ev)
               (* RES (jsonBsListToList ev) *)
         | _ => raise Json.Exn "getRES" "unexpected argument list"
+
+
+
+(* fun jsonToAppRequest : coq_JsonT -> coq_AppraisalRequestMessage  *)
+fun jsonToAppRequest js = case (Json.toMap js) of
+          Some js' => fromAList js'
+        | None => raise Json.Exn "JsonToAppRequest" "Request message does not begin as an object."
+
+    and
+    fromAList pairs =
+        let fun get str = case Map.lookup pairs str of
+                  Some x => x
+                | None   => raise Json.Exn "fromAList (REQ_APP)" "missing request field"
+         in getREQ (List.map get ["appReqTerm", "appReqPlc", "appReqEt", "appReqEv"])
+        end
+
+    and
+    getREQ data = case data of
+          [t, (Json.String p), et, ev] =>
+              REQ_APP (jsonToTerm t) (p) (jsonToEv et) (jsonBsListToList ev)
+        | _ => raise Json.Exn "getREQ_APP" "unexpected argument list"
+
+(* fun jsonToAppResponse : coq_JsonT -> coq_AppraisalResponseMessage  *)
+fun jsonToAppResponse js = case (Json.toMap js) of
+          Some js' => fromAList js'
+        | _ => raise Json.Exn "JsonToResponse" "Response message does not begin as an AList"
+
+    and
+    fromAList pairs =
+        let fun get str = case Map.lookup pairs str of
+                  Some x => x
+                | None   => raise Json.Exn "fromAList APP" "missing request field"
+         in getRES (List.map get ["appRespRes"])
+        end
+
+    and
+    getRES data = case data of
+          [ev] => (jsonToAppResultC ev)
+              (* RES (jsonBsListToList ev) *)
+        | _ => raise Json.Exn "getRES" "unexpected argument list"
+
+
+
 
 fun strToJson str = 
     let val jp = (Json.parse str)
