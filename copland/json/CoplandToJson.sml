@@ -67,16 +67,25 @@ fun constructorWithArgs cName arglist =
                        ("data", Json.Array arglist)]
 
 (* spToJson : coq_SP -> json *)
+(*
 fun spToJson sp = stringToJson (spToString sp)
+*)
+fun spToJson sp = noArgConstructor (spToString sp)
 
+
+(*
 (* fwdToJson : coq_FWD -> json *)
 fun fwdToJson fwd = stringToJson (fwdToString fwd)
+*)
+
+fun fwdToJson fwd = noArgConstructor (fwdToString fwd)
+
 
 (* aspParamsToJson : coq_ASP_PARAMS -> json *)                               
 fun aspParamsToJson ps =
     case ps of
         Coq_asp_paramsC i args tpl tid =>
-        constructorWithArgs "asp_paramsC"
+        constructorWithArgs "Asp_paramsC"
                             [aspIdToJson i,
                              stringListToJsonList args,
                              placeToJson tpl,
@@ -100,12 +109,12 @@ fun termToJson term = case term of
     | Coq_lseq t1 t2 =>
       constructorWithArgs "Lseq"
                           [termToJson t1, termToJson t2]
-    | Coq_bseq p t1 t2 =>
+    | Coq_bseq (Coq_pair sp1 sp2) t1 t2 =>
       constructorWithArgs "Bseq"
-                          [spProdToJson p, termToJson t1, termToJson t2]
-    | Coq_bpar p t1 t2 =>
+                          [spToJson sp1, spToJson sp2, termToJson t1, termToJson t2]
+    | Coq_bpar (Coq_pair sp1 sp2) t1 t2 =>
       constructorWithArgs "Bpar"
-                          [spProdToJson p, termToJson t1, termToJson t2]
+                          [spToJson sp1, spToJson sp2, termToJson t1, termToJson t2]
     |  _ =>
        raise  Json.Exn "termToJson" "Unexpected constructor for APDT term: "
 

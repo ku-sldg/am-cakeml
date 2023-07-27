@@ -73,7 +73,7 @@ fun json_ObToTerm ob f =
 (* getAspParams :: string -> Json.Array(json) -> coq_ASP_PARAMS *)
 fun getAspParams constructor (Json.Array args) =
     case constructor of
-        "asp_paramsC" => getAspParamsArray args
+        "Asp_paramsC" => getAspParamsArray args
       | _ => raise Json.Exn "getAspParams" "unexpected asp_paramsC constructor name"
     
 
@@ -88,6 +88,36 @@ fun getAspParams constructor (Json.Array args) =
           [Json.String aspid, arrayArgs, Json.String plc, Json.String targid] =>
             Coq_asp_paramsC aspid (jsonStringListToList arrayArgs) plc targid
         | _ => raise Json.Exn "getAspParamsArray" "unexpected Coq_asp_paramsC params"                     
+
+fun jsonToSp js =
+  case js of 
+    (Json.Object m) => fromJsonMap m getSp
+  | _ => raise Json.Exn "jsonToSp" "expected Json.Object parameter"
+  
+  and
+  getSp constructor (Json.Array args) =
+    case constructor of
+        "ALL" => ALL
+      | "NONE" => NONE 
+      |  _ => raise Json.Exn "getSp"
+                    ("Unexpected constructor name for SP: " ^
+                     constructor)
+fun jsonToFwd js =
+  case js of 
+    (Json.Object m) => fromJsonMap m getFwd
+  | _ => raise Json.Exn "jsonToFwd" "expected Json.Object parameter"
+  
+  and
+  getFwd constructor (Json.Array args) =
+    case constructor of
+        "EXTD" => EXTD
+      | "COMP" => COMP 
+      | "ENCR" => ENCR 
+      | "KILL" => KILL
+      | "KEEP" => KEEP
+      |  _ => raise Json.Exn "getFwd"
+                    ("Unexpected constructor name for Fwd: " ^
+                     constructor)
 
 (* jsonToTerm : json -> coq_Term 
    (json object to Copland phrase)  *)      
@@ -142,8 +172,10 @@ fun jsonToTerm js = case (Json.toMap js) of
     (* args :: json list 
        Expected: [Json.String "ALL" | "NONE", Json.String "COMP" | "EXTD" | ...,  
                   Json.Object [("constructor", "asp_paramsC"), ("data", ...)]]      *)
-    [Json.String spStr, Json.String fwdStr, paramsJsonOb] =>
-    ASPC (spFromString spStr) (fwdFromString fwdStr)
+    
+    (* Json.String spStr *)
+    [spobj, fwdOjb, paramsJsonOb] =>
+    ASPC (jsonToSp spobj(* spFromString spStr *)) (jsonToFwd fwdOjb)
          (json_ObToTerm paramsJsonOb getAspParams)
                     | _ => raise Json.Exn "getAspc" "unexpected argument list"
 
@@ -167,13 +199,13 @@ fun jsonToTerm js = case (Json.toMap js) of
 
     and
     getBseq data = case data of
-          [ Json.Array [Json.String sp1, Json.String sp2], term1, term2] =>
-            Coq_bseq (Coq_pair (spFromString sp1) (spFromString sp2)) (jsonToTerm term1) (jsonToTerm term2)
+          [ sp1, sp2, term1, term2] =>
+            Coq_bseq (Coq_pair (jsonToSp sp1) (jsonToSp sp2)) (jsonToTerm term1) (jsonToTerm term2)
         | _ => raise  Json.Exn "getBseq" "unexpected argument list"
     and
     getBpar data = case data of
-          [ Json.Array [Json.String sp1, Json.String sp2], term1, term2] =>
-            Coq_bpar (Coq_pair (spFromString sp1) (spFromString sp2)) (jsonToTerm term1) (jsonToTerm term2)
+          [ sp1, sp2, term1, term2] =>
+            Coq_bpar (Coq_pair (jsonToSp sp1) (jsonToSp sp2)) (jsonToTerm term1) (jsonToTerm term2)
         | _ => raise  Json.Exn "getBpar" "unexpected argument list"
 
 
@@ -207,8 +239,8 @@ fun jsonToEv js = case (Json.toMap js) of
     and
     getUU args =
     case args of
-        [Json.String q, Json.String fwdStr, paramsJsonOb, e'] =>
-        Coq_uu q (fwdFromString fwdStr) (json_ObToTerm paramsJsonOb getAspParams)
+        [Json.String q, fwdObj, paramsJsonOb, e'] =>
+        Coq_uu q (jsonToFwd fwdObj) (json_ObToTerm paramsJsonOb getAspParams)
                (jsonToEv e')
       | _ => raise Json.Exn "getUU" "unexpected argument list"
 

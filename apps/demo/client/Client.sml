@@ -37,6 +37,8 @@ fun print_json_man_list_verbose (ts:coq_Term list) (p:coq_Plc) =
   *)
 
 
+(*
+
 (* NOTE: Hardcoding of source place is here now *)
 val formal_manifest = 
   (Build_Manifest 
@@ -109,7 +111,18 @@ val kim_meas = Coq_asp (ASPC ALL EXTD (Coq_asp_paramsC kim_meas_aspid [] dest_pl
     kim_meas_targid))
 *)
 
-fun main () =
+*)
+
+fun main () = 
+  let val _ = print "running demo client\n"
+      val t' = cert_style 
+      val t = t' (* Coq_lseq cert_style (Coq_asp SIG) *)
+      val js = termToJson t 
+      val tstr = Json.stringify js in 
+        print ("Json representation of term: \n" ^ tstr ^ "\n\n")
+  end
+
+(*
     let val authb = True
         val auth_phrase = ssl_sig_parameterized coq_P0 (* TODO: fix this hardcoding *)
         val nonceB = True
@@ -128,9 +141,11 @@ fun main () =
         (* print ( (evidenceCToString (run_am_app_comp am_comp empty_am_result)
           ) ^ "\n\n") *)
     end
+    
     handle Exception e => TextIO.print_err e 
           | ManifestUtils.Excn e => TextIO.print_err ("ManifestUtils Error: " ^ e)
           | ManifestJsonConfig.Excn e => TextIO.print_err ("ManifestUtils Error: " ^ e)
           | Word8Extra.InvalidHex => TextIO.print_err "BSTRING UNSHOW ERROR"
+          *)
 
 val _ = main ()
