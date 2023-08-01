@@ -1,37 +1,20 @@
 (* Depends on: util, copland, system/sockets, am/Measurementsm am/CommTypes,
    am/ServerAm extracted/Term_Defs_Core.cml *)
 
+(* 
+For evalJson (now extracted from Coq):
 
-fun run_am_serve_auth_tok_req (t : coq_Term) (fromPlc : coq_Plc) (myPl : coq_Plc) (authTok : coq_ReqAuthTok) (init_ev : coq_RawEv) =
-  run_am_app_comp (am_serve_auth_tok_req t fromPlc myPl authTok init_ev) []
-
-(* When things go well, this returns a JSON evidence string. When they go wrong,
+When things go well, this returns a JSON response object. When they go wrong,
    it returns a raw error message string. In the future, we may want to wrap
    said error messages in JSON as well to make it easier on the client. *)
-fun evalJson s  = (* jsonToStr (responseToJson (RES O O [])) *)
-    let val fromPlc = "10"
-        val my_plc = "0"
-        val (REQ t authTok ev) = jsonToRequest (strToJson s)
-        (*
-        val _ = print "\n\nGOT past REQ decoding\n"
-        *)
-        val _ = print ("Auth Tok Received in REQ: \n" ^ (evCToString authTok) ^ "\n\n")
-        (* val ev = ev' *)
-        val resev = run_am_serve_auth_tok_req t fromPlc my_plc authTok ev
-            
-    in jsonToStr (responseToJson (RES resev))
-    end
+fun respondToMsg client = Socket.output client (jsonToStr (evalJson (Socket.inputAll client)))
     handle Json.Exn s1 s2 =>
-           (TextIO.print_err ("JSON error" ^ s1 ^ ": " ^ s2 ^ "\n");
-            "Invalid JSON/Copland term")
+           (TextIO.print_err ("JSON error" ^ s1 ^ ": " ^ s2 ^ "\n"); ()
+            )
         (*
          | USMexpn s =>
             (TextIO.print_err (String.concat ["USM error: ", s, "\n"]);
             "USM failure")   *)
-
-
-fun respondToMsg client = Socket.output client (evalJson (Socket.inputAll client))
-
 
 fun handleIncoming listener =
     let val client = Socket.accept listener

@@ -3,8 +3,10 @@
 (* val kim_meas = Coq_asp (ASPC ALL EXTD (Coq_asp_paramsC kim_meas_aspid [] dest_plc
     kim_meas_targid)) *)
 
+(*
 fun run_am_serve_auth_tok_req (t : coq_Term) (fromPlc : coq_Plc) (myPl : coq_Plc) (authTok : coq_ReqAuthTok) (init_ev : coq_RawEv) =
   run_am_app_comp (am_serve_auth_tok_req t fromPlc myPl authTok init_ev) []
+*)
 
 fun run_am_client_auth_tok_req (t : coq_Term) (myPl : coq_Plc) (init_ev : coq_RawEv) (app_bool:bool) =
   run_am_app_comp (am_client_auth_tok_req t myPl init_ev app_bool) empty_am_result
@@ -103,12 +105,12 @@ fun main' ()(* (main_phrase:coq_Term) *) =
         val (Build_ConcreteManifest plc plcMap pubKeyMap aspServer_addr pubKeyServer_addr plcServer_addr uuidServer_addr) = concrete
         (* Retrieving implicit self place from manifest here *)
         val my_plc = ManifestUtils.get_myPlc()
-        val to_plc = coq_P1
+        (* val to_plc = coq_P1 *)
         val _ = print ("\n\nClient my_plc: \n" ^ my_plc ^ "\n\n")
         val uuid = ManifestUtils.get_myUUID()
         (* NOTE: The dest plc is hardcoded here! *)
         val _ = TextIO.print ("Client Launched!\nLoaded following implicit place from Manifest: '" ^ my_plc ^ "'\n\n")
-        val _ = TextIO.print ("Loaded following implicit UUID from Manifest: '" ^ uuid ^ "'\n\n")
+        val _ = TextIO.print ("Loaded following implicit UUID from Client Manifest: '" ^ uuid ^ "'\n\n")
         val nonceB = True
         val appraiseB = True
         (* val _ = print_json_man_list_verbose [auth_phrase, main_phrase] coq_P0  *)

@@ -73,7 +73,7 @@ fun json_ObToTerm ob f =
 (* getAspParams :: string -> Json.Array(json) -> coq_ASP_PARAMS *)
 fun getAspParams constructor (Json.Array args) =
     case constructor of
-        "asp_paramsC" => getAspParamsArray args
+        "Asp_paramsC" => getAspParamsArray args
       | _ => raise Json.Exn "getAspParams" "unexpected asp_paramsC constructor name"
     
 
@@ -88,6 +88,36 @@ fun getAspParams constructor (Json.Array args) =
           [Json.String aspid, arrayArgs, Json.String plc, Json.String targid] =>
             Coq_asp_paramsC aspid (jsonStringListToList arrayArgs) plc targid
         | _ => raise Json.Exn "getAspParamsArray" "unexpected Coq_asp_paramsC params"                     
+
+fun jsonToSp js =
+  case js of 
+    (Json.Object m) => fromJsonMap m getSp
+  | _ => raise Json.Exn "jsonToSp" "expected Json.Object parameter"
+  
+  and
+  getSp constructor (Json.Array args) =
+    case constructor of
+        "ALL" => ALL
+      | "NONE" => NONE 
+      |  _ => raise Json.Exn "getSp"
+                    ("Unexpected constructor name for SP: " ^
+                     constructor)
+fun jsonToFwd js =
+  case js of 
+    (Json.Object m) => fromJsonMap m getFwd
+  | _ => raise Json.Exn "jsonToFwd" "expected Json.Object parameter"
+  
+  and
+  getFwd constructor (Json.Array args) =
+    case constructor of
+        "EXTD" => EXTD
+      | "COMP" => COMP 
+      | "ENCR" => ENCR 
+      | "KILL" => KILL
+      | "KEEP" => KEEP
+      |  _ => raise Json.Exn "getFwd"
+                    ("Unexpected constructor name for Fwd: " ^
+                     constructor)
 
 (* jsonToTerm : json -> coq_Term 
    (json object to Copland phrase)  *)      
@@ -142,8 +172,10 @@ fun jsonToTerm js = case (Json.toMap js) of
     (* args :: json list 
        Expected: [Json.String "ALL" | "NONE", Json.String "COMP" | "EXTD" | ...,  
                   Json.Object [("constructor", "asp_paramsC"), ("data", ...)]]      *)
-    [Json.String spStr, Json.String fwdStr, paramsJsonOb] =>
-    ASPC (spFromString spStr) (fwdFromString fwdStr)
+    
+    (* Json.String spStr *)
+    [spobj, fwdOjb, paramsJsonOb] =>
+    ASPC (jsonToSp spobj(* spFromString spStr *)) (jsonToFwd fwdOjb)
          (json_ObToTerm paramsJsonOb getAspParams)
                     | _ => raise Json.Exn "getAspc" "unexpected argument list"
 
@@ -167,13 +199,13 @@ fun jsonToTerm js = case (Json.toMap js) of
 
     and
     getBseq data = case data of
-          [ Json.Array [Json.String sp1, Json.String sp2], term1, term2] =>
-            Coq_bseq (Coq_pair (spFromString sp1) (spFromString sp2)) (jsonToTerm term1) (jsonToTerm term2)
+          [ sp1, sp2, term1, term2] =>
+            Coq_bseq (Coq_pair (jsonToSp sp1) (jsonToSp sp2)) (jsonToTerm term1) (jsonToTerm term2)
         | _ => raise  Json.Exn "getBseq" "unexpected argument list"
     and
     getBpar data = case data of
-          [ Json.Array [Json.String sp1, Json.String sp2], term1, term2] =>
-            Coq_bpar (Coq_pair (spFromString sp1) (spFromString sp2)) (jsonToTerm term1) (jsonToTerm term2)
+          [ sp1, sp2, term1, term2] =>
+            Coq_bpar (Coq_pair (jsonToSp sp1) (jsonToSp sp2)) (jsonToTerm term1) (jsonToTerm term2)
         | _ => raise  Json.Exn "getBpar" "unexpected argument list"
 
 
@@ -185,7 +217,7 @@ fun jsonToEv js = case (Json.toMap js) of
                     (* Json.toMap : json -> ((string,json) map) option *)
       Some m => fromJsonMap m getEvidence (* js' : (string,json) map *)
     | None =>
-        raise Json.Exn "jsonToTerm" "Copland term does not begin as an AList"
+        raise Json.Exn "jsonToEv" "Copland Evidence does not begin as an AList"
 
     and
     getEvidence constructor (Json.Array args) =
@@ -207,8 +239,8 @@ fun jsonToEv js = case (Json.toMap js) of
     and
     getUU args =
     case args of
-        [Json.String q, Json.String fwdStr, paramsJsonOb, e'] =>
-        Coq_uu q (fwdFromString fwdStr) (json_ObToTerm paramsJsonOb getAspParams)
+        [Json.String q, fwdObj, paramsJsonOb, e'] =>
+        Coq_uu q (jsonToFwd fwdObj) (json_ObToTerm paramsJsonOb getAspParams)
                (jsonToEv e')
       | _ => raise Json.Exn "getUU" "unexpected argument list"
 
@@ -218,6 +250,63 @@ fun jsonToEv js = case (Json.toMap js) of
 
         [e1, e2] =>
         Coq_ss (jsonToEv e1) (jsonToEv e2)
+      | _ => raise Json.Exn "getSS" "unexpected argument list"
+
+
+(* jsonToEv : json -> coq_AppResultC
+   (json object to Copland Appraisal Result Type)  *)      
+fun jsonToAppResultC js = case (Json.toMap js) of
+                    (* Json.toMap : json -> ((string,json) map) option *)
+      Some m => fromJsonMap m getEvidence (* js' : (string,json) map *)
+    | None =>
+        raise Json.Exn "jsonToAppResultC" "Copland Appraisal Result does not begin as an AList"
+
+    and
+    getEvidence constructor (Json.Array args) =
+    case constructor of
+        "mtc_app" => Coq_mtc_app
+      | "nnc_app" => getNN args
+      | "ggc_app" => getGG args
+      | "hhc_app" => getHH args
+      | "eec_app" => getEE args
+      | "ssc_app" => getSS args
+      |  _ => raise Json.Exn "getEvidence"
+                    ("Unexpected constructor for Copland Appraisal Result: " ^
+                     constructor)
+                    
+
+    (* getAspc :: json list -> coq_Evidence *)
+    and                              
+    getNN args =  case args of
+    [Json.Int q, bs] => Coq_nnc_app (natFromInt q) (jsonStringToBS bs)
+
+    and
+    getGG args =
+    case args of
+        [Json.String q, paramsJsonOb, bs, e'] =>
+        Coq_ggc_app q (json_ObToTerm paramsJsonOb getAspParams)
+                      (jsonStringToBS bs) (jsonToAppResultC e')
+      | _ => raise Json.Exn "getGG" "unexpected argument list for AppResultC"
+    and
+    getHH args =
+    case args of
+        [Json.String q, paramsJsonOb, bs, e'] =>
+        Coq_hhc_app q (json_ObToTerm paramsJsonOb getAspParams)
+                      (jsonStringToBS bs) (jsonToAppResultC e')
+      | _ => raise Json.Exn "getHH" "unexpected argument list for AppResultC"
+    and
+    getEE args =
+    case args of
+        [Json.String q, paramsJsonOb, bs, e'] =>
+        Coq_eec_app q (json_ObToTerm paramsJsonOb getAspParams)
+                      (jsonStringToBS bs) (jsonToAppResultC e')
+      | _ => raise Json.Exn "getEE" "unexpected argument list for AppResultC"
+    and
+    getSS args =
+    case args of
+
+        [e1, e2] =>
+        Coq_ssc_app (jsonToAppResultC e1) (jsonToAppResultC e2)
       | _ => raise Json.Exn "getSS" "unexpected argument list"
 
 
@@ -250,6 +339,8 @@ fun jsonToEvC js = case (Json.toMap js) of (* Json.toMap : json -> ((string,json
                                            [ev, et] =>
                                            Coq_evc (jsonBsListToList ev) (jsonToEv et)
 
+
+(* fun jsonToRequest : coq_JsonT -> coq_CvmRequestMessage  *)
 fun jsonToRequest js = case (Json.toMap js) of
           Some js' => fromAList js'
         | None => raise Json.Exn "JsonToRequest" "Request message does not begin as an object."
@@ -258,7 +349,7 @@ fun jsonToRequest js = case (Json.toMap js) of
     fromAList pairs =
         let fun get str = case Map.lookup pairs str of
                   Some x => x
-                | None   => raise Json.Exn "fromAList" "missing request field"
+                | None   => raise Json.Exn "fromAList (REQ)" "missing request field"
          in getREQ (List.map get ["reqTerm", "reqAuthTok", "reqEv"])
         end
 
@@ -268,7 +359,7 @@ fun jsonToRequest js = case (Json.toMap js) of
               REQ (jsonToTerm t) (jsonToEvC authTok) (jsonBsListToList ev)
         | _ => raise Json.Exn "getREQ" "unexpected argument list"
 
-
+(* fun jsonToResponse : coq_JsonT -> coq_CvmResponseMessage  *)
 fun jsonToResponse js = case (Json.toMap js) of
           Some js' => fromAList js'
         | _ => raise Json.Exn "JsonToResponse" "Response message does not begin as an AList"
@@ -283,9 +374,52 @@ fun jsonToResponse js = case (Json.toMap js) of
 
     and
     getRES data = case data of
-          [ev] =>
-              RES (jsonBsListToList ev)
+          [ev] => (jsonBsListToList ev)
+              (* RES (jsonBsListToList ev) *)
         | _ => raise Json.Exn "getRES" "unexpected argument list"
+
+
+
+(* fun jsonToAppRequest : coq_JsonT -> coq_AppraisalRequestMessage  *)
+fun jsonToAppRequest js = case (Json.toMap js) of
+          Some js' => fromAList js'
+        | None => raise Json.Exn "JsonToAppRequest" "Request message does not begin as an object."
+
+    and
+    fromAList pairs =
+        let fun get str = case Map.lookup pairs str of
+                  Some x => x
+                | None   => raise Json.Exn "fromAList (REQ_APP)" "missing request field"
+         in getREQ (List.map get ["appReqTerm", "appReqPlc", "appReqEt", "appReqEv"])
+        end
+
+    and
+    getREQ data = case data of
+          [t, (Json.String p), et, ev] =>
+              REQ_APP (jsonToTerm t) (p) (jsonToEv et) (jsonBsListToList ev)
+        | _ => raise Json.Exn "getREQ_APP" "unexpected argument list"
+
+(* fun jsonToAppResponse : coq_JsonT -> coq_AppraisalResponseMessage  *)
+fun jsonToAppResponse js = case (Json.toMap js) of
+          Some js' => fromAList js'
+        | _ => raise Json.Exn "JsonToResponse" "Response message does not begin as an AList"
+
+    and
+    fromAList pairs =
+        let fun get str = case Map.lookup pairs str of
+                  Some x => x
+                | None   => raise Json.Exn "fromAList APP" "missing request field"
+         in getRES (List.map get ["appRespRes"])
+        end
+
+    and
+    getRES data = case data of
+          [ev] => (jsonToAppResultC ev)
+              (* RES (jsonBsListToList ev) *)
+        | _ => raise Json.Exn "getRES" "unexpected argument list"
+
+
+
 
 fun strToJson str = 
     let val jp = (Json.parse str)

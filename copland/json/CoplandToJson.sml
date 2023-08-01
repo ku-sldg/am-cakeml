@@ -67,16 +67,25 @@ fun constructorWithArgs cName arglist =
                        ("data", Json.Array arglist)]
 
 (* spToJson : coq_SP -> json *)
+(*
 fun spToJson sp = stringToJson (spToString sp)
+*)
+fun spToJson sp = noArgConstructor (spToString sp)
 
+
+(*
 (* fwdToJson : coq_FWD -> json *)
 fun fwdToJson fwd = stringToJson (fwdToString fwd)
+*)
+
+fun fwdToJson fwd = noArgConstructor (fwdToString fwd)
+
 
 (* aspParamsToJson : coq_ASP_PARAMS -> json *)                               
 fun aspParamsToJson ps =
     case ps of
         Coq_asp_paramsC i args tpl tid =>
-        constructorWithArgs "asp_paramsC"
+        constructorWithArgs "Asp_paramsC"
                             [aspIdToJson i,
                              stringListToJsonList args,
                              placeToJson tpl,
@@ -100,12 +109,12 @@ fun termToJson term = case term of
     | Coq_lseq t1 t2 =>
       constructorWithArgs "Lseq"
                           [termToJson t1, termToJson t2]
-    | Coq_bseq p t1 t2 =>
+    | Coq_bseq (Coq_pair sp1 sp2) t1 t2 =>
       constructorWithArgs "Bseq"
-                          [spProdToJson p, termToJson t1, termToJson t2]
-    | Coq_bpar p t1 t2 =>
+                          [spToJson sp1, spToJson sp2, termToJson t1, termToJson t2]
+    | Coq_bpar (Coq_pair sp1 sp2) t1 t2 =>
       constructorWithArgs "Bpar"
-                          [spProdToJson p, termToJson t1, termToJson t2]
+                          [spToJson sp1, spToJson sp2, termToJson t1, termToJson t2]
     |  _ =>
        raise  Json.Exn "termToJson" "Unexpected constructor for APDT term: "
 
@@ -124,14 +133,58 @@ fun evToJson e = case e of
                                          [ evToJson e1,
                                            evToJson e2 ]
 
+fun appResultToJson e = case e of
+                      Coq_mtc_app => noArgConstructor "mtc_app"
+                    | Coq_nnc_app nid bs => 
+                      constructorWithArgs "nnc_app" [intToJson (natToInt nid), 
+                                                     (byteStringToJson bs)]
+                    | Coq_ggc_app p ps bs e' =>
+                     constructorWithArgs "ggc_app"
+                                         [ placeToJson p,
+                                           aspParamsToJson ps,
+                                           byteStringToJson bs,
+                                           appResultToJson e' ]
+                    | Coq_hhc_app p ps bs e' =>
+                     constructorWithArgs "hhc_app"
+                                         [ placeToJson p,
+                                           aspParamsToJson ps,
+                                           byteStringToJson bs,
+                                           appResultToJson e' ]
+                    | Coq_eec_app p ps bs e' =>
+                     constructorWithArgs "eec_app"
+                                         [ placeToJson p,
+                                           aspParamsToJson ps,
+                                           byteStringToJson bs,
+                                           appResultToJson e' ]
+                  
+                   | Coq_ssc_app e1 e2 =>
+                     constructorWithArgs "ssc_app"
+                                         [ appResultToJson e1,
+                                           appResultToJson e2 ]
+
 fun evcToJson e =
     case e of
         Coq_evc ev et => constructorWithArgs "EvC" [ bsListToJsonList ev,
                                                      evToJson et ]
 
-
+(* fun requestToJson : coq_CvmRequestMessage -> coq_JsonT *)
 fun requestToJson (REQ t authTok ev) = Json.fromPairList
-    [("reqTerm", termToJson t), ("reqAuthTok", evcToJson authTok), ("reqEv", bsListToJsonList ev)]
+    [("reqTerm", termToJson t), 
+     ("reqAuthTok", evcToJson authTok), 
+     ("reqEv", bsListToJsonList ev)]
 
-fun responseToJson (RES ev) = Json.fromPairList
+(* fun responseToJson : coq_CvmResponseMessage -> coq_JsonT *)
+fun responseToJson (ev) = Json.fromPairList
     [("respEv", bsListToJsonList ev)]
+
+
+(* fun appRequestToJson : coq_AppraisalRequestMessage -> coq_JsonT *)
+fun appRequestToJson (REQ_APP t p et ev) = Json.fromPairList
+    [("appReqTerm", termToJson t), 
+     ("appReqPlc", placeToJson p), 
+     ("appReqEt", evToJson et), 
+     ("appReqEv", bsListToJsonList ev)]
+
+(* fun appResponseToJson : coq_AppraisalResponseMessage -> coq_JsonT *)
+fun appResponseToJson (appres) = Json.fromPairList
+    [("appRespRes", appResultToJson appres)]

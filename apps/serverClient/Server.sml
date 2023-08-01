@@ -1,29 +1,24 @@
 (* Depends on: util, copland, system/sockets, am/Measurementsm am/CommTypes,
    am/ServerAm *)
 
-(* When things go well, this returns a JSON evidence string. When they go wrong,
-   it returns a raw error message string. In the future, we may want to wrap
-   said error messages in JSON as well to make it easier on the client. *)
-fun evalJson s =
-    let val (REQ pl1 pl2 t ev) = jsonToRequest (strToJson s)
-        val me = O (* TODO: hardcode ok? *)
-        val ev' = run_cvm_rawEv t me ev
-     in jsonToStr (responseToJson (RES pl2 pl1 ev'))
-    end
-    handle Json.Exn s1 s2 =>
-            (TextIO.print_err (String.concat ["JSON error", s1, ": ", s2, "\n"]);
-             "Invalid JSON/Copland term")
-                (*
-         | USMexpn s =>
-            (TextIO.print_err (String.concat ["USM error: ", s, "\n"]);
-            "USM failure")   *)
 
 
 
               
+(* 
+For evalJson (now extracted from Coq):
 
-fun respondToMsg client = Socket.output client (evalJson (Socket.inputAll client))
-                                           
+When things go well, this returns a JSON object. When they go wrong,
+   it returns a raw error message string. In the future, we may want to wrap
+   said error messages in JSON as well to make it easier on the client. *)
+fun respondToMsg client = Socket.output client (jsonToStr (evalJson (Socket.inputAll client)))    
+    handle Json.Exn s1 s2 =>
+           (TextIO.print_err ("JSON error" ^ s1 ^ ": " ^ s2 ^ "\n"); ()
+            )
+        (*
+         | USMexpn s =>
+            (TextIO.print_err (String.concat ["USM error: ", s, "\n"]);
+            "USM failure")   *)                     
 
 fun handleIncoming listener =
     let val client = Socket.accept listener

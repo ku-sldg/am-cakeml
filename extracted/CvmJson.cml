@@ -1,0 +1,14 @@
+(** val run_cvm_json : coq_JsonT -> coq_JsonT **)
+
+fun run_cvm_json j =
+  let val cvmIn = jsonToCvmIn j in
+  let val CVM_IN t ev = cvmIn in
+  let val resev = run_cvm_rawEv t default_place ev in
+  cvmOutMessageToJson resev end end end
+
+(** val run_cvm_json_full : coq_Term -> coq_RawEv -> coq_RawEv **)
+
+fun run_cvm_json_full t ev =
+  let val cvmin_json = cvmInMessageToJson (CVM_IN t ev) in
+  let val cvmout_json = run_cvm_json cvmin_json in
+  jsonToCvmOut cvmout_json end end
