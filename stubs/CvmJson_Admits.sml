@@ -4,6 +4,9 @@ type coq_JsonT = Json.json
 
 type coq_StringT = string
 
+
+(*
+
 (** val jsonToCvmIn : coq_JsonT -> coq_CvmInMessage **)
 fun jsonToCvmIn js = case (Json.toMap js) of
           Some js' => fromAList js'
@@ -60,6 +63,8 @@ fun cvmInMessageToJson x = Json.Null
 
 fun cvmOutMessageToJson x = Json.Null
   (* failwith "AXIOM TO BE REALIZED" *)
+
+*)
 
 *)
 
