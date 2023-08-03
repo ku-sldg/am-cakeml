@@ -30,6 +30,8 @@ CMakeCache.txt
 do_extract.sh
 apps/ManifestCompiler/DemoFiles/FormalManifest_*
 apps/ManifestCompiler/DemoFiles/concrete_Manifest_*
+tests/DemoFiles/*/FormalManifest_*
+tests/DemoFiles/*/concrete_Manifest_*
 
 # Backup files
 *backup.*
