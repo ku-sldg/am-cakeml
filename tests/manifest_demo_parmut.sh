@@ -3,8 +3,6 @@
 # Common Variables
 MAN_COMP=./apps/ManifestCompiler/manComp_demo
 MAN_GEN=./apps/ManifestGenerator/manGen_demo
-#BUILT_AM=./build/COMPILED_AM
-#BUILT_CONC_MAN=./concrete_manifest.json
 DEMO_FILES=../tests/DemoFiles/Parmut
 
 # Server Variables
@@ -42,7 +40,6 @@ CLIENT_P1_CONC_MAN=$DEMO_FILES/concrete_Manifest_P4.json
 CLIENT_P0_EXE_NAME=TEST_CLIENT_AM_ONE_EXE
 CLIENT_P1_EXE_NAME=TEST_CLIENT_AM_TWO_EXE
 
-
 CLIENT_P0_TERM_FILE=$DEMO_FILES/ClientCvmTermParmutP0.sml
 CLIENT_P1_TERM_FILE=$DEMO_FILES/ClientCvmTermParmutP1.sml
 
@@ -57,7 +54,7 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   # First, generate the formal manifests
   $MAN_GEN -om $DEMO_FILES -t "parmut"
 
-  # First we need to compile the server(s), before starting tmux (to prevent race condition)
+  # First we need to compile the AMs, before starting tmux (to prevent race condition)
   $MAN_COMP -s -o $SERVER_P0_EXE_NAME -om $SERVER_P0_CONC_MAN -m $SERVER_P0_FORM_MAN -l $SERVER_AM_LIB
   $MAN_COMP -s -o $SERVER_P1_EXE_NAME -om $SERVER_P1_CONC_MAN -m $SERVER_P1_FORM_MAN -l $SERVER_AM_LIB
   $MAN_COMP -s -o $SERVER_P2_EXE_NAME -om $SERVER_P2_CONC_MAN -m $SERVER_P2_FORM_MAN -l $SERVER_AM_LIB
@@ -77,8 +74,9 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   BUILT_CLIENT_AM_P1=./build/$CLIENT_P1_EXE_NAME
 
 
-  # First let us compile the server and then run it
+  # Setup tmux windows
   tmux new-session -d -s ServerProcess 'bash -i'
+
   tmux split-window -v 'bash -i' # Pane 0
   tmux split-window -h 'bash -i' # Pane 1
   tmux split-window -v 'bash -i' # Pane 2
@@ -103,7 +101,10 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   # Start the P2 server
   tmux send-keys -t 4 "($BUILT_SERVER_AM_P2 -m $SERVER_P2_CONC_MAN -k $SERVER_PRIV_KEY )" Enter
 
+  # Start the P1 server (with slight delay to protect against race conditions)
   tmux send-keys -t 5 "sleep 1 && ($BUILT_CLIENT_AM_P1 -m $CLIENT_P1_CONC_MAN -k $CLIENT_PRIV_KEY -cs)" Enter
+  
+  # Start the P0 server (with slight delay to protect against race conditions)
   tmux send-keys -t 6 "sleep 1 && ($BUILT_CLIENT_AM_P0 -m $CLIENT_P0_CONC_MAN -k $CLIENT_PRIV_KEY -cs)" Enter
 
   tmux attach-session -d -t ServerProcess
