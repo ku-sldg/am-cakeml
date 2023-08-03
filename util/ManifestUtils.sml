@@ -155,55 +155,6 @@ structure ManifestJsonConfig = struct
         (Json.fromList newList)
       end
 
-  (* Parses Json representation of a concrete manifest into a coq_ConcreteManifest 
-    : Json.json -> coq_ConcreteManifest *)
-  fun extract_ConcreteManifest (j : Json.json) =
-    let val plc = (parse_and_cast j "plc" string_cast)
-        (* val uuid = (parse_and_cast j "uuid" string_cast)
-        val privateKey = (parse_and_cast j "privateKey" bstring_cast) *)
-        val plcMap = extract_plcMap j
-        val pubKeyMap = extract_pubKeyMap j
-        val aspServer_addr = (parse_and_cast j "aspServer" string_cast)
-        val pubKeyServer_addr = (parse_and_cast j "pubKeyServer" string_cast)
-        val plcServer_addr = (parse_and_cast j "plcServer" string_cast)
-        val uuidServer_addr = (parse_and_cast j "uuidServer" string_cast)
-    in
-      (Build_ConcreteManifest plc plcMap pubKeyMap
-        aspServer_addr pubKeyServer_addr plcServer_addr uuidServer_addr)
-    end
-
-  (* Encodes a coq_ConcreteManifest into its JSON representation 
-    : coq_ConcreteManifest -> Json.json *)
-  fun encode_ConcreteManifest (cm : coq_ConcreteManifest) =
-    let val (Build_ConcreteManifest plc plcMap pubKeyMap aspServer_addr pubKeyServer_addr plcServer_addr uuidServer_addr) = cm
-        val cmJson = [
-          ("plc", Json.fromString plc),
-          ("plcMap", (encode_plcMap plcMap)),
-          ("pubKeyMap", (encode_pubKeyMap pubKeyMap)),
-          ("aspServer", Json.fromString aspServer_addr),
-          ("pubKeyServer", Json.fromString pubKeyServer_addr),
-          ("plcServer", Json.fromString plcServer_addr),
-          ("uuidServer", Json.fromString uuidServer_addr)
-        ]
-    in
-      Json.fromMap (Map.fromList String.compare cmJson)
-    end
-
-  (* Encodes a coq_Manifest into its JSON representation 
-    : coq_Manifest -> Json.json *)
-  fun encode_Manifest (cm : coq_Manifest) =
-    let val (Build_Manifest myplc aspidList uuidPlcList pubkeyPlcList policyVal) = cm
-        val cmJson = [
-          ("plc", Json.fromString myplc),
-          ("asps", (aspidListToJsonList aspidList)),
-          ("uuidPlcs", (placeListToJsonList uuidPlcList)),
-          ("pubKeyPlcs", (placeListToJsonList pubkeyPlcList)),
-          ("policy", Json.fromBool policyVal)
-        ]
-    in
-      Json.fromMap (Map.fromList String.compare cmJson)
-    end
-
   (* Extracts from json at key 'key' a list of strings into a list
       : Json.json -> string -> string list *)
   fun extract_list_items (j : Json.json) (key : string) =
@@ -220,6 +171,60 @@ structure ManifestJsonConfig = struct
                           | None => raise (Excn "Failed to extract list items, could not perform Json.toString\n")) partial_list
           end) : (string list)
 
+  (* Parses Json representation of a concrete manifest into a coq_ConcreteManifest 
+    : Json.json -> coq_ConcreteManifest *)
+  fun extract_ConcreteManifest (j : Json.json) =
+    let val plc = (parse_and_cast j "plc" string_cast)
+        (* val uuid = (parse_and_cast j "uuid" string_cast)
+        val privateKey = (parse_and_cast j "privateKey" bstring_cast) *)
+        val asps = extract_list_items j "concrete_asps"
+        val plcMap = extract_plcMap j
+        val pubKeyMap = extract_pubKeyMap j
+        val targs = extract_list_items j "concrete_targets"
+        val aspServer_addr = (parse_and_cast j "aspServer" string_cast)
+        val pubKeyServer_addr = (parse_and_cast j "pubKeyServer" string_cast)
+        val plcServer_addr = (parse_and_cast j "plcServer" string_cast)
+        val uuidServer_addr = (parse_and_cast j "uuidServer" string_cast)
+    in
+      (Build_ConcreteManifest plc asps plcMap pubKeyMap targs
+        aspServer_addr pubKeyServer_addr plcServer_addr uuidServer_addr)
+    end
+
+  (* Encodes a coq_ConcreteManifest into its JSON representation 
+    : coq_ConcreteManifest -> Json.json *)
+  fun encode_ConcreteManifest (cm : coq_ConcreteManifest) =
+    let val (Build_ConcreteManifest plc aspidList plcMap pubKeyMap targList aspServer_addr pubKeyServer_addr plcServer_addr uuidServer_addr) = cm
+        val cmJson = [
+          ("plc", Json.fromString plc),
+          ("concrete_asps", aspidListToJsonList aspidList),
+          ("plcMap", (encode_plcMap plcMap)),
+          ("pubKeyMap", (encode_pubKeyMap pubKeyMap)),
+          ("concrete_targets", placeListToJsonList targList),
+          ("aspServer", Json.fromString aspServer_addr),
+          ("pubKeyServer", Json.fromString pubKeyServer_addr),
+          ("plcServer", Json.fromString plcServer_addr),
+          ("uuidServer", Json.fromString uuidServer_addr)
+        ]
+    in
+      Json.fromMap (Map.fromList String.compare cmJson)
+    end
+
+  (* Encodes a coq_Manifest into its JSON representation 
+    : coq_Manifest -> Json.json *)
+  fun encode_Manifest (cm : coq_Manifest) =
+    let val (Build_Manifest myplc aspidList uuidPlcList pubkeyPlcList targetPlcList policyVal) = cm
+        val cmJson = [
+          ("plc", Json.fromString myplc),
+          ("asps", (aspidListToJsonList aspidList)),
+          ("uuidPlcs", (placeListToJsonList uuidPlcList)),
+          ("pubKeyPlcs", (placeListToJsonList pubkeyPlcList)),
+          ("targetPlcs", (placeListToJsonList targetPlcList)),
+          ("policy", Json.fromBool policyVal)
+        ]
+    in
+      Json.fromMap (Map.fromList String.compare cmJson)
+    end
+
 
   (* Parses Json representation of a formal manifest into a coq_Manifest 
     : Json.json -> coq_Manifest *)
@@ -228,6 +233,7 @@ structure ManifestJsonConfig = struct
         val asps = extract_list_items j "asps"
         val uuidPlcs = extract_list_items j "uuidPlcs"
         val pubKeyPlcs = extract_list_items j "pubKeyPlcs"
+        val targetPlcs = extract_list_items j "targetPlcs"
         val policy = case (Json.lookup "policy" j) of
                         None => raise (Excn "Cannot find policy in Json for formal manifest\n")
                         | Some p => 
@@ -235,17 +241,18 @@ structure ManifestJsonConfig = struct
                               None => raise (Excn "Policy found but was not a bool")
                               | Some v => v
     in
-      (Build_Manifest plc asps uuidPlcs pubKeyPlcs policy)
+      (Build_Manifest plc asps uuidPlcs pubKeyPlcs targetPlcs policy)
     end
 
 
   fun write_FormalManifest_file (pathPrefix : string) (c : coq_Manifest) =
-    (let val (Build_Manifest my_plc asps uuidPlcs pubKeyPlcs policy) = c
+    (let val (Build_Manifest my_plc asps uuidPlcs pubKeyPlcs targetPlcs policy) = c
         val fileName = (pathPrefix ^ "/FormalManifest_" ^ my_plc ^ ".sml")
         val _ = TextIOExtra.writeFile fileName ("val formal_manifest = \n\t(Build_Manifest \n\t\t\"" ^ my_plc ^ 
           "\"\n\t\t" ^ (listToString asps (fn a => ("\"" ^ a ^ "\""))) ^ 
           "\n\t\t" ^ (listToString uuidPlcs (fn a => ("\"" ^ a ^ "\""))) ^ 
           "\n\t\t" ^ (listToString pubKeyPlcs (fn a => ("\"" ^ a ^ "\""))) ^ 
+          "\n\t\t" ^ (listToString targetPlcs (fn a => ("\"" ^ a ^ "\""))) ^ 
           "\n\t\t" ^ (Bool.toString policy) ^ "\n\t) : coq_Manifest\n")
         val _ = c_system ("chmod 777 " ^ fileName)
     in
@@ -410,7 +417,7 @@ structure ManifestUtils = struct
       throws an exception if configuration not completed
     : _ -> coq_Plc *)
   fun get_myPlc _ = 
-    (let val (Build_ConcreteManifest my_plc _ _ _ _ _ _) = get_ConcreteManifest() in
+    (let val (Build_ConcreteManifest my_plc _ _ _ _ _ _ _ _) = get_ConcreteManifest() in
       my_plc
     end) : coq_Plc
 
