@@ -14,9 +14,7 @@ fun am_check_auth_tok t fromPl authTok = case authTok of
 
 fun am_serve_auth_tok_req t fromPl myPl authTok init_ev =
   bind (am_check_auth_tok t fromPl authTok) (fn v =>
-    case case requester_bound t fromPl authTok of
-           True => appraise_auth_tok v
-         | False => False of
+    case appraise_auth_tok v of
       True =>
       (case privPolicy coq_Eq_Class_ID_Type fromPl t of
          True => ret (run_cvm_rawEv t myPl init_ev)

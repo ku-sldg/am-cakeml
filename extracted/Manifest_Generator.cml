@@ -2,46 +2,63 @@
     coq_ASP_ID -> coq_Manifest -> coq_Manifest **)
 
 fun aspid_manifest_update i m =
-  let val Build_Manifest oldPlc oldasps oldKnowsOf oldContext oldPolicy = m in
-  Build_Manifest oldPlc (i :: oldasps) oldKnowsOf oldContext oldPolicy end
+  let val Build_Manifest oldPlc oldasps oldKnowsOf oldContext oldTargets
+    oldPolicy = m
+  in
+  Build_Manifest oldPlc (i :: oldasps) oldKnowsOf oldContext oldTargets
+  oldPolicy end
 
 (** val knowsof_manifest_update : coq_Plc -> coq_Manifest -> coq_Manifest **)
 
 fun knowsof_manifest_update toPlc m =
-  let val Build_Manifest oldPlc oldasps oldKnowsOf oldContext oldPolicy = m in
-  Build_Manifest oldPlc oldasps (toPlc :: oldKnowsOf) oldContext oldPolicy end
+  let val Build_Manifest oldPlc oldasps oldKnowsOf oldContext oldTargets
+    oldPolicy = m
+  in
+  Build_Manifest oldPlc oldasps (toPlc :: oldKnowsOf) oldContext oldTargets
+  oldPolicy end
 
 (** val knowsof_myPlc_manifest_update : coq_Manifest -> coq_Manifest **)
 
 fun knowsof_myPlc_manifest_update m =
   knowsof_manifest_update
-    (let val Build_Manifest my_abstract_plc _ _ _ _ = m in my_abstract_plc end)
-    m
+    (let val Build_Manifest my_abstract_plc _ _ _ _ _ = m in
+     my_abstract_plc end) m
 
 (** val myPlc_manifest_update : coq_Plc -> coq_Manifest -> coq_Manifest **)
 
 fun myPlc_manifest_update p m =
-  let val Build_Manifest _ oldasps oldKnowsOf oldContext oldPolicy = m in
-  Build_Manifest p oldasps oldKnowsOf oldContext oldPolicy end
+  let val Build_Manifest _ oldasps oldKnowsOf oldContext oldTargets
+    oldPolicy = m
+  in
+  Build_Manifest p oldasps oldKnowsOf oldContext oldTargets oldPolicy end
 
 (** val pubkey_manifest_update : coq_Plc -> coq_Manifest -> coq_Manifest **)
 
 fun pubkey_manifest_update p m =
-  let val Build_Manifest oldPlc oldasps oldKnowsOf oldContext oldPolicy = m in
-  Build_Manifest oldPlc oldasps oldKnowsOf (p :: oldContext) oldPolicy end
+  let val Build_Manifest oldPlc oldasps oldKnowsOf oldContext oldTargets
+    oldPolicy = m
+  in
+  Build_Manifest oldPlc oldasps oldKnowsOf (p :: oldContext) oldTargets
+  oldPolicy end
 
 (** val pubkeys_manifest_update :
     coq_Plc list -> coq_Manifest -> coq_Manifest **)
 
 fun pubkeys_manifest_update ps m =
-  let val Build_Manifest oldMyPlc oldasps oldKnowsOf _ oldPolicy = m in
-  Build_Manifest oldMyPlc oldasps oldKnowsOf ps oldPolicy end
+  let val Build_Manifest oldMyPlc oldasps oldKnowsOf _ oldTargets oldPolicy =
+    m
+  in
+  Build_Manifest oldMyPlc oldasps oldKnowsOf ps oldTargets oldPolicy end
 
 (** val update_manifest_policy_targ :
     coq_Plc -> coq_Plc -> coq_Manifest -> coq_Manifest **)
 
-fun update_manifest_policy_targ _ _ m =
-  m
+fun update_manifest_policy_targ targp _ m =
+  let val Build_Manifest oldMyPlc oldasps oldKnowsOf oldContext oldTargets
+    oldPolicy = m
+  in
+  Build_Manifest oldMyPlc oldasps oldKnowsOf oldContext (targp :: oldTargets)
+  oldPolicy end
 
 (** val asp_manifest_update : coq_ASP -> coq_Manifest -> coq_Manifest **)
 

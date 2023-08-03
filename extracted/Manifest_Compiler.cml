@@ -33,7 +33,8 @@ fun generate_ASP_dispatcher hID al am =
     let val Build_AM_Library _ _ _ _ _ _ _ _ local_ASPS _ _ = al in
     local_ASPS end
   in
-  let val abstract_asps = let val Build_Manifest _ asps _ _ _ = am in asps end
+  let val abstract_asps =
+    let val Build_Manifest _ asps _ _ _ _ = am in asps end
   in
   let val shrunk_map =
     minify_mapC coq_Eq_Class_ID_Type local_asps_map (fn x =>
@@ -47,7 +48,7 @@ fun generate_ASP_dispatcher hID al am =
   in
   (fn cman =>
   let val asp_server_addr =
-    let val Build_ConcreteManifest _ _ _ aSP_Server _ _ _ = cman in
+    let val Build_ConcreteManifest _ _ _ _ _ aSP_Server _ _ _ = cman in
     aSP_Server end
   in
   (fn par =>
@@ -67,11 +68,11 @@ fun generate_Plc_dispatcher hID al am =
   in
   (fn cman =>
   let val local_plc_map =
-    let val Build_ConcreteManifest _ concrete_Plcs _ _ _ _ _ = cman in
+    let val Build_ConcreteManifest _ _ concrete_Plcs _ _ _ _ _ _ = cman in
     concrete_Plcs end
   in
   let val abstract_plcs =
-    let val Build_Manifest _ _ uuidPlcs _ _ = am in uuidPlcs end
+    let val Build_Manifest _ _ uuidPlcs _ _ _ = am in uuidPlcs end
   in
   let val shrunk_map =
     minify_mapD coq_Eq_Class_ID_Type coq_Eq_Class_uuid local_plc_map (fn x =>
@@ -80,7 +81,7 @@ fun generate_Plc_dispatcher hID al am =
       | Coq_right => False)
   in
   let val plc_server_addr =
-    let val Build_ConcreteManifest _ _ _ _ _ plc_Server _ = cman in
+    let val Build_ConcreteManifest _ _ _ _ _ _ _ plc_Server _ = cman in
     plc_Server end
   in
   (fn p =>
@@ -99,11 +100,11 @@ fun generate_PubKey_dispatcher hID al am =
   in
   (fn cman =>
   let val local_pubkey_map =
-    let val Build_ConcreteManifest _ _ concrete_PubKeys _ _ _ _ = cman in
+    let val Build_ConcreteManifest _ _ _ concrete_PubKeys _ _ _ _ _ = cman in
     concrete_PubKeys end
   in
   let val abstract_plcs =
-    let val Build_Manifest _ _ _ pubKeyPlcs _ = am in pubKeyPlcs end
+    let val Build_Manifest _ _ _ pubKeyPlcs _ _ = am in pubKeyPlcs end
   in
   let val shrunk_map =
     minify_mapD coq_Eq_Class_ID_Type coq_Eq_Class_public_key local_pubkey_map
@@ -113,7 +114,7 @@ fun generate_PubKey_dispatcher hID al am =
       | Coq_right => False)
   in
   let val pubkey_server_addr =
-    let val Build_ConcreteManifest _ _ _ _ pubKey_Server _ _ = cman in
+    let val Build_ConcreteManifest _ _ _ _ _ _ pubKey_Server _ _ = cman in
     pubKey_Server end
   in
   (fn p =>
@@ -132,11 +133,11 @@ fun generate_UUUID_dispatcher _ al _ =
   in
   (fn cman =>
   let val local_plc_map =
-    let val Build_ConcreteManifest _ concrete_Plcs _ _ _ _ _ = cman in
+    let val Build_ConcreteManifest _ _ concrete_Plcs _ _ _ _ _ _ = cman in
     concrete_Plcs end
   in
   let val local_uuid_addr =
-    let val Build_ConcreteManifest _ _ _ _ _ _ uUID_Server = cman in
+    let val Build_ConcreteManifest _ _ _ _ _ _ _ _ uUID_Server = cman in
     uUID_Server end
   in
   (fn u =>
@@ -157,11 +158,14 @@ fun manifest_compiler m al =
   let val pubkey_cb = generate_PubKey_dispatcher coq_Eq_Class_ID_Type al m in
   let val uuid_cb = generate_UUUID_dispatcher coq_Eq_Class_ID_Type al m in
   let val concrete_man = Build_ConcreteManifest
-    (let val Build_Manifest my_abstract_plc _ _ _ _ = m in my_abstract_plc end)
+    (let val Build_Manifest my_abstract_plc _ _ _ _ _ = m in
+     my_abstract_plc end)
+    (let val Build_Manifest _ asps _ _ _ _ = m in asps end)
     (let val Build_AM_Library _ _ _ _ _ _ _ _ _ local_Plcs _ = al in
      local_Plcs end)
     (let val Build_AM_Library _ _ _ _ _ _ _ _ _ _ local_PubKeys = al in
      local_PubKeys end)
+    (let val Build_Manifest _ _ _ _ targetPlcs _ = m in targetPlcs end)
     (let val Build_AM_Library _ _ _ _ aSPServer_Addr _ _ _ _ _ _ = al in
      aSPServer_Addr end)
     (let val Build_AM_Library _ _ _ _ _ pubKeyServer_Addr _ _ _ _ _ = al in

@@ -9,12 +9,12 @@ type coq_CakeML_uuidCallback = coq_UUID -> coq_Plc
 
 datatype coq_Manifest =
   Build_Manifest coq_Plc (coq_ASP_ID list) (coq_Plc list) (coq_Plc list)
-   coq_PolicyT
+   (coq_Plc list) coq_PolicyT
 
 (** val empty_Manifest : coq_Manifest **)
 
 val empty_Manifest =
-  Build_Manifest empty_Manifest_Plc [] [] [] empty_PolicyT
+  Build_Manifest empty_Manifest_Plc [] [] [] [] empty_PolicyT
 
 datatype coq_AM_Library =
   Build_AM_Library ((coq_ASP_Address -> coq_CakeML_ASPCallback))
@@ -26,6 +26,7 @@ datatype coq_AM_Library =
    ((coq_Plc, coq_UUID) coq_MapD) ((coq_Plc, coq_PublicKey) coq_MapD)
 
 datatype coq_ConcreteManifest =
-  Build_ConcreteManifest coq_Plc ((coq_Plc, coq_UUID) coq_MapD)
-   ((coq_Plc, coq_PublicKey) coq_MapD) coq_ASP_Address coq_ASP_Address
-   coq_ASP_Address coq_ASP_Address
+  Build_ConcreteManifest coq_Plc (coq_ASP_ID list)
+   ((coq_Plc, coq_UUID) coq_MapD) ((coq_Plc, coq_PublicKey) coq_MapD)
+   (coq_Plc list) coq_ASP_Address coq_ASP_Address coq_ASP_Address
+   coq_ASP_Address
