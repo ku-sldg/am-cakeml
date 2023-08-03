@@ -7,6 +7,11 @@ type coq_StringT (* AXIOM TO BE REALIZED *)
 val strToJson =
   failwith "AXIOM TO BE REALIZED"
 
+(** val jsonToStr : coq_JsonT -> coq_StringT **)
+
+val jsonToStr =
+  failwith "AXIOM TO BE REALIZED"
+
 (** val responseToJson : coq_CvmResponseMessage -> coq_JsonT **)
 
 val responseToJson =

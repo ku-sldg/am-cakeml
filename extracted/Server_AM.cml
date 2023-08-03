@@ -44,25 +44,17 @@ fun do_appraisal_session appreq = case appreq of
   let val comp = gen_appraise_AM expected_et ev in
   run_am_app_comp comp Coq_mtc_app end end
 
-(** val evalJson : coq_StringT -> coq_JsonT **)
+(** val handle_AM_request : coq_StringT -> coq_StringT **)
 
-fun evalJson s =
+fun handle_AM_request s =
   let val js = strToJson s in
   let val am_req = jsonToAmRequest js in
-  (case am_req of
-     CVM_REQ r =>
-     let val cvm_resp = do_cvm_session r in responseToJson cvm_resp end
-   | APP_REQ appreq =>
-     let val app_resp = do_appraisal_session appreq in
-     appResponseToJson app_resp end) end end
-
-(** val am_client_auth_tok_req :
-    coq_Term -> coq_Plc -> coq_RawEv -> bool -> coq_AM_Result coq_AM **)
-
-fun am_client_auth_tok_req t myPl init_ev app_bool =
-  let val att_res = am_sendReq t myPl mt_evc init_ev in
-  (case app_bool of
-     True =>
-     let val app_res = am_sendReq_app t myPl Coq_mt att_res in
-     ret (Coq_am_appev app_res) end
-   | False => ret (Coq_am_rawev att_res)) end
+  let val json_resp =
+    case am_req of
+      CVM_REQ r =>
+      let val cvm_resp = do_cvm_session r in responseToJson cvm_resp end
+    | APP_REQ appreq =>
+      let val app_resp = do_appraisal_session appreq in
+      appResponseToJson app_resp end
+  in
+  jsonToStr json_resp end end end
