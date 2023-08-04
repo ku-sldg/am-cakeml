@@ -402,8 +402,9 @@ structure ManifestUtils = struct
 
   val local_PrivKey = Ref (Err "Private Key not set") : ((privateKey_t, string) result) ref
 
+(*
   val local_authTerm = Ref (Err "Auth Term not set") : ((coq_Term, string) result) ref
-
+*)
   val local_authEv = Ref (Err "Auth Raw Evidence not set") : ((coq_RawEv, string) result) ref
 
   (* Retrieves the concrete manifest, or exception if not configured 
@@ -430,7 +431,7 @@ structure ManifestUtils = struct
 
   (* Setups up the relevant information and compiles the manifest
       : coq_Manifest -> coq_AM_Library -> () *)
-  fun setup_AM_config (fm : coq_Manifest) (al : coq_AM_Library) (privKey : privateKey_t) (t:coq_Term) =
+  fun setup_AM_config (fm : coq_Manifest) (al : coq_AM_Library) (privKey : privateKey_t) (* (t:coq_Term) *) =
     (case (manifest_compiler fm al) of
       Coq_pair (Coq_pair (Coq_pair (Coq_pair concrete aspDisp) plcDisp) pubKeyDisp) uuidDisp =>
         let val _ = local_formal_manifest := Ok fm
@@ -440,7 +441,7 @@ structure ManifestUtils = struct
             val _ = local_pubKeyCb := Ok pubKeyDisp
             val _ = local_uuidCb := Ok uuidDisp
             val _ = local_PrivKey := Ok privKey
-            val _ = local_authTerm := Ok t
+            (* val _ = local_authTerm := Ok t *)
             (*
             val _ = local_authEv := 
               let val myPlc = get_myPlc () in 
@@ -458,12 +459,14 @@ structure ManifestUtils = struct
       (Ok v) => v
       | Err e => raise Excn e) : coq_Manifest
 
+(*
   (* Retrieves the Copland phrase for request Authorization, or exception if not configured 
     : _ -> coq_Manifest *)
   fun get_authTerm _ =
     (case (!local_authTerm) of
       (Ok v) => v
       | Err e => raise Excn e) : coq_Term
+*)
 
   (* Retrieves the Raw Evidence for request Authorization, or exception if not configured 
     : _ -> coq_Manifest *)
@@ -561,8 +564,8 @@ structure ManifestUtils = struct
       Additionally, we must provide a "fresh" Concrete Manifest to 
       use for manifest operations
     : coq_Manifest -> coq_AM_Library -> AM_Config *)
-  fun setup_and_get_AM_config (fm : coq_Manifest) (al : coq_AM_Library) (cm : coq_ConcreteManifest) (privKey : privateKey_t) (t:coq_Term) =
-    (let val _ = setup_AM_config fm al privKey t
+  fun setup_and_get_AM_config (fm : coq_Manifest) (al : coq_AM_Library) (cm : coq_ConcreteManifest) (privKey : privateKey_t) (* (t:coq_Term) *) =
+    (let val _ = setup_AM_config fm al privKey (*t*)
          val _ = set_ConcreteManifest cm in
       get_AM_config()
     end) : AM_Config

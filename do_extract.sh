@@ -12,6 +12,8 @@ if [ -n "${COPLAND_AVM_DIR}" ]; then
 
   cp ${COPLAND_AVM_DIR}/*.cml ${CML_DIR}
 
+  rm ${CML_DIR}/Extraction_Cvm_Cake.cml
+
   # rm ${CML_DIR}/Anno_Term_Defs.cml
   # rm ${CML_DIR}/Ascii.cml
   # rm ${CML_DIR}/Bool.cml

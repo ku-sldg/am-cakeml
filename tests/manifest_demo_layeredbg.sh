@@ -11,7 +11,7 @@ SERVER_P1_FORM_MAN=$DEMO_FILES/FormalManifest_P1.sml
 SERVER_P2_FORM_MAN=$DEMO_FILES/FormalManifest_P2.sml
 SERVER_P3_FORM_MAN=$DEMO_FILES/FormalManifest_P3.sml
 SERVER_P4_FORM_MAN=$DEMO_FILES/FormalManifest_P4.sml
-SERVER_AM_LIB=$DEMO_FILES/Test_Am_Lib_Cache.sml
+SERVER_AM_LIB=$DEMO_FILES/Test_Am_Lib_LayeredBG.sml
 SERVER_PRIV_KEY=$DEMO_FILES/Test_Server_PrivKey
 
 SERVER_P0_CONC_MAN=$DEMO_FILES/concrete_Manifest_P0.json
@@ -28,7 +28,7 @@ SERVER_P4_EXE_NAME=TEST_SERVER_P4_AM_EXE
 
 # Client Variables
 CLIENT_P0_FORM_MAN=$DEMO_FILES/FormalManifest_P0.sml
-CLIENT_AM_LIB=$DEMO_FILES/Test_Am_Lib_Cache.sml
+CLIENT_AM_LIB=$DEMO_FILES/Test_Am_Lib_LayeredBG.sml
 CLIENT_PRIV_KEY=$DEMO_FILES/Test_PrivKey
 
 CLIENT_P0_CONC_MAN=$DEMO_FILES/concrete_Manifest_P0.json

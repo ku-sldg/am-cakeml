@@ -19,12 +19,6 @@ val parallel_vm_thread =
 val am_sendReq =
   failwith "AXIOM TO BE REALIZED"
 
-(** val am_sendReq_app :
-    coq_Term -> coq_Plc -> coq_Evidence -> coq_RawEv -> coq_AppResultC **)
-
-val am_sendReq_app =
-  failwith "AXIOM TO BE REALIZED"
-
 (** val do_asp' : coq_ASP_PARAMS -> coq_RawEv -> coq_BS coq_IO **)
 
 fun do_asp' params e =
