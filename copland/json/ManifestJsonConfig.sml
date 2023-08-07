@@ -1,0 +1,294 @@
+(* TODO: dependencies *)
+structure ManifestJsonConfig = struct
+  exception Excn string
+
+  type plc_t                  = coq_Plc
+  type uuid_t                 = coq_UUID
+  type privateKey_t           = coq_PrivateKey
+  type pubKey_t               = coq_PublicKey
+  type plcMap_t               = ((plc_t, uuid_t) coq_MapD)
+  type pubKeyMap_t            = ((plc_t, pubKey_t) coq_MapD)
+  type aspServer_t            = coq_ASP_Address
+  type pubKeyServer_t         = coq_ASP_Address
+  type plcServer_t            = coq_ASP_Address
+  type uuidServer_t           = coq_ASP_Address
+
+  (* just a wrapper for bstring.unshow to hoist it into option type 
+      : string -> BString.bstring option *)
+  fun bstring_cast (s : string) = Some (BString.unshow s)
+
+  (* A wrapper around strings to hoist them into option types 
+      : string -> string option *)
+  fun string_cast (s : string) = Some s
+
+  (* A wrapper around bools to hoist them into option types 
+      : string -> bool option *)
+  fun bool_cast (s : string) = 
+    let val mid = case s of
+                    "true" => True
+                    | "false" => False
+                    | _ => raise (Excn ("Manifest Json Config Error: Bool Cast cannot be used on '" ^ s ^ "'\n"))
+    in
+      Some mid
+    end
+
+  (* Attempts to parse out a value from Json and cast it
+      : Json.json -> string -> (string -> ('A option)) -> 'A *)
+  fun parse_and_cast (j : Json.json) (key : string) castFn =
+    case (Json.lookup key j) of
+      None => raise (Excn ("Could not find '" ^ key ^ "' in JSON"))
+      | Some pval => 
+          case (Json.toString pval) of
+              None => raise (Excn ("'" ^ key ^ "' was found, but is not a string"))
+              | Some sval =>
+                  case (castFn sval) of
+                      None => raise (Excn ("'" ^ key ^ "' found, but could not be cast"))
+                      | Some pval' => pval'
+
+  (* Encodes casts a value and encodes it into Json 
+      : 'A -> ('A -> string) -> Json.json *)
+  fun cast_and_encode v castFn = Json.fromString (castFn v)
+
+  (* Parses a json file into its JSON representation 
+      : string -> Json.json *)
+  fun parseJsonFile (file : string) =
+      Result.mapErr (op ^ "Parsing error: ") (Json.parse (TextIOExtra.readFile file))
+      handle 
+          TextIO.BadFileName => Err ("Bad file name: " ^ file)
+          | TextIO.InvalidFD   => Err "Invalid file descriptor"
+          (* TODO: Handle JSON parsing exceptions *)
+
+  (* Writes json to a file
+    : Json.json -> string -> unit *)
+  fun writeJsonFile (j : Json.json) (file : string) =
+      (TextIOExtra.writeFile file (Json.stringify j)
+      handle 
+          TextIO.BadFileName => raise Excn ("Bad file name: " ^ file)
+          | TextIO.InvalidFD   => raise Excn "Invalid file descriptor") : unit
+
+
+ (* Attempts to extract a map from a Json structure of a concrete manifest
+    : Json.json -> (('a, 'b) coq_MapD) *)
+  fun extract_map_gen (j : Json.json) (k_top:string) f (* (f : string -> 'a) *) =
+      (let val gatherPlcs = case (Json.lookup k_top j) of
+                              None => raise (Excn ("Could not find " ^ k_top ^ " field in JSON"))
+                              | Some v => v
+          val jsonPlcPairList = case (Json.toList gatherPlcs) of
+                          None => raise (Excn ("Could not convert Json into a list of json pairs")) 
+                          | Some m => m (* (json list) *)
+          (* Now we want to convert each element in the plcPairList to 
+            a pair representation
+              (json) -> ('a * 'b) *)
+          fun converter (j : Json.json) =
+              (let val jsonSubList = (case (Json.toList j) of
+                                        None => raise (Excn "Could not convert a JSON place mapping to a list")
+                                        | Some v => v)
+                  val plc = (case (Json.toString (List.nth jsonSubList 0)) of
+                              None => raise (Excn "Could not convert plc in mapping to a string")
+                              | Some v => v)
+                  val uuid = (case (Json.toString (List.nth jsonSubList 1)) of
+                              None => raise (Excn "Could not convert uuid in mapping to a string")
+                              | Some v => v)
+              in
+                (Coq_pair plc (f uuid))
+              end) (* : ('a, 'b) prod *)
+          val plcPairList = (List.map converter jsonPlcPairList) (* : ((('a, 'b) prod) list) *)
+      in
+        plcPairList
+      end) (* :  ('a, 'b) coq_MapD) *)
+
+
+  fun extract_plcMap    (j:Json.json) = extract_map_gen j "plcMap" id
+
+  fun extract_pubKeyMap (j:Json.json) = extract_map_gen j "pubKeyMap" BString.unshow
+
+  (* Encodes the (('a, 'b) coq_MapD) as Json.json
+    : (('a, 'b) coq_MapD) -> ('b -> string) -> Json.json *)
+  fun encode_map_gen m f =
+      let fun encoder ab_pair = 
+            let val Coq_pair aval bval = ab_pair
+            in
+              (* Converts the pair to a Json list representing the pair *)
+              (Json.fromList [Json.fromString aval, Json.fromString (f bval)])
+            end
+          val newList = (List.map encoder m)
+      in
+        (Json.fromList newList)
+      end
+
+
+  fun encode_plcMap m = encode_map_gen m id
+
+  fun encode_pubKeyMap m = encode_map_gen m (BString.show)
+
+  (* Extracts from json at key 'key' a list of strings into a list
+      : Json.json -> string -> string list *)
+  fun extract_list_items (j : Json.json) (key : string) =
+    (case (Json.lookup key j) of
+      None => raise (Excn ("Could not find '" ^ key ^ "' in JSON"))
+      | Some pval => 
+          let val partial_list = case (Json.toList pval) of
+                                    Some s => s : (Json.json list)
+                                    | None => raise (Excn ("Failed to extract list items, the key '" ^ key ^ "' was not a Json list\n"))
+          in
+            List.map (fn s => 
+                        case (Json.toString s) of
+                          Some s => s
+                          | None => raise (Excn "Failed to extract list items, could not perform Json.toString\n")) partial_list
+          end) : (string list)
+
+  (* Parses Json representation of a concrete manifest into a coq_ConcreteManifest 
+    : Json.json -> coq_ConcreteManifest *)
+  fun extract_ConcreteManifest (j : Json.json) =
+    let val plc = (parse_and_cast j "plc" string_cast)
+        (* val uuid = (parse_and_cast j "uuid" string_cast)
+        val privateKey = (parse_and_cast j "privateKey" bstring_cast) *)
+        val asps = extract_list_items j "concrete_asps"
+        val plcMap = extract_plcMap j
+        val pubKeyMap = extract_pubKeyMap j
+        val targs = extract_list_items j "concrete_targets"
+        val aspServer_addr = (parse_and_cast j "aspServer" string_cast)
+        val pubKeyServer_addr = (parse_and_cast j "pubKeyServer" string_cast)
+        val plcServer_addr = (parse_and_cast j "plcServer" string_cast)
+        val uuidServer_addr = (parse_and_cast j "uuidServer" string_cast)
+    in
+      (Build_ConcreteManifest plc asps plcMap pubKeyMap targs
+        aspServer_addr pubKeyServer_addr plcServer_addr uuidServer_addr)
+    end
+
+  (* Encodes a coq_ConcreteManifest into its JSON representation 
+    : coq_ConcreteManifest -> Json.json *)
+  fun encode_ConcreteManifest (cm : coq_ConcreteManifest) =
+    let val (Build_ConcreteManifest plc aspidList plcMap pubKeyMap targList aspServer_addr pubKeyServer_addr plcServer_addr uuidServer_addr) = cm
+        val cmJson = [
+          ("plc", Json.fromString plc),
+          ("concrete_asps", aspidListToJsonList aspidList),
+          ("plcMap", (encode_plcMap plcMap)),
+          ("pubKeyMap", (encode_pubKeyMap pubKeyMap)),
+          ("concrete_targets", placeListToJsonList targList),
+          ("aspServer", Json.fromString aspServer_addr),
+          ("pubKeyServer", Json.fromString pubKeyServer_addr),
+          ("plcServer", Json.fromString plcServer_addr),
+          ("uuidServer", Json.fromString uuidServer_addr)
+        ]
+    in
+      Json.fromMap (Map.fromList String.compare cmJson)
+    end
+
+  (* Encodes a coq_Manifest into its JSON representation 
+    : coq_Manifest -> Json.json *)
+  fun encode_Manifest (cm : coq_Manifest) =
+    let val (Build_Manifest myplc aspidList uuidPlcList pubkeyPlcList targetPlcList policyVal) = cm
+        val cmJson = [
+          ("plc", Json.fromString myplc),
+          ("asps", (aspidListToJsonList aspidList)),
+          ("uuidPlcs", (placeListToJsonList uuidPlcList)),
+          ("pubKeyPlcs", (placeListToJsonList pubkeyPlcList)),
+          ("targetPlcs", (placeListToJsonList targetPlcList)),
+          ("policy", Json.fromBool policyVal)
+        ]
+    in
+      Json.fromMap (Map.fromList String.compare cmJson)
+    end
+
+
+  (* Parses Json representation of a formal manifest into a coq_Manifest 
+    : Json.json -> coq_Manifest *)
+  fun extract_Manifest (j : Json.json) =
+    let val plc = (parse_and_cast j "plc" string_cast)
+        val asps = extract_list_items j "asps"
+        val uuidPlcs = extract_list_items j "uuidPlcs"
+        val pubKeyPlcs = extract_list_items j "pubKeyPlcs"
+        val targetPlcs = extract_list_items j "targetPlcs"
+        val policy = case (Json.lookup "policy" j) of
+                        None => raise (Excn "Cannot find policy in Json for formal manifest\n")
+                        | Some p => 
+                            case (Json.toBool p) of
+                              None => raise (Excn "Policy found but was not a bool")
+                              | Some v => v
+    in
+      (Build_Manifest plc asps uuidPlcs pubKeyPlcs targetPlcs policy)
+    end
+
+
+  fun write_FormalManifest_file (pathPrefix : string) (c : coq_Manifest) =
+    (let val (Build_Manifest my_plc asps uuidPlcs pubKeyPlcs targetPlcs policy) = c
+        val fileName = (pathPrefix ^ "/FormalManifest_" ^ my_plc ^ ".sml")
+        val _ = TextIOExtra.writeFile fileName ("val formal_manifest = \n\t(Build_Manifest \n\t\t\"" ^ my_plc ^ 
+          "\"\n\t\t" ^ (listToString asps (fn a => ("\"" ^ a ^ "\""))) ^ 
+          "\n\t\t" ^ (listToString uuidPlcs (fn a => ("\"" ^ a ^ "\""))) ^ 
+          "\n\t\t" ^ (listToString pubKeyPlcs (fn a => ("\"" ^ a ^ "\""))) ^ 
+          "\n\t\t" ^ (listToString targetPlcs (fn a => ("\"" ^ a ^ "\""))) ^ 
+          "\n\t\t" ^ (Bool.toString policy) ^ "\n\t) : coq_Manifest\n")
+        val _ = c_system ("chmod 777 " ^ fileName)
+    in
+      ()
+    end
+    handle 
+      TextIO.BadFileName => raise Excn ("Bad file name: " ^ (pathPrefix ^ "FormalManifest_<PLCNAMEHERE>.sml"))
+      | TextIO.InvalidFD   => raise Excn "Invalid file descriptor") : unit
+
+fun write_FormalManifestList (pathPrefix : string) (cl : coq_Manifest list) =
+    List.map (write_FormalManifest_file pathPrefix) cl
+
+fun print_json_man_id (m:coq_Manifest) =
+    let val _ = print ("\n" ^ (Json.stringify (encode_Manifest m)) ^ "\n") in
+    m
+    end
+
+fun print_json_man_list (ls: coq_Manifest list) =
+    let val _ = List.map print_json_man_id ls
+    in
+      ()
+    end
+
+fun write_form_man_list_and_print_json (pathPrefix : string) (ls:(coq_Term, coq_Plc) prod list) = 
+  let val man_list : coq_Manifest list = man_gen_run_attify ls
+      val _ = write_FormalManifestList pathPrefix man_list
+      val _ = print_json_man_list man_list in 
+        ()
+  end
+  handle Excn e => TextIOExtra.printLn e
+
+fun parse_private_key file =
+  BString.unshow (TextIOExtra.readFile file)
+
+fun argIndPresent (i:int) = (i <> ~1)
+  
+
+  (* Retrieves the concrete manifest and private key 
+    based upon Command Line arguments
+    : () -> (coq_ConcreteManifest, string, coq_Term)*)
+fun retrieve_CLI_args _ =
+  let val name = CommandLine.name ()
+      val usage = ("Usage: " ^ name ^ " -m <concreteManifestFile>.json -k <privateKeyFile>\n" ^
+                    "e.g.\t" ^ name ^ " -m concMan.json -k ~/.ssh/id_ed25519\n")
+      val (jsonFile, privKey) = 
+              (case CommandLine.arguments () of 
+                  argList => (
+                    let val manInd = ListExtra.find_index argList "-m"
+                        val keyInd = ListExtra.find_index argList "-k"
+                        val manIndBool = argIndPresent manInd 
+                        val keyIndBool = argIndPresent keyInd
+                    in
+                    (
+                      if (manIndBool = False)
+                      then raise (Excn ("Invalid Arguments\n" ^ usage))
+                      else (
+                        if (keyIndBool = False)
+                        then raise (Excn ("Invalid Arguments\n" ^ usage))
+                          else (
+                              let val fileName = List.nth argList (manInd + 1)
+                                  val privKeyFile = List.nth argList (keyInd + 1) in
+                                  (
+                                    case (parseJsonFile fileName) of
+                                      Err e => raise (Excn ("Could not parse JSON file: " ^ e ^ "\n"))
+                                    | Ok j => (j, parse_private_key privKeyFile)
+                                  )
+                                end )))
+                  end ))
+      val cm = extract_ConcreteManifest jsonFile
+        in
+          (cm, privKey)
+      end
+end

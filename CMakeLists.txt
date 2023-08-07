@@ -91,6 +91,7 @@ get_files(cop_src
     copland/json/CoplandToJson.sml
     copland/json/JsonToCopland.sml
     extracted/Manifest_Generator.cml
+    copland/json/ManifestJsonConfig.sml
     util/ManifestUtils.sml
     extracted/privPolicy.cml
     apps/blockchain/Blockchain.sml
