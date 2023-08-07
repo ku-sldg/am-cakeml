@@ -19,6 +19,13 @@ fun gen_authEvC_if_some ot myPlc init_evc =
     ret (Coq_evc auth_rawev auth_et) end end end
   | None => ret (Coq_evc [] Coq_mt)
 
+(** val am_appraise :
+    coq_Term -> coq_Plc -> coq_Evidence -> coq_RawEv -> coq_AppResultC coq_AM **)
+
+fun am_appraise t toPlc init_et cvm_ev =
+  let val expected_et = eval t toPlc init_et in
+  bind (gen_appraise_AM expected_et cvm_ev) ret end
+
 (** val am_client_gen :
     coq_Term -> coq_Plc -> coq_Plc -> coq_EvC option -> coq_Term option ->
     bool -> coq_AM_Result coq_AM **)
@@ -30,9 +37,8 @@ fun am_client_gen t myPlc pTo initEvOpt authPhrase app_bool =
       let val resev = am_sendReq t pTo auth_evc init_ev in
       (case app_bool of
          True =>
-         let val expected_et = eval t pTo init_et in
-         bind (gen_appraise_AM expected_et resev) (fn app_res =>
-           ret (Coq_am_appev app_res)) end
+         bind (am_appraise t pTo init_et resev) (fn app_res =>
+           ret (Coq_am_appev app_res))
        | False => ret (Coq_am_rawev resev)) end end))
 
 (** val am_client_auth :
