@@ -6,58 +6,47 @@ fun gen_nonce_if_none initEv = case initEv of
   bind (am_newNonce gen_nonce_bits) (fn nid =>
     ret (Coq_evc (gen_nonce_bits :: []) (Coq_nn nid)))
 
-(** val gen_authEvC_if_some : coq_Term option -> coq_Plc -> coq_EvC coq_AM **)
+(** val gen_authEvC_if_some :
+    coq_Term option -> coq_Plc -> coq_EvC -> coq_EvC coq_AM **)
 
-fun gen_authEvC_if_some ot pFrom =
+fun gen_authEvC_if_some ot myPlc init_evc =
   case ot of
     Some auth_phrase =>
-    let val auth_rawev = run_cvm_rawEv auth_phrase pFrom [] in
-    let val auth_et = eval auth_phrase pFrom Coq_mt in
-    ret (Coq_evc auth_rawev auth_et) end end
+    let val Coq_evc init_rawev_auth init_et_auth = init_evc in
+    let val auth_rawev = am_sendReq auth_phrase myPlc mt_evc init_rawev_auth
+    in
+    let val auth_et = eval auth_phrase myPlc init_et_auth in
+    ret (Coq_evc auth_rawev auth_et) end end end
   | None => ret (Coq_evc [] Coq_mt)
 
-(** val run_appraisal_client :
-    coq_Term -> coq_Plc -> coq_Evidence -> coq_RawEv -> coq_AppResultC **)
+(** val am_appraise :
+    coq_Term -> coq_Plc -> coq_Evidence -> coq_RawEv -> coq_AppResultC coq_AM **)
 
-fun run_appraisal_client t p e re =
-  let val expected_et = eval t p e in
-  let val comp = gen_appraise_AM expected_et re in
-  run_am_app_comp comp Coq_mtc_app end end
+fun am_appraise t toPlc init_et cvm_ev =
+  let val expected_et = eval t toPlc init_et in
+  bind (gen_appraise_AM expected_et cvm_ev) ret end
 
-(** val am_sendReq_gen :
+(** val am_client_gen :
     coq_Term -> coq_Plc -> coq_Plc -> coq_EvC option -> coq_Term option ->
     bool -> coq_AM_Result coq_AM **)
 
-fun am_sendReq_gen t pFrom pTo initEv authPhrase app_bool =
-  bind (gen_nonce_if_none initEv) (fn evcIn =>
-    bind (gen_authEvC_if_some authPhrase pFrom) (fn auth_evc =>
+fun am_client_gen t myPlc pTo initEvOpt authPhrase app_bool =
+  bind (gen_nonce_if_none initEvOpt) (fn evcIn =>
+    bind (gen_authEvC_if_some authPhrase myPlc mt_evc) (fn auth_evc =>
       let val Coq_evc init_ev init_et = evcIn in
       let val resev = am_sendReq t pTo auth_evc init_ev in
       (case app_bool of
          True =>
-         let val app_res = run_appraisal_client t pTo init_et resev in
-         ret (Coq_am_appev app_res) end
+         bind (am_appraise t pTo init_et resev) (fn app_res =>
+           ret (Coq_am_appev app_res))
        | False => ret (Coq_am_rawev resev)) end end))
 
-(** val am_sendReq_dispatch :
-    coq_Term option -> bool -> coq_Term -> coq_Plc -> coq_Plc -> bool ->
+(** val am_client_auth :
+    coq_Term -> coq_Plc -> coq_Plc -> coq_Term -> bool -> bool ->
     coq_AM_Result coq_AM **)
 
-fun am_sendReq_dispatch maybeAuthTerm nonceB t source dest app_bool =
-  let val nonce_param =
-    case nonceB of
-      True => None
-    | False => Some (Coq_evc [] Coq_mt)
-  in
-  am_sendReq_gen t source dest nonce_param maybeAuthTerm app_bool end
-
-(** val am_client_auth_tok_req :
-    coq_Term -> coq_Plc -> coq_RawEv -> bool -> coq_AM_Result coq_AM **)
-
-fun am_client_auth_tok_req t myPl init_ev app_bool =
-  let val att_res = am_sendReq t myPl mt_evc init_ev in
-  (case app_bool of
-     True =>
-     let val app_res = am_sendReq_app t myPl Coq_mt att_res in
-     ret (Coq_am_appev app_res) end
-   | False => ret (Coq_am_rawev att_res)) end
+fun am_client_auth t myPlc pTo authPhrase nonceB appraiseB =
+  let val init_evc_opt = case nonceB of
+                           True => None
+                         | False => Some mt_evc in
+  am_client_gen t myPlc pTo init_evc_opt (Some authPhrase) appraiseB end

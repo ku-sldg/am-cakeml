@@ -49,16 +49,11 @@ fun startServer () =
 
 (* () -> () *)
 fun main () =
-  (* let val auth_phrase = ssl_sig_parameterized coq_P0
-      val kim_phrase = Coq_att coq_P1 (kim_meas dest_plc kim_meas_targid)
-      val cert_phrase = cert_style *)
-  let val auth_phrase = ssl_sig_parameterized coq_P0
-      val (concreteMan, privKey) = ManifestJsonConfig.retrieve_CLI_args () 
-      val (concrete, privKey, aspDisp, plcDisp, pubKeyDisp, uuidDisp) = ManifestUtils.setup_and_get_AM_config formal_manifest am_library concreteMan privKey auth_phrase
+  let val (concreteMan, privKey) = ManifestJsonConfig.retrieve_CLI_args () 
+      val (concrete, privKey, aspDisp, plcDisp, pubKeyDisp, uuidDisp) = ManifestUtils.setup_and_get_AM_config formal_manifest am_library concreteMan privKey
       val (Build_ConcreteManifest plc concAsps plcMap pubKeyMap concTargs aspServer_addr pubKeyServer_addr plcServer_addr uuidServer_addr) = concrete
       (* Retrieving implicit self place from manifest here *)
       val my_plc = ManifestUtils.get_myPlc()
-      (* Retrieving implicit self place from manifest here *)
       val _ = print ("My Place (retrieved from Manifest): " ^ my_plc ^ "\n\n")
   in
     startServer()
