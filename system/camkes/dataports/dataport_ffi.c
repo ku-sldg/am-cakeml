@@ -37,8 +37,8 @@ typedef struct Connection {
 Connection_t conns[CONNS_LEN];
 
 void ffiinitDataports(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
-    conns[0] = (Connection_t){.data = introspect_dp, .length = 4096, .wait = &measurement_done_wait, .emit = &measurement_request_emit};
-    conns[1] = (Connection_t){.data = client_dp, .length = 4096, .wait = &client_ready_wait, .emit = NULL};
+    conns[0] = (Connection_t){.data = inspect_dp, .length = 4096, .wait = &measurement_done_wait, .emit = &measurement_request_emit};
+    conns[1] = (Connection_t){.data = client_dp, .length = 4096, .wait = &client_ready_wait, .emit = &client_done_emit};
 }
 
 void ffiwriteDataport(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
