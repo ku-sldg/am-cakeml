@@ -72,7 +72,12 @@ function(add_hacl_camkes component)
         ${component}
         SOURCES ${hacl_sources}
         INCLUDES ${hacl_path} ${kremlin_path} ${kremlib_path}
-        # DEPENDS hacl-star
+        # There's gotta be a better way to do this. It's not right that
+        # specific cross-compilation headers should be here. It should
+        # really be something declared a level higher in the project
+        # which includes the am-cakeml project. However, I can't figure
+        # out how to do that, and this works for now.
+        cross_include
     )
     # target_sources(CAmkESComponent_${component} ${hacl_sources})
     add_dependencies(CAmkESComponent_${component} hacl-star)
