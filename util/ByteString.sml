@@ -81,6 +81,9 @@ structure BString = struct
         (* string -> bstring *)
         fun fromString s = Bs s
 
+        (* string -> bstring *)
+        fun nullTerminated s = concat (fromString s) nullByte
+
         (* bstring -> string *)
         val toCString = applyStr StringExtra.toCString
 
@@ -181,5 +184,17 @@ structure BString = struct
 
         (* compare: bstring -> bstring -> ordering *)
         fun compare bs1 bs2 = String.compare (toString bs1) (toString bs2)
+        
+	(* int -> bstring *)
+        fun n2w2 n =
+            let val buf = Word8ArrayExtra.nulls 2
+             in Marshalling.n2w2 n buf 0;
+                fromByteArray buf
+            end
+
+        (* bstring -> int *)
+        fun w22n bs = Marshalling.w22n (toByteArray bs) 0
+    end
+
     end
 end

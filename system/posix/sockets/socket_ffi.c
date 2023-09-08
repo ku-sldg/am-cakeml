@@ -24,10 +24,10 @@
 // provided FFI functions when possible.
 // However, I'm not sure why ints (usually 4 bytes) are converted back and forth
 // to 8-byte arrays.
-int byte2_to_int(uint8_t *b);
-void int_to_byte2(int i, uint8_t *b);
-int byte8_to_int(uint8_t *b);
-void int_to_byte8(int i, uint8_t *b);
+extern int byte2_to_int(uint8_t *b);
+extern void int_to_byte2(int i, uint8_t *b);
+extern int byte8_to_int(uint8_t *b);
+extern void int_to_byte8(int i, uint8_t *b);
 
 // Arguments: qlen (first 2 bytes of c), and port, a string representation of a
 //     number, following qlen

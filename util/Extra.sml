@@ -255,3 +255,20 @@ structure MapExtra = struct
     (* ('a -> 'a -> ordering) -> ('b -> 'c -> ('a * 'd) option) -> ('b, 'c) map -> ('a, 'd) map *)
     fun mapPartial cmp f m = Map.fromList cmp (List.mapPartial (uncurry f) (Map.toAscList m))
 end
+
+structure MapExtra = struct 
+    (* ('a, 'b) map -> 'a -> bool *)
+    fun exists m k = Option.isSome (Map.lookup m k)
+
+    (* fun maybeInsert *)
+
+    (* fun singleton  *)
+end
+
+structure JsonExtra = struct 
+    (* Json.json -> string *)
+    fun fromString str = List.hd (fst (Json.parse ([], str)))
+
+    (* string -> Json.json *)
+    fun toString js  = Json.print_json js 0
+end
