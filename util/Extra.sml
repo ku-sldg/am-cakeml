@@ -259,10 +259,3 @@ structure MapExtra = struct
     fun mapPartial cmp f m = Map.fromList cmp (List.mapPartial (uncurry f) (Map.toAscList m))
 end
 
-structure JsonExtra = struct 
-    (* string -> Json.json *)
-    fun fromString str = List.hd (fst (Json.parse ([], str)))
-
-    (* Json.json -> string *)
-    fun toString js  = Json.print_json js 0
-end

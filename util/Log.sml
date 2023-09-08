@@ -17,10 +17,12 @@ structure Log = struct
     fun logDebugDefault   msg = TextIOExtra.printLn     ("DEBUG: "   ^ msg)
 
     (* string -> string -> () *)
+    (*
     fun logInfoFile    file msg = TextIOExtra.printLn_file file ("WARNING: " ^ msg)
     fun logWarningFile file msg = TextIOExtra.printLn_file file ("WARNING: " ^ msg)
     fun logErrorFile   file msg = TextIOExtra.printLn_file file ("ERROR: "   ^ msg)
     fun logDebugFile   file msg = TextIOExtra.printLn_file file ("DEBUG: "   ^ msg)
+    *)
 
     (* TODO: add optional timestamps *)
 
@@ -53,12 +55,15 @@ structure Log = struct
         setLogDebug   logDebugDefault
     )
 
+    (*
     fun setLogFile file = (
         setLogInfo    (logInfoFile    file);
         setLogWarning (logWarningFile file);
         setLogError   (logErrorFile   file);
         setLogDebug   (logDebugFile   file)
     )
+    *)
+
 end
 
 val log = Log.log
