@@ -1,37 +1,45 @@
-type 'a coq_AM = (coq_AM_St, 'a) coq_St
-
-(** val fromSome : 'a1 -> 'a1 option -> 'a1 **)
+(** val fromSome : 'a1 -> ('a1, 'a2) coq_ResultT -> 'a1 **)
 
 fun fromSome default opt = case opt of
-  Some x => x
-| None => default
+  Coq_errC _ => default
+| Coq_resultC x => x
 
 (** val run_am_app_comp : 'a1 coq_AM -> 'a1 -> 'a1 **)
 
 fun run_am_app_comp am_comp default_A =
-  let val optRes = evalSt am_comp empty_amst in fromSome default_A optRes end
+  let val optRes = evalErr am_comp empty_amst in fromSome default_A optRes end
+
+(** val get_amConfig : coq_AM_Config coq_AM **)
+
+val get_amConfig =
+  bind get (fn st =>
+    ret (let val Coq_mkAM_St _ _ amConfig = st in amConfig end))
 
 (** val am_newNonce : coq_BS -> nat coq_AM **)
 
 fun am_newNonce bs =
   bind get (fn oldSt =>
     let val oldMap =
-      let val Coq_mkAM_St am_nonceMap _ = oldSt in am_nonceMap end
+      let val Coq_mkAM_St am_nonceMap _ _ = oldSt in am_nonceMap end
     in
-    let val oldId = let val Coq_mkAM_St _ am_nonceId = oldSt in am_nonceId end
+    let val oldId =
+      let val Coq_mkAM_St _ am_nonceId _ = oldSt in am_nonceId end
+    in
+    let val oldAMConfig =
+      let val Coq_mkAM_St _ _ amConfig = oldSt in amConfig end
     in
     let val newMap = map_set nat_EqClass oldMap oldId bs in
     let val newId = add oldId (S O) in
-    bind (put (Coq_mkAM_St newMap newId)) (fn _ => ret oldId) end end end end)
+    bind (put (Coq_mkAM_St newMap newId oldAMConfig)) (fn _ => ret oldId) end end end end end)
 
 (** val am_getNonce : nat -> coq_BS coq_AM **)
 
 fun am_getNonce nid =
   bind get (fn oldSt =>
     let val oldMap =
-      let val Coq_mkAM_St am_nonceMap _ = oldSt in am_nonceMap end
+      let val Coq_mkAM_St am_nonceMap _ _ = oldSt in am_nonceMap end
     in
     let val resopt = map_get nat_EqClass oldMap nid in
     (case resopt of
        Some res => ret res
-     | None => failm) end end)
+     | None => failm (Coq_am_error errStr_amNonce)) end end)

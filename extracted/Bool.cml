@@ -1,0 +1,19 @@
+(** val bool_dec : bool -> bool -> sumbool **)
+
+fun bool_dec b1 b2 =
+  case b1 of
+    True => (case b2 of
+               True => Coq_left
+             | False => Coq_right)
+  | False => (case b2 of
+                True => Coq_right
+              | False => Coq_left)
+
+(** val eqb : bool -> bool -> bool **)
+
+fun eqb b1 b2 =
+  case b1 of
+    True => b2
+  | False => (case b2 of
+                True => False
+              | False => True)

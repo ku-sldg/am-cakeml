@@ -1,0 +1,69 @@
+structure Pos =struct
+  (** val succ : positive -> positive **)
+
+  fun succ x = case x of
+    Coq_xI p => Coq_xO (succ p)
+  | Coq_xO p => Coq_xI p
+  | Coq_xH => Coq_xO Coq_xH
+
+  (** val add : positive -> positive -> positive **)
+
+  fun add x y =
+    case x of
+      Coq_xI p =>
+      (case y of
+         Coq_xI q => Coq_xO (add_carry p q)
+       | Coq_xO q => Coq_xI (add p q)
+       | Coq_xH => Coq_xO (succ p))
+    | Coq_xO p =>
+      (case y of
+         Coq_xI q => Coq_xI (add p q)
+       | Coq_xO q => Coq_xO (add p q)
+       | Coq_xH => Coq_xI p)
+    | Coq_xH =>
+      (case y of
+         Coq_xI q => Coq_xO (succ q)
+       | Coq_xO q => Coq_xI q
+       | Coq_xH => Coq_xO Coq_xH)
+
+  (** val add_carry : positive -> positive -> positive **)
+
+  and add_carry x y =
+    case x of
+      Coq_xI p =>
+      (case y of
+         Coq_xI q => Coq_xI (add_carry p q)
+       | Coq_xO q => Coq_xO (add_carry p q)
+       | Coq_xH => Coq_xI (succ p))
+    | Coq_xO p =>
+      (case y of
+         Coq_xI q => Coq_xO (add_carry p q)
+       | Coq_xO q => Coq_xI (add p q)
+       | Coq_xH => Coq_xO (succ p))
+    | Coq_xH =>
+      (case y of
+         Coq_xI q => Coq_xI (succ q)
+       | Coq_xO q => Coq_xO (succ q)
+       | Coq_xH => Coq_xI Coq_xH)
+
+  (** val mul : positive -> positive -> positive **)
+
+  fun mul x y =
+    case x of
+      Coq_xI p => add y (Coq_xO (mul p y))
+    | Coq_xO p => Coq_xO (mul p y)
+    | Coq_xH => y
+
+  (** val iter_op : ('a1 -> 'a1 -> 'a1) -> positive -> 'a1 -> 'a1 **)
+
+  fun iter_op op0 p a =
+    case p of
+      Coq_xI p0 => op0 a (iter_op op0 p0 (op0 a a))
+    | Coq_xO p0 => iter_op op0 p0 (op0 a a)
+    | Coq_xH => a
+
+  (** val to_nat : positive -> nat **)
+
+  fun to_nat x =
+    iter_op Nat.add x (S O)
+ end

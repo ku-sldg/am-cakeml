@@ -1,0 +1,14 @@
+(** val places' : coq_Term -> coq_Plc list -> coq_Plc list **)
+
+fun places' t ls =
+  case t of
+    Coq_asp _ => ls
+  | Coq_att q t' => q :: (places' t' ls)
+  | Coq_lseq t1 t2 => places' t2 (places' t1 ls)
+  | Coq_bseq _ t1 t2 => places' t2 (places' t1 ls)
+  | Coq_bpar _ t1 t2 => places' t2 (places' t1 ls)
+
+(** val places : coq_Plc -> coq_Term -> coq_Plc list **)
+
+fun places p t =
+  p :: (places' t [])

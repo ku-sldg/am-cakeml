@@ -1,7 +1,5 @@
 type coq_JsonT (* AXIOM TO BE REALIZED *)
 
-type coq_StringT (* AXIOM TO BE REALIZED *)
-
 (** val strToJson : coq_StringT -> coq_JsonT **)
 
 val strToJson =

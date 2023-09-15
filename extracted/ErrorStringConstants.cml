@@ -1,0 +1,24 @@
+(** val errStr_amNonce : coq_StringT **)
+
+val errStr_amNonce =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val errStr_peel_bs_am : coq_StringT **)
+
+val errStr_peel_bs_am =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val errStr_requester_bound : coq_StringT **)
+
+val errStr_requester_bound =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val errStr_privPolicy : coq_StringT **)
+
+val errStr_privPolicy =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val errStr_app_auth_tok : coq_StringT **)
+
+val errStr_app_auth_tok =
+  failwith "AXIOM TO BE REALIZED"

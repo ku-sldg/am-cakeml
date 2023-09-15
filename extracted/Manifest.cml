@@ -1,32 +1,61 @@
-type coq_CakeML_ASPCallback =
-  coq_ASP_PARAMS -> coq_Plc -> coq_BS -> coq_RawEv -> coq_BS
+datatype coq_DispatcherErrors =
+  Unavailable 
+| Runtime 
 
-type coq_CakeML_PubKeyCallback = coq_Plc -> coq_PublicKey
+type coq_CallBackErrors =
+  string
+  (* singleton inductive, whose constructor was messageLift *)
 
-type coq_CakeML_PlcCallback = coq_Plc -> coq_UUID
+type 'errType coq_ASPCallback =
+  coq_ASP_PARAMS -> coq_Plc -> coq_BS -> coq_RawEv -> (coq_BS, 'errType)
+  coq_ResultT
 
-type coq_CakeML_uuidCallback = coq_UUID -> coq_Plc
+type coq_PubKeyCallback =
+  coq_Plc -> (coq_PublicKey, coq_DispatcherErrors) coq_ResultT
+
+type coq_PlcCallback = coq_Plc -> (coq_UUID, coq_DispatcherErrors) coq_ResultT
+
+type coq_UUIDCallback =
+  coq_UUID -> (coq_Plc, coq_DispatcherErrors) coq_ResultT
 
 datatype coq_Manifest =
-  Build_Manifest coq_Plc (coq_ASP_ID list) (coq_Plc list) (coq_Plc list)
-   (coq_Plc list) coq_PolicyT
+  Build_Manifest coq_Plc (coq_ASP_ID list) ((coq_Plc, coq_ASP_ID) prod list)
+   (coq_Plc list) (coq_Plc list) (coq_Plc list) coq_PolicyT
 
 (** val empty_Manifest : coq_Manifest **)
 
 val empty_Manifest =
-  Build_Manifest empty_Manifest_Plc [] [] [] [] empty_PolicyT
+  Build_Manifest empty_Manifest_Plc [] [] [] [] [] empty_PolicyT
 
 datatype coq_AM_Library =
-  Build_AM_Library ((coq_ASP_Address -> coq_CakeML_ASPCallback))
-   ((coq_ASP_Address -> coq_CakeML_PubKeyCallback))
-   ((coq_ASP_Address -> coq_CakeML_PlcCallback))
-   ((coq_ASP_Address -> coq_CakeML_uuidCallback)) coq_ASP_Address
-   coq_ASP_Address coq_ASP_Address coq_ASP_Address
-   ((coq_ASP_ID, coq_CakeML_ASPCallback) coq_MapC)
+  Build_AM_Library ((coq_ASP_Address -> coq_CallBackErrors coq_ASPCallback))
+   ((coq_ASP_Address -> coq_PubKeyCallback))
+   ((coq_ASP_Address -> coq_PlcCallback))
+   ((coq_ASP_Address -> coq_UUIDCallback)) coq_ASP_Address coq_ASP_Address
+   coq_ASP_Address coq_ASP_Address
+   ((coq_ASP_ID, coq_CallBackErrors coq_ASPCallback) coq_MapC)
+   (((coq_Plc, coq_ASP_ID) prod, coq_CallBackErrors coq_ASPCallback) coq_MapC)
    ((coq_Plc, coq_UUID) coq_MapD) ((coq_Plc, coq_PublicKey) coq_MapD)
 
 datatype coq_ConcreteManifest =
-  Build_ConcreteManifest coq_Plc (coq_ASP_ID list)
-   ((coq_Plc, coq_UUID) coq_MapD) ((coq_Plc, coq_PublicKey) coq_MapD)
-   (coq_Plc list) coq_ASP_Address coq_ASP_Address coq_ASP_Address
-   coq_ASP_Address
+  Build_ConcreteManifest coq_Plc coq_PolicyT (coq_ASP_ID list) (coq_Plc list)
+   (coq_Plc list) (coq_Plc list) coq_ASP_Address coq_ASP_Address
+   coq_ASP_Address coq_ASP_Address
+
+(** val emptyConcreteMan : coq_ConcreteManifest **)
+
+val emptyConcreteMan =
+  Build_ConcreteManifest min_id_type [] [] [] [] [] empty_ASP_Address
+    empty_ASP_Address empty_ASP_Address empty_ASP_Address
+
+datatype coq_AM_Config =
+  Coq_mkAmConfig coq_ConcreteManifest (coq_DispatcherErrors coq_ASPCallback)
+   (coq_DispatcherErrors coq_ASPCallback) coq_PlcCallback coq_PubKeyCallback
+   coq_UUIDCallback
+
+(** val empty_am_config : coq_AM_Config **)
+
+val empty_am_config =
+  Coq_mkAmConfig emptyConcreteMan (fn _ _ _ _ => Coq_errC Unavailable)
+    (fn _ _ _ _ => Coq_errC Unavailable) (fn _ => Coq_errC Unavailable)
+    (fn _ => Coq_errC Unavailable) (fn _ => Coq_errC Unavailable)

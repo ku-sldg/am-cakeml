@@ -21,7 +21,17 @@ val hsh_params = ( undefined () )
 val enc_aspid =
   failwith "AXIOM TO BE REALIZED"
 
+(** val enc_aspargs : coq_Arg list **)
+
+val enc_aspargs =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val enc_targid : coq_ASP_ID **)
+
+val enc_targid =
+  failwith "AXIOM TO BE REALIZED"
+
 (** val enc_params : coq_Plc -> coq_ASP_PARAMS **)
 
-val enc_params =
-  failwith "AXIOM TO BE REALIZED"
+fun enc_params p =
+  Coq_asp_paramsC enc_aspid enc_aspargs p enc_targid
