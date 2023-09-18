@@ -87,8 +87,10 @@ fun am_sendReq' (t : coq_Term) (targUUID : coq_UUID) (authTok : coq_ReqAuthTok) 
 
 (* coq_Term -> coq_Plc -> coq_ReqAuthTok -> (bs list) -> (bs list) *)
 fun am_sendReq (t : coq_Term) (targPlc : coq_Plc) (authTok : coq_ReqAuthTok) (ev : (bs list)) =
-  let val uuid = ManifestUtils.get_PlcCallback() targPlc in 
-    am_sendReq' t uuid authTok ev 
+  let val res_uuid = ManifestUtils.get_PlcCallback() targPlc in 
+    case res_uuid of 
+        Coq_errC e => [] (* raise Excn ("get_PlcCallback() error")  *)
+      | Coq_resultC uuid => am_sendReq' t uuid authTok ev 
   end
 
 

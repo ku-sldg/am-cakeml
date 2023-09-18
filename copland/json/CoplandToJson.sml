@@ -40,6 +40,22 @@ fun nsMapToJson map =
     in Json.fromPairList (List.map jsonify (Map.toAscList map))
     end
 
+(* appMapToJson : appMap -> json 
+   type appMap = ((coq_Plc, coq_ASP_ID) prod list)
+*)
+fun appMapToJson map =
+    let fun jsonify (pl, aspid) = (plToString pl, Json.fromString aspid)
+    in Json.fromPairList (List.map jsonify (Map.toAscList map))
+    end
+
+(* policyToJson : appMap -> json 
+   type appMap = ((coq_ASP_ID, coq_Plc) prod list)
+*)
+fun policyToJson map =
+    let fun jsonify (aspid, pl) = (aspIdToString aspid, Json.fromString pl)
+    in Json.fromPairList (List.map jsonify map (* (Map.toAscList map) *) )
+    end
+
 (* aspMapToJson : am/Manifest.aspMap -> json 
    type aspMap = ((coq_ASP_ID, addr) map)
 *)

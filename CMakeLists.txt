@@ -61,11 +61,11 @@ system/posix/sys/SysFFI.sml)
 include(./stubs/appraisal_asps/CMakeLists.txt)
 include(./stubs/attestation_asps/CMakeLists.txt)
 
-get_files(cop_src 
+get_files(cop_src
     stubs/BS.sml
     extracted/Specif.cml
-    extracted/EqClass.cml
     extracted/Datatypes.cml
+    extracted/EqClass.cml
     extracted/List.cml
     # extracted/Nat.cml
     extracted/Eqb_Evidence.cml
@@ -77,7 +77,9 @@ get_files(cop_src
     extracted/Term_Defs.cml
     extracted/Maps.cml
     stubs/Maps.sml
+    stubs/AbstractedTypes.sml
     stubs/Manifest_Admits_Stubs.sml
+    extracted/ErrorStMonad_Coq.cml
     extracted/Manifest.cml
     extracted/Manifest_Compiler.cml
     extracted/EnvironmentM.cml
@@ -90,6 +92,7 @@ get_files(cop_src
     am/CommTypes.sml
     copland/json/CoplandToJson.sml
     copland/json/JsonToCopland.sml
+    extracted/Executable_Defs_Prop.cml
     extracted/Manifest_Generator.cml
     copland/json/ManifestJsonConfig.sml
     util/ManifestUtils.sml
@@ -101,6 +104,9 @@ get_files(cop_src
     stubs/Appraisal_IO_Stubs.sml
     stubs/Axioms_Io.sml
     extracted/StMonad_Coq.cml
+    stubs/CvmJson_Admits.sml
+    stubs/ErrorStringConstants.sml
+    extracted/Cvm_St.cml 
     extracted/AM_St.cml
     extracted/AM_Monad.cml
     extracted/Appraisal_Defs.cml
@@ -108,11 +114,9 @@ get_files(cop_src
     # extracted/IO_Type.cml
     am/CoplandCommUtil.sml
     stubs/IO_Stubs.sml
-    extracted/Cvm_St.cml 
     extracted/Cvm_Monad.cml
     extracted/Cvm_Impl.cml
     extracted/Cvm_Run.cml
-    stubs/CvmJson_Admits.sml
     extracted/Impl_appraisal.cml
     extracted/Client_AM.cml
     extracted/Server_AM.cml)

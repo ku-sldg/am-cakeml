@@ -176,8 +176,8 @@ val empty_am_result =
 (** val term_discloses_aspid_to_remote_enc_bool :
     coq_Term -> coq_Plc -> coq_Evidence -> coq_ASP_ID -> coq_Plc -> bool **)
 
-val term_discloses_aspid_to_remote_enc_bool =
-  failwith "AXIOM TO BE REALIZED"
+fun term_discloses_aspid_to_remote_enc_bool t p e i r = False
+  (* failwith "AXIOM TO BE REALIZED" *)
 
 (** val policy_list_not_disclosed :
     coq_Term -> coq_Plc -> coq_Evidence -> (coq_ASP_ID, coq_Plc) prod list ->

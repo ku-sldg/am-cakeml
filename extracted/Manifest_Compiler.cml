@@ -42,7 +42,7 @@ fun generate_ASP_dispatcher hID al am =
         Coq_left => True
       | Coq_right => False)
   in
-  (fn _ par p bs rawEv =>
+  (fn _ => fn par => fn p => fn bs => fn rawEv =>
   let val Coq_asp_paramsC aspid _ _ _ = par in
   (case map_get coq_Eq_Class_ID_Type shrunk_map aspid of
      Some cb =>
@@ -73,7 +73,7 @@ fun generate_appraisal_ASP_dispatcher hID al am =
         Coq_left => True
       | Coq_right => False)
   in
-  (fn _ par p bs rawEv =>
+  (fn _ => fn par => fn p => fn bs => fn rawEv =>
   let val Coq_asp_paramsC aspid _ _ _ = par in
   (case map_get (pair_EqClass coq_Eq_Class_ID_Type coq_Eq_Class_ID_Type)
           shrunk_map (Coq_pair p aspid) of

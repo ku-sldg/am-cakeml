@@ -2,14 +2,16 @@
     coq_BS -> coq_ASP_PARAMS -> coq_PublicKey -> (coq_RawEv,
     coq_DispatcherErrors) coq_ResultT **)
 
+(*
 val decrypt_bs_to_rawev_prim =
   failwith "AXIOM TO BE REALIZED"
+*)
 
 (** val check_et_size :
     coq_Evidence -> coq_RawEv -> (unit, coq_DispatcherErrors) coq_ResultT **)
 
 fun check_et_size et ls =
-  case eqb (et_size et) (length ls) of
+  case Nat.eqb (et_size et) (length ls) of
     True => Coq_resultC ()
   | False => Coq_errC Runtime
 
@@ -27,7 +29,7 @@ fun decrypt_bs_to_rawev bs params ac =
     coq_BS -> coq_ASP_PARAMS -> coq_Evidence -> coq_RawEv coq_AM **)
 
 fun decrypt_bs_to_rawev' bs params et =
-  bind get_amConfig (fn ac =>
+  bind (get_amConfig_am ()) (fn ac =>
     case decrypt_bs_to_rawev bs params ac of
       Coq_errC e => failm (Coq_dispatch_error e)
     | Coq_resultC r =>
@@ -47,7 +49,7 @@ fun check_asp_EXTD params p sig0 ls ac =
     coq_ASP_PARAMS -> coq_Plc -> coq_BS -> coq_RawEv -> coq_BS coq_AM **)
 
 fun check_asp_EXTD' params p sig0 ls =
-  bind get_amConfig (fn ac =>
+  bind (get_amConfig_am ()) (fn ac =>
     case check_asp_EXTD params p sig0 ls ac of
       Coq_errC e => failm (Coq_dispatch_error e)
     | Coq_resultC r => ret r)
