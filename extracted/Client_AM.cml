@@ -23,8 +23,8 @@ fun gen_authEvC_if_some ot myPlc init_evc =
     coq_Term -> coq_Plc -> coq_Evidence -> coq_RawEv -> coq_AppResultC coq_AM **)
 
 fun am_appraise t toPlc init_et cvm_ev =
-  let val expected_et = eval t toPlc init_et in
-  bind (gen_appraise_AM expected_et cvm_ev) ret end
+  let val expected_et = eval t toPlc init_et in (ret Coq_mtc_app)
+  (* bind (gen_appraise_AM expected_et cvm_ev) ret *) end
 
 (** val am_client_gen :
     coq_Term -> coq_Plc -> coq_Plc -> coq_EvC option -> coq_Term option ->

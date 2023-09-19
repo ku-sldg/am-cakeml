@@ -28,6 +28,8 @@ fun decrypt_bs_to_rawev bs ps (* priv pub *) =
     end
 
 
+(*
+
 (** val chec_asp_EXTD :
     coq_ASP_PARAMS -> coq_Plc -> coq_BS -> coq_RawEv -> coq_BS **)
 fun check_asp_EXTD (ps : coq_ASP_PARAMS) (p : coq_Plc) (bs : coq_BS) (ls : coq_RawEv) =
@@ -45,6 +47,9 @@ fun check_asp_EXTD (ps : coq_ASP_PARAMS) (p : coq_Plc) (bs : coq_BS) (ls : coq_R
                             | _ => let val _ = print ("\nAppraisal Check of ASP with ID: " ^ aspid ^ "\n") in
                                        BString.fromString ("check(" ^ aspid ^ ")") (* TODO: check data val here? *)
                                    end
+
+
+*)
                                        
                                        
 (** fun checkNonce : coq_BS -> coq_BS -> coq_BS **)

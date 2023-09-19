@@ -33,7 +33,7 @@ fun appraise_ssl_sig (ps : coq_ASP_PARAMS) (p : coq_Plc) (bs : coq_BS) (ls : coq
     in
         if checkGood
         then (print ("\nSSL Sig Check PASSED\n\n");
-              passed_bs)
+              (Coq_resultC passed_bs))
         else (print ("\nSSL Sig Check FAILED\n\n");
-              failed_bs)
+              (Coq_resultC failed_bs))
     end
