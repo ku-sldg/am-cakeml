@@ -6,5 +6,5 @@ fun sig_asp_stub ps e =
                let val _ = () in
                    print ("Matched aspid:  " ^ aspid ^ "\n");
                    print ("Performing ASP " ^ aspid ^ "\n\n"); 
-                   passed_bs
+                   (Coq_resultC passed_bs)
                end
