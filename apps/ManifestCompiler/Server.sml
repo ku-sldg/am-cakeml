@@ -13,7 +13,8 @@ When things go wrong, handle_AM_request returns a raw error message string.
   it easier on the client. *)
 fun respondToMsg client = 
   let val inString  = Socket.inputAll client 
-      val outString = handle_AM_request inString in 
+      val ac = ManifestUtils.get_local_amConfig ()
+      val outString = handle_AM_request inString ac in 
     Socket.output client outString
   end
   handle Json.Exn s1 s2 =>
@@ -50,8 +51,8 @@ fun startServer () =
 (* () -> () *)
 fun main () =
   let val (concreteMan, privKey) = ManifestJsonConfig.retrieve_CLI_args () 
-      val (concrete, privKey, aspDisp, plcDisp, pubKeyDisp, uuidDisp) = ManifestUtils.setup_and_get_AM_config formal_manifest am_library concreteMan privKey
-      val (Build_ConcreteManifest plc concAsps plcMap pubKeyMap concTargs aspServer_addr pubKeyServer_addr plcServer_addr uuidServer_addr) = concrete
+      val _ (* (concrete, privKey, aspDisp, plcDisp, pubKeyDisp, uuidDisp) *) = ManifestUtils.setup_and_get_AM_config formal_manifest am_library concreteMan privKey
+      (* val (Build_ConcreteManifest plc concAsps plcMap pubKeyMap concTargs aspServer_addr pubKeyServer_addr plcServer_addr uuidServer_addr) = concrete *)
       (* Retrieving implicit self place from manifest here *)
       val my_plc = ManifestUtils.get_myPlc()
       val _ = print ("My Place (retrieved from Manifest): " ^ my_plc ^ "\n\n")

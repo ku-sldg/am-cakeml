@@ -89,11 +89,11 @@ fun do_asp asp_server_addr ps e =
 
 val aspServer_cb = (fn aspServerAddr => fn aspParams => fn plc => fn bs => fn rawEv => do_asp aspServerAddr aspParams rawEv) : (coq_ASP_Address -> coq_ASPCallback)
 
-val pubKeyServer_cb = (fn _ => fn _ => BString.unshow "OUTPUT_PUBKEY") :  (coq_ASP_Address -> coq_CakeML_PubKeyCallback)
+val pubKeyServer_cb = (fn _ => fn _ => BString.unshow "OUTPUT_PUBKEY") :  (coq_ASP_Address -> coq_PubKeyCallback)
 
-val plcServer_cb = (fn _ => fn _ => "OUTPUT_UUID") : (coq_ASP_Address ->  coq_CakeML_PlcCallback)
+val plcServer_cb = (fn _ => fn _ => "OUTPUT_UUID") : (coq_ASP_Address ->  coq_PlcCallback)
 
-val uuidServer_cb = (fn _ => fn _ => "OUTPUT_PLC") : (coq_ASP_Address -> coq_CakeML_uuidCallback)
+val uuidServer_cb = (fn _ => fn _ => "OUTPUT_PLC") : (coq_ASP_Address -> coq_uuidCallback)
 
 val client_am_library = 
   (Build_AM_Library 

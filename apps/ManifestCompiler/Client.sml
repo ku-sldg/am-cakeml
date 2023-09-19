@@ -10,8 +10,8 @@ fun run_am_client_auth_tok_req (t : coq_Term) (myPl : coq_Plc) (init_ev : coq_Ra
 fun main () =
     let val main_phrase = clientCvmTerm (* TODO:  remove this hard-coded val via manifest compiler build *)
         val (concreteMan, privKey) = ManifestJsonConfig.retrieve_CLI_args () 
-        val (concrete, privKey, aspDisp, plcDisp, pubKeyDisp, uuidDisp) = ManifestUtils.setup_and_get_AM_config formal_manifest am_library concreteMan privKey (* auth_phrase *)
-        val (Build_ConcreteManifest plc concAsps plcMap pubKeyMap concTargs aspServer_addr pubKeyServer_addr plcServer_addr uuidServer_addr) = concrete
+        val _ (* (concrete, privKey, aspDisp, plcDisp, pubKeyDisp, uuidDisp) *) = ManifestUtils.setup_and_get_AM_config formal_manifest am_library concreteMan privKey (* auth_phrase *)
+        (* val (Build_ConcreteManifest plc concAsps plcMap pubKeyMap concTargs aspServer_addr pubKeyServer_addr plcServer_addr uuidServer_addr) = concrete *)
         (* Retrieving implicit self place from manifest here *)
         val my_plc = ManifestUtils.get_myPlc()
         val auth_phrase = ssl_sig_parameterized my_plc

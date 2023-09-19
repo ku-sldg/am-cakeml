@@ -22,6 +22,8 @@ structure ManifestUtils = struct
 
   val local_concreteManifest = Ref (Err "Concrete Manifest not set") : ((coq_ConcreteManifest, string) result) ref
 
+  val local_amConfig = Ref (Err "AM_Config not set") : ((coq_AM_Config, string) result) ref
+
   val local_aspCb = Ref (Err "ASP Callback not set") : ((Partial_ASP_CB, string) result) ref
 
   val local_plcCb = Ref (Err "Plc Callback not set") : ((Partial_Plc_CB, string) result) ref
@@ -38,6 +40,13 @@ structure ManifestUtils = struct
     (case (!local_concreteManifest) of
       (Ok v) => v
       | Err e => raise Excn e) : coq_ConcreteManifest
+  
+   (* Retrieves the AM_Config, or exception if not configured 
+    : _ -> coq_AM_Config *)
+  fun get_local_amConfig _ =
+    (case (!local_amConfig) of
+      (Ok v) => v
+      | Err e => raise Excn e) : coq_AM_Config
 
     (* Retrieves the plc corresponding to this processes Manifest/AM_Config
       throws an exception if configuration not completed
@@ -70,6 +79,7 @@ structure ManifestUtils = struct
             val _ = local_pubKeyCb := Ok pubKeyDisp
             val _ = local_uuidCb := Ok uuidDisp
             val _ = local_PrivKey := Ok privKey
+            val _ = local_amConfig := Ok (Coq_mkAmConfig concrete aspDisp appDisp plcDisp pubKeyDisp uuidDisp)
             (* val _ = local_authTerm := Ok t *)
             (*
             val _ = local_authEv := 
@@ -96,6 +106,14 @@ structure ManifestUtils = struct
       ()
     end
 
+    (* Sets the AM_Config, should not throw
+    : coq_ConcreteManifest -> () *)
+  fun set_AM_Config (c : coq_AM_Config) =
+    let val _ = local_amConfig := Ok c
+    in 
+      ()
+    end
+
   (* Retrieves the asp callback, or exception if not configured 
     : _ -> coq_ASPCallback *)
   fun get_ASPCallback _ =
@@ -107,7 +125,7 @@ structure ManifestUtils = struct
     end) : coq_DispatcherErrors coq_ASPCallback
 
   (* Retrieves the plc callback, or exception if not configured 
-    : _ -> coq_CakeML_PlcCallback *)
+    : _ -> coq_PlcCallback *)
   fun get_PlcCallback _ =
     (let val cm = get_ConcreteManifest()
     in
@@ -117,7 +135,7 @@ structure ManifestUtils = struct
     end) : coq_PlcCallback
 
   (* Retrieves the asp callback, or exception if not configured 
-    : _ -> coq_CakeML_PubKeyCallback *)
+    : _ -> coq_PubKeyCallback *)
   fun get_PubKeyCallback _ =
     (let val cm = get_ConcreteManifest()
     in
@@ -130,7 +148,7 @@ structure ManifestUtils = struct
     end) : coq_PubKeyCallback
 
   (* Retrieves the asp callback, or exception if not configured 
-    : _ -> coq_CakeML_uuidCallback *)
+    : _ -> coq_UUIDCallback *)
   fun get_UUIDCallback _ =
     (let val cm = get_ConcreteManifest()
     in
