@@ -10,6 +10,6 @@ fun ssl_enc_asp_stub ps e =
                        val ciphertext =
                            Crypto.encryptOneShot
                                priv1 pub2 plaintext in
-                       ciphertext
+                       Coq_resultC (ciphertext)
                    end
                end

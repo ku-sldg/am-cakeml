@@ -12,10 +12,10 @@ structure ManifestUtils = struct
   
   (*
   (coq_ConcreteManifest * privateKey_t *
-      (coq_CakeML_ASPCallback) * 
-      (coq_CakeML_PlcCallback) * 
-      (coq_CakeML_PubKeyCallback) * 
-      (coq_CakeML_uuidCallback))
+      (coq_ASPCallback) * 
+      (coq_PlcCallback) * 
+      (coq_PubKeyCallback) * 
+      (coq_UUIDCallback))
     *)
 
   val local_formal_manifest = Ref (Err "Formal Manifest not set") : ((coq_Manifest, string) result) ref
@@ -97,7 +97,7 @@ structure ManifestUtils = struct
     end
 
   (* Retrieves the asp callback, or exception if not configured 
-    : _ -> coq_CakeML_ASPCallback *)
+    : _ -> coq_ASPCallback *)
   fun get_ASPCallback _ =
     (let val cm = get_ConcreteManifest() 
     in

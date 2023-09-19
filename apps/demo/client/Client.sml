@@ -49,7 +49,7 @@ val formal_manifest =
     True
   ) : coq_Manifest
 
-val aspMapping = (mapC_from_pairList []) : ((coq_ASP_ID, coq_CakeML_ASPCallback) coq_MapC)
+val aspMapping = (mapC_from_pairList []) : ((coq_ASP_ID, coq_ASPCallback) coq_MapC)
 
 
 (** val do_asp : coq_ASP_Address -> coq_ASP_PARAMS -> coq_RawEv -> coq_BS **)
@@ -87,7 +87,7 @@ fun do_asp asp_server_addr ps e =
         res
     end
 
-val aspServer_cb = (fn aspServerAddr => fn aspParams => fn plc => fn bs => fn rawEv => do_asp aspServerAddr aspParams rawEv) : (coq_ASP_Address -> coq_CakeML_ASPCallback)
+val aspServer_cb = (fn aspServerAddr => fn aspParams => fn plc => fn bs => fn rawEv => do_asp aspServerAddr aspParams rawEv) : (coq_ASP_Address -> coq_ASPCallback)
 
 val pubKeyServer_cb = (fn _ => fn _ => BString.unshow "OUTPUT_PUBKEY") :  (coq_ASP_Address -> coq_CakeML_PubKeyCallback)
 

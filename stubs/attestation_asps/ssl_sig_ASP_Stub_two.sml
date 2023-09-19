@@ -10,6 +10,6 @@ fun ssl_sig_asp_stub_two (ps : coq_ASP_PARAMS) (e : coq_RawEv) =
                 val privKey = ManifestUtils.get_myPrivateKey()
                 val sigRes = Crypto.signMsg privKey data 
             in
-                sigRes
+                Coq_resultC (sigRes)
             end
         end

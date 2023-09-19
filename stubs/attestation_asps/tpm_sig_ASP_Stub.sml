@@ -7,6 +7,6 @@ fun tpm_sig_asp_stub ps e =
                    print ("Matched aspid:  " ^ aspid ^ "\n");
                    let val data = encode_RawEv e
                        val sigRes = Crypto.tpmSign data in
-                       sigRes
+                       Coq_resultC (sigRes)
                    end
                end

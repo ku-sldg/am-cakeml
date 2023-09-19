@@ -46,9 +46,9 @@ fun pub_bc_asp_stub ps e =
                                          targetId (HealthRecord.toJson hr)
                in
                    case hrAddResult of
-                       Ok bstring => bstring
+                       Ok bstring => Coq_resultC (bstring)
                      | Err str =>
                        (print (String.concat [str, "\n"]);
-                        BString.nulls 1)
+                        (Coq_resultC (BString.nulls 1)))
                end
                    

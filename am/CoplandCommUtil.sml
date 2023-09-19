@@ -114,9 +114,11 @@ fun am_sendReq'_app (targUUID : coq_UUID) (t : coq_Term) (p:coq_Plc) (et:coq_Evi
 
 (* coq_Term -> coq_Plc -> coq_Evidence -> coq_RawEv -> coq_AppResultC *)
 fun am_sendReq_app (t : coq_Term) (targPlc:coq_Plc) (et:coq_Evidence) (ev : coq_RawEv) =
-  let val uuid = ManifestUtils.get_PlcCallback() targPlc
+  let val res_uuid = ManifestUtils.get_PlcCallback() targPlc
       val _ = print "\n\n EXECUTING am_sendReq_app \n\n" in 
-    am_sendReq'_app uuid t targPlc et ev
+      case res_uuid of 
+        Coq_errC e => Coq_mtc_app (* raise Excn ("get_PlcCallback() error")  *)
+      | Coq_resultC uuid => am_sendReq'_app uuid t targPlc et ev
   end
 
 

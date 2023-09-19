@@ -6,6 +6,6 @@ fun get_data_asp_stub ps e =
                let val _ = () in
                    print ("Matched aspid:  " ^ aspid ^ "\n");
                    let val dataRes = Crypto.getData () in
-                       dataRes
+                       Coq_resultC (dataRes)
                    end
                end

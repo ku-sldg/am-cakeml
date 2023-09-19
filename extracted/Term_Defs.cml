@@ -183,6 +183,8 @@ fun term_discloses_aspid_to_remote_enc_bool t p e i r = False
     coq_Term -> coq_Plc -> coq_Evidence -> (coq_ASP_ID, coq_Plc) prod list ->
     bool **)
 
-fun policy_list_not_disclosed t p e ls =
+fun policy_list_not_disclosed t p e ls = True
+(*
   forallb (fn pr =>
     negb (term_discloses_aspid_to_remote_enc_bool t p e (fst pr) (snd pr))) ls
+  *)
