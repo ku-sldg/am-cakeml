@@ -24,64 +24,79 @@ fun minify_mapD hA hB m f =
        True => (Coq_pair k v) :: (minify_mapD hA hB tl f)
      | False => minify_mapD hA hB tl f) end
 
-(** val generate_ASP_dispatcher :
-    coq_ID_Type coq_EqClass -> coq_AM_Library -> coq_Manifest ->
-    coq_ConcreteManifest -> coq_DispatcherErrors coq_ASPCallback **)
+(** val generate_ASP_dispatcher' :
+    coq_AM_Library -> coq_Manifest -> coq_ASP_PARAMS -> coq_Plc -> coq_BS ->
+    coq_RawEv -> (coq_BS, coq_DispatcherErrors) coq_ResultT **)
 
-fun generate_ASP_dispatcher hID al am =
+fun generate_ASP_dispatcher' al am par p bs rawEv =
+  let val Coq_asp_paramsC aspid _ _ _ = par in
+  let val abstract_asps =
+    let val Build_Manifest _ asps _ _ _ _ _ = am in asps end
+  in
   let val local_asps_map =
     let val Build_AM_Library _ _ _ _ _ _ _ _ local_ASPS _ _ _ = al in
     local_ASPS end
   in
-  let val abstract_asps =
-    let val Build_Manifest _ asps _ _ _ _ _ = am in asps end
-  in
   let val shrunk_map =
     minify_mapC coq_Eq_Class_ID_Type local_asps_map (fn x =>
-      case in_dec (coq_EqClass_impl_DecEq hID) x abstract_asps of
+      case in_dec (coq_EqClass_impl_DecEq coq_Eq_Class_ID_Type) x
+             abstract_asps of
         Coq_left => True
       | Coq_right => False)
   in
-  (fn _ => fn par => fn p => fn bs => fn rawEv =>
-  let val Coq_asp_paramsC aspid _ _ _ = par in
   (case map_get coq_Eq_Class_ID_Type shrunk_map aspid of
      Some cb =>
      (case cb par p bs rawEv of
         Coq_errC _ => Coq_errC Runtime
       | Coq_resultC r => Coq_resultC r)
-   | None => Coq_errC Unavailable) end) end end end
+   | None => Coq_errC Unavailable) end end end end
 
-(** val generate_appraisal_ASP_dispatcher :
+(** val generate_ASP_dispatcher :
     coq_ID_Type coq_EqClass -> coq_AM_Library -> coq_Manifest ->
     coq_ConcreteManifest -> coq_DispatcherErrors coq_ASPCallback **)
 
-fun generate_appraisal_ASP_dispatcher hID al am =
-  let val local_app_asps_map =
+fun generate_ASP_dispatcher _ al am _ =
+  generate_ASP_dispatcher' al am
+
+(** val generate_appraisal_ASP_dispatcher' :
+    coq_AM_Library -> coq_Manifest -> coq_ASP_PARAMS -> coq_Plc -> coq_BS ->
+    coq_RawEv -> (coq_BS, coq_DispatcherErrors) coq_ResultT **)
+
+fun generate_appraisal_ASP_dispatcher' al am par p bs rawEv =
+  let val Coq_asp_paramsC aspid _ _ _ = par in
+  let val abstract_asps =
+    let val Build_Manifest _ _ appraisal_asps _ _ _ _ = am in
+    appraisal_asps end
+  in
+  let val local_asps_map =
     let val Build_AM_Library _ _ _ _ _ _ _ _ _ local_Appraisal_ASPS _ _ = al
     in
     local_Appraisal_ASPS end
   in
-  let val abstract_app_asps =
-    let val Build_Manifest _ _ appraisal_asps _ _ _ _ = am in
-    appraisal_asps end
-  in
   let val shrunk_map =
     minify_mapC (pair_EqClass coq_Eq_Class_ID_Type coq_Eq_Class_ID_Type)
-      local_app_asps_map (fn x =>
-      case in_dec (coq_EqClass_impl_DecEq (pair_EqClass hID hID)) x
-             abstract_app_asps of
+      local_asps_map (fn x =>
+      case in_dec
+             (coq_EqClass_impl_DecEq
+               (pair_EqClass coq_Eq_Class_ID_Type coq_Eq_Class_ID_Type)) x
+             abstract_asps of
         Coq_left => True
       | Coq_right => False)
   in
-  (fn _ => fn par => fn p => fn bs => fn rawEv =>
-  let val Coq_asp_paramsC aspid _ _ _ = par in
   (case map_get (pair_EqClass coq_Eq_Class_ID_Type coq_Eq_Class_ID_Type)
           shrunk_map (Coq_pair p aspid) of
      Some cb =>
      (case cb par p bs rawEv of
         Coq_errC _ => Coq_errC Runtime
       | Coq_resultC r => Coq_resultC r)
-   | None => Coq_errC Unavailable) end) end end end
+   | None => Coq_errC Unavailable) end end end end
+
+(** val generate_appraisal_ASP_dispatcher :
+    coq_ID_Type coq_EqClass -> coq_AM_Library -> coq_Manifest ->
+    coq_ConcreteManifest -> coq_DispatcherErrors coq_ASPCallback **)
+
+fun generate_appraisal_ASP_dispatcher _ al am _ =
+  generate_appraisal_ASP_dispatcher' al am
 
 (** val generate_Plc_dispatcher :
     coq_ID_Type coq_EqClass -> coq_AM_Library -> coq_Manifest ->

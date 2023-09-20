@@ -37,14 +37,6 @@ fun fold_right f a0 l = case l of
   [] => a0
 | b :: t => f b (fold_right f a0 t)
 
-(** val forallb : ('a1 -> bool) -> 'a1 list -> bool **)
-
-fun forallb f l = case l of
-  [] => True
-| a :: l0 => (case f a of
-                True => forallb f l0
-              | False => False)
-
 (** val firstn : nat -> 'a1 list -> 'a1 list **)
 
 fun firstn n l =

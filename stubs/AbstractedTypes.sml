@@ -1,16 +1,10 @@
 
-(*
-
-type coq_ID_Type (* AXIOM TO BE REALIZED *)
+type coq_ID_Type = string
+(* AXIOM TO BE REALIZED *)
 
 (** val coq_Eq_Class_ID_Type : coq_ID_Type coq_EqClass **)
 
-val coq_Eq_Class_ID_Type =
-  failwith "AXIOM TO BE REALIZED"
-
-*)
-
-(** val min_id_type : coq_ID_Type **)
-
-val min_id_type = ""
+fun coq_Eq_Class_ID_Type x y = (x = y)
   (* failwith "AXIOM TO BE REALIZED" *)
+val coq_ID_Type_ordering = String.compare
+

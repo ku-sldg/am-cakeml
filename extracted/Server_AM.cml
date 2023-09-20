@@ -5,7 +5,7 @@ fun am_check_auth_tok t fromPl authTok = case authTok of
   Coq_evc auth_ev auth_et =>
   bind
     (case requester_bound t fromPl authTok of
-       True => ret Coq_mtc_app (* gen_appraise_AM auth_et auth_ev *)
+       True => gen_appraise_AM auth_et auth_ev
      | False => failm (Coq_am_error errStr_requester_bound)) ret
 
 (** val am_serve_auth_tok_req :

@@ -19,12 +19,12 @@ type coq_PublicKey (* AXIOM TO BE REALIZED *)
 val coq_Eq_Class_public_key =
   failwith "AXIOM TO BE REALIZED"
 
-type coq_PolicyT = (coq_ASP_ID, coq_Plc) prod list
+type coq_PolicyT = bool
 
 (** val empty_PolicyT : coq_PolicyT **)
 
 val empty_PolicyT =
-  []
+  True
 
 (** val empty_Manifest_Plc : coq_Plc **)
 

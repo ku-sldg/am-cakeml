@@ -9,12 +9,6 @@ fun fromSome default opt = case opt of
 fun run_am_app_comp am_comp default_A =
   let val optRes = evalErr am_comp empty_amst in fromSome default_A optRes end
 
-(** val get_amConfig : coq_AM_Config coq_AM **)
-
-fun get_amConfig_am () =
-  bind get (fn st =>
-    ret (let val Coq_mkAM_St _ _ amConfig = st in amConfig end))
-
 (** val am_newNonce : coq_BS -> nat coq_AM **)
 
 fun am_newNonce bs =

@@ -1,9 +1,3 @@
-(** val negb : bool -> bool **)
-
-fun negb b = case b of
-  True => False
-| False => True
-
 datatype ('a, 'b) prod =
   Coq_pair 'a 'b
 

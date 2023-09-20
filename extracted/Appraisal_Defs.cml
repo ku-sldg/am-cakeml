@@ -1,17 +1,8 @@
-(** val decrypt_bs_to_rawev_prim :
-    coq_BS -> coq_ASP_PARAMS -> coq_PublicKey -> (coq_RawEv,
-    coq_DispatcherErrors) coq_ResultT **)
-
-(*
-val decrypt_bs_to_rawev_prim =
-  failwith "AXIOM TO BE REALIZED"
-*)
-
 (** val check_et_size :
     coq_Evidence -> coq_RawEv -> (unit, coq_DispatcherErrors) coq_ResultT **)
 
 fun check_et_size et ls =
-  case Nat.eqb (et_size et) (length ls) of
+  case eqb nat_EqClass (et_size et) (length ls) of
     True => Coq_resultC ()
   | False => Coq_errC Runtime
 
@@ -29,13 +20,14 @@ fun decrypt_bs_to_rawev bs params ac =
     coq_BS -> coq_ASP_PARAMS -> coq_Evidence -> coq_RawEv coq_AM **)
 
 fun decrypt_bs_to_rawev' bs params et =
-  bind (get_amConfig_am ()) (fn ac =>
-    case decrypt_bs_to_rawev bs params ac of
-      Coq_errC e => failm (Coq_dispatch_error e)
-    | Coq_resultC r =>
-      (case check_et_size et r of
-         Coq_errC e => failm (Coq_dispatch_error e)
-       | Coq_resultC _ => ret r))
+  bind get (fn st =>
+    let val ac = let val Coq_mkAM_St _ _ amConfig = st in amConfig end in
+    (case decrypt_bs_to_rawev bs params ac of
+       Coq_errC e => failm (Coq_dispatch_error e)
+     | Coq_resultC r =>
+       (case check_et_size et r of
+          Coq_errC e => failm (Coq_dispatch_error e)
+        | Coq_resultC _ => ret r)) end)
 
 (** val check_asp_EXTD :
     coq_ASP_PARAMS -> coq_Plc -> coq_BS -> coq_RawEv -> coq_AM_Config ->
@@ -49,10 +41,11 @@ fun check_asp_EXTD params p sig0 ls ac =
     coq_ASP_PARAMS -> coq_Plc -> coq_BS -> coq_RawEv -> coq_BS coq_AM **)
 
 fun check_asp_EXTD' params p sig0 ls =
-  bind (get_amConfig_am ()) (fn ac =>
-    case check_asp_EXTD params p sig0 ls ac of
-      Coq_errC e => failm (Coq_dispatch_error e)
-    | Coq_resultC r => ret r)
+  bind get (fn st =>
+    let val ac = let val Coq_mkAM_St _ _ amConfig = st in amConfig end in
+    (case check_asp_EXTD params p sig0 ls ac of
+       Coq_errC e => failm (Coq_dispatch_error e)
+     | Coq_resultC r => ret r) end)
 
 (** val checkNonce' : nat -> coq_BS -> coq_BS coq_AM **)
 

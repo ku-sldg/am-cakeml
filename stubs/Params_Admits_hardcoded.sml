@@ -37,3 +37,8 @@ val enc_targplc = "encP"
 fun enc_params q = Coq_asp_paramsC enc_aspid enc_aspargs q enc_targid
 
 (* fun enc_params q = Coq_asp_paramsC "encid" [] q "enctargid" *)
+
+
+(* TODO: move this to different stubs file?  
+    Or eventually extract entirely from spec... *)
+fun term_discloses_aspid_to_remote_enc_bool t p e i r = False

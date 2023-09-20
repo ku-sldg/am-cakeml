@@ -67,6 +67,7 @@ get_files(cop_src
     extracted/Datatypes.cml
     extracted/EqClass.cml
     extracted/List.cml
+    stubs/AbstractedTypes.sml
     # extracted/Nat.cml
     extracted/Eqb_Evidence.cml
     # extracted/OptMonad_Coq.cml
@@ -77,7 +78,6 @@ get_files(cop_src
     extracted/Term_Defs.cml
     extracted/Maps.cml
     stubs/Maps.sml
-    stubs/AbstractedTypes.sml
     stubs/Manifest_Admits_Stubs.sml
     extracted/ErrorStMonad_Coq.cml
     extracted/Manifest.cml
@@ -106,7 +106,8 @@ get_files(cop_src
     extracted/StMonad_Coq.cml
     stubs/CvmJson_Admits.sml
     stubs/ErrorStringConstants.sml
-    extracted/Cvm_St.cml 
+    extracted/Cvm_St.cml
+    stubs/Cvm_St_Utils.sml
     extracted/AM_St.cml
     extracted/AM_Monad.cml
     extracted/Appraisal_Defs.cml

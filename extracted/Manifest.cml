@@ -44,18 +44,24 @@ datatype coq_ConcreteManifest =
 
 (** val emptyConcreteMan : coq_ConcreteManifest **)
 
-val emptyConcreteMan : coq_ConcreteManifest =
-  Build_ConcreteManifest "" empty_PolicyT [] [] [] [] empty_ASP_Address
-    empty_ASP_Address empty_ASP_Address empty_ASP_Address
+val emptyConcreteMan =
+  Build_ConcreteManifest empty_Manifest_Plc empty_PolicyT [] [] [] []
+    empty_ASP_Address empty_ASP_Address empty_ASP_Address empty_ASP_Address
 
 datatype coq_AM_Config =
   Coq_mkAmConfig coq_ConcreteManifest (coq_DispatcherErrors coq_ASPCallback)
    (coq_DispatcherErrors coq_ASPCallback) coq_PlcCallback coq_PubKeyCallback
    coq_UUIDCallback
 
+(** val empty_aspCb :
+    coq_ASP_PARAMS -> coq_Plc -> coq_BS -> coq_RawEv -> (coq_BS,
+    coq_DispatcherErrors) coq_ResultT **)
+
+fun empty_aspCb _ _ _ _ =
+  Coq_errC Unavailable
+
 (** val empty_am_config : coq_AM_Config **)
 
 val empty_am_config =
-  Coq_mkAmConfig emptyConcreteMan (fn _ => fn _ => fn _ => fn _ => Coq_errC Unavailable)
-    (fn _ => fn _ => fn _ => fn _ => Coq_errC Unavailable) (fn _ => Coq_errC Unavailable)
-    (fn _ => Coq_errC Unavailable) (fn _ => Coq_errC Unavailable)
+  Coq_mkAmConfig emptyConcreteMan empty_aspCb empty_aspCb (fn _ => Coq_errC
+    Unavailable) (fn _ => Coq_errC Unavailable) (fn _ => Coq_errC Unavailable)
