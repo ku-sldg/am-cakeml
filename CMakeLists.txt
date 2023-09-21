@@ -101,14 +101,14 @@ get_files(cop_src
     apps/blockchain/HealthRecord.sml
     ${attestation_asps}
     ${appraisal_asps}
-    stubs/Appraisal_IO_Stubs.sml
-    stubs/Axioms_Io.sml
-    extracted/StMonad_Coq.cml
     stubs/CvmJson_Admits.sml
     stubs/ErrorStringConstants.sml
     extracted/Cvm_St.cml
-    stubs/Cvm_St_Utils.sml
     extracted/AM_St.cml
+    stubs/Appraisal_IO_Stubs.sml
+    stubs/Axioms_Io.sml
+    extracted/StMonad_Coq.cml
+    stubs/Cvm_St_Utils.sml
     extracted/AM_Monad.cml
     extracted/Appraisal_Defs.cml
     extracted/Evidence_Bundlers.cml

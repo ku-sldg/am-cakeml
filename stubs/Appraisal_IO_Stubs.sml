@@ -76,3 +76,42 @@ val gen_nonce_bits = (BString.fromString "anonce") (* TODO: real nonce gen *)
     coq_DispatcherErrors) coq_ResultT **)
 fun decrypt_bs_to_rawev_prim bs params pubkey = Coq_errC Runtime
   (*failwith "AXIOM TO BE REALIZED"*)
+
+
+(*
+datatype coq_AM_Error =
+  Coq_cvm_error coq_CVM_Error
+| Coq_am_error coq_StringT
+| Coq_am_dispatch_error coq_DispatcherErrors
+
+*)
+
+
+(** val print_am_error : coq_AM_Error -> bool -> bool **)
+
+fun print_am_error e _ = 
+    case e of 
+        Coq_cvm_error _ => 
+            let val _ = print ("\n\n\n" ^ errStr_cvm_error ^ "\n\n\n") in True
+            end
+    | Coq_am_error s => 
+        let val _ = print ("\n\n\n" ^ s ^ "\n\n\n") in True
+        end
+    | Coq_am_dispatch_error _ =>
+        let val _ =  print ("\n\n\n" ^ errStr_dispatch_error ^ "\n\n\n") in True
+        end
+
+
+
+
+
+(*
+(** val print_am_error : coq_AM_Error -> bool -> bool **)
+
+fun print_am_error e _ = case b of
+  True => (case b of
+             True => b
+           | False => negb b)
+| False => negb b
+
+*)

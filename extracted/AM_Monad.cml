@@ -4,10 +4,20 @@ fun fromSome default opt = case opt of
   Coq_errC _ => default
 | Coq_resultC x => x
 
-(** val run_am_app_comp : 'a1 coq_AM -> 'a1 -> 'a1 **)
+(** val run_am_app_comp : 'a1 coq_AM -> 'a1 -> bool -> 'a1 **)
 
-fun run_am_app_comp am_comp default_A =
-  let val optRes = evalErr am_comp empty_amst in fromSome default_A optRes end
+fun run_am_app_comp am_comp default_A b = case b of
+  True =>
+  let val optRes = evalErr am_comp empty_amst in
+  let val v =
+    case optRes of
+      Coq_errC e => print_am_error e b
+    | Coq_resultC _ => negb b
+  in
+  (case v of
+     True => fromSome default_A optRes
+   | False => default_A) end end
+| False => default_A
 
 (** val put_amConfig : coq_AM_Config -> unit coq_AM **)
 
