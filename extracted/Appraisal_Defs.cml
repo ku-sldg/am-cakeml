@@ -23,10 +23,10 @@ fun decrypt_bs_to_rawev' bs params et =
   bind get (fn st =>
     let val ac = let val Coq_mkAM_St _ _ amConfig = st in amConfig end in
     (case decrypt_bs_to_rawev bs params ac of
-       Coq_errC e => failm (Coq_dispatch_error e)
+       Coq_errC e => am_failm (Coq_am_dispatch_error e)
      | Coq_resultC r =>
        (case check_et_size et r of
-          Coq_errC e => failm (Coq_dispatch_error e)
+          Coq_errC e => am_failm (Coq_am_dispatch_error e)
         | Coq_resultC _ => ret r)) end)
 
 (** val check_asp_EXTD :
@@ -44,7 +44,7 @@ fun check_asp_EXTD' params p sig0 ls =
   bind get (fn st =>
     let val ac = let val Coq_mkAM_St _ _ amConfig = st in amConfig end in
     (case check_asp_EXTD params p sig0 ls ac of
-       Coq_errC e => failm (Coq_dispatch_error e)
+       Coq_errC e => am_failm (Coq_am_dispatch_error e)
      | Coq_resultC r => ret r) end)
 
 (** val checkNonce' : nat -> coq_BS -> coq_BS coq_AM **)

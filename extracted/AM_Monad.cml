@@ -36,4 +36,4 @@ fun am_getNonce nid =
     let val resopt = map_get nat_EqClass oldMap nid in
     (case resopt of
        Some res => ret res
-     | None => failm (Coq_am_error errStr_amNonce)) end end)
+     | None => am_failm (Coq_am_error errStr_amNonce)) end end)

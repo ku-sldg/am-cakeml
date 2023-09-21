@@ -9,6 +9,11 @@ val empty_amst =
 datatype coq_AM_Error =
   Coq_cvm_error coq_CVM_Error
 | Coq_am_error coq_StringT
-| Coq_dispatch_error coq_DispatcherErrors
+| Coq_am_dispatch_error coq_DispatcherErrors
+
+(** val am_failm : coq_AM_Error -> (coq_AM_St, 'a1, coq_AM_Error) coq_Err **)
+
+fun am_failm e s =
+  Coq_pair (Coq_errC e) s
 
 type 'a coq_AM = (coq_AM_St, 'a, coq_AM_Error) coq_Err

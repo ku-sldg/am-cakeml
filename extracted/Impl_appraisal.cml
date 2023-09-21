@@ -1,7 +1,7 @@
 (** val peel_bs_am : coq_RawEv -> (coq_BS, coq_RawEv) prod coq_AM **)
 
 fun peel_bs_am ls = case ls of
-  [] => failm (Coq_am_error errStr_peel_bs_am)
+  [] => am_failm (Coq_am_error errStr_peel_bs_am)
 | bs :: ls' => ret (Coq_pair bs ls')
 
 (** val gen_appraise_AM :
