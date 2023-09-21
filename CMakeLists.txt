@@ -119,7 +119,7 @@ get_files(cop_src
     extracted/Cvm_Impl.cml
     extracted/Cvm_Run.cml
     extracted/Impl_appraisal.cml
-    extracted/Client_AM.cml
+    extracted/Client_AM_Local.cml
     extracted/Server_AM.cml)
 
 get_files(server_am_src ${util_src} ${posix_src} ${cop_src})

@@ -138,6 +138,11 @@ fun dedup_list ps = case ps of
 fun manifest_generator_terms p ts =
   fold_right (manifest_generator' p) e_empty ts
 
+(** val manifest_generator : coq_Term -> coq_Plc -> coq_EnvironmentM **)
+
+fun manifest_generator t p =
+  manifest_generator' p t e_empty
+
 (** val places_terms' : coq_Term list -> coq_Plc -> coq_Plc list list **)
 
 fun places_terms' ts p =
@@ -212,3 +217,36 @@ fun attify_terms ls =
 
 fun man_gen_run_attify ls =
   let val ts = attify_terms ls in demo_man_gen_run ts default_place end
+
+(** val app_aspid_manifest_update :
+    coq_ASP_ID -> coq_Plc -> coq_Manifest -> coq_Manifest **)
+
+fun app_aspid_manifest_update i p m =
+  let val Build_Manifest oldPlc oldasps old_app_asps oldKnowsOf oldContext
+    oldTargets oldPolicy = m
+  in
+  Build_Manifest oldPlc oldasps ((Coq_pair i p) :: old_app_asps) oldKnowsOf
+  oldContext oldTargets oldPolicy end
+
+(** val manifest_generator_app' :
+    coq_Evidence -> coq_Manifest -> coq_Manifest **)
+
+fun manifest_generator_app' et m =
+  case et of
+    Coq_uu p fwd ps e' =>
+    (case fwd of
+       ENCR =>
+       let val Coq_asp_paramsC _ _ p' _ = ps in
+       manifest_generator_app' e' (pubkey_manifest_update p' m) end
+     | EXTD =>
+       let val Coq_asp_paramsC a _ _ _ = ps in
+       manifest_generator_app' e' (app_aspid_manifest_update p a m) end
+     | KEEP => manifest_generator_app' e' m
+     | _ => m)
+  | Coq_ss e1 e2 => manifest_generator_app' e2 (manifest_generator_app' e1 m)
+  | _ => m
+
+(** val manifest_generator_app : coq_Evidence -> coq_Manifest **)
+
+fun manifest_generator_app et =
+  manifest_generator_app' et empty_Manifest

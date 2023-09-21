@@ -64,3 +64,15 @@ val requester_bound =
 
 val appraise_auth_tok =
   failwith "AXIOM TO BE REALIZED"
+
+(** val lib_supports_manifest_bool :
+    coq_AM_Library -> coq_Manifest -> bool **)
+
+val lib_supports_manifest_bool =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val lib_supports_manifest_app_bool :
+    coq_AM_Library -> coq_Manifest -> bool **)
+
+val lib_supports_manifest_app_bool =
+  failwith "AXIOM TO BE REALIZED"
