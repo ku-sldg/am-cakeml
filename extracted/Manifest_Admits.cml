@@ -1,10 +1,5 @@
 type coq_ASP_Address (* AXIOM TO BE REALIZED *)
 
-(** val empty_ASP_Address : coq_ASP_Address **)
-
-val empty_ASP_Address =
-  failwith "AXIOM TO BE REALIZED"
-
 type coq_UUID (* AXIOM TO BE REALIZED *)
 
 (** val coq_Eq_Class_uuid : coq_UUID coq_EqClass **)

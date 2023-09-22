@@ -144,6 +144,9 @@ structure ManifestJsonConfig = struct
                           | None => raise (Excn "Failed to extract list items, could not perform Json.toString\n")) partial_list
           end) : (string list)
 
+
+(*
+
   (* Parses Json representation of a concrete manifest into a coq_ConcreteManifest 
     : Json.json -> coq_ConcreteManifest *)
   fun extract_ConcreteManifest (j : Json.json) =
@@ -182,6 +185,8 @@ structure ManifestJsonConfig = struct
     in
       Json.fromMap (Map.fromList String.compare cmJson)
     end
+
+  *)
 
   (* Encodes a coq_Manifest into its JSON representation 
     : coq_Manifest -> Json.json *)
@@ -299,8 +304,9 @@ fun retrieve_CLI_args _ =
                                   )
                                 end )))
                   end ))
-      val cm = extract_ConcreteManifest jsonFile
+      (* val cm = extract_ConcreteManifest jsonFile *)
         in
-          (cm, privKey)
+          privKey
+          (* (cm, privKey) *)
       end
 end

@@ -4,7 +4,7 @@
 fun check_et_size et ls =
   case eqb nat_EqClass (et_size et) (length ls) of
     True => Coq_resultC ()
-  | False => Coq_errC Runtime
+  | False => Coq_errC (Runtime errStr_et_size)
 
 (** val decrypt_bs_to_rawev :
     coq_BS -> coq_ASP_PARAMS -> coq_AM_Config -> (coq_RawEv,

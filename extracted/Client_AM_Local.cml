@@ -38,39 +38,42 @@ fun config_AM_if_lib_supported t myPlc amLib =
      True =>
      let val amConf = manifest_compiler absMan amLib in
      put_amConfig amConf end
-   | False => am_failm (Coq_am_dispatch_error Runtime)) end end
+   | False =>
+     am_failm (Coq_am_dispatch_error (Runtime errStr_lib_supports_man_check))) end end
 
 (** val config_AM_if_lib_supported_app :
     coq_Evidence -> coq_AM_Library -> unit coq_AM **)
 
 fun config_AM_if_lib_supported_app et amLib =
   let val absMan = manifest_generator_app et in
-  let val supportsB = lib_supports_manifest_app_bool amLib absMan in
+  let val supportsB = lib_supports_manifest_bool amLib absMan in
   (case supportsB of
      True =>
      let val amConf = manifest_compiler absMan amLib in
      put_amConfig amConf end
-   | False => am_failm (Coq_am_dispatch_error Runtime)) end end
+   | False =>
+     am_failm (Coq_am_dispatch_error (Runtime
+       errStr_lib_supports_man_app_check))) end end
 
 (** val check_et_length : coq_Evidence -> coq_RawEv -> unit coq_AM **)
 
 fun check_et_length et ls =
   case eqb nat_EqClass (et_size et) (length ls) of
     True => ret ()
-  | False => am_failm (Coq_am_dispatch_error Runtime)
+  | False => am_failm (Coq_am_dispatch_error (Runtime errStr_et_size))
 
 (** val get_am_policy : coq_PolicyT coq_AM **)
 
 val get_am_policy : coq_PolicyT coq_AM =
   bind get (fn st =>
     ret
-      (let val Build_ConcreteManifest _ concrete_policy _ _ _ _ _ _ _ _ =
-         let val Coq_mkAmConfig concMan _ _ _ _ _ =
+      (let val Build_Manifest _ _ _ _ _ _ policy =
+         let val Coq_mkAmConfig absMan _ _ _ _ _ =
            let val Coq_mkAM_St _ _ amConfig = st in amConfig end
          in
-         concMan end
+         absMan end
        in
-       concrete_policy end))
+       policy end))
 
 (** val check_disclosure_policy :
     coq_Term -> coq_Plc -> coq_Evidence -> unit coq_AM **)
@@ -79,7 +82,7 @@ fun check_disclosure_policy t p e =
   bind get_am_policy (fn policy =>
     case policy_list_not_disclosed t p e policy of
       True => ret ()
-    | False => am_failm (Coq_am_dispatch_error Runtime))
+    | False => am_failm (Coq_am_dispatch_error (Runtime errStr_privPolicy)))
 
 (** val am_client_gen_local :
     coq_Term -> coq_Plc -> coq_EvC option -> coq_AM_Library -> coq_AM_Result

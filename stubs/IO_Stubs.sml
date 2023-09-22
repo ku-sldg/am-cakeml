@@ -42,7 +42,7 @@ fun do_remote t pTo e ac =
      Coq_errC e0 => Coq_errC e0
    | Coq_resultC uuid =>
      (case doRemote_uuid t uuid (get_bits e) of
-        Coq_errC _ => Coq_errC Runtime
+        Coq_errC _ => Coq_errC (Runtime errStr_doRemote_uuid)
       | Coq_resultC v => Coq_resultC v)) end
 
 (** val parallel_vm_thread : coq_Loc -> coq_EvC **)

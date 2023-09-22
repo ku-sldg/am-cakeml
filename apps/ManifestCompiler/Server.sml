@@ -50,8 +50,8 @@ fun startServer () =
 
 (* () -> () *)
 fun main () =
-  let val (concreteMan, privKey) = ManifestJsonConfig.retrieve_CLI_args () 
-      val _ (* (concrete, privKey, aspDisp, plcDisp, pubKeyDisp, uuidDisp) *) = ManifestUtils.setup_and_get_AM_config formal_manifest am_library concreteMan privKey
+  let val (privKey) = ManifestJsonConfig.retrieve_CLI_args () 
+      val _ (* (concrete, privKey, aspDisp, plcDisp, pubKeyDisp, uuidDisp) *) = ManifestUtils.setup_and_get_AM_config formal_manifest am_library privKey
       (* val (Build_ConcreteManifest plc concAsps plcMap pubKeyMap concTargs aspServer_addr pubKeyServer_addr plcServer_addr uuidServer_addr) = concrete *)
       (* Retrieving implicit self place from manifest here *)
       val my_plc = ManifestUtils.get_myPlc()

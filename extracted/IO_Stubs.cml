@@ -30,7 +30,7 @@ fun do_remote t pTo e ac =
      Coq_errC e0 => Coq_errC e0
    | Coq_resultC uuid =>
      (case doRemote_uuid t uuid (get_bits e) of
-        Coq_errC _ => Coq_errC Runtime
+        Coq_errC c => Coq_errC (Runtime c)
       | Coq_resultC v => Coq_resultC v)) end
 
 (** val parallel_vm_thread : coq_Loc -> coq_EvC **)
@@ -69,10 +69,4 @@ val appraise_auth_tok =
     coq_AM_Library -> coq_Manifest -> bool **)
 
 val lib_supports_manifest_bool =
-  failwith "AXIOM TO BE REALIZED"
-
-(** val lib_supports_manifest_app_bool :
-    coq_AM_Library -> coq_Manifest -> bool **)
-
-val lib_supports_manifest_app_bool =
   failwith "AXIOM TO BE REALIZED"

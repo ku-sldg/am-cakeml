@@ -163,10 +163,10 @@ fun tag_RPY p q e =
 val get_cvm_policy =
   bind get_amConfig (fn ac =>
     ret
-      (let val Build_ConcreteManifest _ concrete_policy _ _ _ _ _ _ _ _ =
-         let val Coq_mkAmConfig concMan _ _ _ _ _ = ac in concMan end
+      (let val Build_Manifest _ _ _ _ _ _ policy =
+         let val Coq_mkAmConfig absMan _ _ _ _ _ = ac in absMan end
        in
-       concrete_policy end))
+       policy end))
 
 (** val check_cvm_policy :
     coq_Term -> coq_Plc -> coq_Evidence -> unit coq_CVM **)
@@ -175,7 +175,7 @@ fun check_cvm_policy t pTo et =
   bind get_cvm_policy (fn pol =>
     case policy_list_not_disclosed t pTo et pol of
       True => ret ()
-    | False => failm (Coq_dispatch_error Runtime))
+    | False => failm (Coq_dispatch_error (Runtime errStr_privPolicy)))
 
 (** val doRemote_session' :
     coq_Term -> coq_Plc -> coq_EvC -> coq_EvC coq_CVM **)

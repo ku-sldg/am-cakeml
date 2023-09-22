@@ -1,9 +1,9 @@
 datatype coq_DispatcherErrors =
   Unavailable 
-| Runtime 
+| Runtime coq_StringT
 
 type coq_CallBackErrors =
-  string
+  coq_StringT
   (* singleton inductive, whose constructor was messageLift *)
 
 type 'errType coq_ASPCallback =
@@ -37,19 +37,8 @@ datatype coq_AM_Library =
    (((coq_Plc, coq_ASP_ID) prod, coq_CallBackErrors coq_ASPCallback) coq_MapC)
    ((coq_Plc, coq_UUID) coq_MapD) ((coq_Plc, coq_PublicKey) coq_MapD)
 
-datatype coq_ConcreteManifest =
-  Build_ConcreteManifest coq_Plc coq_PolicyT (coq_ASP_ID list) (coq_Plc list)
-   (coq_Plc list) (coq_Plc list) coq_ASP_Address coq_ASP_Address
-   coq_ASP_Address coq_ASP_Address
-
-(** val emptyConcreteMan : coq_ConcreteManifest **)
-
-val emptyConcreteMan =
-  Build_ConcreteManifest empty_Manifest_Plc empty_PolicyT [] [] [] []
-    empty_ASP_Address empty_ASP_Address empty_ASP_Address empty_ASP_Address
-
 datatype coq_AM_Config =
-  Coq_mkAmConfig coq_ConcreteManifest (coq_DispatcherErrors coq_ASPCallback)
+  Coq_mkAmConfig coq_Manifest (coq_DispatcherErrors coq_ASPCallback)
    (coq_DispatcherErrors coq_ASPCallback) coq_PlcCallback coq_PubKeyCallback
    coq_UUIDCallback
 
@@ -63,5 +52,5 @@ fun empty_aspCb _ _ _ _ =
 (** val empty_am_config : coq_AM_Config **)
 
 val empty_am_config =
-  Coq_mkAmConfig emptyConcreteMan empty_aspCb empty_aspCb (fn _ => Coq_errC
+  Coq_mkAmConfig empty_Manifest empty_aspCb empty_aspCb (fn _ => Coq_errC
     Unavailable) (fn _ => Coq_errC Unavailable) (fn _ => Coq_errC Unavailable)

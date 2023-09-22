@@ -74,7 +74,7 @@ val gen_nonce_bits = (BString.fromString "anonce") (* TODO: real nonce gen *)
 (** val decrypt_bs_to_rawev_prim :
     coq_BS -> coq_ASP_PARAMS -> coq_PublicKey -> (coq_RawEv,
     coq_DispatcherErrors) coq_ResultT **)
-fun decrypt_bs_to_rawev_prim bs params pubkey = Coq_errC Runtime
+fun decrypt_bs_to_rawev_prim bs params pubkey = Coq_errC (Runtime errStr_decryption_prim)
   (*failwith "AXIOM TO BE REALIZED"*)
 
 

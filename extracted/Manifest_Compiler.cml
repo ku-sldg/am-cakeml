@@ -47,16 +47,16 @@ fun generate_ASP_dispatcher' al am par p bs rawEv =
   (case map_get coq_Eq_Class_ID_Type shrunk_map aspid of
      Some cb =>
      (case cb par p bs rawEv of
-        Coq_errC _ => Coq_errC Runtime
+        Coq_errC c => Coq_errC (Runtime c)
       | Coq_resultC r => Coq_resultC r)
    | None => Coq_errC Unavailable) end end end end
 
 (** val generate_ASP_dispatcher :
     coq_ID_Type coq_EqClass -> coq_AM_Library -> coq_Manifest ->
-    coq_ConcreteManifest -> coq_DispatcherErrors coq_ASPCallback **)
+    coq_DispatcherErrors coq_ASPCallback **)
 
-fun generate_ASP_dispatcher _ al am _ =
-  generate_ASP_dispatcher' al am
+fun generate_ASP_dispatcher _ =
+  generate_ASP_dispatcher'
 
 (** val generate_appraisal_ASP_dispatcher' :
     coq_AM_Library -> coq_Manifest -> coq_ASP_PARAMS -> coq_Plc -> coq_BS ->
@@ -87,22 +87,22 @@ fun generate_appraisal_ASP_dispatcher' al am par p bs rawEv =
           shrunk_map (Coq_pair p aspid) of
      Some cb =>
      (case cb par p bs rawEv of
-        Coq_errC _ => Coq_errC Runtime
+        Coq_errC c => Coq_errC (Runtime c)
       | Coq_resultC r => Coq_resultC r)
    | None => Coq_errC Unavailable) end end end end
 
 (** val generate_appraisal_ASP_dispatcher :
     coq_ID_Type coq_EqClass -> coq_AM_Library -> coq_Manifest ->
-    coq_ConcreteManifest -> coq_DispatcherErrors coq_ASPCallback **)
+    coq_DispatcherErrors coq_ASPCallback **)
 
-fun generate_appraisal_ASP_dispatcher _ al am _ =
-  generate_appraisal_ASP_dispatcher' al am
+fun generate_appraisal_ASP_dispatcher _ =
+  generate_appraisal_ASP_dispatcher'
 
 (** val generate_Plc_dispatcher :
     coq_ID_Type coq_EqClass -> coq_AM_Library -> coq_Manifest ->
-    coq_ConcreteManifest -> coq_PlcCallback **)
+    coq_PlcCallback **)
 
-fun generate_Plc_dispatcher hID al am _ =
+fun generate_Plc_dispatcher hID al am =
   let val local_plc_map =
     let val Build_AM_Library _ _ _ _ _ _ _ _ _ _ local_Plcs _ = al in
     local_Plcs end
@@ -123,9 +123,9 @@ fun generate_Plc_dispatcher hID al am _ =
 
 (** val generate_PubKey_dispatcher :
     coq_ID_Type coq_EqClass -> coq_AM_Library -> coq_Manifest ->
-    coq_ConcreteManifest -> coq_PubKeyCallback **)
+    coq_PubKeyCallback **)
 
-fun generate_PubKey_dispatcher hID al am _ =
+fun generate_PubKey_dispatcher hID al am =
   let val local_pubkey_map =
     let val Build_AM_Library _ _ _ _ _ _ _ _ _ _ _ local_PubKeys = al in
     local_PubKeys end
@@ -147,9 +147,9 @@ fun generate_PubKey_dispatcher hID al am _ =
 
 (** val generate_UUUID_dispatcher :
     coq_ID_Type coq_EqClass -> coq_AM_Library -> coq_Manifest ->
-    coq_ConcreteManifest -> coq_UUIDCallback **)
+    coq_UUIDCallback **)
 
-fun generate_UUUID_dispatcher _ al _ _ =
+fun generate_UUUID_dispatcher _ al _ =
   let val local_plc_map =
     let val Build_AM_Library _ _ _ _ _ _ _ _ _ _ local_Plcs _ = al in
     local_Plcs end
@@ -163,25 +163,8 @@ fun generate_UUUID_dispatcher _ al _ _ =
     coq_Manifest -> coq_AM_Library -> coq_AM_Config **)
 
 fun manifest_compiler m al =
-  let val cm = Build_ConcreteManifest
-    (let val Build_Manifest my_abstract_plc _ _ _ _ _ _ = m in
-     my_abstract_plc end)
-    (let val Build_Manifest _ _ _ _ _ _ policy = m in policy end)
-    (let val Build_Manifest _ asps _ _ _ _ _ = m in asps end)
-    (let val Build_Manifest _ _ _ uuidPlcs _ _ _ = m in uuidPlcs end)
-    (let val Build_Manifest _ _ _ _ pubKeyPlcs _ _ = m in pubKeyPlcs end)
-    (let val Build_Manifest _ _ _ _ _ targetPlcs _ = m in targetPlcs end)
-    (let val Build_AM_Library _ _ _ _ aSPServer_Addr _ _ _ _ _ _ _ = al in
-     aSPServer_Addr end)
-    (let val Build_AM_Library _ _ _ _ _ pubKeyServer_Addr _ _ _ _ _ _ = al in
-     pubKeyServer_Addr end)
-    (let val Build_AM_Library _ _ _ _ _ _ plcServer_Addr _ _ _ _ _ = al in
-     plcServer_Addr end)
-    (let val Build_AM_Library _ _ _ _ _ _ _ uUIDServer_Addr _ _ _ _ = al in
-     uUIDServer_Addr end)
-  in
-  Coq_mkAmConfig cm (generate_ASP_dispatcher coq_Eq_Class_ID_Type al m cm)
-  (generate_appraisal_ASP_dispatcher coq_Eq_Class_ID_Type al m cm)
-  (generate_Plc_dispatcher coq_Eq_Class_ID_Type al m cm)
-  (generate_PubKey_dispatcher coq_Eq_Class_ID_Type al m cm)
-  (generate_UUUID_dispatcher coq_Eq_Class_ID_Type al m cm) end
+  Coq_mkAmConfig m (generate_ASP_dispatcher coq_Eq_Class_ID_Type al m)
+    (generate_appraisal_ASP_dispatcher coq_Eq_Class_ID_Type al m)
+    (generate_Plc_dispatcher coq_Eq_Class_ID_Type al m)
+    (generate_PubKey_dispatcher coq_Eq_Class_ID_Type al m)
+    (generate_UUUID_dispatcher coq_Eq_Class_ID_Type al m)

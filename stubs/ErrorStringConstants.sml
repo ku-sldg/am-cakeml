@@ -25,3 +25,21 @@ val errStr_cvm_error = "errStr_cvm_error"
 (** val errStr_dispatch_error : coq_StringT **)
 
 val errStr_dispatch_error = "errStr_dispatch_error"
+
+val errStr_decryption_prim = "errStr_decryption_prim"
+
+(** val errStr_et_size : coq_StringT **)
+
+val errStr_et_size = "errStr_et_size"
+
+(** val errStr_doRemote_uuid : coq_StringT **)
+
+val errStr_doRemote_uuid = "errStr_doRemote_uuid"
+
+(** val errStr_lib_supports_man_app_check : coq_StringT **)
+
+val errStr_lib_supports_man_app_check = "errStr_lib_supports_man_app_check"
+
+(** val errStr_lib_supports_man_check : coq_StringT **)
+
+val errStr_lib_supports_man_check = "errStr_lib_supports_man_check"
