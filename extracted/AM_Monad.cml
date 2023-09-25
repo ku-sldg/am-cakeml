@@ -15,8 +15,8 @@ fun run_am_app_comp am_comp default_A b = case b of
     | Coq_resultC _ => negb b
   in
   (case v of
-     True => fromSome default_A optRes
-   | False => default_A) end end
+     True => default_A
+   | False => fromSome default_A optRes) end end
 | False => default_A
 
 (** val put_amConfig : coq_AM_Config -> unit coq_AM **)

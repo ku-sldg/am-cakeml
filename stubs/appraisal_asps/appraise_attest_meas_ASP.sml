@@ -1,10 +1,10 @@
-(* Appraisal Stub code for ASP with asp ID:  kim_meas_aspid *)
+(* Appraisal Stub code for ASP with asp ID:  attest_id *)
 
 (* appraise_kim_meas_asp_stub :: coq_ASP_PARAMS -> coq_Plc -> coq_BS -> coq_RawEv -> coq_BS *)
 fun appraise_attest_meas_asp_stub ps p bs ls =
     case ps of Coq_asp_paramsC aspid args tpl tid =>
         let val _ = print ("Appraising ASP with ID: \n" ^ aspid ^ "...\n\n") in 
-                passed_bs
+                Coq_resultC passed_bs
         end
 
         (*

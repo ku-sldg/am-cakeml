@@ -227,12 +227,26 @@ structure ManifestJsonConfig = struct
     end
 
 
+(* 
+datatype ('a, 'b) prod =
+  Coq_pair 'a 'b 
+*)
+
+  fun coqPair_toCodeString pr (* (:('a, 'b) prod)*) f (* :'a -> string) *) g (* :'b -> string) *) = 
+      case pr of 
+        Coq_pair a b => 
+          let val lstring = f a 
+              val rstring = g a in ("( Coq_pair " ^ lstring ^ " " ^ rstring ^ " )") 
+          end
+
   fun write_FormalManifest_file (pathPrefix : string) (c : coq_Manifest) =
     (let val (Build_Manifest my_plc asps appMap uuidPlcs pubKeyPlcs targetPlcs policy) = c
         val fileName = (pathPrefix ^ "/FormalManifest_" ^ my_plc ^ ".sml")
-        val _ = TextIOExtra.writeFile fileName ("val formal_manifest = \n\t(Build_Manifest \n\t\t\"" ^ my_plc ^ 
-          "\"\n\t\t" ^ (listToString asps (fn a => ("\"" ^ a ^ "\""))) ^ 
-          (* )"\"\n\t\t" ^ *) "\n\t\t" ^ "[]" ^
+        val _ = TextIOExtra.writeFile fileName ("val formal_manifest = \n\t(Build_Manifest \n\t\t\"" ^ my_plc ^ "\"" ^
+          "\n\t\t" ^ (listToString asps (fn a => ("\"" ^ a ^ "\""))) ^ 
+          "\n\t\t" ^ (listToString appMap (fn a => (coqPair_toCodeString a id id))) ^ 
+
+                  (* "\n\t\t" ^ "[]" ^ *)
           "\n\t\t" ^ (listToString uuidPlcs (fn a => ("\"" ^ a ^ "\""))) ^ 
           "\n\t\t" ^ (listToString pubKeyPlcs (fn a => ("\"" ^ a ^ "\""))) ^ 
           "\n\t\t" ^ (listToString targetPlcs (fn a => ("\"" ^ a ^ "\""))) ^ 

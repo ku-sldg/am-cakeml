@@ -30,7 +30,23 @@ val aspMapping = (mapC_from_pairList
   ]
   ) : ((coq_ASP_ID, coq_CallBackErrors coq_ASPCallback) coq_MapC)
 
-val appAspMapping = (mapC_from_pairList []) : (((coq_Plc, coq_ASP_ID) prod, coq_CallBackErrors coq_ASPCallback) coq_MapC)
+
+val appAspMapping = (mapC_from_pairList [
+
+      ((Coq_pair coq_P1 attest_id), 
+        fn par => fn p => fn bs => fn rawEv => appraise_attest_meas_asp_stub par p bs rawEv), 
+
+      ((Coq_pair coq_P2 appraise_id), 
+        fn par => fn p => fn bs => fn rawEv => appraise_appraise_meas_asp_stub par p bs rawEv), 
+
+      ((Coq_pair coq_P2 cert_id), 
+        fn par => fn p => fn bs => fn rawEv => appraise_cert_meas_asp_stub par p bs rawEv), 
+
+      ((Coq_pair coq_P1 kim_meas_aspid), 
+        fn par => fn p => fn bs => fn rawEv => appraise_kim_meas_asp_stub par p bs rawEv)
+
+
+]) : (((coq_Plc, coq_ASP_ID) prod, coq_CallBackErrors coq_ASPCallback) coq_MapC)
 
 
 (** val do_asp : coq_ASP_Address -> coq_ASP_PARAMS -> coq_RawEv -> coq_BS **)

@@ -78,6 +78,21 @@ fun decrypt_bs_to_rawev_prim bs params pubkey = Coq_errC (Runtime errStr_decrypt
   (*failwith "AXIOM TO BE REALIZED"*)
 
 
+
+
+(*
+datatype coq_DispatcherErrors =
+  Unavailable 
+| Runtime coq_StringT
+*)
+
+fun dispatch_error_toString e = 
+    case e of 
+        Unavailable => "Unavailable" 
+    | Runtime str => "Runtime error: " ^ str 
+
+
+
 (*
 datatype coq_AM_Error =
   Coq_cvm_error coq_CVM_Error
@@ -85,7 +100,6 @@ datatype coq_AM_Error =
 | Coq_am_dispatch_error coq_DispatcherErrors
 
 *)
-
 
 (** val print_am_error : coq_AM_Error -> bool -> bool **)
 
@@ -97,8 +111,8 @@ fun print_am_error e _ =
     | Coq_am_error s => 
         let val _ = print ("\n\n\n" ^ s ^ "\n\n\n") in True
         end
-    | Coq_am_dispatch_error _ =>
-        let val _ =  print ("\n\n\n" ^ errStr_dispatch_error ^ "\n\n\n") in True
+    | Coq_am_dispatch_error s =>
+        let val _ =  print ("\n\n\n" ^ (dispatch_error_toString s) ^ "\n\n\n") in True
         end
 
 

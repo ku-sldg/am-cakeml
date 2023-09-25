@@ -32,14 +32,16 @@ val aspMapping = (mapC_from_pairList
 
 val appAspMapping = (mapC_from_pairList [
 
-      ((Coq_pair ssl_sig_aspid coq_P1), 
-        fn par => fn p => fn bs => fn rawEv => appraise_ssl_sig par p bs rawEv)
+      ((Coq_pair coq_P1 ssl_sig_aspid), 
+        fn par => fn p => fn bs => fn rawEv => appraise_ssl_sig par p bs rawEv), 
 
-
-
+      ((Coq_pair coq_P1 kim_meas_aspid), 
+        fn par => fn p => fn bs => fn rawEv => appraise_kim_meas_asp_stub par p bs rawEv)
 
 
 ]) : (((coq_Plc, coq_ASP_ID) prod, coq_CallBackErrors coq_ASPCallback) coq_MapC)
+
+
 
 (** val do_asp : coq_ASP_Address -> coq_ASP_PARAMS -> coq_RawEv -> coq_BS **)
 fun do_asp asp_server_addr ps e =
