@@ -1,39 +1,39 @@
 (** val errStr_amNonce : coq_StringT **)
 
-val errStr_amNonce =
+val errStr_amNonce : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val errStr_peel_bs_am : coq_StringT **)
 
-val errStr_peel_bs_am =
+val errStr_peel_bs_am : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val errStr_requester_bound : coq_StringT **)
 
-val errStr_requester_bound =
+val errStr_requester_bound : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val errStr_privPolicy : coq_StringT **)
 
-val errStr_privPolicy =
+val errStr_privPolicy : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val errStr_app_auth_tok : coq_StringT **)
 
-val errStr_app_auth_tok =
+val errStr_app_auth_tok : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val errStr_et_size : coq_StringT **)
 
-val errStr_et_size =
+val errStr_et_size : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val errStr_lib_supports_man_check : coq_StringT **)
 
-val errStr_lib_supports_man_check =
+val errStr_lib_supports_man_check : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val errStr_lib_supports_man_app_check : coq_StringT **)
 
-val errStr_lib_supports_man_app_check =
+val errStr_lib_supports_man_app_check : coq_StringT =
   failwith "AXIOM TO BE REALIZED"

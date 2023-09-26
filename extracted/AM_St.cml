@@ -3,7 +3,7 @@ datatype coq_AM_St =
 
 (** val empty_amst : coq_AM_St **)
 
-val empty_amst =
+val empty_amst : coq_AM_St =
   Coq_mkAM_St (map_empty nat_EqClass) O empty_am_config
 
 datatype coq_AM_Error =

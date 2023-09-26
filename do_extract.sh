@@ -18,6 +18,9 @@ if [ -n "${COPLAND_AVM_DIR}" ]; then
   cp ${CML_DIR}/../stubs/Cvm_Monad_Annotated.sml ${CML_DIR}/Cvm_Monad.cml
   cp ${CML_DIR}/../stubs/Client_AM_Local_Annotated.sml ${CML_DIR}/Client_AM_Local.cml
 
+  # This is a temporary hack to remove faulty explicit type annotations (type variables causing issues in annotations)
+  cp ${CML_DIR}/../stubs/EqClass_UnAnnotated.sml ${CML_DIR}/EqClass.cml
+
   # rm ${CML_DIR}/Anno_Term_Defs.cml
   # rm ${CML_DIR}/Ascii.cml
   # rm ${CML_DIR}/Bool.cml

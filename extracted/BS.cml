@@ -2,7 +2,7 @@ type coq_BS (* AXIOM TO BE REALIZED *)
 
 (** val passed_bs : coq_BS **)
 
-val passed_bs =
+val passed_bs : coq_BS =
   failwith "AXIOM TO BE REALIZED"
 
 type coq_StringT (* AXIOM TO BE REALIZED *)

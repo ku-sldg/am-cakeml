@@ -1,7 +1,8 @@
 (** val cvm_events_core :
     coq_Core_Term -> coq_Plc -> coq_Evidence -> coq_Ev list **)
 
-val cvm_events_core =
+val cvm_events_core : (coq_Core_Term -> coq_Plc -> coq_Evidence -> coq_Ev
+                      list) =
   failwith "AXIOM TO BE REALIZED"
 
 (** val cvm_events : coq_Term -> coq_Plc -> coq_Evidence -> coq_Ev list **)

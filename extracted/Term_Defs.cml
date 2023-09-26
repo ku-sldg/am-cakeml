@@ -72,7 +72,7 @@ datatype coq_EvC =
 
 (** val mt_evc : coq_EvC **)
 
-val mt_evc =
+val mt_evc : coq_EvC =
   Coq_evc [] Coq_mt
 
 (** val get_et : coq_EvC -> coq_Evidence **)
@@ -170,7 +170,7 @@ datatype coq_AM_Result =
 
 (** val empty_am_result : coq_AM_Result **)
 
-val empty_am_result =
+val empty_am_result : coq_AM_Result =
   Coq_am_rawev []
 
 (** val policy_list_not_disclosed :

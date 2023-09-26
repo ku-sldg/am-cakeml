@@ -25,68 +25,68 @@ fun retrieve p targ =
 
 (** val cert_style : coq_Term **)
 
-val cert_style =
+val cert_style : coq_Term =
   Coq_att coq_P1 (Coq_lseq (attest coq_P1 sys) (Coq_att coq_P2 (Coq_lseq
     (appraise coq_P2 sys) (certificate coq_P2 sys))))
 
 (** val cert_style_trimmed : coq_Term **)
 
-val cert_style_trimmed =
+val cert_style_trimmed : coq_Term =
   Coq_lseq (attest coq_P1 sys) (Coq_att coq_P2 (Coq_lseq
     (appraise coq_P2 sys) (certificate coq_P2 sys)))
 
 (** val cert_style_test : coq_Term **)
 
-val cert_style_test =
+val cert_style_test : coq_Term =
   Coq_att coq_P1 (Coq_lseq (attest coq_P1 sys) (Coq_lseq (Coq_att coq_P2
     (Coq_lseq (appraise coq_P2 sys) (certificate coq_P2 sys))) (Coq_att
     coq_P3 (store coq_P1 cache))))
 
 (** val cert_cache_p1 : coq_Term **)
 
-val cert_cache_p1 =
+val cert_cache_p1 : coq_Term =
   Coq_lseq (attest coq_P1 sys) (Coq_lseq (Coq_att coq_P2 (Coq_lseq
     (appraise coq_P2 sys) (certificate coq_P2 sys))) (store coq_P1 cache))
 
 (** val cert_cache_p0 : coq_Term **)
 
-val cert_cache_p0 =
+val cert_cache_p0 : coq_Term =
   Coq_att coq_P1 (Coq_lseq (Coq_bseq (Coq_pair NONE ALL)
     (retrieve coq_P1 cache) (Coq_asp CPY)) (Coq_asp SIG))
 
 (** val cert_cache_p0_trimmed : coq_Term **)
 
-val cert_cache_p0_trimmed =
+val cert_cache_p0_trimmed : coq_Term =
   Coq_lseq (Coq_bseq (Coq_pair NONE ALL) (retrieve coq_P1 cache) (Coq_asp
     CPY)) (Coq_asp SIG)
 
 (** val par_mut_p0 : coq_Term **)
 
-val par_mut_p0 =
+val par_mut_p0 : coq_Term =
   Coq_lseq (Coq_att coq_P1 (attest coq_P1 sys)) (Coq_att coq_P2
     (appraise coq_P2 sys))
 
 (** val par_mut_p1 : coq_Term **)
 
-val par_mut_p1 =
+val par_mut_p1 : coq_Term =
   Coq_lseq (Coq_att coq_P0 (attest coq_P0 sys)) (Coq_att coq_P2
     (appraise coq_P2 sys))
 
 (** val layered_bg' : coq_Term **)
 
-val layered_bg' =
+val layered_bg' : coq_Term =
   Coq_lseq (attest coq_P1 sys) (Coq_lseq (attest coq_P3 att_tid)
     (attest coq_P4 att_tid))
 
 (** val layered_bg'' : coq_Term **)
 
-val layered_bg'' =
+val layered_bg'' : coq_Term =
   Coq_bseq (Coq_pair ALL ALL) (Coq_att coq_P3 (attest coq_P3 sys)) (Coq_att
     coq_P4 (attest coq_P4 sys))
 
 (** val layered_bg_strong : coq_Term **)
 
-val layered_bg_strong =
+val layered_bg_strong : coq_Term =
   Coq_att coq_P1 (Coq_lseq (Coq_bseq (Coq_pair ALL ALL) layered_bg'
     layered_bg'') (Coq_att coq_P2 (Coq_lseq (appraise coq_P2 it) (Coq_asp
     SIG))))

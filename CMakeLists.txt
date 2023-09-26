@@ -69,9 +69,9 @@ get_files(cop_src
     extracted/List.cml
     stubs/AbstractedTypes.sml
     # extracted/Nat.cml
-    extracted/Eqb_Evidence.cml
     # extracted/OptMonad_Coq.cml
     extracted/Term_Defs_Core.cml
+    extracted/Eqb_Evidence.cml
     # extracted/Appraisal_Evidence.cml
     # extracted/ConcreteEvidence.cml
     stubs/Params_Admits_hardcoded.sml

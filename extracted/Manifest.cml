@@ -24,7 +24,7 @@ datatype coq_Manifest =
 
 (** val empty_Manifest : coq_Manifest **)
 
-val empty_Manifest =
+val empty_Manifest : coq_Manifest =
   Build_Manifest empty_Manifest_Plc [] [] [] [] [] empty_PolicyT
 
 datatype coq_AM_Library =
@@ -51,6 +51,6 @@ fun empty_aspCb _ _ _ _ =
 
 (** val empty_am_config : coq_AM_Config **)
 
-val empty_am_config =
+val empty_am_config : coq_AM_Config =
   Coq_mkAmConfig empty_Manifest empty_aspCb empty_aspCb (fn _ => Coq_errC
     Unavailable) (fn _ => Coq_errC Unavailable) (fn _ => Coq_errC Unavailable)
