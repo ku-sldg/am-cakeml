@@ -10,31 +10,34 @@ fun am_check_auth_tok t fromPl authTok = case authTok of
 
 (** val am_serve_auth_tok_req :
     coq_Term -> coq_Plc -> coq_Plc -> coq_ReqAuthTok -> coq_RawEv ->
-    coq_AM_Config -> coq_RawEv coq_AM **)
+    coq_AM_Config -> coq_AM_Library -> coq_RawEv coq_AM **)
 
-fun am_serve_auth_tok_req t fromPl myPl authTok init_ev ac =
+fun am_serve_auth_tok_req t fromPl myPl authTok init_ev ac al =
   bind (am_check_auth_tok t fromPl authTok) (fn v =>
     case appraise_auth_tok v of
       True =>
       (case privPolicy coq_Eq_Class_ID_Type fromPl t of
-         True => ret (run_cvm_rawEv t myPl init_ev ac)
+         True =>
+         bind (config_AM_if_lib_supported t myPl al) (fn _ =>
+           ret (run_cvm_rawEv t myPl init_ev ac))
        | False => am_failm (Coq_am_error errStr_privPolicy))
     | False => am_failm (Coq_am_error errStr_app_auth_tok))
 
 (** val run_am_server_auth_tok_req :
     coq_Term -> coq_Plc -> coq_Plc -> coq_ReqAuthTok -> coq_RawEv ->
-    coq_AM_Config -> coq_RawEv **)
+    coq_AM_Config -> coq_AM_Library -> coq_RawEv **)
 
-fun run_am_server_auth_tok_req t fromPlc myPl authTok init_ev ac =
-  run_am_app_comp (am_serve_auth_tok_req t fromPlc myPl authTok init_ev ac)
-    [] True
+fun run_am_server_auth_tok_req t fromPlc myPl authTok init_ev ac al =
+  run_am_app_comp
+    (am_serve_auth_tok_req t fromPlc myPl authTok init_ev ac al) [] True
 
 (** val do_cvm_session :
-    coq_CvmRequestMessage -> coq_AM_Config -> coq_CvmResponseMessage **)
+    coq_CvmRequestMessage -> coq_AM_Config -> coq_AM_Library ->
+    coq_CvmResponseMessage **)
 
-fun do_cvm_session req ac =
+fun do_cvm_session req ac al =
   let val REQ t tok ev = req in
-  run_am_server_auth_tok_req t default_place default_place tok ev ac end
+  run_am_server_auth_tok_req t default_place default_place tok ev ac al end
 
 (** val do_appraisal_session :
     coq_AppraisalRequestMessage -> coq_AppraisalResponseMessage **)
@@ -45,15 +48,16 @@ fun do_appraisal_session appreq = case appreq of
   let val comp = gen_appraise_AM expected_et ev in
   run_am_app_comp comp Coq_mtc_app True end end
 
-(** val handle_AM_request : coq_StringT -> coq_AM_Config -> coq_StringT **)
+(** val handle_AM_request :
+    coq_StringT -> coq_AM_Config -> coq_AM_Library -> coq_StringT **)
 
-fun handle_AM_request s ac =
+fun handle_AM_request s ac al =
   let val js = strToJson s in
   let val am_req = jsonToAmRequest js in
   let val json_resp =
     case am_req of
       CVM_REQ r =>
-      let val cvm_resp = do_cvm_session r ac in responseToJson cvm_resp end
+      let val cvm_resp = do_cvm_session r ac al in responseToJson cvm_resp end
     | APP_REQ appreq =>
       let val app_resp = do_appraisal_session appreq in
       appResponseToJson app_resp end

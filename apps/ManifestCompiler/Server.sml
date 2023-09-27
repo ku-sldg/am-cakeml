@@ -14,7 +14,7 @@ When things go wrong, handle_AM_request returns a raw error message string.
 fun respondToMsg client = 
   let val inString  = Socket.inputAll client 
       val ac = ManifestUtils.get_local_amConfig ()
-      val outString = handle_AM_request inString ac 
+      val outString = handle_AM_request inString ac am_library
       val _ = print ("\n\nSending response string: \n" ^ outString) in 
     Socket.output client outString
   end

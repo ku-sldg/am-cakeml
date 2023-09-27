@@ -15,8 +15,7 @@ fun do_asp params e mpl _ ac =
     coq_Term -> coq_UUID -> coq_RawEv -> (coq_RawEv, coq_CallBackErrors)
     coq_ResultT **)
 
-val doRemote_uuid : (coq_Term -> coq_UUID -> coq_RawEv -> (coq_RawEv,
-                    coq_CallBackErrors) coq_ResultT) =
+val doRemote_uuid =
   failwith "AXIOM TO BE REALIZED"
 
 (** val do_remote :
@@ -65,10 +64,4 @@ val requester_bound : (coq_Term -> coq_Plc -> coq_ReqAuthTok -> bool) =
 (** val appraise_auth_tok : coq_AppResultC -> bool **)
 
 val appraise_auth_tok : (coq_AppResultC -> bool) =
-  failwith "AXIOM TO BE REALIZED"
-
-(** val lib_supports_manifest_bool :
-    coq_AM_Library -> coq_Manifest -> bool **)
-
-val lib_supports_manifest_bool : (coq_AM_Library -> coq_Manifest -> bool) =
   failwith "AXIOM TO BE REALIZED"

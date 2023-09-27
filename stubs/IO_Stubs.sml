@@ -86,9 +86,6 @@ fun appraise_auth_tok appres = True
 (** val lib_supports_manifest_bool :
     coq_AM_Library -> coq_Manifest -> bool **)
 
+(*
 fun lib_supports_manifest_bool amlib m = True
-
-(** val lib_supports_manifest_app_bool :
-    coq_AM_Library -> coq_Manifest -> bool **)
-
-fun lib_supports_manifest_app_bool amlib m = True
+*)

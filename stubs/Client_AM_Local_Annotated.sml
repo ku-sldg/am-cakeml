@@ -19,6 +19,103 @@ fun get_my_absman_generated t myPlc =
   let val maybe_absMan = map_get coq_Eq_Class_ID_Type env myPlc in
   fromSomeOption empty_Manifest maybe_absMan end end
 
+(** val aspid_in_amlib_bool : coq_AM_Library -> coq_ASP_ID -> bool **)
+
+fun aspid_in_amlib_bool al i =
+  case map_get coq_Eq_Class_ID_Type
+         (let val Build_AM_Library _ _ _ _ _ _ _ _ local_ASPS _ _ _ = al in
+          local_ASPS end) i of
+    Some _ => True
+  | None => False
+
+(** val uuid_plc_in_amlib_bool : coq_AM_Library -> coq_Plc -> bool **)
+
+fun uuid_plc_in_amlib_bool al p =
+  case map_get coq_Eq_Class_ID_Type
+         (let val Build_AM_Library _ _ _ _ _ _ _ _ _ _ local_Plcs _ = al in
+          local_Plcs end) p of
+    Some _ => True
+  | None => False
+
+(** val pubkey_plc_in_amlib_bool : coq_AM_Library -> coq_Plc -> bool **)
+
+fun pubkey_plc_in_amlib_bool al p =
+  case map_get coq_Eq_Class_ID_Type
+         (let val Build_AM_Library _ _ _ _ _ _ _ _ _ _ _ local_PubKeys = al in
+          local_PubKeys end) p of
+    Some _ => True
+  | None => False
+
+(** val appraisal_aspid_in_amlib_bool :
+    coq_AM_Library -> (coq_Plc, coq_ASP_ID) prod -> bool **)
+
+fun appraisal_aspid_in_amlib_bool al pr =
+  case map_get (pair_EqClass coq_Eq_Class_ID_Type coq_Eq_Class_ID_Type)
+         (let val Build_AM_Library _ _ _ _ _ _ _ _ _ local_Appraisal_ASPS _
+            _ = al
+          in
+          local_Appraisal_ASPS end) pr of
+    Some _ => True
+  | None => False
+
+(** val lib_supports_aspids_bool :
+    coq_ASP_ID list -> coq_AM_Library -> bool **)
+
+fun lib_supports_aspids_bool ls al =
+  forallb (aspid_in_amlib_bool al) ls
+
+(** val lib_supports_uuid_plcs_bool :
+    coq_Plc list -> coq_AM_Library -> bool **)
+
+fun lib_supports_uuid_plcs_bool ls al =
+  forallb (uuid_plc_in_amlib_bool al) ls
+
+(** val lib_supports_pubkey_plcs_bool :
+    coq_Plc list -> coq_AM_Library -> bool **)
+
+fun lib_supports_pubkey_plcs_bool ls al =
+  forallb (pubkey_plc_in_amlib_bool al) ls
+
+(** val lib_supports_appraisal_aspids_bool :
+    (coq_Plc, coq_ASP_ID) prod list -> coq_AM_Library -> bool **)
+
+fun lib_supports_appraisal_aspids_bool ls al =
+  forallb (appraisal_aspid_in_amlib_bool al) ls
+
+(** val lib_supports_manifest_bool :
+    coq_AM_Library -> coq_Manifest -> bool **)
+
+fun lib_supports_manifest_bool al am =
+  let val aspid_list =
+    let val Build_Manifest _ asps _ _ _ _ _ = am in asps end
+  in
+  let val uuid_plcs_list =
+    let val Build_Manifest _ _ _ uuidPlcs _ _ _ = am in uuidPlcs end
+  in
+  let val pubkey_plcs_list =
+    let val Build_Manifest _ _ _ _ pubKeyPlcs _ _ = am in pubKeyPlcs end
+  in
+  let val appraisal_asps_list =
+    let val Build_Manifest _ _ appraisal_asps _ _ _ _ = am in
+    appraisal_asps end
+  in
+  let val aspid_list_bool = lib_supports_aspids_bool aspid_list al in
+  let val uuid_plcs_list_bool = lib_supports_uuid_plcs_bool uuid_plcs_list al
+  in
+  let val pubkey_plcs_list_bool =
+    lib_supports_pubkey_plcs_bool pubkey_plcs_list al
+  in
+  let val appraisal_aspids_list_bool =
+    lib_supports_appraisal_aspids_bool appraisal_asps_list al
+  in
+  (case case case aspid_list_bool of
+               True => uuid_plcs_list_bool
+             | False => False of
+          True => pubkey_plcs_list_bool
+        | False => False of
+     True => appraisal_aspids_list_bool
+   | False => False) end end end end end end end end
+
 (** val run_cvm_local_am :
     coq_Term -> coq_Plc -> coq_RawEv -> coq_RawEv coq_AM **)
 
