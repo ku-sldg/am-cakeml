@@ -30,11 +30,40 @@ val aspMapping = (mapC_from_pairList
     (cache_id,
       fn par => fn plc => fn bs => fn rawEv => cache_asp_stub par rawEv),
     (sig_aspid,
-      fn par => fn plc => fn bs => fn rawEv => sig_asp_stub par rawEv)
+      fn par => fn plc => fn bs => fn rawEv => ssl_sig_asp_stub (*sig_asp_stub*) par rawEv)
   ]
   ) : ((coq_ASP_ID, coq_CallBackErrors coq_ASPCallback) coq_MapC)
 
+
+(*
 val appAspMapping = (mapC_from_pairList []) : (((coq_Plc, coq_ASP_ID) prod, coq_CallBackErrors coq_ASPCallback) coq_MapC)
+*)
+
+val appAspMapping = (mapC_from_pairList [
+
+      ((Coq_pair coq_P1 attest_id), 
+        fn par => fn p => fn bs => fn rawEv => appraise_attest_meas_asp_stub par p bs rawEv), 
+
+      ((Coq_pair coq_P0 attest_id), 
+        fn par => fn p => fn bs => fn rawEv => appraise_attest_meas_asp_stub par p bs rawEv), 
+
+      ((Coq_pair coq_P2 appraise_id), 
+        fn par => fn p => fn bs => fn rawEv => appraise_appraise_meas_asp_stub par p bs rawEv), 
+
+      ((Coq_pair coq_P2 cert_id), 
+        fn par => fn p => fn bs => fn rawEv => appraise_cert_meas_asp_stub par p bs rawEv), 
+
+      ((Coq_pair coq_P1 cache_id), 
+        fn par => fn p => fn bs => fn rawEv => appraise_cache_meas_asp_stub par p bs rawEv),
+
+      ((Coq_pair coq_P1 sig_aspid), 
+        fn par => fn p => fn bs => fn rawEv => appraise_ssl_sig par p bs rawEv),
+
+      ((Coq_pair coq_P1 kim_meas_aspid), 
+        fn par => fn p => fn bs => fn rawEv => appraise_kim_meas_asp_stub par p bs rawEv)
+
+
+]) : (((coq_Plc, coq_ASP_ID) prod, coq_CallBackErrors coq_ASPCallback) coq_MapC)
 
 (** val do_asp : coq_ASP_Address -> coq_ASP_PARAMS -> coq_RawEv -> coq_BS **)
 fun do_asp asp_server_addr ps e =
