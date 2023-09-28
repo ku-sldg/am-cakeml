@@ -23,7 +23,7 @@ val enc_aspid : coq_ASP_ID =
 
 (** val enc_aspargs : coq_Arg list **)
 
-val enc_aspargs =
+val enc_aspargs : coq_Arg list =
   failwith "AXIOM TO BE REALIZED"
 
 (** val enc_targid : coq_ASP_ID **)

@@ -119,6 +119,7 @@ get_files(cop_src
     extracted/Cvm_Impl.cml
     extracted/Cvm_Run.cml
     extracted/Impl_appraisal.cml
+    extracted/AM_Helpers.cml
     extracted/Client_AM_Local.cml
     extracted/Server_AM.cml)
 

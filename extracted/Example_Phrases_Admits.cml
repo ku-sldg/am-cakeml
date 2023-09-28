@@ -50,12 +50,12 @@ val cache_id : coq_ASP_ID =
 
 (** val store_args : coq_Arg list **)
 
-val store_args =
+val store_args : coq_Arg list =
   failwith "AXIOM TO BE REALIZED"
 
 (** val retrieve_args : coq_Arg list **)
 
-val retrieve_args =
+val retrieve_args : coq_Arg list =
   failwith "AXIOM TO BE REALIZED"
 
 (** val sys : coq_TARG_ID **)

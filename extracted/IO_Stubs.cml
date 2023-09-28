@@ -15,7 +15,8 @@ fun do_asp params e mpl _ ac =
     coq_Term -> coq_UUID -> coq_RawEv -> (coq_RawEv, coq_CallBackErrors)
     coq_ResultT **)
 
-val doRemote_uuid =
+val doRemote_uuid : (coq_Term -> coq_UUID -> coq_RawEv -> (coq_RawEv,
+                    coq_CallBackErrors) coq_ResultT) =
   failwith "AXIOM TO BE REALIZED"
 
 (** val do_remote :

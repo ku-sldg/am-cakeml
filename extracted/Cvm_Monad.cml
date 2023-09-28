@@ -51,7 +51,7 @@ fun add_tracem tr =
 
 (** val split_ev : unit coq_CVM **)
 
-val split_ev =
+val split_ev : unit coq_CVM =
   bind get_pl (fn p =>
     bind inc_id (fn i => add_tracem ((Coq_split i p) :: [])))
 
@@ -94,14 +94,14 @@ fun invoke_ASP fwd params =
 
 (** val copyEv : coq_EvC coq_CVM **)
 
-val copyEv =
+val copyEv : coq_EvC coq_CVM =
   bind get_pl (fn p =>
     bind inc_id (fn x =>
       bind (add_tracem ((Coq_copy x p) :: [])) (fn _ => get_ev)))
 
 (** val nullEv : coq_EvC coq_CVM **)
 
-val nullEv =
+val nullEv : coq_EvC coq_CVM =
   bind get_pl (fn p =>
     bind inc_id (fn x =>
       bind (add_tracem ((Coq_null x p) :: [])) (fn _ => ret mt_evc)))
@@ -160,7 +160,7 @@ fun tag_RPY p q e =
 
 (** val get_cvm_policy : coq_PolicyT coq_CVM **)
 
-val get_cvm_policy =
+val get_cvm_policy : coq_PolicyT coq_CVM =
   bind get_amConfig (fn ac =>
     ret
       (let val Build_Manifest _ _ _ _ _ _ policy =
