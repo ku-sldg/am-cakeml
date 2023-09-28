@@ -89,3 +89,30 @@ fun appraise_auth_tok appres = True
 (*
 fun lib_supports_manifest_bool amlib m = True
 *)
+
+
+(*
+
+datatype ('a, 'b) prod =
+  Coq_pair 'a 'b
+
+*)
+
+fun plc_aspid_pair_toString (pr:((coq_Plc, coq_ASP_ID) prod)) = 
+    case pr of 
+      Coq_pair a b => "(" ^ (plToString a) ^ ", " ^ (aspIdToString b) ^ ")"
+      : coq_StringT
+
+(** val pretty_print_manifest : coq_Manifest -> coq_StringT **)
+
+fun pretty_print_manifest (m:coq_Manifest) (* : coq_StringT *) = 
+  "\nManifest does NOT support AM Library.\nHere is a Manifest that captures omitted fields: \n\n" ^
+  (case m of 
+    Build_Manifest p asp_ls appraisal_ls uuid_ls pubkey_ls targ_ls pol => 
+    "\tmy_plc: " ^ (plToString p) ^ 
+    "\n\tasps: " ^ (listToString asp_ls aspIdToString) ^
+    "\n\tappraisal_asps: " ^ (listToString appraisal_ls plc_aspid_pair_toString) ^
+    "\n\tuuidPlcs: " ^ (listToString uuid_ls plToString) ^
+    "\n\tpubkeyPlcs: " ^ (listToString pubkey_ls plToString) ^
+    "\n\ttargPlcs: " ^ (listToString targ_ls plToString) ^
+    "\n\tpolicy: " ^ "True")

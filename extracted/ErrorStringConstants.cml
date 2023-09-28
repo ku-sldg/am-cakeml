@@ -27,13 +27,3 @@ val errStr_app_auth_tok : coq_StringT =
 
 val errStr_et_size : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
-
-(** val errStr_lib_supports_man_check : coq_StringT **)
-
-val errStr_lib_supports_man_check : coq_StringT =
-  failwith "AXIOM TO BE REALIZED"
-
-(** val errStr_lib_supports_man_app_check : coq_StringT **)
-
-val errStr_lib_supports_man_app_check : coq_StringT =
-  failwith "AXIOM TO BE REALIZED"

@@ -50,34 +50,35 @@ fun appraisal_aspid_in_amlib_bool al pr =
     Some _ => True
   | None => False
 
-(** val lib_supports_aspids_bool :
-    coq_ASP_ID list -> coq_AM_Library -> bool **)
+(** val lib_omits_aspids :
+    coq_ASP_ID list -> coq_AM_Library -> coq_ASP_ID list **)
 
-fun lib_supports_aspids_bool ls al =
-  forallb (aspid_in_amlib_bool al) ls
+fun lib_omits_aspids ls al =
+  filter (fn i => negb (aspid_in_amlib_bool al i)) ls
 
-(** val lib_supports_uuid_plcs_bool :
-    coq_Plc list -> coq_AM_Library -> bool **)
+(** val lib_omits_uuid_plcs :
+    coq_Plc list -> coq_AM_Library -> coq_Plc list **)
 
-fun lib_supports_uuid_plcs_bool ls al =
-  forallb (uuid_plc_in_amlib_bool al) ls
+fun lib_omits_uuid_plcs ls al =
+  filter (fn p => negb (uuid_plc_in_amlib_bool al p)) ls
 
-(** val lib_supports_pubkey_plcs_bool :
-    coq_Plc list -> coq_AM_Library -> bool **)
+(** val lib_omits_pubkey_plcs :
+    coq_Plc list -> coq_AM_Library -> coq_Plc list **)
 
-fun lib_supports_pubkey_plcs_bool ls al =
-  forallb (pubkey_plc_in_amlib_bool al) ls
+fun lib_omits_pubkey_plcs ls al =
+  filter (fn p => negb (pubkey_plc_in_amlib_bool al p)) ls
 
-(** val lib_supports_appraisal_aspids_bool :
-    (coq_Plc, coq_ASP_ID) prod list -> coq_AM_Library -> bool **)
+(** val lib_omits_appraisal_aspids :
+    (coq_Plc, coq_ASP_ID) prod list -> coq_AM_Library -> (coq_Plc,
+    coq_ASP_ID) prod list **)
 
-fun lib_supports_appraisal_aspids_bool ls al =
-  forallb (appraisal_aspid_in_amlib_bool al) ls
+fun lib_omits_appraisal_aspids ls al =
+  filter (fn i => negb (appraisal_aspid_in_amlib_bool al i)) ls
 
-(** val lib_supports_manifest_bool :
-    coq_AM_Library -> coq_Manifest -> bool **)
+(** val lib_omits_manifest :
+    coq_AM_Library -> coq_Manifest -> coq_Manifest **)
 
-fun lib_supports_manifest_bool al am =
+fun lib_omits_manifest al am =
   let val aspid_list =
     let val Build_Manifest _ asps _ _ _ _ _ = am in asps end
   in
@@ -91,46 +92,53 @@ fun lib_supports_manifest_bool al am =
     let val Build_Manifest _ _ appraisal_asps _ _ _ _ = am in
     appraisal_asps end
   in
-  let val aspid_list_bool = lib_supports_aspids_bool aspid_list al in
-  let val uuid_plcs_list_bool = lib_supports_uuid_plcs_bool uuid_plcs_list al
-  in
-  let val pubkey_plcs_list_bool =
-    lib_supports_pubkey_plcs_bool pubkey_plcs_list al
-  in
-  let val appraisal_aspids_list_bool =
-    lib_supports_appraisal_aspids_bool appraisal_asps_list al
-  in
-  (case case case aspid_list_bool of
-               True => uuid_plcs_list_bool
-             | False => False of
-          True => pubkey_plcs_list_bool
-        | False => False of
-     True => appraisal_aspids_list_bool
-   | False => False) end end end end end end end end
+  Build_Manifest
+  (let val Build_Manifest my_abstract_plc _ _ _ _ _ _ = am in
+   my_abstract_plc end) (lib_omits_aspids aspid_list al)
+  (lib_omits_appraisal_aspids appraisal_asps_list al)
+  (lib_omits_uuid_plcs uuid_plcs_list al)
+  (lib_omits_pubkey_plcs pubkey_plcs_list al) [] empty_PolicyT end end end end
+
+(** val manifest_none_omitted : coq_Manifest -> bool **)
+
+fun manifest_none_omitted m =
+  let val Build_Manifest _ asps appraisal_asps uuidPlcs pubKeyPlcs _ _ = m in
+  (case asps of
+     [] =>
+     (case appraisal_asps of
+        [] =>
+        (case uuidPlcs of
+           [] => (case pubKeyPlcs of
+                    [] => True
+                  | _ :: _ => False)
+         | _ :: _ => False)
+      | _ :: _ => False)
+   | _ :: _ => False) end
 
 (** val config_AM_if_lib_supported :
     coq_Term -> coq_Plc -> coq_AM_Library -> unit coq_AM **)
 
 fun config_AM_if_lib_supported t myPlc amLib =
   let val absMan = get_my_absman_generated t myPlc in
-  let val supportsB = lib_supports_manifest_bool amLib absMan in
+  let val om = lib_omits_manifest amLib absMan in
+  let val supportsB = manifest_none_omitted om in
   (case supportsB of
      True =>
      let val amConf = manifest_compiler absMan amLib in
      put_amConfig amConf end
    | False =>
-     am_failm (Coq_am_dispatch_error (Runtime errStr_lib_supports_man_check))) end end
+     am_failm (Coq_am_dispatch_error (Runtime (pretty_print_manifest om)))) end end end
 
 (** val config_AM_if_lib_supported_app :
     coq_Evidence -> coq_AM_Library -> unit coq_AM **)
 
 fun config_AM_if_lib_supported_app et amLib =
   let val absMan = manifest_generator_app et in
-  let val supportsB = lib_supports_manifest_bool amLib absMan in
+  let val om = lib_omits_manifest amLib absMan in
+  let val supportsB = manifest_none_omitted om in
   (case supportsB of
      True =>
      let val amConf = manifest_compiler absMan amLib in
      put_amConfig amConf end
    | False =>
-     am_failm (Coq_am_dispatch_error (Runtime
-       errStr_lib_supports_man_app_check))) end end
+     am_failm (Coq_am_dispatch_error (Runtime (pretty_print_manifest om)))) end end end
