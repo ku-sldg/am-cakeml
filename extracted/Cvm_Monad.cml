@@ -175,7 +175,7 @@ fun check_cvm_policy t pTo et =
   bind get_cvm_policy (fn pol =>
     case policy_list_not_disclosed t pTo et pol of
       True => ret ()
-    | False => failm (Coq_dispatch_error (Runtime errStr_privPolicy)))
+    | False => failm (Coq_dispatch_error (Runtime errStr_disclosePolicy)))
 
 (** val doRemote_session' :
     coq_Term -> coq_Plc -> coq_EvC -> coq_EvC coq_CVM **)

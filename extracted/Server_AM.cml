@@ -20,7 +20,7 @@ fun am_serve_auth_tok_req t fromPl myPl authTok init_ev ac al =
          True =>
          bind (config_AM_if_lib_supported t myPl al) (fn _ =>
            ret (run_cvm_rawEv t myPl init_ev ac))
-       | False => am_failm (Coq_am_error errStr_privPolicy))
+       | False => am_failm (Coq_am_error errStr_disclosePolicy))
     | False => am_failm (Coq_am_error errStr_app_auth_tok))
 
 (** val run_am_server_auth_tok_req :

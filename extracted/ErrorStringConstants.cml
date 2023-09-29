@@ -13,9 +13,9 @@ val errStr_peel_bs_am : coq_StringT =
 val errStr_requester_bound : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
-(** val errStr_privPolicy : coq_StringT **)
+(** val errStr_disclosePolicy : coq_StringT **)
 
-val errStr_privPolicy : coq_StringT =
+val errStr_disclosePolicy : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val errStr_app_auth_tok : coq_StringT **)

@@ -42,7 +42,8 @@ fun check_disclosure_policy t p e =
   bind get_am_policy (fn policy =>
     case policy_list_not_disclosed t p e policy of
       True => ret ()
-    | False => am_failm (Coq_am_dispatch_error (Runtime errStr_privPolicy)))
+    | False =>
+      am_failm (Coq_am_dispatch_error (Runtime errStr_disclosePolicy)))
 
 (** val am_client_gen_local :
     coq_Term -> coq_Plc -> coq_EvC option -> coq_AM_Library -> coq_AM_Result

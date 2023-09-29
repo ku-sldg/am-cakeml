@@ -243,6 +243,10 @@ datatype ('a, 'b) prod =
               val rstring = g a in ("( Coq_pair " ^ lstring ^ " " ^ rstring ^ " )") 
           end
 
+  fun policy_plc_helper (p:coq_Plc) = "\"" ^ (plToString p) ^ "\"" : string 
+
+  fun policy_aspid_helper (i:coq_ASP_ID) = "\"" ^ (aspIdToString i) ^ "\"" : string 
+
   fun write_FormalManifest_file (pathPrefix : string) (c : coq_Manifest) =
     (let val (Build_Manifest my_plc asps appMap uuidPlcs pubKeyPlcs targetPlcs policy) = c
         val fileName = (pathPrefix ^ "/FormalManifest_" ^ my_plc ^ ".sml")
@@ -254,7 +258,7 @@ datatype ('a, 'b) prod =
           "\n\t\t" ^ (listToString uuidPlcs (fn a => ("\"" ^ a ^ "\""))) ^ 
           "\n\t\t" ^ (listToString pubKeyPlcs (fn a => ("\"" ^ a ^ "\""))) ^ 
           "\n\t\t" ^ (listToString targetPlcs (fn a => ("\"" ^ a ^ "\""))) ^ 
-          "\n\t\t" ^ (listToString policy (fn a => (coqPair_toCodeString a id id))) ^ "\n\t) : coq_Manifest\n")
+          "\n\t\t" ^ (listToString policy (fn a => (coqPair_toCodeString a policy_plc_helper policy_aspid_helper))) ^ "\n\t) : coq_Manifest\n")
         val _ = c_system ("chmod 777 " ^ fileName)
     in
       ()

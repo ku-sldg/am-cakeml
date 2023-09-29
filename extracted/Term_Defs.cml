@@ -177,5 +177,6 @@ val empty_am_result : coq_AM_Result =
     coq_Term -> coq_Plc -> coq_Evidence -> (coq_Plc, coq_ASP_ID) prod list ->
     bool **)
 
-fun policy_list_not_disclosed _ _ _ _ =
-  True
+fun policy_list_not_disclosed t p e ls =
+  forallb (fn pr =>
+    negb (term_discloses_aspid_to_remote_enc_bool t p e (fst pr) (snd pr))) ls

@@ -12,7 +12,7 @@ val errStr_requester_bound = ""
 
 (** val errStr_privPolicy : coq_StringT **)
 
-val errStr_privPolicy = ""
+val errStr_disclosePolicy = "errStr_disclosePolicy"
 
 (** val errStr_app_auth_tok : coq_StringT **)
 

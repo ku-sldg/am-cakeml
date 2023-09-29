@@ -17,13 +17,13 @@ fun coq_Eq_Class_private_key x y = (x = y)
 
 val empty_PolicyT = True
 
-*)
-
 type coq_PolicyT = bool  (* ((coq_ASP_ID, coq_Plc) prod) list *)
 
 (** val empty_PolicyT : coq_PolicyT **)
 
 val empty_PolicyT : coq_PolicyT = False (*[] *) (* [(Coq_pair "hi" "hey")] *)
+
+*)
 
 val empty_Manifest_Plc = "empty_Plc"
 
