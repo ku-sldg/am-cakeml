@@ -174,7 +174,8 @@ val empty_am_result : coq_AM_Result =
   Coq_am_rawev []
 
 (** val policy_list_not_disclosed :
-    coq_Term -> coq_Plc -> coq_Evidence -> bool -> bool **)
+    coq_Term -> coq_Plc -> coq_Evidence -> (coq_Plc, coq_ASP_ID) prod list ->
+    bool **)
 
 fun policy_list_not_disclosed _ _ _ _ =
   True

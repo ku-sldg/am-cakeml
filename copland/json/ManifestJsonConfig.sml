@@ -128,6 +128,8 @@ structure ManifestJsonConfig = struct
 
   fun encode_appMap m = encode_map_gen m id
 
+  fun encode_policy m = encode_map_gen m id
+
   (* Extracts from json at key 'key' a list of strings into a list
       : Json.json -> string -> string list *)
   fun extract_list_items (j : Json.json) (key : string) =
@@ -199,7 +201,7 @@ structure ManifestJsonConfig = struct
           ("uuidPlcs", (placeListToJsonList uuidPlcList)),
           ("pubKeyPlcs", (placeListToJsonList pubkeyPlcList)),
           ("targetPlcs", (placeListToJsonList targetPlcList)),
-          ("policy", (* (policyToJson policyVal) *) Json.fromBool policyVal)
+          ("policy", encode_policy policyVal)
         ]
     in
       Json.fromMap (Map.fromList String.compare cmJson)
@@ -215,13 +217,15 @@ structure ManifestJsonConfig = struct
         val uuidPlcs = extract_list_items j "uuidPlcs"
         val pubKeyPlcs = extract_list_items j "pubKeyPlcs"
         val targetPlcs = extract_list_items j "targetPlcs"
-        val policy = (* extract_policy j *)
+        val policy = extract_policy j
+
+        (*
               case (Json.lookup "policy" j) of
                         None => raise (Excn "Cannot find policy in Json for formal manifest\n")
                         | Some p => 
                             case (Json.toBool p) of
                               None => raise (Excn "Policy found but was not a bool")
-                              | Some v => v
+                              | Some v => v *)
     in
       (Build_Manifest plc asps appAsps uuidPlcs pubKeyPlcs targetPlcs policy)
     end
@@ -250,7 +254,7 @@ datatype ('a, 'b) prod =
           "\n\t\t" ^ (listToString uuidPlcs (fn a => ("\"" ^ a ^ "\""))) ^ 
           "\n\t\t" ^ (listToString pubKeyPlcs (fn a => ("\"" ^ a ^ "\""))) ^ 
           "\n\t\t" ^ (listToString targetPlcs (fn a => ("\"" ^ a ^ "\""))) ^ 
-          "\n\t\t" ^ (Bool.toString policy) ^ "\n\t) : coq_Manifest\n")
+          "\n\t\t" ^ (listToString policy (fn a => (coqPair_toCodeString a id id))) ^ "\n\t) : coq_Manifest\n")
         val _ = c_system ("chmod 777 " ^ fileName)
     in
       ()
