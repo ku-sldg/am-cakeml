@@ -20,9 +20,9 @@ val get_ev : coq_EvC coq_CVM =
 val get_pl : coq_Plc coq_CVM =
   bind get (fn st => ret (let val Coq_mk_st _ _ st_pl _ _ = st in st_pl end))
 
-(** val get_amConfig : coq_AM_Config coq_CVM **)
+(** val get_CVM_amConfig : coq_AM_Config coq_CVM **)
 
-val get_amConfig : coq_AM_Config coq_CVM =
+val get_CVM_amConfig : coq_AM_Config coq_CVM =
   bind get (fn st =>
     ret (let val Coq_mk_st _ _ _ _ st_AM_config = st in st_AM_config end))
 
@@ -78,7 +78,7 @@ fun fwd_asp fwd bs e p ps =
     coq_ASP_PARAMS -> coq_RawEv -> coq_Plc -> coq_Event_ID -> coq_BS coq_CVM **)
 
 fun do_asp' params e mpl x =
-  bind get_amConfig (fn ac =>
+  bind get_CVM_amConfig (fn ac =>
     case do_asp params e mpl x ac of
       Coq_errC e0 => failm (Coq_dispatch_error e0)
     | Coq_resultC r => ret r)
@@ -161,7 +161,7 @@ fun tag_RPY p q e =
 (** val get_cvm_policy : coq_PolicyT coq_CVM **)
 
 val get_cvm_policy : coq_PolicyT coq_CVM =
-  bind get_amConfig (fn ac =>
+  bind get_CVM_amConfig (fn ac =>
     ret
       (let val Build_Manifest _ _ _ _ _ _ policy =
          let val Coq_mkAmConfig absMan _ _ _ _ _ = ac in absMan end
@@ -182,7 +182,7 @@ fun check_cvm_policy t pTo et =
 
 fun doRemote_session' t pTo e =
   bind (check_cvm_policy t pTo (get_et e)) (fn _ =>
-    bind get_amConfig (fn ac =>
+    bind get_CVM_amConfig (fn ac =>
       case do_remote t pTo e ac of
         Coq_errC e0 => failm (Coq_dispatch_error e0)
       | Coq_resultC ev => ret (Coq_evc ev (eval t pTo (get_et e)))))

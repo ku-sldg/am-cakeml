@@ -19,6 +19,12 @@ fun run_am_app_comp am_comp default_A b = case b of
    | False => fromSome default_A optRes) end end
 | False => default_A
 
+(** val get_AM_amConfig : coq_AM_Config coq_AM **)
+
+val get_AM_amConfig : coq_AM_Config coq_AM =
+  bind get (fn st =>
+    ret (let val Coq_mkAM_St _ _ amConfig = st in amConfig end))
+
 (** val put_amConfig : coq_AM_Config -> unit coq_AM **)
 
 fun put_amConfig ac =
