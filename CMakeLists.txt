@@ -97,8 +97,6 @@ get_files(cop_src
     copland/json/ManifestJsonConfig.sml
     util/ManifestUtils.sml
     extracted/privPolicy.cml
-    apps/blockchain/Blockchain.sml
-    apps/blockchain/HealthRecord.sml
     ${attestation_asps}
     ${appraisal_asps}
     stubs/CvmJson_Admits.sml

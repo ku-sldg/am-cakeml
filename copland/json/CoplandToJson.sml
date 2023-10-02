@@ -83,19 +83,9 @@ fun constructorWithArgs cName arglist =
                        ("data", Json.Array arglist)]
 
 (* spToJson : coq_SP -> json *)
-(*
-fun spToJson sp = stringToJson (spToString sp)
-*)
 fun spToJson sp = noArgConstructor (spToString sp)
 
-
-(*
-(* fwdToJson : coq_FWD -> json *)
-fun fwdToJson fwd = stringToJson (fwdToString fwd)
-*)
-
 fun fwdToJson fwd = noArgConstructor (fwdToString fwd)
-
 
 (* aspParamsToJson : coq_ASP_PARAMS -> json *)                               
 fun aspParamsToJson ps =

@@ -324,13 +324,6 @@ fun jsonToEvC js = case (Json.toMap js) of (* Json.toMap : json -> ((string,json
                       | _ => raise Json.Exn "getEvC"
                     ("Unexpected constructor for Copland EvC: " ^
                      constructor)
-                            (*
-      | "NN" => getNN args
-      | "UU" => getUU args
-      | "SS" => getSS args
-      |  _ => raise Json.Exn "getEvidence"
-                    ("Unexpected constructor for Copland Evidence: " ^
-                     constructor) *)
                     
 
     (* getEvcArgs :: json list -> coq_EvC *)

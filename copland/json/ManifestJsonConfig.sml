@@ -219,22 +219,9 @@ structure ManifestJsonConfig = struct
         val targetPlcs = extract_list_items j "targetPlcs"
         val policy = extract_policy j
 
-        (*
-              case (Json.lookup "policy" j) of
-                        None => raise (Excn "Cannot find policy in Json for formal manifest\n")
-                        | Some p => 
-                            case (Json.toBool p) of
-                              None => raise (Excn "Policy found but was not a bool")
-                              | Some v => v *)
     in
       (Build_Manifest plc asps appAsps uuidPlcs pubKeyPlcs targetPlcs policy)
     end
-
-
-(* 
-datatype ('a, 'b) prod =
-  Coq_pair 'a 'b 
-*)
 
   fun coqPair_toCodeString pr (* (:('a, 'b) prod)*) f (* :'a -> string) *) g (* :'b -> string) *) = 
       case pr of 
@@ -253,8 +240,6 @@ datatype ('a, 'b) prod =
         val _ = TextIOExtra.writeFile fileName ("val formal_manifest = \n\t(Build_Manifest \n\t\t\"" ^ my_plc ^ "\"" ^
           "\n\t\t" ^ (listToString asps (fn a => ("\"" ^ a ^ "\""))) ^ 
           "\n\t\t" ^ (listToString appMap (fn a => (coqPair_toCodeString a id id))) ^ 
-
-                  (* "\n\t\t" ^ "[]" ^ *)
           "\n\t\t" ^ (listToString uuidPlcs (fn a => ("\"" ^ a ^ "\""))) ^ 
           "\n\t\t" ^ (listToString pubKeyPlcs (fn a => ("\"" ^ a ^ "\""))) ^ 
           "\n\t\t" ^ (listToString targetPlcs (fn a => ("\"" ^ a ^ "\""))) ^ 
