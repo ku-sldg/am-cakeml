@@ -2,6 +2,9 @@
 fun main () = (
     log Debug "Server AM Awake. Wait for VM to start before doing anything...";
     waitDataportId 1;
+
+    kernelMeasurement 0;
+
     writeDataportId 0 (BString.fromString "1");
     writeDataportId 1 (BString.fromString "2");
     log Debug "Server AM emitting to Inspector.";
