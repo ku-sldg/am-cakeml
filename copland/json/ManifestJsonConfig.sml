@@ -233,8 +233,8 @@ structure ManifestJsonConfig = struct
   fun policy_plc_helper (p:coq_Plc) = "\"" ^ (plToString p) ^ "\"" : string 
 
   fun policy_aspid_helper (i:coq_ASP_ID) = "\"" ^ (aspIdToString i) ^ "\"" : string 
-
-  fun write_FormalManifest_file (pathPrefix : string) (c : coq_Manifest) =
+(*
+  fun write_FormalManifest_file_code (pathPrefix : string) (c : coq_Manifest) =
     (let val (Build_Manifest my_plc asps appMap uuidPlcs pubKeyPlcs targetPlcs policy) = c
         val fileName = (pathPrefix ^ "/FormalManifest_" ^ my_plc ^ ".sml")
         val _ = TextIOExtra.writeFile fileName ("val formal_manifest = \n\t(Build_Manifest \n\t\t\"" ^ my_plc ^ "\"" ^
@@ -251,9 +251,58 @@ structure ManifestJsonConfig = struct
     handle 
       TextIO.BadFileName => raise Excn ("Bad file name: " ^ (pathPrefix ^ "FormalManifest_<PLCNAMEHERE>.sml"))
       | TextIO.InvalidFD   => raise Excn "Invalid file descriptor") : unit
+*)
 
-fun write_FormalManifestList (pathPrefix : string) (cl : coq_Manifest list) =
-    List.map (write_FormalManifest_file pathPrefix) cl
+
+(*
+fun strToJson str = 
+    let val jp = (Json.parse str)
+        val jpOk = case jp of
+                      Err e => raise (Exception ("Json Parsing Error: Attempting to parse string '" ^ str ^ "' and encountered error '" ^ e ^ "'\n"))
+                      | Ok v => v
+    in
+      jpOk
+    end
+
+fun jsonToStr js  = Json.stringify js
+
+*)
+
+
+fun write_FormalManifest_file_json (pathPrefix : string) (c : coq_Manifest) =
+  (let val (Build_Manifest my_plc asps appMap uuidPlcs pubKeyPlcs targetPlcs policy) = c
+      val fileName = (pathPrefix ^ "/FormalManifest_" ^ my_plc ^ ".json")
+      val _ = TextIOExtra.writeFile fileName (Json.stringify (encode_Manifest c))
+      val _ = c_system ("chmod 777 " ^ fileName)
+  in
+    ()
+  end
+  handle 
+    TextIO.BadFileName => raise Excn ("Bad file name: " ^ (pathPrefix ^ "FormalManifest_<PLCNAMEHERE>.json"))
+    | TextIO.InvalidFD   => raise Excn "Invalid file descriptor") : unit
+
+fun read_FormalManifest_file_json (*(pathPrefix : string)*) (manfile:string) =
+      (let val s = TextIOExtra.readFile manfile
+          val jsonman = strToJson s 
+  in
+    (extract_Manifest jsonman)
+  end
+  handle 
+    TextIO.BadFileName => raise Excn ("Bad file name: " ^ manfile)(* (pathPrefix ^ "FormalManifest_<PLCNAMEHERE>.sml")) *)
+    | TextIO.InvalidFD   => raise Excn "Invalid file descriptor") : coq_Manifest
+
+
+
+
+
+
+(*
+fun write_FormalManifestList_code (pathPrefix : string) (cl : coq_Manifest list) =
+    List.map (write_FormalManifest_file_code pathPrefix) cl
+*)
+
+fun write_FormalManifestList_json (pathPrefix : string) (cl : coq_Manifest list) =
+    List.map (write_FormalManifest_file_json pathPrefix) cl
 
 fun print_json_man_id (m:coq_Manifest) =
     let val _ = print ("\n" ^ (Json.stringify (encode_Manifest m)) ^ "\n") in
@@ -266,9 +315,19 @@ fun print_json_man_list (ls: coq_Manifest list) =
       ()
     end
 
-fun write_form_man_list_and_print_json (pathPrefix : string) (ls:(coq_Term, coq_Plc) prod list) = 
+(*
+fun write_form_man_list_code_and_print_json (pathPrefix : string) (ls:(coq_Term, coq_Plc) prod list) = 
   let val man_list : coq_Manifest list = man_gen_run_attify ls
-      val _ = write_FormalManifestList pathPrefix man_list
+      val _ = write_FormalManifestList_code pathPrefix man_list
+      val _ = print_json_man_list man_list in 
+        ()
+  end
+  handle Excn e => TextIOExtra.printLn e
+*)
+
+fun write_form_man_list_json_and_print_json (pathPrefix : string) (ls:(coq_Term, coq_Plc) prod list) = 
+  let val man_list : coq_Manifest list = man_gen_run_attify ls
+      val _ = write_FormalManifestList_json pathPrefix man_list
       val _ = print_json_man_list man_list in 
         ()
   end
@@ -285,9 +344,9 @@ fun argIndPresent (i:int) = (i <> ~1)
     : () -> (coq_ConcreteManifest, string, coq_Term)*)
 fun retrieve_CLI_args _ =
   let val name = CommandLine.name ()
-      val usage = ("Usage: " ^ name ^ " -m <concreteManifestFile>.json -k <privateKeyFile>\n" ^
+      val usage = ("Usage: " ^ name ^ " -m <ManifestFile>.json -k <privateKeyFile>\n" ^
                     "e.g.\t" ^ name ^ " -m concMan.json -k ~/.ssh/id_ed25519\n")
-      val (jsonFile, privKey) = 
+      val (manFileName, privKey) = 
               (case CommandLine.arguments () of 
                   argList => (
                     let val manInd = ListExtra.find_index argList "-m"
@@ -302,18 +361,19 @@ fun retrieve_CLI_args _ =
                         if (keyIndBool = False)
                         then raise (Excn ("Invalid Arguments\n" ^ usage))
                           else (
-                              let val fileName = List.nth argList (manInd + 1)
+                              let val manFileName = List.nth argList (manInd + 1)
                                   val privKeyFile = List.nth argList (keyInd + 1) in
                                   (
-                                    case (parseJsonFile fileName) of
+                                    case (parseJsonFile manFileName) of
                                       Err e => raise (Excn ("Could not parse JSON file: " ^ e ^ "\n"))
-                                    | Ok j => (j, parse_private_key privKeyFile)
+                                    | Ok j => (manFileName, parse_private_key privKeyFile)
                                   )
                                 end )))
                   end ))
       (* val cm = extract_ConcreteManifest jsonFile *)
         in
-          privKey
+          (manFileName, privKey)
+          (*privKey*)
           (* (cm, privKey) *)
       end
 end

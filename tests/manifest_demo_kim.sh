@@ -6,20 +6,20 @@ MAN_GEN=./apps/ManifestGenerator/manGen_demo
 DEMO_FILES=../tests/DemoFiles/Kim
 
 # Server Variables
-SERVER_P0_FORM_MAN=$DEMO_FILES/FormalManifest_P0.sml
+SERVER_P0_FORM_MAN=$DEMO_FILES/FormalManifest_P0.json
 
-SERVER_P1_FORM_MAN=$DEMO_FILES/FormalManifest_P1.sml
+SERVER_P1_FORM_MAN=$DEMO_FILES/FormalManifest_P1.json
 SERVER_AM_LIB=$DEMO_FILES/Test_Am_Lib_Kim.sml
 SERVER_PRIV_KEY=$DEMO_FILES/Test_Server_PrivKey
 
 SERVER_P0_EXE_NAME=TEST_SERVER_AM_P0_EXE
 SERVER_P1_EXE_NAME=TEST_SERVER_AM_EXE
 
-SERVER_P0_CONC_MAN=$DEMO_FILES/concrete_Manifest_P0.json
-SERVER_P1_CONC_MAN=$DEMO_FILES/concrete_Manifest_P1.json
+SERVER_P0_CONC_MAN=$SERVER_P0_FORM_MAN #$DEMO_FILES/concrete_Manifest_P0.json
+SERVER_P1_CONC_MAN=$SERVER_P1_FORM_MAN #$DEMO_FILES/concrete_Manifest_P1.json
 
 # Client Variables
-CLIENT_FORM_MAN=$DEMO_FILES/FormalManifest_P0.sml
+CLIENT_FORM_MAN=$DEMO_FILES/FormalManifest_P0.json
 CLIENT_AM_LIB=$DEMO_FILES/Test_Am_Lib_Kim.sml
 CLIENT_PRIV_KEY=$DEMO_FILES/Test_PrivKey
 
@@ -27,7 +27,7 @@ CLIENT_EXE_NAME=TEST_CLIENT_AM_ONE_EXE
 
 CLIENT_TERM_FILE=$DEMO_FILES/ClientCvmTermKim.sml
 
-CLIENT_P0_CONC_MAN=$DEMO_FILES/concrete_Manifest_P0.json
+CLIENT_P0_CONC_MAN=$SERVER_P0_FORM_MAN #$DEMO_FILES/concrete_Manifest_P0.json
 
 if [[ "$PWD" == */am-cakeml/tests ]]; then
   repoRoot=$(dirname "$PWD")
@@ -40,6 +40,8 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
 
   # First, generate the formal manifests
   $MAN_GEN -om $DEMO_FILES -t "kim"
+
+  #sleep 2
 
   # Now compile the servers, before starting tmux (to prevent race condition)
   $MAN_COMP -s -o $SERVER_P1_EXE_NAME -om $SERVER_P1_CONC_MAN -m $SERVER_P1_FORM_MAN -l $SERVER_AM_LIB

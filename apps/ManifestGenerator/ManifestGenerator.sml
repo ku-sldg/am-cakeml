@@ -60,7 +60,7 @@ fun main () =
                   if (typeSwitch = "lbg")
                   then (layered_bg_phrases)
                   else (kim_phrases)))))
-        val _ = ManifestJsonConfig.write_form_man_list_and_print_json outFilePathPrefix phrases
+        val _ = ManifestJsonConfig.write_form_man_list_json_and_print_json outFilePathPrefix phrases
         val _ = print "\n\n" in
       ()
     end
