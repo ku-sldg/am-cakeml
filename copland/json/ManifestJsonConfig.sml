@@ -68,7 +68,7 @@ structure ManifestJsonConfig = struct
           | TextIO.InvalidFD   => raise Excn "Invalid file descriptor") : unit
 
 
- (* Attempts to extract a map from a Json structure of a concrete manifest
+ (* Attempts to extract a map from a Json structure
     : Json.json -> (('a, 'b) coq_MapD) *)
   fun extract_map_gen (j : Json.json) (k_top:string) f (* (f : string -> 'a) *) =
       (let val gatherPlcs = case (Json.lookup k_top j) of
@@ -146,50 +146,6 @@ structure ManifestJsonConfig = struct
                           | None => raise (Excn "Failed to extract list items, could not perform Json.toString\n")) partial_list
           end) : (string list)
 
-
-(*
-
-  (* Parses Json representation of a concrete manifest into a coq_ConcreteManifest 
-    : Json.json -> coq_ConcreteManifest *)
-  fun extract_ConcreteManifest (j : Json.json) =
-    let val plc = (parse_and_cast j "plc" string_cast)
-        (* val uuid = (parse_and_cast j "uuid" string_cast)
-        val privateKey = (parse_and_cast j "privateKey" bstring_cast) *)
-        val policy = False (* [] *) (* TODO: this is hardcoded for now...get policy by other means? *)
-        val asps = extract_list_items j "concrete_asps"
-        val plcs = extract_list_items j "concrete_places" (* extract_plcMap j *)
-        val pubKeys = extract_list_items j "concrete_pubkeys"(* extract_pubKeyMap j *)
-        val targs = extract_list_items j "concrete_targets"
-        val aspServer_addr = (parse_and_cast j "aspServer" string_cast)
-        val pubKeyServer_addr = (parse_and_cast j "pubKeyServer" string_cast)
-        val plcServer_addr = (parse_and_cast j "plcServer" string_cast)
-        val uuidServer_addr = (parse_and_cast j "uuidServer" string_cast)
-    in
-      (Build_ConcreteManifest plc policy asps plcs pubKeys targs
-        aspServer_addr pubKeyServer_addr plcServer_addr uuidServer_addr)
-    end
-
-  (* Encodes a coq_ConcreteManifest into its JSON representation 
-    : coq_ConcreteManifest -> Json.json *)
-  fun encode_ConcreteManifest (cm : coq_ConcreteManifest) =
-    let val (Build_ConcreteManifest plc x aspidList plcs pubKeys targList aspServer_addr pubKeyServer_addr plcServer_addr uuidServer_addr) = cm
-        val cmJson = [
-          ("plc", Json.fromString plc),
-          ("concrete_asps", aspidListToJsonList aspidList),
-          ("concrete_places", placeListToJsonList plcs (* (encode_plcMap plcMap) *)),
-          ("concrete_pubkeys", placeListToJsonList pubKeys (* (encode_pubKeyMap pubKeyMap) *)),
-          ("concrete_targets", placeListToJsonList targList),
-          ("aspServer", Json.fromString aspServer_addr),
-          ("pubKeyServer", Json.fromString pubKeyServer_addr),
-          ("plcServer", Json.fromString plcServer_addr),
-          ("uuidServer", Json.fromString uuidServer_addr)
-        ]
-    in
-      Json.fromMap (Map.fromList String.compare cmJson)
-    end
-
-  *)
-
   (* Encodes a coq_Manifest into its JSON representation 
     : coq_Manifest -> Json.json *)
   fun encode_Manifest (cm : coq_Manifest) =
@@ -208,65 +164,31 @@ structure ManifestJsonConfig = struct
     end
 
 
-  (* Parses Json representation of a formal manifest into a coq_Manifest 
-    : Json.json -> coq_Manifest *)
-  fun extract_Manifest (j : Json.json) =
-    let val plc = (parse_and_cast j "plc" string_cast)
-        val asps = extract_list_items j "asps"
-        val appAsps = extract_appMap j 
-        val uuidPlcs = extract_list_items j "uuidPlcs"
-        val pubKeyPlcs = extract_list_items j "pubKeyPlcs"
-        val targetPlcs = extract_list_items j "targetPlcs"
-        val policy = extract_policy j
+(* Parses Json representation of a formal manifest into a coq_Manifest 
+  : Json.json -> coq_Manifest *)
+fun extract_Manifest (j : Json.json) =
+  let val plc = (parse_and_cast j "plc" string_cast)
+      val asps = extract_list_items j "asps"
+      val appAsps = extract_appMap j 
+      val uuidPlcs = extract_list_items j "uuidPlcs"
+      val pubKeyPlcs = extract_list_items j "pubKeyPlcs"
+      val targetPlcs = extract_list_items j "targetPlcs"
+      val policy = extract_policy j
 
-    in
-      (Build_Manifest plc asps appAsps uuidPlcs pubKeyPlcs targetPlcs policy)
-    end
+  in
+    (Build_Manifest plc asps appAsps uuidPlcs pubKeyPlcs targetPlcs policy)
+  end
 
-  fun coqPair_toCodeString pr (* (:('a, 'b) prod)*) f (* :'a -> string) *) g (* :'b -> string) *) = 
-      case pr of 
-        Coq_pair a b => 
-          let val lstring = f a 
-              val rstring = g a in ("( Coq_pair " ^ lstring ^ " " ^ rstring ^ " )") 
-          end
+fun coqPair_toCodeString pr (* (:('a, 'b) prod)*) f (* :'a -> string) *) g (* :'b -> string) *) = 
+    case pr of 
+      Coq_pair a b => 
+        let val lstring = f a 
+            val rstring = g a in ("( Coq_pair " ^ lstring ^ " " ^ rstring ^ " )") 
+        end
 
-  fun policy_plc_helper (p:coq_Plc) = "\"" ^ (plToString p) ^ "\"" : string 
+fun policy_plc_helper (p:coq_Plc) = "\"" ^ (plToString p) ^ "\"" : string 
 
-  fun policy_aspid_helper (i:coq_ASP_ID) = "\"" ^ (aspIdToString i) ^ "\"" : string 
-(*
-  fun write_FormalManifest_file_code (pathPrefix : string) (c : coq_Manifest) =
-    (let val (Build_Manifest my_plc asps appMap uuidPlcs pubKeyPlcs targetPlcs policy) = c
-        val fileName = (pathPrefix ^ "/FormalManifest_" ^ my_plc ^ ".sml")
-        val _ = TextIOExtra.writeFile fileName ("val formal_manifest = \n\t(Build_Manifest \n\t\t\"" ^ my_plc ^ "\"" ^
-          "\n\t\t" ^ (listToString asps (fn a => ("\"" ^ a ^ "\""))) ^ 
-          "\n\t\t" ^ (listToString appMap (fn a => (coqPair_toCodeString a id id))) ^ 
-          "\n\t\t" ^ (listToString uuidPlcs (fn a => ("\"" ^ a ^ "\""))) ^ 
-          "\n\t\t" ^ (listToString pubKeyPlcs (fn a => ("\"" ^ a ^ "\""))) ^ 
-          "\n\t\t" ^ (listToString targetPlcs (fn a => ("\"" ^ a ^ "\""))) ^ 
-          "\n\t\t" ^ (listToString policy (fn a => (coqPair_toCodeString a policy_plc_helper policy_aspid_helper))) ^ "\n\t) : coq_Manifest\n")
-        val _ = c_system ("chmod 777 " ^ fileName)
-    in
-      ()
-    end
-    handle 
-      TextIO.BadFileName => raise Excn ("Bad file name: " ^ (pathPrefix ^ "FormalManifest_<PLCNAMEHERE>.sml"))
-      | TextIO.InvalidFD   => raise Excn "Invalid file descriptor") : unit
-*)
-
-
-(*
-fun strToJson str = 
-    let val jp = (Json.parse str)
-        val jpOk = case jp of
-                      Err e => raise (Exception ("Json Parsing Error: Attempting to parse string '" ^ str ^ "' and encountered error '" ^ e ^ "'\n"))
-                      | Ok v => v
-    in
-      jpOk
-    end
-
-fun jsonToStr js  = Json.stringify js
-
-*)
+fun policy_aspid_helper (i:coq_ASP_ID) = "\"" ^ (aspIdToString i) ^ "\"" : string 
 
 
 fun write_FormalManifest_file_json (pathPrefix : string) (c : coq_Manifest) =
@@ -291,16 +213,6 @@ fun read_FormalManifest_file_json (*(pathPrefix : string)*) (manfile:string) =
     TextIO.BadFileName => raise Excn ("Bad file name: " ^ manfile)(* (pathPrefix ^ "FormalManifest_<PLCNAMEHERE>.sml")) *)
     | TextIO.InvalidFD   => raise Excn "Invalid file descriptor") : coq_Manifest
 
-
-
-
-
-
-(*
-fun write_FormalManifestList_code (pathPrefix : string) (cl : coq_Manifest list) =
-    List.map (write_FormalManifest_file_code pathPrefix) cl
-*)
-
 fun write_FormalManifestList_json (pathPrefix : string) (cl : coq_Manifest list) =
     List.map (write_FormalManifest_file_json pathPrefix) cl
 
@@ -314,16 +226,6 @@ fun print_json_man_list (ls: coq_Manifest list) =
     in
       ()
     end
-
-(*
-fun write_form_man_list_code_and_print_json (pathPrefix : string) (ls:(coq_Term, coq_Plc) prod list) = 
-  let val man_list : coq_Manifest list = man_gen_run_attify ls
-      val _ = write_FormalManifestList_code pathPrefix man_list
-      val _ = print_json_man_list man_list in 
-        ()
-  end
-  handle Excn e => TextIOExtra.printLn e
-*)
 
 fun write_form_man_list_json_and_print_json (pathPrefix : string) (ls:(coq_Term, coq_Plc) prod list) = 
   let val man_list : coq_Manifest list = man_gen_run_attify ls
@@ -339,13 +241,14 @@ fun parse_private_key file =
 fun argIndPresent (i:int) = (i <> ~1)
   
 
-  (* Retrieves the concrete manifest and private key 
-    based upon Command Line arguments
-    : () -> (coq_ConcreteManifest, string, coq_Term)*)
+(* Retrieves the manifest filename and private key (as strings)
+  based upon Command Line arguments
+  : () -> (string, string) 
+*)
 fun retrieve_CLI_args _ =
   let val name = CommandLine.name ()
       val usage = ("Usage: " ^ name ^ " -m <ManifestFile>.json -k <privateKeyFile>\n" ^
-                    "e.g.\t" ^ name ^ " -m concMan.json -k ~/.ssh/id_ed25519\n")
+                    "e.g.\t" ^ name ^ " -m formMan.json -k ~/.ssh/id_ed25519\n")
       val (manFileName, privKey) = 
               (case CommandLine.arguments () of 
                   argList => (
@@ -370,10 +273,7 @@ fun retrieve_CLI_args _ =
                                   )
                                 end )))
                   end ))
-      (* val cm = extract_ConcreteManifest jsonFile *)
         in
           (manFileName, privKey)
-          (*privKey*)
-          (* (cm, privKey) *)
       end
 end
