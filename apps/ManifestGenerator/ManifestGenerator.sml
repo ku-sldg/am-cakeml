@@ -43,6 +43,9 @@ fun main () =
         val parmut_phrases_auth = (auth_phrase_list coq_P3) @ (auth_phrase_list coq_P0) @ (auth_phrase_list coq_P1) @ (auth_phrase_list coq_P4)
         val parmut_phrases = parmut_phrases' @ parmut_phrases_auth
         val layered_bg_phrases = [(Coq_pair layered_bg_strong coq_P0)] @ (auth_phrase_list coq_P0)
+        val cm_phrase = Coq_lseq (cm_meas coq_P0 cm_targid) (Coq_asp SIG)
+          (* Coq_lseq (cm_meas coq_P0 cm_targid) (ssl_sig_parameterized coq_P0) *)
+        val cm_phrases = [(Coq_pair cm_phrase coq_P0)] (* @ (auth_phrase_list coq_P0) *)
         val _ = print "\n\n"
         val phrases = 
           if (typeSwitch = "kim")
@@ -59,7 +62,10 @@ fun main () =
                 else (
                   if (typeSwitch = "lbg")
                   then (layered_bg_phrases)
-                  else (kim_phrases)))))
+                  else (
+                    if (typeSwitch = "cm")
+                    then (cm_phrases) 
+                    else (kim_phrases))))))
         val _ = ManifestJsonConfig.write_form_man_list_json_and_print_json outFilePathPrefix phrases
         val _ = print "\n\n" in
       ()

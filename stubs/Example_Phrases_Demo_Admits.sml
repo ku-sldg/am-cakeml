@@ -109,3 +109,15 @@ val kim_meas_aspid = "kim_meas_aspid"
 (** val kim_meas_args : coq_Arg list **)
 
 val kim_meas_args = ["../apps/demo/server/kim_targ.txt"]
+
+(** val cm_targid : coq_ASP_ID **)
+
+val cm_targid = "cm_targid"
+
+(** val cm_aspid : coq_ASP_ID **)
+
+val cm_aspid = "cm_aspid"
+
+(** val cm_args : coq_Arg list **)
+
+val cm_args = []

@@ -37,3 +37,13 @@ val kim_meas_aspid : coq_ASP_ID =
 
 val kim_meas_args : coq_Arg list =
   failwith "AXIOM TO BE REALIZED"
+
+(** val cm_aspid : coq_ASP_ID **)
+
+val cm_aspid : coq_ASP_ID =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val cm_args : coq_Arg list **)
+
+val cm_args : coq_Arg list =
+  failwith "AXIOM TO BE REALIZED"

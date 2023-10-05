@@ -104,6 +104,19 @@ To add custom arguments to the C compiler (without requiring manual changes via 
 `/util`:  Source files with miscellaneous utility functions used throughout this codebase.  Examples include parsing (Parser.sml), Json (Json.sml), and binary data representation (ByteString.sml).
 
 
+# Steps to integrate and execute a new ASP
+
+1. Define and extract a new Copland phrase that involves the new ASP
+    * Good examples can be found in src/Example_Phrases.v and src/Example_Phrases_Demo.v of [copland-avm](https://github.com/ku-sldg/copland-avm).
+    * First:  Define (Admitted) ASP params.  See `ssl_sig_*` in src/Example_Phrases_Demo_Admits.v.
+    * Next:  Use those params to define a full Copland phrase that includes the ASP.  See `ssl_sig_parameterized` in src/Example_Phrases_Demo.v.
+    * Finally:  Add that phrase to the list of extracted items in src/Extraction_Cvm_Cake.v, then type `make` in the src/ directory of the copland-avm repo to compile the Coq source and extract the newly defined phrase.
+1. Bring newly extracted code over to am-cakeml (run the top-level ./do_extract script).  You should see changes to the corresponding .cml files in /extracted where you defined the phrase.
+1. Fill in stubs for Admitted extracted parameters.  If you extracted to Example_Phrases_Demo_Admits.cml, these stubs should go in /stubs/Example_Phrases_Demo_Admits.sml.  You should be able to just copy similar definitions and rename them (i.e. the ssl_sig_* params).
+1. Define a new ASP stub (in /stubs/attestation_asps) with the desired functionality.  Again, copying an existing stub to get started is usually best (i.e. `cp /stubs/ssl_sig_ASP_Stub.sml /stubs/<new_ASP_Stub>.sml`).  NOTE:  cakeml function names should be unique, so re-name the ASP stub.
+1.  Add this new source file dependency to the CMakeLists.txt (in /stubs/attestation_asps/CMakeLists.txt).  NOTE:  at this point, check that the project is compiling (i.e. `make manCompDemo`).  Modify something in your new ASP stub code to produce a type error, and check that the compiler catches it.
+1.  This phrase is now available to use in any code beyond where the extracted source file is defined in the CMakeLists dependencies.
+
 # Misc.
 
 ### Why are you using the sml file extension for CakeML files?
