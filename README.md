@@ -116,6 +116,8 @@ To add custom arguments to the C compiler (without requiring manual changes via 
 1. Define a new ASP stub (in /stubs/attestation_asps) with the desired functionality.  Again, copying an existing stub to get started is usually best (i.e. `cp /stubs/ssl_sig_ASP_Stub.sml /stubs/<new_ASP_Stub>.sml`).  NOTE:  cakeml function names should be unique, so re-name the ASP stub.
 1.  Add this new source file dependency to the CMakeLists.txt (in /stubs/attestation_asps/CMakeLists.txt).  NOTE:  at this point, check that the project is compiling (i.e. `make manCompDemo`).  Modify something in your new ASP stub code to produce a type error, and check that the compiler catches it.
 1.  This phrase is now available to use in any code beyond where the extracted source file is defined in the CMakeLists dependencies.
+1. TODO:  Describe linking stubs in AM Library
+1. TODO:  Describe setting up phrase to execute in new (or existing) Copland app
 
 # Misc.
 
