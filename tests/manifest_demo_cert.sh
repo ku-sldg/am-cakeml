@@ -12,7 +12,7 @@ SERVER_P2_FORM_MAN=$DEMO_FILES/FormalManifest_P2.json
 SERVER_AM_LIB=$DEMO_FILES/Test_Am_Lib_Cert.sml
 SERVER_PRIV_KEY=$DEMO_FILES/Test_Server_PrivKey
 
-SERVER_P0_EXE_NAME=TEST_SERVER_P0_AM_EXE
+#SERVER_P0_EXE_NAME=TEST_SERVER_P0_AM_EXE
 SERVER_P1_EXE_NAME=TEST_SERVER_P1_AM_EXE
 SERVER_P2_EXE_NAME=TEST_SERVER_P2_AM_EXE
 
@@ -39,11 +39,11 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   $MAN_GEN -om $DEMO_FILES -t "cert"
 
   # First we need to compile the server(s), before starting tmux (to prevent race condition)
-  $MAN_COMP -s -o $SERVER_P0_EXE_NAME -m $SERVER_P0_FORM_MAN -l $SERVER_AM_LIB
+  #$MAN_COMP -s -o $SERVER_P0_EXE_NAME -m $SERVER_P0_FORM_MAN -l $SERVER_AM_LIB
   $MAN_COMP -s -o $SERVER_P1_EXE_NAME -m $SERVER_P1_FORM_MAN -l $SERVER_AM_LIB
   $MAN_COMP -s -o $SERVER_P2_EXE_NAME -m $SERVER_P2_FORM_MAN -l $SERVER_AM_LIB
 
-  BUILT_SERVER_AM_P0=./build/$SERVER_P0_EXE_NAME
+  #BUILT_SERVER_AM_P0=./build/$SERVER_P0_EXE_NAME
   BUILT_SERVER_AM_P1=./build/$SERVER_P1_EXE_NAME
   BUILT_SERVER_AM_P2=./build/$SERVER_P2_EXE_NAME
 
@@ -55,21 +55,21 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
 
   tmux split-window -v 'bash -i'
   tmux split-window -v 'bash -i'
-  tmux split-window -h 'bash -i'
+  #tmux split-window -h 'bash -i'
   tmux select-layout even-horizontal
 
   # Start the P0 server
-  tmux send-keys -t 0 "( $BUILT_SERVER_AM_P0 -m $SERVER_P0_FORM_MAN -k $SERVER_PRIV_KEY )" Enter
+  #tmux send-keys -t 0 "( $BUILT_SERVER_AM_P0 -m $SERVER_P0_FORM_MAN -k $SERVER_PRIV_KEY )" Enter
 
   # Start the P1 server
-  tmux send-keys -t 1 "( $BUILT_SERVER_AM_P1 -m $SERVER_P1_FORM_MAN -k $SERVER_PRIV_KEY )" Enter
+  tmux send-keys -t 0 "( $BUILT_SERVER_AM_P1 -m $SERVER_P1_FORM_MAN -k $SERVER_PRIV_KEY )" Enter
 
   # Start the P2 server
-  tmux send-keys -t 2 "( $BUILT_SERVER_AM_P2 -m $SERVER_P2_FORM_MAN -k $SERVER_PRIV_KEY )" Enter
+  tmux send-keys -t 1 "( $BUILT_SERVER_AM_P2 -m $SERVER_P2_FORM_MAN -k $SERVER_PRIV_KEY )" Enter
   
   # Now manifest compile and run the Client AM
   # Sending a chain of first AM comp, then run AM
-  tmux send-keys -t 3 \
+  tmux send-keys -t 2 \
     "($MAN_COMP -c $CLIENT_TERM_FILE -o $CLIENT_EXE_NAME -m $CLIENT_FORM_MAN -l $CLIENT_AM_LIB) && \
      ($BUILT_CLIENT_AM_ONE -m $CLIENT_FORM_MAN -k $CLIENT_PRIV_KEY)" Enter
 
