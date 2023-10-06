@@ -64,7 +64,7 @@ structure ManCompConfig = struct
 
 end
 
-fun makeAM_CmakeFile fm_path am_library_path cvmTermFile targetFile = "cmake_minimum_required(VERSION 3.10.2)\nget_files(man_comp_src ${server_am_src_tpm} " ^ am_library_path ^ " " ^ cvmTermFile ^ " " ^ targetFile ^ " )\nbuild_posix_am_tpm(\"COMPILED_AM\" ${man_comp_src})\n"
+fun makeAM_CmakeFile fm_path am_library_path cvmTermFile targetFile = "cmake_minimum_required(VERSION 3.10.2)\nget_files(man_comp_src ${server_am_src} " ^ am_library_path ^ " " ^ cvmTermFile ^ " " ^ targetFile ^ " )\nbuild_posix_am(\"COMPILED_AM\" ${man_comp_src})\n"
 
 (* () -> () *)
 fun main () =

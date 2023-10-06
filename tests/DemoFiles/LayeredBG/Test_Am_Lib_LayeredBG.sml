@@ -1,12 +1,6 @@
 
 val aspMapping = (mapC_from_pairList 
   [
-    (cal_ak_aspid, 
-      fn par => fn plc => fn bs => fn rawEv => cal_ak_asp_stub par rawEv),
-    (get_data_aspid,
-      fn par => fn plc => fn bs => fn rawEv => get_data_asp_stub par rawEv),
-    (tpm_sig_aspid,
-      fn par => fn plc => fn bs => fn rawEv => tpm_sig_asp_stub par rawEv),
     (ssl_enc_aspid,
       fn par => fn plc => fn bs => fn rawEv => ssl_enc_asp_stub par rawEv),
     (store_clientData_aspid,

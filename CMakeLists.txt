@@ -33,28 +33,36 @@ get_files(util_src util/CoqDefaults.sml util/Extra.sml
     util/ByteString.sml util/Misc.sml util/Parser.sml util/Json.sml
     util/BinaryParser.sml util/Http.sml)
 
-get_files(crypto_src system/crypto/openssl/CryptoFFI.sml
+get_files(crypto_src 
+system/crypto/openssl/CryptoFFI.sml
 system/crypto/openssl/Random.sml)
 
-get_files(crypto_src_hacl system/crypto/evercrypt/CryptoFFI.sml
+get_files(crypto_src_hacl 
+system/crypto/evercrypt/CryptoFFI.sml
 system/crypto/evercrypt/Random.sml)
 
-get_files(crypto_src_tpm system/crypto/tpm/CryptoFFI.sml
+get_files(crypto_src_tpm 
+system/crypto/tpm/CryptoFFI.sml
 system/crypto/tpm/Random.sml)
 
 
 
-get_files(posix_src ${crypto_src} system/posix/sockets/SocketFFI.sml
-system/posix/time/TimeFFI.sml system/posix/meas/MeasFFI.sml system/posix/sys/SysFFI.sml)
+get_files(posix_src ${crypto_src} 
+system/posix/sockets/SocketFFI.sml
+system/posix/time/TimeFFI.sml 
+system/posix/meas/MeasFFI.sml 
+system/posix/sys/SysFFI.sml)
 
 get_files(posix_src_hacl ${crypto_src_hacl}
 system/posix/sockets/SocketFFI.sml
-system/posix/time/TimeFFI.sml system/posix/meas/MeasFFI.sml
+system/posix/time/TimeFFI.sml 
+system/posix/meas/MeasFFI.sml
 system/posix/sys/SysFFI.sml)
 
 get_files(posix_src_tpm ${crypto_src_tpm}
 system/posix/sockets/SocketFFI.sml
-system/posix/time/TimeFFI.sml system/posix/meas/MeasFFI.sml
+system/posix/time/TimeFFI.sml 
+system/posix/meas/MeasFFI.sml
 system/posix/sys/SysFFI.sml)
 
 # Includes the CMakeLists for the specific asps types (modularity)
@@ -125,31 +133,27 @@ get_files(server_am_src ${util_src} ${posix_src} ${cop_src})
 get_files(server_am_src_hacl ${util_src} ${posix_src_hacl} ${cop_src})
 get_files(server_am_src_tpm ${util_src} ${posix_src_tpm} ${cop_src})
 
-
+get_files(posix_c_files_base
+    system/posix/sockets/socket_ffi.c
+    system/posix/time/time_ffi.c
+    system/posix/meas/meas_ffi.c
+    system/posix/sys/sys_ffi.c
+)
 
 get_files(posix_c_files
     ${BASIS_FILE}
     system/crypto/openssl/crypto_ffi.c
-    system/posix/sockets/socket_ffi.c
-    system/posix/time/time_ffi.c
-    system/posix/meas/meas_ffi.c
-    system/posix/sys/sys_ffi.c
+    ${posix_c_files_base}
 )
 get_files(posix_c_files_hacl
     ${BASIS_FILE}
     system/crypto/evercrypt/crypto_ffi.c
-    system/posix/sockets/socket_ffi.c
-    system/posix/time/time_ffi.c
-    system/posix/meas/meas_ffi.c
-    system/posix/sys/sys_ffi.c
+    ${posix_c_files_base}
 )
 get_files(posix_c_files_tpm
     ${BASIS_FILE}
     system/crypto/tpm/crypto_ffi.c
-    system/posix/sockets/socket_ffi.c
-    system/posix/time/time_ffi.c
-    system/posix/meas/meas_ffi.c
-    system/posix/sys/sys_ffi.c
+    ${posix_c_files_base}
 )
 
 # OS Config
