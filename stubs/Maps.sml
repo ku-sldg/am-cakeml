@@ -17,10 +17,3 @@ fun mapD_from_pairList pList =
 
 fun mapC_from_pairList pList = 
   List.map pair_to_Coq_pair pList
-
-
-fun map_to_mapC m =
-  let val mList = Map.toAscList m
-  in
-    mList
-  end
