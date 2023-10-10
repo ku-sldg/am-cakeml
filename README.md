@@ -1,15 +1,9 @@
 # About
 A Copland Attestation Manager (AM). See [here](https://ku-sldg.github.io/copland/) for more information about Copland.
 
-This project makes use of formally verified components, including the CakeML compiler, and the EverCrypt crypto implementations. It aims for portability, targeting minimal environments such as seL4.
+This project makes use of formally verified components, including extracted CakeML code from the Coq theorem prover,  the CakeML compiler, and cryptographic implementations (i.e. EverCrypt). It aims for portability, targeting minimal environments such as seL4.
 
 # Building
-
-## Automated Build (Docker)
-
-See README instructions at the following repository for a (Docker-based) automated build: [am-docker](https://github.com/ku-sldg/am-docker).
-
-## Manual Build
 
 The following documents the process of manually building standalone executables for Linux and MacOS.
 

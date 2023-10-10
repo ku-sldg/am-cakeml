@@ -46,42 +46,34 @@ system/crypto/tpm/CryptoFFI.sml
 system/crypto/tpm/Random.sml)
 
 
-
-get_files(posix_src ${crypto_src} 
+get_files (posix_src_cake 
 system/posix/sockets/SocketFFI.sml
 system/posix/time/TimeFFI.sml 
 system/posix/meas/MeasFFI.sml 
 system/posix/sys/SysFFI.sml)
 
+get_files(posix_src ${crypto_src} 
+${posix_src_cake})
+
 get_files(posix_src_hacl ${crypto_src_hacl}
-system/posix/sockets/SocketFFI.sml
-system/posix/time/TimeFFI.sml 
-system/posix/meas/MeasFFI.sml
-system/posix/sys/SysFFI.sml)
+${posix_src_cake})
 
 get_files(posix_src_tpm ${crypto_src_tpm}
-system/posix/sockets/SocketFFI.sml
-system/posix/time/TimeFFI.sml 
-system/posix/meas/MeasFFI.sml
-system/posix/sys/SysFFI.sml)
+${posix_src_cake})
 
 # Includes the CMakeLists for the specific asps types (modularity)
 include(./stubs/appraisal_asps/CMakeLists.txt)
 include(./stubs/attestation_asps/CMakeLists.txt)
 
-get_files(cop_src
+get_files(cop_src_pre_aspStubs
     stubs/BS.sml
     extracted/Specif.cml
     extracted/Datatypes.cml
     extracted/EqClass.cml
     extracted/List.cml
     stubs/AbstractedTypes.sml
-    # extracted/Nat.cml
-    # extracted/OptMonad_Coq.cml
     extracted/Term_Defs_Core.cml
     extracted/Eqb_Evidence.cml
-    # extracted/Appraisal_Evidence.cml
-    # extracted/ConcreteEvidence.cml
     stubs/Params_Admits_hardcoded.sml
     extracted/Term_Defs.cml
     extracted/Maps.cml
@@ -105,8 +97,9 @@ get_files(cop_src
     copland/json/ManifestJsonConfig.sml
     util/ManifestUtils.sml
     extracted/privPolicy.cml
-    ${attestation_asps}
-    ${appraisal_asps}
+)
+
+get_files(cop_src_post_aspStubs
     stubs/CvmJson_Admits.sml
     stubs/ErrorStringConstants.sml
     extracted/Cvm_St.cml
@@ -118,7 +111,6 @@ get_files(cop_src
     extracted/AM_Monad.cml
     extracted/Appraisal_Defs.cml
     extracted/Evidence_Bundlers.cml
-    # extracted/IO_Type.cml
     am/CoplandCommUtil.sml
     stubs/IO_Stubs.sml
     extracted/Cvm_Monad.cml
@@ -127,7 +119,22 @@ get_files(cop_src
     extracted/Impl_appraisal.cml
     extracted/AM_Helpers.cml
     extracted/Client_AM_Local.cml
-    extracted/Server_AM.cml)
+    extracted/Server_AM.cml
+)
+
+get_files(cop_src
+    ${cop_src_pre_aspStubs}
+    ${attestation_asps}
+    ${appraisal_asps}
+    ${cop_src_post_aspStubs}
+)
+
+get_files(cop_src_noasps
+    ${cop_src_pre_aspStubs}
+    ${cop_src_post_aspStubs}
+)
+
+get_files(server_am_src_noasps ${util_src} ${posix_src_cake} ${cop_src_noasps})
 
 get_files(server_am_src ${util_src} ${posix_src} ${cop_src})
 get_files(server_am_src_hacl ${util_src} ${posix_src_hacl} ${cop_src})
@@ -138,6 +145,13 @@ get_files(posix_c_files_base
     system/posix/time/time_ffi.c
     system/posix/meas/meas_ffi.c
     system/posix/sys/sys_ffi.c
+)
+
+
+get_files(posix_c_files_noasps
+    ${BASIS_FILE}
+    system/crypto/openssl/crypto_ffi.c
+    ${posix_c_files_base}
 )
 
 get_files(posix_c_files
@@ -189,6 +203,17 @@ mark_as_advanced(CLEAR
 add_subdirectory(system/crypto/evercrypt)
 add_subdirectory(system/crypto/openssl)
 add_subdirectory(system/crypto/tpm)
+
+function(build_posix_am_noasps name)
+    build_cake("${name}.cake" SOURCES "${ARGN}")
+    add_executable(${name} ${posix_c_files_noasps})
+    if(${STATIC_LINKING})
+        set(link_flags "-static-libgcc -static -lcrypto")
+    else()
+        set(link_flags "-lcrypto")
+    endif()
+    target_link_libraries(${name} "${name}.cake" ${link_flags})
+endfunction()
 
 function(build_posix_am name)
     build_cake("${name}.cake" SOURCES "${ARGN}")

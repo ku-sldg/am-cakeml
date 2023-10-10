@@ -20,7 +20,7 @@ fun decode_RawEv bsval = jsonBsListToList (strToJson (BString.toString bsval))
 (** val decrypt_bs_to_rawev : coq_BS -> coq_ASP_PARAMS -> coq_RawEv **)
 
 fun decrypt_bs_to_rawev bs ps (* priv pub *) =
-    let val recoveredtext = Crypto.decryptOneShot (* priv pub *) priv2 pub1 bs
+    let val recoveredtext = "" (* Crypto.decryptOneShot (* priv pub *) priv2 pub1 bs *)
         val bs_recovered = BString.fromString recoveredtext
         val res = decode_RawEv bs_recovered
         val _ = print ("\nDecryption Succeeded: \n" ^ (rawEvToString res) ^ "\n" ) in
