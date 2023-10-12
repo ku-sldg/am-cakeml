@@ -1,18 +1,3 @@
-(** val source_plc : coq_Plc **)
-
-val source_plc : coq_Plc =
-  failwith "AXIOM TO BE REALIZED"
-
-(** val dest_plc : coq_Plc **)
-
-val dest_plc : coq_Plc =
-  failwith "AXIOM TO BE REALIZED"
-
-(** val get_data_aspid : coq_ASP_ID **)
-
-val get_data_aspid : coq_ASP_ID =
-  failwith "AXIOM TO BE REALIZED"
-
 (** val ssl_sig_targid : coq_ASP_ID **)
 
 val ssl_sig_targid : coq_ASP_ID =

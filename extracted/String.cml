@@ -1,3 +1,0 @@
-datatype string =
-  EmptyString 
-| String ascii string

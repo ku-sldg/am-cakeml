@@ -39,20 +39,13 @@ fun do_remote t pTo e ac =
 val parallel_vm_thread : (coq_Loc -> coq_EvC) =
   failwith "AXIOM TO BE REALIZED"
 
-(** val am_sendReq :
-    coq_Term -> coq_Plc -> coq_ReqAuthTok -> coq_RawEv -> coq_RawEv **)
-
-val am_sendReq : (coq_Term -> coq_Plc -> coq_ReqAuthTok -> coq_RawEv ->
-                 coq_RawEv) =
-  failwith "AXIOM TO BE REALIZED"
-
 (** val do_start_par_thread :
-    coq_Loc -> coq_Core_Term -> coq_RawEv -> unit coq_IO **)
+    coq_Loc -> coq_Core_Term -> coq_RawEv -> unit coq_CVM **)
 
 fun do_start_par_thread _ _ _ =
   ret ()
 
-(** val do_wait_par_thread : coq_Loc -> coq_EvC coq_IO **)
+(** val do_wait_par_thread : coq_Loc -> coq_EvC coq_CVM **)
 
 fun do_wait_par_thread loc =
   ret (parallel_vm_thread loc)

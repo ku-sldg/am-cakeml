@@ -81,6 +81,7 @@ get_files(cop_src_pre_aspStubs
     stubs/Manifest_Admits_Stubs.sml
     extracted/ErrorStMonad_Coq.cml
     stubs/Example_Phrases_Admits.sml
+    extracted/Manifest_Set.cml
     extracted/Manifest.cml
     extracted/Manifest_Compiler.cml
     extracted/EnvironmentM.cml
@@ -92,11 +93,10 @@ get_files(cop_src_pre_aspStubs
     am/CommTypes.sml
     copland/json/CoplandToJson.sml
     copland/json/JsonToCopland.sml
-    extracted/Executable_Defs_Prop.cml
+    extracted/Manifest_Generator_Helpers.cml
     extracted/Manifest_Generator.cml
     copland/json/ManifestJsonConfig.sml
     util/ManifestUtils.sml
-    extracted/privPolicy.cml
 )
 
 get_files(cop_src_post_aspStubs

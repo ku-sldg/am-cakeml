@@ -26,13 +26,15 @@ val empty_PolicyT : coq_PolicyT =
   []
 
 datatype coq_Manifest =
-  Build_Manifest coq_Plc (coq_ASP_ID list) ((coq_Plc, coq_ASP_ID) prod list)
-   (coq_Plc list) (coq_Plc list) (coq_Plc list) coq_PolicyT
+  Build_Manifest coq_Plc (coq_ASP_ID manifest_set)
+   ((coq_Plc, coq_ASP_ID) prod manifest_set) (coq_Plc manifest_set)
+   (coq_Plc manifest_set) (coq_Plc manifest_set) coq_PolicyT
 
 (** val empty_Manifest : coq_Manifest **)
 
 val empty_Manifest : coq_Manifest =
-  Build_Manifest empty_Manifest_Plc [] [] [] [] [] empty_PolicyT
+  Build_Manifest empty_Manifest_Plc manifest_set_empty manifest_set_empty
+    manifest_set_empty manifest_set_empty manifest_set_empty empty_PolicyT
 
 datatype coq_AM_Library =
   Build_AM_Library ((coq_ASP_Address -> coq_CallBackErrors coq_ASPCallback))

@@ -39,7 +39,7 @@ fun generate_ASP_dispatcher' al am par p bs rawEv =
   in
   let val shrunk_map =
     minify_mapC coq_Eq_Class_ID_Type local_asps_map (fn x =>
-      case in_dec (coq_EqClass_impl_DecEq coq_Eq_Class_ID_Type) x
+      case in_dec_set (coq_EqClass_impl_DecEq coq_Eq_Class_ID_Type) x
              abstract_asps of
         Coq_left => True
       | Coq_right => False)
@@ -76,7 +76,7 @@ fun generate_appraisal_ASP_dispatcher' al am par p bs rawEv =
   let val shrunk_map =
     minify_mapC (pair_EqClass coq_Eq_Class_ID_Type coq_Eq_Class_ID_Type)
       local_asps_map (fn x =>
-      case in_dec
+      case in_dec_set
              (coq_EqClass_impl_DecEq
                (pair_EqClass coq_Eq_Class_ID_Type coq_Eq_Class_ID_Type)) x
              abstract_asps of
@@ -112,7 +112,7 @@ fun generate_Plc_dispatcher hID al am =
   in
   let val shrunk_map =
     minify_mapD coq_Eq_Class_ID_Type coq_Eq_Class_uuid local_plc_map (fn x =>
-      case in_dec (coq_EqClass_impl_DecEq hID) x abstract_plcs of
+      case in_dec_set (coq_EqClass_impl_DecEq hID) x abstract_plcs of
         Coq_left => True
       | Coq_right => False)
   in
@@ -136,7 +136,7 @@ fun generate_PubKey_dispatcher hID al am =
   let val shrunk_map =
     minify_mapD coq_Eq_Class_ID_Type coq_Eq_Class_public_key local_pubkey_map
       (fn x =>
-      case in_dec (coq_EqClass_impl_DecEq hID) x abstract_plcs of
+      case in_dec_set (coq_EqClass_impl_DecEq hID) x abstract_plcs of
         Coq_left => True
       | Coq_right => False)
   in
