@@ -68,6 +68,46 @@ structure ManifestJsonConfig = struct
           | TextIO.InvalidFD   => raise Excn "Invalid file descriptor") : unit
 
 
+(* Now we want to convert each element in the plcPairList to 
+  a pair representation
+    (json) -> ('a * 'b) *)
+fun converter (j : Json.json) f g =
+    (let val jsonSubList = (case (Json.toList j) of
+                              None => raise (Excn "Could not convert a JSON place mapping to a list")
+                              | Some v => v)
+        val a = (case ((* Json.toString *) f (List.nth jsonSubList 0)) of
+                    None => raise (Excn "Could not convert (fst pr) in Json list to type a")
+                    | Some v => v)
+        val b = (case ((* Json.toString *) g (List.nth jsonSubList 1)) of
+                    None => raise (Excn "Could not convert (snd pr) in Json list to type b")
+                    | Some v => v)
+    in
+      (Coq_pair a b)
+    end) (* : ('a, 'b) prod *)
+
+
+
+(* Attempts to extract a map from a Json structure
+  : Json.json -> (('a, 'b) coq_MapD) *)
+fun extract_map_gen (j : Json.json) (k_top:string) f g (* (f : string -> 'a) *) =
+    (let val gatherPlcs = case (Json.lookup k_top j) of
+                            None => raise (Excn ("Could not find " ^ k_top ^ " field in JSON"))
+                            | Some v => v
+        val jsonPairList = case (Json.toList gatherPlcs) of
+                        None => raise (Excn ("Could not convert Json into a list of json pairs")) 
+                        | Some m => m (* (json list) *)
+
+        val plcPairList = (List.map (fn x => (converter x f g)) jsonPairList) (* : ((('a, 'b) prod) list) *)
+    in
+      plcPairList
+    end) (* :  ('a, 'b) coq_MapD) *)
+
+
+
+
+(*
+
+
  (* Attempts to extract a map from a Json structure
     : Json.json -> (('a, 'b) coq_MapD) *)
   fun extract_map_gen (j : Json.json) (k_top:string) f (* (f : string -> 'a) *) =
@@ -98,23 +138,32 @@ structure ManifestJsonConfig = struct
         plcPairList
       end) (* :  ('a, 'b) coq_MapD) *)
 
+*)
 
-  fun extract_plcMap    (j:Json.json) = extract_map_gen j "plcMap" id
+fun decodePubkeyJsonString (j:Json.json) = 
+      case (Json.toString j) of 
+        None => None 
+        | Some s => Some (BString.unshow s) : BString.bstring option
 
-  fun extract_pubKeyMap (j:Json.json) = extract_map_gen j "pubKeyMap" BString.unshow
 
-  fun extract_appMap    (j:Json.json) = extract_map_gen j "appMap" id
 
-  fun extract_policy    (j:Json.json) = extract_map_gen j "policy" id
+
+  fun extract_plcMap    (j:Json.json) = extract_map_gen j "plcMap" Json.toString Json.toString
+
+  fun extract_pubKeyMap (j:Json.json) = extract_map_gen j "pubKeyMap" Json.toString decodePubkeyJsonString
+
+  fun extract_appMap    (j:Json.json) = extract_map_gen j "appMap" Json.toString Json.toString
+
+  fun extract_policy    (j:Json.json) = extract_map_gen j "policy" Json.toString Json.toString
 
   (* Encodes the (('a, 'b) coq_MapD) as Json.json
     : (('a, 'b) coq_MapD) -> ('b -> string) -> Json.json *)
-  fun encode_map_gen m f =
+  fun encode_map_gen m f g =
       let fun encoder ab_pair = 
             let val Coq_pair aval bval = ab_pair
             in
               (* Converts the pair to a Json list representing the pair *)
-              (Json.fromList [Json.fromString aval, Json.fromString (f bval)])
+              (Json.fromList [(* Json.fromString *) f aval, (* Json.fromString (f bval) *) g bval])
             end
           val newList = (List.map encoder m)
       in
@@ -122,13 +171,14 @@ structure ManifestJsonConfig = struct
       end
 
 
-  fun encode_plcMap m = encode_map_gen m id
+  fun encode_plcMap m = encode_map_gen m Json.fromString Json.fromString
 
-  fun encode_pubKeyMap m = encode_map_gen m (BString.show)
+  fun encode_pubKeyMap m = encode_map_gen m Json.fromString (fn s => Json.fromString (BString.show s))
 
-  fun encode_appMap m = encode_map_gen m id
+  fun encode_appMap m = encode_map_gen m Json.fromString Json.fromString
 
-  fun encode_policy m = encode_map_gen m id
+  fun encode_policy m = encode_map_gen m Json.fromString Json.fromString
+
 
   (* Extracts from json at key 'key' a list of strings into a list
       : Json.json -> string -> string list *)
@@ -212,6 +262,52 @@ fun read_FormalManifest_file_json (*(pathPrefix : string)*) (manfile:string) =
   handle 
     TextIO.BadFileName => raise Excn ("Bad file name: " ^ manfile)(* (pathPrefix ^ "FormalManifest_<PLCNAMEHERE>.sml")) *)
     | TextIO.InvalidFD   => raise Excn "Invalid file descriptor") : coq_Manifest
+
+
+
+
+fun encode_plcTermList m = encode_map_gen m termToJson Json.fromString
+
+
+(*  fun plcTermListToJsonList : ((coq_Term coq_Plc) coq_Pair) list -> json *)
+fun plcTermListToJsonList ts = encode_plcTermList ts (* Json.fromList (List.map termToJson ts) *)
+
+(*  fun jsonListTotermList : json -> coq_Term list *)
+fun jsonListTotermList (Json.Array args) =
+    List.map (fn j => (converter j (fn t => Some (jsonToTerm t)) Json.toString)) args
+
+
+
+
+fun write_termList_file_json (filepath : string) (ts : ((coq_Term, coq_Plc) prod) list) =
+  (let val _ = TextIOExtra.writeFile filepath (Json.stringify (plcTermListToJsonList ts))
+      val _ = c_system ("chmod 777 " ^ filepath)
+  in
+    ()
+  end
+  handle 
+    TextIO.BadFileName => raise Excn ("Bad file name in write_termList_file_json: " ^ (filepath))
+    | TextIO.InvalidFD   => raise Excn "Invalid file descriptor in write_termList_file_json") : unit
+
+
+
+fun read_termList_file_json (filepath:string) =
+      (let val s = TextIOExtra.readFile filepath
+          val termListJson = strToJson s 
+  in
+    (jsonListTotermList termListJson)
+  end
+  handle 
+    TextIO.BadFileName => raise Excn ("Bad file name in read_termList_file_json: " ^ filepath)
+    | TextIO.InvalidFD   => raise Excn "Invalid file descriptor in read_termList_file_json") : ((coq_Term, coq_Plc) prod) list
+
+
+
+
+
+
+
+
 
 fun write_FormalManifestList_json (pathPrefix : string) (cl : coq_Manifest list) =
     List.map (write_FormalManifest_file_json pathPrefix) cl

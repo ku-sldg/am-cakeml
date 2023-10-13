@@ -24,6 +24,8 @@ CLIENT_EXE_NAME=TEST_CLIENT_AM_ONE_EXE
 
 CLIENT_TERM_FILE=$DEMO_FILES/ClientCvmTermCm.sml
 
+MANGEN_TERMS_FILE=$DEMO_FILES/ServerPlcTermsCm.json
+
 
 if [[ "$PWD" == */am-cakeml/tests ]]; then
   repoRoot=$(dirname "$PWD")
@@ -35,7 +37,7 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
 
 
   # First, generate the formal manifests
-  $MAN_GEN -om $DEMO_FILES -t "cm"
+  $MAN_GEN -om $DEMO_FILES -t $MANGEN_TERMS_FILE
 
   #sleep 2
 

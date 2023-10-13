@@ -31,6 +31,8 @@ CLIENT_P1_EXE_NAME=TEST_CLIENT_AM_TWO_EXE
 CLIENT_P0_TERM_FILE=$DEMO_FILES/ClientCvmTermCacheP0.sml
 CLIENT_P1_TERM_FILE=$DEMO_FILES/ClientCvmTermCacheP1.sml
 
+MANGEN_TERMS_FILE=$DEMO_FILES/ServerPlcTermsCache.json
+
 
 if [[ "$PWD" == */am-cakeml/tests ]]; then
   repoRoot=$(dirname "$PWD")
@@ -41,7 +43,7 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   make manifest_compiler
 
   # First, generate the formal manifests
-  $MAN_GEN -om $DEMO_FILES -t "cache"
+  $MAN_GEN -om $DEMO_FILES -t $MANGEN_TERMS_FILE
   
   #sleep 5
 

@@ -1,10 +1,10 @@
 (* Depends on: util, copland, am/Measurements, am/ServerAm *)
 
-type TermPlcConfigPath_In = string
 type FormalManifestPath_Out = string
+type TermPlcConfigPath_In = string
 
 
-type ManGenArgs = (string * string)
+type ManGenArgs = (FormalManifestPath_Out * TermPlcConfigPath_In)
 
   (**
     gets the command line arguments used to configure the manifest generator
@@ -32,7 +32,7 @@ fun get_args () =
      end
 
 fun main () =
-    let val (outFilePathPrefix, typeSwitch) = get_args ()
+    let val (outFilePathPrefix, cvmPlcTermsFilepath) = get_args ()
         val auth_phrase = ssl_sig_parameterized default_place
         fun auth_phrase_list p = [(Coq_pair auth_phrase p)]
         val kim_phrase = Coq_att coq_P1 (kim_meas dest_plc kim_meas_targid)
@@ -47,25 +47,14 @@ fun main () =
           (* Coq_lseq (cm_meas coq_P0 cm_targid) (ssl_sig_parameterized coq_P0) *)
         val cm_phrases = [(Coq_pair cm_phrase coq_P0)] (* @ (auth_phrase_list coq_P0) *)
         val _ = print "\n\n"
-        val phrases = 
-          if (typeSwitch = "kim")
-          then (kim_phrases)
-          else (
-            if (typeSwitch = "cert")
-            then (cert_phrases)
-            else (
-              if (typeSwitch = "cache")
-              then (cache_phrases)
-              else (
-                if (typeSwitch = "parmut")
-                then (parmut_phrases)
-                else (
-                  if (typeSwitch = "lbg")
-                  then (layered_bg_phrases)
-                  else (
-                    if (typeSwitch = "cm")
-                    then (cm_phrases) 
-                    else (kim_phrases))))))
+        val phrases =  (* TODO:  add "provisioning" capability (to exe for Manifest Generator? Copland Parser?), 
+                                 to output Json files with ((coq_Term, coq_Plc) prod) lists that become inputs 
+                                 to the Generator exe *)
+              let (* val _ = ManifestJsonConfig.write_termList_file_json cvmPlcTermsFilepath layered_bg_phrases *)
+                  val ts = ManifestJsonConfig.read_termList_file_json cvmPlcTermsFilepath in 
+                    ts 
+              end
+
         val _ = ManifestJsonConfig.write_form_man_list_json_and_print_json outFilePathPrefix phrases
         val _ = print "\n\n" in
       ()
