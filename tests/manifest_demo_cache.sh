@@ -27,9 +27,8 @@ CLIENT_PRIV_KEY=$DEMO_FILES/Test_PrivKey
 CLIENT_P0_EXE_NAME=TEST_CLIENT_AM_ONE_EXE
 CLIENT_P1_EXE_NAME=TEST_CLIENT_AM_TWO_EXE
 
-
-CLIENT_P0_TERM_FILE=$DEMO_FILES/ClientCvmTermCacheP0.sml
-CLIENT_P1_TERM_FILE=$DEMO_FILES/ClientCvmTermCacheP1.sml
+CLIENT_P0_TERM_FILE_JSON=$DEMO_FILES/ClientCvmTermCacheP0.json
+CLIENT_P1_TERM_FILE_JSON=$DEMO_FILES/ClientCvmTermCacheP1.json
 
 MANGEN_TERMS_FILE=$DEMO_FILES/ServerPlcTermsCache.json
 
@@ -52,8 +51,8 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   $MAN_COMP -s -o $SERVER_P1_EXE_NAME -m $SERVER_P1_FORM_MAN -l $SERVER_AM_LIB
   $MAN_COMP -s -o $SERVER_P2_EXE_NAME -m $SERVER_P2_FORM_MAN -l $SERVER_AM_LIB
 
-  $MAN_COMP -c $CLIENT_P0_TERM_FILE -o $CLIENT_P0_EXE_NAME -m $CLIENT_P0_FORM_MAN -l $CLIENT_AM_LIB
-  $MAN_COMP -c $CLIENT_P1_TERM_FILE -o $CLIENT_P1_EXE_NAME -m $CLIENT_P1_FORM_MAN -l $CLIENT_AM_LIB
+  $MAN_COMP -c -o $CLIENT_P0_EXE_NAME -m $CLIENT_P0_FORM_MAN -l $CLIENT_AM_LIB
+  $MAN_COMP -c -o $CLIENT_P1_EXE_NAME -m $CLIENT_P1_FORM_MAN -l $CLIENT_AM_LIB
 
   #BUILT_SERVER_AM_P0=./build/$SERVER_P0_EXE_NAME
   BUILT_SERVER_AM_P1=./build/$SERVER_P1_EXE_NAME
@@ -82,10 +81,10 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   tmux send-keys -t 1 "($BUILT_SERVER_AM_P2 -m $SERVER_P2_FORM_MAN -k $SERVER_PRIV_KEY )" Enter
 
   # Start the P0 client
-  tmux send-keys -t 2 "sleep 1 && ($BUILT_CLIENT_AM_P0 -m $CLIENT_P0_FORM_MAN -k $CLIENT_PRIV_KEY -cs)" Enter
+  tmux send-keys -t 2 "sleep 1 && ($BUILT_CLIENT_AM_P0 -m $CLIENT_P0_FORM_MAN -k $CLIENT_PRIV_KEY -t $CLIENT_P0_TERM_FILE_JSON)" Enter
 
   # Start the P1 client
-  tmux send-keys -t 3 "sleep 1 && ($BUILT_CLIENT_AM_P1 -m $CLIENT_P1_FORM_MAN -k $CLIENT_PRIV_KEY -cs)" Enter
+  tmux send-keys -t 3 "sleep 1 && ($BUILT_CLIENT_AM_P1 -m $CLIENT_P1_FORM_MAN -k $CLIENT_PRIV_KEY -t $CLIENT_P1_TERM_FILE_JSON)" Enter
 
   tmux attach-session -d -t ServerProcess
 

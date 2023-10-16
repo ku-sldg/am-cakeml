@@ -22,7 +22,7 @@ CLIENT_PRIV_KEY=$DEMO_FILES/Test_PrivKey
 
 CLIENT_EXE_NAME=TEST_CLIENT_AM_ONE_EXE
 
-CLIENT_TERM_FILE=$DEMO_FILES/ClientCvmTermCm.sml
+CLIENT_TERM_FILE_JSON=$DEMO_FILES/ClientCvmTermCm.json
 
 MANGEN_TERMS_FILE=$DEMO_FILES/ServerPlcTermsCm.json
 
@@ -66,8 +66,8 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   # Now manifest compile and run the Client AM
   # Sending a chain of first AM comp, then run AM
   tmux send-keys -t 1 \
-    "($MAN_COMP -c $CLIENT_TERM_FILE -o $CLIENT_EXE_NAME -m $CLIENT_FORM_MAN -l $CLIENT_AM_LIB) && \
-     ($BUILT_CLIENT_AM -m $CLIENT_FORM_MAN -k $CLIENT_PRIV_KEY)" Enter
+    "($MAN_COMP -c -o $CLIENT_EXE_NAME -m $CLIENT_FORM_MAN -l $CLIENT_AM_LIB) && \
+     ($BUILT_CLIENT_AM -m $CLIENT_FORM_MAN -k $CLIENT_PRIV_KEY -t $CLIENT_TERM_FILE_JSON)" Enter
 
   tmux attach-session -d -t ServerProcess
 

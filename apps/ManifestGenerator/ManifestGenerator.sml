@@ -50,8 +50,8 @@ fun main () =
         val phrases =  (* TODO:  add "provisioning" capability (to exe for Manifest Generator? Copland Parser?), 
                                  to output Json files with ((coq_Term, coq_Plc) prod) lists that become inputs 
                                  to the Generator exe *)
-              let (* val _ = ManifestJsonConfig.write_termList_file_json cvmPlcTermsFilepath layered_bg_phrases *)
-                  val ts = ManifestJsonConfig.read_termList_file_json cvmPlcTermsFilepath in 
+              let (* val _ = ManifestJsonConfig.write_termPlcList_file_json cvmPlcTermsFilepath layered_bg_phrases *)
+                  val ts = ManifestJsonConfig.read_termPlcList_file_json cvmPlcTermsFilepath in 
                     ts 
               end
 

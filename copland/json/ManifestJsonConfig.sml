@@ -265,44 +265,62 @@ fun read_FormalManifest_file_json (*(pathPrefix : string)*) (manfile:string) =
 
 
 
-
+(*  fun encode_plcTermList : ((coq_Term coq_Plc) coq_Pair) list -> json *)
 fun encode_plcTermList m = encode_map_gen m termToJson Json.fromString
 
-
-(*  fun plcTermListToJsonList : ((coq_Term coq_Plc) coq_Pair) list -> json *)
-fun plcTermListToJsonList ts = encode_plcTermList ts (* Json.fromList (List.map termToJson ts) *)
-
-(*  fun jsonListTotermList : json -> coq_Term list *)
-fun jsonListTotermList (Json.Array args) =
+(*  fun extract_plcTermList : json -> ((coq_Term, coq_Plc) prod) list *)
+fun extract_plcTermList (Json.Array args) =
     List.map (fn j => (converter j (fn t => Some (jsonToTerm t)) Json.toString)) args
 
 
-
-
-fun write_termList_file_json (filepath : string) (ts : ((coq_Term, coq_Plc) prod) list) =
-  (let val _ = TextIOExtra.writeFile filepath (Json.stringify (plcTermListToJsonList ts))
+fun write_term_file_json (filepath : string) (t : coq_Term) =
+  (let val _ = TextIOExtra.writeFile filepath (Json.stringify (termToJson t))
       val _ = c_system ("chmod 777 " ^ filepath)
   in
     ()
   end
   handle 
-    TextIO.BadFileName => raise Excn ("Bad file name in write_termList_file_json: " ^ (filepath))
-    | TextIO.InvalidFD   => raise Excn "Invalid file descriptor in write_termList_file_json") : unit
+    TextIO.BadFileName => raise Excn ("Bad file name in write_term_file_json: " ^ (filepath))
+    | TextIO.InvalidFD   => raise Excn "Invalid file descriptor in write_term_file_json") : unit
 
 
 
-fun read_termList_file_json (filepath:string) =
+fun read_term_file_json (filepath:string) =
       (let val s = TextIOExtra.readFile filepath
-          val termListJson = strToJson s 
+          val termJson = strToJson s 
   in
-    (jsonListTotermList termListJson)
+    (jsonToTerm termJson)
   end
   handle 
-    TextIO.BadFileName => raise Excn ("Bad file name in read_termList_file_json: " ^ filepath)
-    | TextIO.InvalidFD   => raise Excn "Invalid file descriptor in read_termList_file_json") : ((coq_Term, coq_Plc) prod) list
+    TextIO.BadFileName => raise Excn ("Bad file name in read_term_file_json: " ^ filepath)
+    | TextIO.InvalidFD   => raise Excn "Invalid file descriptor in read_term_file_json") : coq_Term
 
 
 
+
+
+
+fun write_termPlcList_file_json (filepath : string) (ts : ((coq_Term, coq_Plc) prod) list) =
+  (let val _ = TextIOExtra.writeFile filepath (Json.stringify (encode_plcTermList ts))
+      val _ = c_system ("chmod 777 " ^ filepath)
+  in
+    ()
+  end
+  handle 
+    TextIO.BadFileName => raise Excn ("Bad file name in write_termPlcList_file_json: " ^ (filepath))
+    | TextIO.InvalidFD   => raise Excn "Invalid file descriptor in write_termPlcList_file_json") : unit
+
+
+
+fun read_termPlcList_file_json (filepath:string) =
+      (let val s = TextIOExtra.readFile filepath
+          val plcTermListJson = strToJson s 
+  in
+    (extract_plcTermList plcTermListJson)
+  end
+  handle 
+    TextIO.BadFileName => raise Excn ("Bad file name in read_termPlcList_file_json: " ^ filepath)
+    | TextIO.InvalidFD   => raise Excn "Invalid file descriptor in read_termPlcList_file_json") : ((coq_Term, coq_Plc) prod) list
 
 
 
@@ -343,13 +361,14 @@ fun argIndPresent (i:int) = (i <> ~1)
 *)
 fun retrieve_CLI_args _ =
   let val name = CommandLine.name ()
-      val usage = ("Usage: " ^ name ^ " -m <ManifestFile>.json -k <privateKeyFile>\n" ^
-                    "e.g.\t" ^ name ^ " -m formMan.json -k ~/.ssh/id_ed25519\n")
-      val (manFileName, privKey) = 
+      val usage = ("Usage: " ^ name ^ " -m <ManifestFile>.json -k <privateKeyFile> (-t <ClientTermFile>.json)\n " ^
+                    "e.g.\t" ^ name ^ " -m formMan.json -k ~/.ssh/id_ed25519 -t clientPhrase.json\n")
+      val (manFileName, privKey, termFileName) = 
               (case CommandLine.arguments () of 
                   argList => (
                     let val manInd = ListExtra.find_index argList "-m"
                         val keyInd = ListExtra.find_index argList "-k"
+                        val termFileInd = ListExtra.find_index argList "-t"
                         val manIndBool = argIndPresent manInd 
                         val keyIndBool = argIndPresent keyInd
                     in
@@ -361,15 +380,16 @@ fun retrieve_CLI_args _ =
                         then raise (Excn ("Invalid Arguments\n" ^ usage))
                           else (
                               let val manFileName = List.nth argList (manInd + 1)
-                                  val privKeyFile = List.nth argList (keyInd + 1) in
+                                  val privKeyFile = List.nth argList (keyInd + 1)
+                                  val termFile = List.nth argList (termFileInd + 1) in
                                   (
                                     case (parseJsonFile manFileName) of
                                       Err e => raise (Excn ("Could not parse JSON file: " ^ e ^ "\n"))
-                                    | Ok j => (manFileName, parse_private_key privKeyFile)
+                                    | Ok _ => (manFileName, (parse_private_key privKeyFile), termFile)
                                   )
                                 end )))
                   end ))
         in
-          (manFileName, privKey)
+          (manFileName, privKey, termFileName) : (string * pubKey_t * string)
       end
 end

@@ -5,8 +5,8 @@ structure ManCompConfig = struct
   type AmLibraryPath        = string
   type AmExecutableName     = string
   type CompileTarget        = string
-  type CvmTermFilePath      = string
-  type ManCompArgs          = (FormalManifestPath * AmLibraryPath * AmExecutableName * CompileTarget * CvmTermFilePath (* * CvmTermFilePath  *))
+  (* type CvmTermFilePath      = string *)
+  type ManCompArgs          = (FormalManifestPath * AmLibraryPath * AmExecutableName * CompileTarget (* * CvmTermFilePath *) (* * CvmTermFilePath  *))
 
   (**
     gets the command line arguments used to configure the manifest compiler
@@ -14,7 +14,7 @@ structure ManCompConfig = struct
   *)
   fun get_args () = 
     let val name = CommandLine.name()
-        val usage = ("Usage: " ^ name ^ "-m <manifest_file>.json -l <am_library_file>.sml [-s | -c <cvm_term_file>.sml] (-o <executable_output_path>)\n" ^ 
+        val usage = ("Usage: " ^ name ^ "-m <manifest_file>.json -l <am_library_file>.sml [-s | -c] (-o <executable_output_path>)\n" ^ 
         "e.g\t" ^ name ^ "-m fman.json -l AMLib.sml -c client_term.sml  -o am_out")
     in
       case (CommandLine.arguments()) of
@@ -44,17 +44,18 @@ structure ManCompConfig = struct
                         then defaultExecOut
                         else List.nth argList (execOutInd + 1)
                       val buildClient = clientCompileInd <> ~1
+                      (*
                       val buildServer = serverCompileInd <> ~1
                       val clientCvmTermFile : CvmTermFilePath = 
                         if (buildClient) 
                         then (List.nth argList (clientCompileInd + 1))
-                        else ""
+                        else "" *)
                   in
                     (( formManFile, 
                        amLibFile, 
                        execOutFile, 
-                       (if buildClient then "CLIENT" else "SERVER"), 
-                       clientCvmTermFile ) : ManCompArgs)
+                       (if buildClient then "CLIENT" else "SERVER") (*, 
+                       clientCvmTermFile *) ) : ManCompArgs)
                   end
                 )
               )
@@ -64,17 +65,17 @@ structure ManCompConfig = struct
 
 end
 
-fun makeAM_CmakeFile fm_path am_library_path cvmTermFile targetFile = "cmake_minimum_required(VERSION 3.10.2)\nget_files(man_comp_src ${server_am_src} " ^ am_library_path ^ " " ^ cvmTermFile ^ " " ^ targetFile ^ " )\nbuild_posix_am(\"COMPILED_AM\" ${man_comp_src})\n"
+fun makeAM_CmakeFile fm_path am_library_path (* cvmTermFile *) targetFile = "cmake_minimum_required(VERSION 3.10.2)\nget_files(man_comp_src ${server_am_src} " ^ am_library_path ^ " " (* ^ cvmTermFile ^ " " *) ^ targetFile ^ " )\nbuild_posix_am(\"COMPILED_AM\" ${man_comp_src})\n"
 
 (* () -> () *)
 fun main () =
-  let val (fmPath, libPath, execOutFileName, targetType, cvmClientTermFile ) = ManCompConfig.get_args()
+  let val (fmPath, libPath, execOutFileName, targetType (* , cvmClientTermFile *) ) = ManCompConfig.get_args()
       val targetFile = if (targetType = "CLIENT") then "../apps/ManifestCompiler/Client.sml" else "../apps/ManifestCompiler/Server.sml"
-      val cvmTermFilePath = if (targetType = "CLIENT") 
+      (* val cvmTermFilePath = if (targetType = "CLIENT") 
                             then cvmClientTermFile
-                            else ( "" )
+                            else ( "" ) *)
       val _ = (print ("Formal Manifest: " ^ fmPath ^ "\nAM Library: " ^ libPath ^ "\n\n"))
-      val am_cmakefile = makeAM_CmakeFile fmPath libPath cvmTermFilePath targetFile
+      val am_cmakefile = makeAM_CmakeFile fmPath libPath (* cvmTermFilePath *) targetFile
       val _ = c_system ("echo '" ^ am_cmakefile ^ "' > CMakeLists.txt")
       val _ = c_system ("cmake ..")
       val _ = c_system ("make COMPILED_AM")
