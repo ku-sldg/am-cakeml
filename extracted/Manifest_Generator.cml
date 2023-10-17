@@ -5,8 +5,8 @@ fun aspid_manifest_update i m =
   let val Build_Manifest oldPlc oldasps old_app_asps oldKnowsOf oldContext
     oldTargets oldPolicy = m
   in
-  Build_Manifest oldPlc (manset_add i oldasps) old_app_asps oldKnowsOf
-  oldContext oldTargets oldPolicy end
+  Build_Manifest oldPlc (manset_add coq_Eq_Class_ID_Type i oldasps)
+  old_app_asps oldKnowsOf oldContext oldTargets oldPolicy end
 
 (** val knowsof_manifest_update : coq_Plc -> coq_Manifest -> coq_Manifest **)
 
@@ -14,8 +14,9 @@ fun knowsof_manifest_update toPlc m =
   let val Build_Manifest oldPlc oldasps old_app_asps oldKnowsOf oldContext
     oldTargets oldPolicy = m
   in
-  Build_Manifest oldPlc oldasps old_app_asps (manset_add toPlc oldKnowsOf)
-  oldContext oldTargets oldPolicy end
+  Build_Manifest oldPlc oldasps old_app_asps
+  (manset_add coq_Eq_Class_ID_Type toPlc oldKnowsOf) oldContext oldTargets
+  oldPolicy end
 
 (** val knowsof_myPlc_manifest_update : coq_Manifest -> coq_Manifest **)
 
@@ -40,7 +41,7 @@ fun pubkey_manifest_update p m =
     oldTargets oldPolicy = m
   in
   Build_Manifest oldPlc oldasps old_app_asps oldKnowsOf
-  (manset_add p oldContext) oldTargets oldPolicy end
+  (manset_add coq_Eq_Class_ID_Type p oldContext) oldTargets oldPolicy end
 
 (** val pubkeys_manifest_update :
     coq_Plc manifest_set -> coq_Manifest -> coq_Manifest **)
@@ -60,7 +61,7 @@ fun update_manifest_policy_targ targp _ m =
     oldTargets oldPolicy = m
   in
   Build_Manifest oldMyPlc oldasps old_app_asps oldKnowsOf oldContext
-  (manset_add targp oldTargets) oldPolicy end
+  (manset_add coq_Eq_Class_ID_Type targp oldTargets) oldPolicy end
 
 (** val asp_manifest_update : coq_ASP -> coq_Manifest -> coq_Manifest **)
 
@@ -185,7 +186,9 @@ fun get_unique_manifests_env ts p e =
 fun get_final_manifests_env ts p e =
   let val ms = get_unique_manifests_env ts p e in
   let val ms' = map knowsof_myPlc_manifest_update ms in
-  map (pubkeys_manifest_update (list_to_manset (places_terms ts p))) ms' end end
+  map
+    (pubkeys_manifest_update
+      (list_to_manset coq_Eq_Class_ID_Type (places_terms ts p))) ms' end end
 
 (** val man_gen_run : coq_Term list -> coq_Plc -> coq_EnvironmentM **)
 
@@ -225,8 +228,9 @@ fun app_aspid_manifest_update i p m =
   let val Build_Manifest oldPlc oldasps old_app_asps oldKnowsOf oldContext
     oldTargets oldPolicy = m
   in
-  Build_Manifest oldPlc oldasps (manset_add (Coq_pair i p) old_app_asps)
-  oldKnowsOf oldContext oldTargets oldPolicy end
+  Build_Manifest oldPlc oldasps
+  (manset_add (pair_EqClass coq_Eq_Class_ID_Type coq_Eq_Class_ID_Type)
+    (Coq_pair i p) old_app_asps) oldKnowsOf oldContext oldTargets oldPolicy end
 
 (** val manifest_generator_app' :
     coq_Evidence -> coq_Manifest -> coq_Manifest **)

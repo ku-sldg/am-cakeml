@@ -5,15 +5,21 @@ type 'a manifest_set = 'a list
 val manifest_set_empty =
   []
 
-(** val manset_add : 'a1 -> 'a1 manifest_set -> 'a1 manifest_set **)
+(** val manset_add :
+    'a1 coq_EqClass -> 'a1 -> 'a1 manifest_set -> 'a1 manifest_set **)
 
-fun manset_add x s =
-  x :: s
+fun manset_add hA a s = case s of
+  [] => a :: []
+| h :: t =>
+  (case eqb hA a h of
+     True => h :: t
+   | False => h :: (manset_add hA a t))
 
-(** val list_to_manset : 'a1 list -> 'a1 manifest_set **)
+(** val list_to_manset : 'a1 coq_EqClass -> 'a1 list -> 'a1 manifest_set **)
 
-fun list_to_manset ls =
-  ls
+fun list_to_manset hA l = case l of
+  [] => []
+| h :: t => manset_add hA h (list_to_manset hA t)
 
 (** val filter_manset :
     ('a1 -> bool) -> 'a1 manifest_set -> 'a1 manifest_set **)
@@ -21,28 +27,19 @@ fun list_to_manset ls =
 val filter_manset =
   filter
 
-(** val list_beq : ('a1 -> 'a1 -> bool) -> 'a1 list -> 'a1 list -> bool **)
+(** val is_empty_manset : 'a1 manifest_set -> bool **)
 
-fun list_beq eq_A x y =
-  case x of
-    [] => (case y of
-             [] => True
-           | _ :: _ => False)
-  | x0 :: x1 =>
-    (case y of
-       [] => False
-     | x2 :: x3 =>
-       (case eq_A x0 x2 of
-          True => list_beq eq_A x1 x3
-        | False => False))
-
-(** val is_empty_manset : 'a1 coq_EqClass -> 'a1 manifest_set -> bool **)
-
-fun is_empty_manset h s =
-  list_beq (eqb h) s manifest_set_empty
+fun is_empty_manset s = case s of
+  [] => True
+| _ :: _ => False
 
 (** val in_dec_set :
-    ('a1 -> 'a1 -> sumbool) -> 'a1 -> 'a1 manifest_set -> sumbool **)
+    'a1 coq_EqClass -> ('a1 -> 'a1 -> sumbool) -> 'a1 -> 'a1 manifest_set ->
+    sumbool **)
 
-val in_dec_set =
-  in_dec
+fun in_dec_set hA x a s = case s of
+  [] => Coq_right
+| y :: l =>
+  (case in_dec_set hA x a l of
+     Coq_left => Coq_left
+   | Coq_right => coq_EqClass_impl_DecEq hA a y)

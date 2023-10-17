@@ -103,15 +103,12 @@ fun lib_omits_manifest al am =
 
 fun manifest_none_omitted m =
   let val Build_Manifest _ asps app_asps uuids pubkeys _ _ = m in
-  (case case case is_empty_manset coq_Eq_Class_ID_Type asps of
-               True =>
-               is_empty_manset
-                 (pair_EqClass coq_Eq_Class_ID_Type coq_Eq_Class_ID_Type)
-                 app_asps
+  (case case case is_empty_manset asps of
+               True => is_empty_manset app_asps
              | False => False of
-          True => is_empty_manset coq_Eq_Class_ID_Type uuids
+          True => is_empty_manset uuids
         | False => False of
-     True => is_empty_manset coq_Eq_Class_ID_Type pubkeys
+     True => is_empty_manset pubkeys
    | False => False) end
 
 (** val config_AM_if_lib_supported :
