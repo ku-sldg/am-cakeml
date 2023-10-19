@@ -29,19 +29,6 @@ val cert_style : coq_Term =
   Coq_att coq_P1 (Coq_lseq (attest coq_P1 sys) (Coq_att coq_P2 (Coq_lseq
     (appraise coq_P2 sys) (certificate coq_P2 sys))))
 
-(** val cert_style_trimmed : coq_Term **)
-
-val cert_style_trimmed : coq_Term =
-  Coq_lseq (attest coq_P1 sys) (Coq_att coq_P2 (Coq_lseq
-    (appraise coq_P2 sys) (certificate coq_P2 sys)))
-
-(** val cert_style_test : coq_Term **)
-
-val cert_style_test : coq_Term =
-  Coq_att coq_P1 (Coq_lseq (attest coq_P1 sys) (Coq_lseq (Coq_att coq_P2
-    (Coq_lseq (appraise coq_P2 sys) (certificate coq_P2 sys))) (Coq_att
-    coq_P3 (store coq_P1 cache))))
-
 (** val cert_cache_p1 : coq_Term **)
 
 val cert_cache_p1 : coq_Term =
@@ -53,12 +40,6 @@ val cert_cache_p1 : coq_Term =
 val cert_cache_p0 : coq_Term =
   Coq_att coq_P1 (Coq_lseq (Coq_bseq (Coq_pair NONE ALL)
     (retrieve coq_P1 cache) (Coq_asp CPY)) (Coq_asp SIG))
-
-(** val cert_cache_p0_trimmed : coq_Term **)
-
-val cert_cache_p0_trimmed : coq_Term =
-  Coq_lseq (Coq_bseq (Coq_pair NONE ALL) (retrieve coq_P1 cache) (Coq_asp
-    CPY)) (Coq_asp SIG)
 
 (** val par_mut_p0 : coq_Term **)
 

@@ -67,6 +67,7 @@ include(./stubs/attestation_asps/CMakeLists.txt)
 
 get_files(cop_src_pre_aspStubs
     stubs/BS.sml
+    stubs/StringT.sml
     extracted/Specif.cml
     extracted/Datatypes.cml
     extracted/EqClass.cml

@@ -33,8 +33,8 @@ val enc_targid : coq_ASP_ID =
 
 (** val enc_params : coq_Plc -> coq_ASP_PARAMS **)
 
-fun enc_params p =
-  Coq_asp_paramsC enc_aspid enc_aspargs p enc_targid
+fun enc_params enc_targplc =
+  Coq_asp_paramsC enc_aspid enc_aspargs enc_targplc enc_targid
 
 (** val term_discloses_aspid_to_remote_enc_bool :
     coq_Term -> coq_Plc -> coq_Evidence -> coq_ASP_ID -> coq_Plc -> bool **)
