@@ -341,6 +341,7 @@ fun print_json_man_list (ls: coq_Manifest list) =
       ()
     end
 
+(*
 fun write_form_man_list_json_and_print_json (pathPrefix : string) (ls:(coq_Term, coq_Plc) prod list) = 
   let val man_list : coq_Manifest list = man_gen_run_attify ls
       val _ = write_FormalManifestList_json pathPrefix man_list
@@ -348,6 +349,17 @@ fun write_form_man_list_json_and_print_json (pathPrefix : string) (ls:(coq_Term,
         ()
   end
   handle Excn e => TextIOExtra.printLn e
+*)
+
+fun write_form_man_list_json_and_print_json_app (pathPrefix : string) (ets:(coq_Evidence, coq_Plc) prod list) (ls:(coq_Term, coq_Plc) prod list) = 
+  let val man_list : coq_Manifest list = end_to_end_mangen_final ets ls (* man_gen_run_attify ls *)
+      val _ = write_FormalManifestList_json pathPrefix man_list
+      val _ = print_json_man_list man_list in 
+        ()
+  end
+  handle Excn e => TextIOExtra.printLn e
+
+
 
 fun parse_private_key file =
   BString.unshow (TextIOExtra.readFile file)

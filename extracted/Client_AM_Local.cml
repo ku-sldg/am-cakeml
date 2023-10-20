@@ -46,17 +46,16 @@ fun check_disclosure_policy t p e =
       am_failm (Coq_am_dispatch_error (Runtime errStr_disclosePolicy)))
 
 (** val am_client_gen_local :
-    coq_Term -> coq_Plc -> coq_EvC option -> coq_AM_Library -> coq_AM_Result
-    coq_AM **)
+    coq_Term -> coq_Plc -> coq_EvC option -> coq_Manifest -> coq_AM_Library
+    -> coq_AM_Result coq_AM **)
 
-fun am_client_gen_local t myPlc initEvOpt amLib =
+fun am_client_gen_local t myPlc initEvOpt absMan amLib =
   bind (gen_nonce_if_none_local initEvOpt) (fn evcIn =>
     let val Coq_evc init_ev init_et = evcIn in
-    bind (config_AM_if_lib_supported t myPlc amLib) (fn _ =>
+    bind (config_AM_if_lib_supported absMan amLib) (fn _ =>
       bind (check_disclosure_policy t myPlc init_et) (fn _ =>
         bind (run_cvm_local_am t myPlc init_ev) (fn resev =>
           let val expected_et = eval t myPlc init_et in
           bind (check_et_length expected_et resev) (fn _ =>
-            bind (config_AM_if_lib_supported_app expected_et amLib) (fn _ =>
-              bind (gen_appraise_AM expected_et resev) (fn app_res =>
-                ret (Coq_am_appev app_res)))) end))) end)
+            bind (gen_appraise_AM expected_et resev) (fn app_res =>
+              ret (Coq_am_appev app_res))) end))) end)

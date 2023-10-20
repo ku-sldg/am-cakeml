@@ -1,16 +1,3 @@
-(** val fromSomeOption : 'a1 -> 'a1 option -> 'a1 **)
-
-fun fromSomeOption default opt = case opt of
-  Some x => x
-| None => default
-
-(** val get_my_absman_generated : coq_Term -> coq_Plc -> coq_Manifest **)
-
-fun get_my_absman_generated t myPlc =
-  let val env = manifest_generator t myPlc in
-  let val maybe_absMan = map_get coq_Eq_Class_ID_Type env myPlc in
-  fromSomeOption empty_Manifest maybe_absMan end end
-
 (** val aspid_in_amlib_bool : coq_AM_Library -> coq_ASP_ID -> bool **)
 
 fun aspid_in_amlib_bool al i =
@@ -112,10 +99,9 @@ fun manifest_none_omitted m =
    | False => False) end
 
 (** val config_AM_if_lib_supported :
-    coq_Term -> coq_Plc -> coq_AM_Library -> unit coq_AM **)
+    coq_Manifest -> coq_AM_Library -> unit coq_AM **)
 
-fun config_AM_if_lib_supported t myPlc amLib =
-  let val absMan = get_my_absman_generated t myPlc in
+fun config_AM_if_lib_supported absMan amLib =
   let val om = lib_omits_manifest amLib absMan in
   let val supportsB = manifest_none_omitted om in
   (case supportsB of
@@ -123,18 +109,4 @@ fun config_AM_if_lib_supported t myPlc amLib =
      let val amConf = manifest_compiler absMan amLib in
      put_amConfig amConf end
    | False =>
-     am_failm (Coq_am_dispatch_error (Runtime (pretty_print_manifest om)))) end end end
-
-(** val config_AM_if_lib_supported_app :
-    coq_Evidence -> coq_AM_Library -> unit coq_AM **)
-
-fun config_AM_if_lib_supported_app et amLib =
-  let val absMan = manifest_generator_app et in
-  let val om = lib_omits_manifest amLib absMan in
-  let val supportsB = manifest_none_omitted om in
-  (case supportsB of
-     True =>
-     let val amConf = manifest_compiler absMan amLib in
-     put_amConfig amConf end
-   | False =>
-     am_failm (Coq_am_dispatch_error (Runtime (pretty_print_manifest om)))) end end end
+     am_failm (Coq_am_dispatch_error (Runtime (pretty_print_manifest om)))) end end

@@ -39,8 +39,7 @@ fun generate_ASP_dispatcher' al am par p bs rawEv =
   in
   let val shrunk_map =
     minify_mapC coq_Eq_Class_ID_Type local_asps_map (fn x =>
-      case in_dec_set coq_Eq_Class_ID_Type
-             (coq_EqClass_impl_DecEq coq_Eq_Class_ID_Type) x abstract_asps of
+      case in_dec_set coq_Eq_Class_ID_Type x abstract_asps of
         Coq_left => True
       | Coq_right => False)
   in
@@ -77,9 +76,7 @@ fun generate_appraisal_ASP_dispatcher' al am par p bs rawEv =
     minify_mapC (pair_EqClass coq_Eq_Class_ID_Type coq_Eq_Class_ID_Type)
       local_asps_map (fn x =>
       case in_dec_set
-             (pair_EqClass coq_Eq_Class_ID_Type coq_Eq_Class_ID_Type)
-             (coq_EqClass_impl_DecEq
-               (pair_EqClass coq_Eq_Class_ID_Type coq_Eq_Class_ID_Type)) x
+             (pair_EqClass coq_Eq_Class_ID_Type coq_Eq_Class_ID_Type) x
              abstract_asps of
         Coq_left => True
       | Coq_right => False)
@@ -113,7 +110,7 @@ fun generate_Plc_dispatcher hID al am =
   in
   let val shrunk_map =
     minify_mapD coq_Eq_Class_ID_Type coq_Eq_Class_uuid local_plc_map (fn x =>
-      case in_dec_set hID (coq_EqClass_impl_DecEq hID) x abstract_plcs of
+      case in_dec_set hID x abstract_plcs of
         Coq_left => True
       | Coq_right => False)
   in
@@ -137,7 +134,7 @@ fun generate_PubKey_dispatcher hID al am =
   let val shrunk_map =
     minify_mapD coq_Eq_Class_ID_Type coq_Eq_Class_public_key local_pubkey_map
       (fn x =>
-      case in_dec_set hID (coq_EqClass_impl_DecEq hID) x abstract_plcs of
+      case in_dec_set hID x abstract_plcs of
         Coq_left => True
       | Coq_right => False)
   in
@@ -150,15 +147,24 @@ fun generate_PubKey_dispatcher hID al am =
     coq_ID_Type coq_EqClass -> coq_AM_Library -> coq_Manifest ->
     coq_UUIDCallback **)
 
-fun generate_UUUID_dispatcher _ al _ =
+fun generate_UUUID_dispatcher hID al am =
   let val local_plc_map =
     let val Build_AM_Library _ _ _ _ _ _ _ _ _ _ local_Plcs _ = al in
     local_Plcs end
   in
+  let val abstract_plcs =
+    let val Build_Manifest _ _ _ uuidPlcs _ _ _ = am in uuidPlcs end
+  in
+  let val shrunk_map =
+    minify_mapD coq_Eq_Class_ID_Type coq_Eq_Class_uuid local_plc_map (fn x =>
+      case in_dec_set hID x abstract_plcs of
+        Coq_left => True
+      | Coq_right => False)
+  in
   (fn u =>
-  case mapD_get_key coq_Eq_Class_ID_Type coq_Eq_Class_uuid local_plc_map u of
+  case mapD_get_key coq_Eq_Class_ID_Type coq_Eq_Class_uuid shrunk_map u of
     Some p => Coq_resultC p
-  | None => Coq_errC Unavailable) end
+  | None => Coq_errC Unavailable) end end end
 
 (** val manifest_compiler :
     coq_Manifest -> coq_AM_Library -> coq_AM_Config **)

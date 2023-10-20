@@ -1,0 +1,46 @@
+(** val manifest_set_union :
+    'a1 coq_EqClass -> 'a1 manifest_set -> 'a1 manifest_set -> 'a1
+    manifest_set **)
+
+fun manifest_set_union hA s1 s2 =
+  case s1 of
+    [] => s2
+  | h :: t => manifest_set_union hA t (manset_add hA h s2)
+
+(** val manifest_union : coq_Manifest -> coq_Manifest -> coq_Manifest **)
+
+fun manifest_union m1 m2 =
+  let val Build_Manifest myPlc asps1 app_asps1 uuidPlcs1 pubKeyPlcs1
+    targPlcs1 myPol = m1
+  in
+  let val Build_Manifest _ asps2 app_asps2 uuidPlcs2 pubKeyPlcs2 targPlcs2
+    _ = m2
+  in
+  Build_Manifest myPlc (manifest_set_union coq_Eq_Class_ID_Type asps1 asps2)
+  (manifest_set_union
+    (pair_EqClass coq_Eq_Class_ID_Type coq_Eq_Class_ID_Type) app_asps1
+    app_asps2) (manifest_set_union coq_Eq_Class_ID_Type uuidPlcs1 uuidPlcs2)
+  (manifest_set_union coq_Eq_Class_ID_Type pubKeyPlcs1 pubKeyPlcs2)
+  (manifest_set_union coq_Eq_Class_ID_Type targPlcs1 targPlcs2) myPol end end
+
+(** val environment_union'' :
+    coq_Plc -> coq_Manifest -> coq_EnvironmentM -> coq_EnvironmentM **)
+
+fun environment_union'' p m1 e2 =
+  case map_get coq_Eq_Class_ID_Type e2 p of
+    Some m2 =>
+    let val new_man = manifest_union m1 m2 in
+    map_set coq_Eq_Class_ID_Type e2 p new_man end
+  | None => map_set coq_Eq_Class_ID_Type e2 p m1
+
+(** val env_union_helper :
+    (coq_Plc, coq_Manifest) prod -> coq_EnvironmentM -> coq_EnvironmentM **)
+
+fun env_union_helper e1_pr e2 =
+  environment_union'' (fst e1_pr) (snd e1_pr) e2
+
+(** val environment_union :
+    coq_EnvironmentM -> coq_EnvironmentM -> coq_EnvironmentM **)
+
+fun environment_union e1 e2 =
+  fold_right env_union_helper e2 e1

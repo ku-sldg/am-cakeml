@@ -1,0 +1,82 @@
+(** val manifest_generator_plcTerm_list :
+    (coq_Term, coq_Plc) prod list -> coq_EnvironmentM list **)
+
+fun manifest_generator_plcTerm_list ls =
+  map (fn pat => let val Coq_pair t p = pat in manifest_generator t p end) ls
+
+(** val env_list_union : coq_EnvironmentM list -> coq_EnvironmentM **)
+
+fun env_list_union ls =
+  fold_right environment_union e_empty ls
+
+(** val mangen_plcTerm_list_union :
+    (coq_Term, coq_Plc) prod list -> coq_EnvironmentM **)
+
+fun mangen_plcTerm_list_union ls =
+  env_list_union (manifest_generator_plcTerm_list ls)
+
+(** val empty_Manifest_plc : coq_Plc -> coq_Manifest **)
+
+fun empty_Manifest_plc myPlc =
+  Build_Manifest myPlc manifest_set_empty manifest_set_empty
+    manifest_set_empty manifest_set_empty manifest_set_empty empty_PolicyT
+
+(** val mangen_app_plc : coq_Evidence -> coq_Plc -> coq_Manifest **)
+
+fun mangen_app_plc et p =
+  manifest_union (empty_Manifest_plc p) (manifest_generator_app et)
+
+(** val lift_manifest_to_env : coq_Manifest -> coq_EnvironmentM **)
+
+fun lift_manifest_to_env m =
+  map_set coq_Eq_Class_ID_Type e_empty
+    (let val Build_Manifest my_abstract_plc _ _ _ _ _ _ = m in
+     my_abstract_plc end) m
+
+(** val manifest_generator_plcEvidence_list :
+    (coq_Evidence, coq_Plc) prod list -> coq_EnvironmentM list **)
+
+fun manifest_generator_plcEvidence_list ls =
+  let val ms =
+    map (fn pat => let val Coq_pair et p = pat in mangen_app_plc et p end) ls
+  in
+  map lift_manifest_to_env ms end
+
+(** val mangen_plcEvidence_list_union :
+    (coq_Evidence, coq_Plc) prod list -> coq_EnvironmentM **)
+
+fun mangen_plcEvidence_list_union ls =
+  env_list_union (manifest_generator_plcEvidence_list ls)
+
+(** val end_to_end_mangen :
+    (coq_Evidence, coq_Plc) prod list -> (coq_Term, coq_Plc) prod list ->
+    coq_EnvironmentM **)
+
+fun end_to_end_mangen ls ts =
+  let val app_env = mangen_plcEvidence_list_union ls in
+  let val att_env = mangen_plcTerm_list_union ts in
+  environment_union app_env att_env end end
+
+(** val get_all_unique_places :
+    (coq_Term, coq_Plc) prod list -> coq_Plc list **)
+
+fun get_all_unique_places ls =
+  let val lss =
+    map (fn pat => let val Coq_pair t p = pat in places p t end) ls
+  in
+  let val res_dup = concat lss in dedup_list res_dup end end
+
+(** val end_to_end_mangen_final :
+    (coq_Evidence, coq_Plc) prod list -> (coq_Term, coq_Plc) prod list ->
+    coq_Manifest list **)
+
+fun end_to_end_mangen_final ls ts =
+  let val env = end_to_end_mangen ls ts in
+  let val unique_plcs = get_all_unique_places ts in
+  let val res' =
+    map knowsof_myPlc_manifest_update
+      (get_unique_manifests_env' unique_plcs env)
+  in
+  map
+    (pubkeys_manifest_update
+      (list_to_manset coq_Eq_Class_ID_Type unique_plcs)) res' end end end

@@ -24,7 +24,7 @@ fun main () =
 
         val nonceB    : bool = True 
         val appraiseB : bool = True
-        val am_comp = am_client_gen_local main_phrase my_plc None am_library 
+        val am_comp = am_client_gen_local main_phrase my_plc None formal_manifest am_library 
                         (* am_client_auth main_phrase my_plc my_plc auth_phrase nonceB appraiseB  *)
         val am_res = run_am_app_comp am_comp empty_am_result True 
             (* the bool here is to force evaluation of unit-typed error prints from extracted code *)

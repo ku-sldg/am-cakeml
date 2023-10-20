@@ -1,3 +1,13 @@
+(** val in_dec : ('a1 -> 'a1 -> sumbool) -> 'a1 -> 'a1 list -> sumbool **)
+
+fun in_dec h a l = case l of
+  [] => Coq_right
+| y :: l0 =>
+  let val s = h y a in
+  (case s of
+     Coq_left => Coq_left
+   | Coq_right => in_dec h a l0) end
+
 (** val count_occ : ('a1 -> 'a1 -> sumbool) -> 'a1 list -> 'a1 -> nat **)
 
 fun count_occ eq_dec l x =

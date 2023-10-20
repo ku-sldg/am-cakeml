@@ -86,6 +86,7 @@ get_files(cop_src_pre_aspStubs
     extracted/Manifest.cml
     extracted/Manifest_Compiler.cml
     extracted/EnvironmentM.cml
+    extracted/Manifest_Union.cml
     copland/CoplandUtil.sml
     stubs/Example_Phrases_Demo_Admits.sml
     extracted/Example_Phrases.cml
@@ -96,6 +97,7 @@ get_files(cop_src_pre_aspStubs
     copland/json/JsonToCopland.sml
     extracted/Manifest_Generator_Helpers.cml
     extracted/Manifest_Generator.cml
+    extracted/Manifest_Generator_Union.cml
     copland/json/ManifestJsonConfig.sml
     util/ManifestUtils.sml
 )

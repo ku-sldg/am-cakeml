@@ -55,7 +55,47 @@ fun main () =
                     ts 
               end
 
-        val _ = ManifestJsonConfig.write_form_man_list_json_and_print_json outFilePathPrefix phrases
+
+(*
+
+(** val eval : coq_Term -> coq_Plc -> coq_Evidence -> coq_Evidence **)
+
+datatype coq_Evidence =
+  Coq_mt 
+| Coq_nn coq_N_ID
+| Coq_uu coq_Plc coq_FWD coq_ASP_PARAMS coq_Evidence
+| Coq_ss coq_Evidence coq_Evidence
+
+*)
+        val my_plc = coq_P0 
+        val appraiser_evidence_kim = eval kim_phrase coq_P0 (Coq_nn O)
+        val appraiser_evidence_cm = eval cm_phrase coq_P0 (Coq_nn O)
+        val appraiser_evidence_cert = eval cert_style coq_P0 (Coq_nn O)
+        val appraiser_evidence_cache_p0 = eval cert_cache_p0 coq_P0 (Coq_nn O)
+        val appraiser_evidence_cache_p1 = eval cert_cache_p1 coq_P1 (Coq_nn O)
+        val appraiser_evidence_parmut_p0 = eval par_mut_p0 coq_P0 (Coq_nn O)
+        val appraiser_evidence_parmut_p1 = eval par_mut_p1 coq_P1 (Coq_nn O)
+        val appraiser_evidence_layeredbg = eval layered_bg_strong coq_P0 (Coq_nn O)
+
+        val ets_kim = [(Coq_pair appraiser_evidence_kim coq_P0)]
+        val ets_cm = [(Coq_pair appraiser_evidence_cm coq_P0)]
+        val ets_cert = [(Coq_pair appraiser_evidence_cert coq_P0)]
+        val ets_cache = [(Coq_pair appraiser_evidence_cache_p0 coq_P0),
+                         (Coq_pair appraiser_evidence_cache_p1 coq_P1)]
+        val ets_parmut = [(Coq_pair appraiser_evidence_parmut_p0 coq_P0),
+                          (Coq_pair appraiser_evidence_parmut_p1 coq_P1)]
+        val ets_layeredbg = [(Coq_pair appraiser_evidence_layeredbg coq_P0)]
+
+        val ets = ets_layeredbg
+                  (* ets_kim *)
+                  (* ets_cm *)
+                  (* ets_cert *)
+                  (* ets_cache *)
+                  (* ets_parmut *)
+                  (* ets_layeredbg *)
+
+        val _ = ManifestJsonConfig.write_form_man_list_json_and_print_json_app 
+                  outFilePathPrefix ets phrases
         val _ = print "\n\n" in
       ()
     end

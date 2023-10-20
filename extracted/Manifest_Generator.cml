@@ -133,26 +133,10 @@ fun dedup_list ps = case ps of
      True => p :: (dedup_list ps')
    | False => dedup_list ps')
 
-(** val manifest_generator_terms :
-    coq_Plc -> coq_Term list -> coq_EnvironmentM **)
-
-fun manifest_generator_terms p ts =
-  fold_right (manifest_generator' p) e_empty ts
-
 (** val manifest_generator : coq_Term -> coq_Plc -> coq_EnvironmentM **)
 
 fun manifest_generator t p =
   manifest_generator' p t e_empty
-
-(** val places_terms' : coq_Term list -> coq_Plc -> coq_Plc list list **)
-
-fun places_terms' ts p =
-  map (places p) ts
-
-(** val places_terms : coq_Term list -> coq_Plc -> coq_Plc list **)
-
-fun places_terms ts p =
-  dedup_list (concat (places_terms' ts p))
 
 (** val fromSome : 'a1 option -> 'a1 -> 'a1 **)
 
@@ -173,53 +157,6 @@ fun get_manifest_env_default e p =
 
 fun get_unique_manifests_env' ps e =
   map (get_manifest_env_default e) ps
-
-(** val get_unique_manifests_env :
-    coq_Term list -> coq_Plc -> coq_EnvironmentM -> coq_Manifest list **)
-
-fun get_unique_manifests_env ts p e =
-  let val ps = places_terms ts p in get_unique_manifests_env' ps e end
-
-(** val get_final_manifests_env :
-    coq_Term list -> coq_Plc -> coq_EnvironmentM -> coq_Manifest list **)
-
-fun get_final_manifests_env ts p e =
-  let val ms = get_unique_manifests_env ts p e in
-  let val ms' = map knowsof_myPlc_manifest_update ms in
-  map
-    (pubkeys_manifest_update
-      (list_to_manset coq_Eq_Class_ID_Type (places_terms ts p))) ms' end end
-
-(** val man_gen_run : coq_Term list -> coq_Plc -> coq_EnvironmentM **)
-
-fun man_gen_run ts p =
-  manifest_generator_terms p ts
-
-(** val demo_man_gen_run : coq_Term list -> coq_Plc -> coq_Manifest list **)
-
-fun demo_man_gen_run ts p =
-  get_final_manifests_env ts p (man_gen_run ts p)
-
-(** val attify : coq_Term -> coq_Plc -> coq_Term **)
-
-fun attify t p =
-  Coq_att p t
-
-(** val attify_terms' : (coq_Term, coq_Plc) prod -> coq_Term **)
-
-fun attify_terms' pr = case pr of
-  Coq_pair t p => attify t p
-
-(** val attify_terms : (coq_Term, coq_Plc) prod list -> coq_Term list **)
-
-fun attify_terms ls =
-  map attify_terms' ls
-
-(** val man_gen_run_attify :
-    (coq_Term, coq_Plc) prod list -> coq_Manifest list **)
-
-fun man_gen_run_attify ls =
-  let val ts = attify_terms ls in demo_man_gen_run ts default_place end
 
 (** val app_aspid_manifest_update :
     coq_ASP_ID -> coq_Plc -> coq_Manifest -> coq_Manifest **)
