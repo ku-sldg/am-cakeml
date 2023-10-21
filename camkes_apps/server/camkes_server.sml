@@ -3,9 +3,14 @@ fun main () = (
     log Debug "Server AM Awake. Wait for VM to start before doing anything...";
     waitDataportId 1;
     log Debug "Server AM learned the VM is ready. Requesting a measurement.";
-    kernelMeasurement 0;
-    log Debug "Server AM received a measurement. Having it appraised.";
-    kernelAppraisal 0;
+    let val evidence = kernelMeasurement 0
+    in
+        log Debug "Server AM received a measurement. Having it appraised.";
+        let val report = kernelAppraisal 0 evidence
+        in
+            log Debug (BString.toString report)
+        end
+    end;
     waitDataportId 1;
     ()
     )

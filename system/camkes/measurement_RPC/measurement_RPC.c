@@ -28,8 +28,6 @@ bool ffimeasurementRequest(const uint8_t * c, const long clen, uint8_t * a, cons
         return;
     }
 
-    printf("evidence: %s\n", evidence);
-
     // Should we fail if output buffer is too long?
     memcpy_volatile_src((void *)(a+1), evidence, alen-1);
 
