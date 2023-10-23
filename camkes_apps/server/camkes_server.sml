@@ -8,7 +8,7 @@ fun main () = (
         log Debug "Server AM received a measurement. Having it appraised.";
         let val report = kernelAppraisal 0 evidence
         in
-            log Debug (BString.toString report)
+            log Debug (BString.toCString report)
         end
     end;
     waitDataportId 1;

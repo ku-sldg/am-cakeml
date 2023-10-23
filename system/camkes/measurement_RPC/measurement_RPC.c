@@ -31,6 +31,9 @@ bool ffimeasurementRequest(const uint8_t * c, const long clen, uint8_t * a, cons
     // Should we fail if output buffer is too long?
     memcpy_volatile_src((void *)(a+1), evidence, alen-1);
 
+    // We are bound to free this.
+    free(evidence);
+
     a[0] = FFI_SUCCESS;
 }
 
@@ -52,6 +55,9 @@ bool ffimeasurementAppraise(const uint8_t * c, const long clen, uint8_t * a, con
 
     // Should we fail if output buffer is too long?
     memcpy_volatile_src((void *)(a+1), appraisal_report, alen-1);
+
+    // We are bound to free this.
+    free(appraisal_report);
 
     a[0] = FFI_SUCCESS;
 }
