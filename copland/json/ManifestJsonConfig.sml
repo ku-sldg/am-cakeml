@@ -265,12 +265,20 @@ fun read_FormalManifest_file_json (*(pathPrefix : string)*) (manfile:string) =
 
 
 
-(*  fun encode_plcTermList : ((coq_Term coq_Plc) coq_Pair) list -> json *)
-fun encode_plcTermList m = encode_map_gen m termToJson Json.fromString
+(*  fun encode_termPlcList : ((coq_Term coq_Plc) coq_Pair) list -> json *)
+fun encode_termPlcList m = encode_map_gen m termToJson Json.fromString
 
-(*  fun extract_plcTermList : json -> ((coq_Term, coq_Plc) prod) list *)
-fun extract_plcTermList (Json.Array args) =
+(*  fun extract_termPlcList : json -> ((coq_Term, coq_Plc) prod) list *)
+fun extract_termPlcList (Json.Array args) =
     List.map (fn j => (converter j (fn t => Some (jsonToTerm t)) Json.toString)) args
+
+
+(*  fun encode_EvidencePlcList : ((coq_Evidence coq_Plc) coq_Pair) list -> json *)
+fun encode_EvidencePlcList m = encode_map_gen m evToJson Json.fromString
+
+(*  fun extract_EvidencePlcList : json -> ((coq_Evidence, coq_Plc) prod) list *)
+fun extract_EvidencePlcList (Json.Array args) =
+    List.map (fn j => (converter j (fn et => Some (jsonToEv et)) Json.toString)) args
 
 
 fun write_term_file_json (filepath : string) (t : coq_Term) =
@@ -301,7 +309,7 @@ fun read_term_file_json (filepath:string) =
 
 
 fun write_termPlcList_file_json (filepath : string) (ts : ((coq_Term, coq_Plc) prod) list) =
-  (let val _ = TextIOExtra.writeFile filepath (Json.stringify (encode_plcTermList ts))
+  (let val _ = TextIOExtra.writeFile filepath (Json.stringify (encode_termPlcList ts))
       val _ = c_system ("chmod 777 " ^ filepath)
   in
     ()
@@ -314,13 +322,43 @@ fun write_termPlcList_file_json (filepath : string) (ts : ((coq_Term, coq_Plc) p
 
 fun read_termPlcList_file_json (filepath:string) =
       (let val s = TextIOExtra.readFile filepath
-          val plcTermListJson = strToJson s 
+          val termPlcListJson = strToJson s 
   in
-    (extract_plcTermList plcTermListJson)
+    (extract_termPlcList termPlcListJson)
   end
   handle 
     TextIO.BadFileName => raise Excn ("Bad file name in read_termPlcList_file_json: " ^ filepath)
     | TextIO.InvalidFD   => raise Excn "Invalid file descriptor in read_termPlcList_file_json") : ((coq_Term, coq_Plc) prod) list
+
+
+
+
+
+
+fun write_EvidencePlcList_file_json (filepath : string) (ts : ((coq_Evidence, coq_Plc) prod) list) =
+  (let val _ = TextIOExtra.writeFile filepath (Json.stringify (encode_EvidencePlcList ts))
+      val _ = c_system ("chmod 777 " ^ filepath)
+  in
+    ()
+  end
+  handle 
+    TextIO.BadFileName => raise Excn ("Bad file name in write_EvidencePlcList_file_json: " ^ (filepath))
+    | TextIO.InvalidFD   => raise Excn "Invalid file descriptor in write_EvidencePlcList_file_json") : unit
+
+
+
+fun read_EvidencePlcList_file_json (filepath:string) =
+      (let val s = TextIOExtra.readFile filepath
+          val evidencePlcListJson = strToJson s 
+  in
+    (extract_EvidencePlcList evidencePlcListJson)
+  end
+  handle 
+    TextIO.BadFileName => raise Excn ("Bad file name in read_evidencePlcList_file_json: " ^ filepath)
+    | TextIO.InvalidFD   => raise Excn "Invalid file descriptor in read_evidencePlcList_file_json") : ((coq_Evidence, coq_Plc) prod) list
+
+
+
 
 
 

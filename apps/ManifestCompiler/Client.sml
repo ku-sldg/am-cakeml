@@ -4,14 +4,17 @@
 fun main () =
     let val (manifestFileName, privKey, phraseFileName) : (string * coq_PrivateKey * string) = ManifestJsonConfig.retrieve_CLI_args () 
 
-(*
-        val main_phrase = clientCvmTerm
+        (*
+
+        (* UNCOMMENT BELOW FOR PROVISIONING CLIENT CVM PHRASE *)
+        val main_phrase = cert_style
         val _ = ManifestJsonConfig.write_term_file_json phraseFileName main_phrase
-*)
+
+        *)
+
         val main_phrase = ManifestJsonConfig.read_term_file_json phraseFileName
 
 
-     (* val main_phrase = clientCvmTerm *) (* TODO:  remove this hard-coded val via manifest compiler build *)
         val formal_manifest = ManifestJsonConfig.read_FormalManifest_file_json manifestFileName
         val _ = ManifestUtils.setup_and_get_AM_config formal_manifest am_library privKey
         (* Retrieving implicit self place from manifest here *)

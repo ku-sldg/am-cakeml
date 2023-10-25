@@ -50,7 +50,15 @@ fun main () =
         val phrases =  (* TODO:  add "provisioning" capability (to exe for Manifest Generator? Copland Parser?), 
                                  to output Json files with ((coq_Term, coq_Plc) prod) lists that become inputs 
                                  to the Generator exe *)
-              let (* val _ = ManifestJsonConfig.write_termPlcList_file_json cvmPlcTermsFilepath layered_bg_phrases *)
+              let 
+                  (*
+
+                  (* UNCOMMENT BELOW FOR PROVISIONING SERVER TERMPLC LIST JSON FILE *)
+                  val _ = ManifestJsonConfig.write_termPlcList_file_json cvmPlcTermsFilepath cert_phrases
+
+                  *)
+
+
                   val ts = ManifestJsonConfig.read_termPlcList_file_json cvmPlcTermsFilepath in 
                     ts 
               end
@@ -66,8 +74,9 @@ datatype coq_Evidence =
 | Coq_uu coq_Plc coq_FWD coq_ASP_PARAMS coq_Evidence
 | Coq_ss coq_Evidence coq_Evidence
 
-*)
-        val my_plc = coq_P0 
+*) 
+
+        (* val my_plc = coq_P0  *)
         val appraiser_evidence_kim = eval kim_phrase coq_P0 (Coq_nn O)
         val appraiser_evidence_cm = eval cm_phrase coq_P0 (Coq_nn O)
         val appraiser_evidence_cert = eval cert_style coq_P0 (Coq_nn O)
@@ -86,7 +95,33 @@ datatype coq_Evidence =
                           (Coq_pair appraiser_evidence_parmut_p1 coq_P1)]
         val ets_layeredbg = [(Coq_pair appraiser_evidence_layeredbg coq_P0)]
 
-        val ets = ets_layeredbg
+        val ets = (* TODO:  add "provisioning" capability (to exe for Manifest Generator? Copland Parser?), 
+                                 to output Json files with ((coq_Evidence, coq_Plc) prod) lists that become inputs 
+                                 to the Generator exe *)
+
+              (* TODO:  add additinoal CLI param to generator executable for specifying path 
+                        to EvidencePlc list input (avoid hardcoding _Evidence.json path...) *)
+              let val appEvidencePlcFilepath = cvmPlcTermsFilepath ^ "_Evidence.json"
+                  
+
+                  (*
+
+                  (* UNCOMMENT BELOW FOR PROVISIONING APPRAISAL EVIDENCEPLC LIST JSON FILE  *)
+                  
+                  val temp_ets = ets_cert
+                  val _ = ManifestJsonConfig.write_EvidencePlcList_file_json appEvidencePlcFilepath temp_ets
+
+                  *)
+                  
+                  
+                  val ls = ManifestJsonConfig.read_EvidencePlcList_file_json appEvidencePlcFilepath in 
+                    ls 
+              end
+
+
+
+
+                  (* ets_layeredbg *)
                   (* ets_kim *)
                   (* ets_cm *)
                   (* ets_cert *)
