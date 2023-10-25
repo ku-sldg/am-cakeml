@@ -142,6 +142,11 @@ get_files(server_am_src_noasps ${util_src} ${posix_src} ${cop_src_noasps})
 get_files(server_am_src ${util_src} ${posix_src} ${cop_src})
 get_files(server_am_src_hacl ${util_src} ${posix_src_hacl} ${cop_src})
 get_files(server_am_src_tpm ${util_src} ${posix_src_tpm} ${cop_src})
+get_files(server_am_src_camkes ${util_src} ${crypto_src_hacl}
+${cop_src_pre_aspStubs} ${cop_src_post_aspStubs} util/Log.sml
+system/camkes/measurement_RPC/Measurement_RPC.sml)
+get_files(server_am_src_camkes ${util_src} ${crypto_src_hacl}
+${cop_src_pre_aspStubs} ${cop_src_post_aspStubs} util/Log.sml)
 
 get_files(posix_c_files_base
     system/posix/sockets/socket_ffi.c
@@ -171,6 +176,11 @@ get_files(posix_c_files_tpm
     ${BASIS_FILE}
     system/crypto/tpm/crypto_ffi.c
     ${posix_c_files_base}
+)
+get_files(camkes_c_files
+    system/camkes/basis_ffi.c
+    system/crypto/evercrypt/crypto_ffi.c
+    system/camkes/dataports/dataport_ffi.c
 )
 
 # OS Config
@@ -251,14 +261,20 @@ function(build_posix_am_tpm name)
     target_link_libraries(${name} "${name}.cake" ${link_flags})
 endfunction()
 
-file(GLOB appdirs apps/*)
-foreach(appdir ${appdirs})
-    if(EXISTS "${appdir}/CMakeLists.txt")
-        add_subdirectory(${appdir})
-    endif()
-endforeach()
+if(IS_CAMKES_AM)
+    add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/camkes_apps/server)
+elseif(IS_VM_USERAM)
+    add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/camkes_apps/client)
+else()
+    file(GLOB appdirs apps/*)
+    foreach(appdir ${appdirs})
+        if(EXISTS "${appdir}/CMakeLists.txt")
+            add_subdirectory(${appdir})
+        endif()
+    endforeach()
 
-get_real_file("./build/CMakeLists.txt" temp)
-if (EXISTS ${temp})
-  add_subdirectory("build")
+    get_real_file("./build/CMakeLists.txt" temp)
+    if (EXISTS ${temp})
+    add_subdirectory("build")
+    endif()
 endif()
