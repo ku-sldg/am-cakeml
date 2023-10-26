@@ -13,4 +13,8 @@ get_files(attestation_asps
     cache_ASP_Stub.sml
     sig_ASP_Stub.sml
     cm_ASP_Stub.sml
+
+    # For Demo Phrase
+    attest1_ASP_Stub.sml
+    attest2_ASP_Stub.sml
 )

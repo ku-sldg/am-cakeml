@@ -27,6 +27,9 @@ val default_place = "default_place"
 val attest_id = "attest_aspid"
   (* failwith "AXIOM TO BE REALIZED" *)
 
+val attest1_id = "attest1_aspid"
+val attest2_id = "attest2_aspid"
+
 (** val appraise_id : coq_ASP_ID **)
 
 val appraise_id = "appraise_aspid"
