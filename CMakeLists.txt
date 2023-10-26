@@ -46,9 +46,9 @@ add_app_subdirectory(demo "${CMAKE_CURRENT_LIST_DIR}/apps/demo")
 add_app_subdirectory(compiler "${CMAKE_CURRENT_LIST_DIR}/apps/ManifestCompiler")
 add_app_subdirectory(generator "${CMAKE_CURRENT_LIST_DIR}/apps/ManifestGenerator")
 
-# Compile the AM only if its particular CMakeLists.txt has been generated.
-get_real_file("./build/CMakeLists.txt" temp)
+# Compile the AM if and only if its particular CMakeLists.txt has been generated.
+get_real_file("${CMAKE_CURRENT_LIST_DIR}/build/CMakeLists.txt" temp)
 if (EXISTS ${temp})
-    add_app_subdirectory(attestation_manager "${CMAKE_CURRENT_LIST_DIR}/build")
+    add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/build")
 endif()
 
