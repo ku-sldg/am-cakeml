@@ -6,29 +6,17 @@ fun main () =
 
         
 
-        (* UNCOMMENT BELOW FOR PROVISIONING CLIENT CVM PHRASE *)
-        fun attest1 p targ = 
-          Coq_asp (ASPC ALL EXTD (Coq_asp_paramsC attest1_id [] p targ))
-        fun attest2 p targ = 
-          Coq_asp (ASPC ALL EXTD (Coq_asp_paramsC attest2_id [] p targ))
-        val advanced_pldi_example : coq_Term =
-          Coq_att coq_P1 
-            (Coq_lseq 
-              (Coq_bseq (Coq_pair ALL ALL) (attest1 coq_P1 sys) (attest2 coq_P1 sys))
-              (Coq_att coq_P2 
-                (Coq_lseq 
-                  (appraise coq_P2 sys)
-                  (certificate coq_P2 sys)  
-                )
-              )
-            )
 
-        val main_phrase = advanced_pldi_example
+        (* UNCOMMENT BELOW FOR PROVISIONING CLIENT CVM PHRASE *)
+        (*
+
+        val main_phrase = example_phrase (* cert_style *)
         val _ = ManifestJsonConfig.write_term_file_json phraseFileName main_phrase
 
+        *)
        
 
-        (* val main_phrase = ManifestJsonConfig.read_term_file_json phraseFileName *)
+        val main_phrase = ManifestJsonConfig.read_term_file_json phraseFileName
 
 
         val formal_manifest = ManifestJsonConfig.read_FormalManifest_file_json manifestFileName

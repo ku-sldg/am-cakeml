@@ -6,26 +6,6 @@ type TermPlcConfigPath_In = string
 
 type ManGenArgs = (FormalManifestPath_Out * TermPlcConfigPath_In)
 
-(* UNCOMMENT BELOW FOR PROVISIONING CLIENT CVM PHRASE *)
-fun attest1 p targ = 
-  Coq_asp (ASPC ALL EXTD (Coq_asp_paramsC attest1_id [] p targ))
-fun attest2 p targ = 
-  Coq_asp (ASPC ALL EXTD (Coq_asp_paramsC attest2_id [] p targ))
-val advanced_pldi_example : coq_Term =
-  Coq_att coq_P1 
-    (Coq_lseq 
-      (Coq_bseq (Coq_pair ALL ALL) (attest1 coq_P1 sys) (attest2 coq_P1 sys))
-      (Coq_att coq_P2 
-        (Coq_lseq 
-          (appraise coq_P2 sys)
-          (certificate coq_P2 sys)  
-        )
-      )
-    )
-
-val main_phrase = advanced_pldi_example
-
-
 
   (**
     gets the command line arguments used to configure the manifest generator
@@ -67,15 +47,27 @@ fun main () =
         val cm_phrase = Coq_lseq (cm_meas coq_P0 cm_targid) (Coq_asp SIG)
           (* Coq_lseq (cm_meas coq_P0 cm_targid) (ssl_sig_parameterized coq_P0) *)
         val cm_phrases = [(Coq_pair cm_phrase coq_P0)] (* @ (auth_phrase_list coq_P0) *)
+
+        val main_phrase = example_phrase (* cert_style *)
+        val demo_phrases = [(Coq_pair main_phrase coq_P0)] @ (auth_phrase_list coq_P0)
+
+
+
         val _ = print "\n\n"
         val phrases =  (* TODO:  add "provisioning" capability (to exe for Manifest Generator? Copland Parser?), 
                                  to output Json files with ((coq_Term, coq_Plc) prod) lists that become inputs 
                                  to the Generator exe *)
-              (* UNCOMMENT BELOW FOR PROVISIONING SERVER TERMPLC LIST JSON FILE *)
-              let val demo_phrases = [(Coq_pair main_phrase coq_P0)] @ (auth_phrase_list coq_P0)
-                  val _ = ManifestJsonConfig.write_termPlcList_file_json cvmPlcTermsFilepath demo_phrases
-                  
-                  
+
+
+              
+              
+              let 
+
+                (* UNCOMMENT BELOW FOR PROVISIONING SERVER TERMPLC LIST JSON FILE *)
+                (*
+                  val _ = ManifestJsonConfig.write_termPlcList_file_json cvmPlcTermsFilepath demo_phrases (* kim_phrases *)
+                *)
+              
                   val ts = ManifestJsonConfig.read_termPlcList_file_json cvmPlcTermsFilepath in 
                     ts
               end
@@ -112,6 +104,10 @@ datatype coq_Evidence =
                           (Coq_pair appraiser_evidence_parmut_p1 coq_P1)]
         val ets_layeredbg = [(Coq_pair appraiser_evidence_layeredbg coq_P0)]
 
+        val appraiser_evidence_demo_phrase = eval main_phrase coq_P0 (Coq_nn O)
+
+        val ets_example_phrase = [(Coq_pair appraiser_evidence_demo_phrase coq_P0)]
+
         val ets = (* TODO:  add "provisioning" capability (to exe for Manifest Generator? Copland Parser?), 
                                  to output Json files with ((coq_Evidence, coq_Plc) prod) lists that become inputs 
                                  to the Generator exe *)
@@ -122,10 +118,11 @@ datatype coq_Evidence =
                   
 
                   (* UNCOMMENT BELOW FOR PROVISIONING APPRAISAL EVIDENCEPLC LIST JSON FILE  *)
-                  
-                  val appraiser_evidence_demo_phrase = eval main_phrase coq_P0 (Coq_nn O)
-                  val temp_ets = [(Coq_pair appraiser_evidence_demo_phrase coq_P0)]
+                  (*
+                  val temp_ets = ets_example_phrase (* ets_kim *) (* ets_cert *)
                   val _ = ManifestJsonConfig.write_EvidencePlcList_file_json appEvidencePlcFilepath temp_ets
+                  *)
+                  
                   
                   val ls = ManifestJsonConfig.read_EvidencePlcList_file_json appEvidencePlcFilepath in 
                     ls
