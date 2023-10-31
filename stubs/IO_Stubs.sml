@@ -117,3 +117,17 @@ fun pretty_print_manifest (m:coq_Manifest) (* : coq_StringT *) =
     "\n\ttargPlcs: " ^ (listToString targ_ls plToString) (* ^
     "\n\tpolicy: " ^ "True" *) 
     )
+
+(** val pretty_print_manifest : coq_Manifest -> coq_StringT **)
+
+fun pretty_print_manifest_simple (m:coq_Manifest) (* : coq_StringT *) = 
+  (case m of 
+    Build_Manifest p asp_ls appraisal_ls uuid_ls pubkey_ls targ_ls pol => 
+    (* )"\tmy_plc: " ^ (plToString p) ^ *)
+    "\n\tasps: " ^ (listToString asp_ls aspIdToString) ^
+    "\n\tappraisal_asps: " ^ (listToString appraisal_ls plc_aspid_pair_toString) ^
+    "\n\tuuidPlcs: " ^ (listToString uuid_ls plToString) ^
+    "\n\tpubkeyPlcs: " ^ (listToString pubkey_ls plToString) ^
+    "\n\ttargPlcs: " ^ (listToString targ_ls plToString) (* ^
+    "\n\tpolicy: " ^ "True" *) 
+    )

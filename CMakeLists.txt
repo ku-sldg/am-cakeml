@@ -68,6 +68,7 @@ include(./stubs/attestation_asps/CMakeLists.txt)
 get_files(cop_src_pre_aspStubs
     stubs/BS.sml
     stubs/StringT.sml
+    stubs/ErrorStringConstants.sml
     extracted/Specif.cml
     extracted/Datatypes.cml
     extracted/EqClass.cml
@@ -77,6 +78,11 @@ get_files(cop_src_pre_aspStubs
     extracted/Eqb_Evidence.cml
     stubs/Params_Admits_hardcoded.sml
     extracted/Term_Defs.cml
+    extracted/Anno_Term_Defs.cml
+    copland/CoplandUtil.sml
+    copland/json/CoplandToJson.sml
+    copland/json/JsonToCopland.sml
+    stubs/CvmJson_Admits.sml
     extracted/Maps.cml
     stubs/Maps.sml
     stubs/Manifest_Admits_Stubs.sml
@@ -84,43 +90,41 @@ get_files(cop_src_pre_aspStubs
     stubs/Example_Phrases_Admits.sml
     extracted/Manifest_Set.cml
     extracted/Manifest.cml
-    extracted/Manifest_Compiler.cml
     extracted/EnvironmentM.cml
     extracted/Manifest_Union.cml
-    copland/CoplandUtil.sml
+    extracted/Manifest_Generator_Helpers.cml
+    extracted/Manifest_Generator.cml
+    extracted/Manifest_Generator_Facts.cml
+    extracted/ManCompSoundness_Helpers.cml
+    extracted/ManCompSoundness.cml
+    extracted/Manifest_Generator_Union.cml
+    extracted/Manifest_Compiler.cml
+    extracted/Cvm_St.cml
+    extracted/AM_St.cml
+    copland/json/ManifestJsonConfig.sml
+    util/ManifestUtils.sml
+    am/CoplandCommUtil.sml
+    stubs/IO_Stubs.sml
+    stubs/Axioms_Io.sml
+    extracted/Evidence_Bundlers.cml
+    extracted/Cvm_Monad.cml
+    extracted/Cvm_Impl.cml
+    extracted/Cvm_Run.cml
+    stubs/Appraisal_IO_Stubs.sml
+    extracted/AM_Monad.cml
+    extracted/Appraisal_Defs.cml
+    extracted/Impl_appraisal.cml
     stubs/Example_Phrases_Demo_Admits.sml
     extracted/Example_Phrases.cml
     extracted/Example_Phrases_Demo.cml
     stubs/IO_Stubs_extra.sml
     am/CommTypes.sml
-    copland/json/CoplandToJson.sml
-    copland/json/JsonToCopland.sml
-    extracted/Manifest_Generator_Helpers.cml
-    extracted/Manifest_Generator.cml
-    extracted/Manifest_Generator_Union.cml
-    copland/json/ManifestJsonConfig.sml
-    util/ManifestUtils.sml
+    extracted/AM_Helpers.cml
 )
 
 get_files(cop_src_post_aspStubs
-    stubs/CvmJson_Admits.sml
-    stubs/ErrorStringConstants.sml
-    extracted/Cvm_St.cml
-    extracted/AM_St.cml
-    stubs/Appraisal_IO_Stubs.sml
-    stubs/Axioms_Io.sml
     extracted/StMonad_Coq.cml
     stubs/Cvm_St_Utils.sml
-    extracted/AM_Monad.cml
-    extracted/Appraisal_Defs.cml
-    extracted/Evidence_Bundlers.cml
-    am/CoplandCommUtil.sml
-    stubs/IO_Stubs.sml
-    extracted/Cvm_Monad.cml
-    extracted/Cvm_Impl.cml
-    extracted/Cvm_Run.cml
-    extracted/Impl_appraisal.cml
-    extracted/AM_Helpers.cml
     extracted/Client_AM_Local.cml
     extracted/Server_AM.cml
 )

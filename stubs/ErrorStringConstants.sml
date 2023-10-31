@@ -1,6 +1,6 @@
 (** val errStr_amNonce : coq_StringT **)
 
-val errStr_amNonce = ""
+val errStr_amNonce = "Nonce not in AM monad state (nonceMap)"
 
 (** val errStr_peel_bs_am : coq_StringT **)
 

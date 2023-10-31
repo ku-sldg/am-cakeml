@@ -14,6 +14,8 @@ structure ManifestUtils = struct
 
   val local_amConfig = Ref (Err "AM_Config not set") : ((coq_AM_Config, string) result) ref
 
+  val local_amLib = Ref (Err "AM_Lib not set") : ((coq_AM_Library, string) result) ref
+
   val local_aspCb = Ref (Err "ASP Callback not set") : ((Partial_ASP_CB, string) result) ref
 
   val local_plcCb = Ref (Err "Plc Callback not set") : ((Partial_Plc_CB, string) result) ref
@@ -30,6 +32,13 @@ structure ManifestUtils = struct
     (case (!local_amConfig) of
       (Ok v) => v
       | Err e => raise Excn e) : coq_AM_Config
+
+  (* Retrieves the AM_Lib, or exception if not configured 
+    : _ -> coq_AM_Library *)
+  fun get_local_amLib _ =
+    (case (!local_amLib) of
+      (Ok v) => v
+      | Err e => raise Excn e) : coq_AM_Library
 
     (* Retrieves the formal manifest, or exception if not configured 
     : _ -> coq_Manifest *)
@@ -58,6 +67,7 @@ structure ManifestUtils = struct
             val _ = local_uuidCb := Ok uuidDisp
             val _ = local_PrivKey := Ok privKey
             val _ = local_amConfig := Ok (Coq_mkAmConfig compiled_fm aspDisp appDisp plcDisp pubKeyDisp uuidDisp)
+            val _ = local_amLib := Ok al
         in
           ()
         end) : unit
@@ -69,6 +79,17 @@ structure ManifestUtils = struct
     in 
       ()
     end
+
+(*
+  (* TODO:  consider removing this setter...might be unwise to expose this interface *)
+  (* Sets the AM_Library, should not throw an exception
+  : coq_AM_Library -> () *)
+  fun set_AM_Lib (al : coq_AM_Library) =
+    let val _ = local_amLib := Ok al
+    in 
+      ()
+    end
+*)
 
   (* Retrieves the asp callback, or exception if not configured 
     : _ -> coq_ASPCallback *)
@@ -91,10 +112,7 @@ structure ManifestUtils = struct
   fun get_PubKeyCallback _ =
     (
       case (!local_pubKeyCb) of
-      (Ok v) =>
-      let val _ = print "\n\nLooking up pubkey callback\n\n" in
-        v
-      end
+      (Ok v) => v
       | Err e => raise Excn e) : coq_PubKeyCallback
 
   (* Retrieves the asp callback, or exception if not configured 

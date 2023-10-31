@@ -19,6 +19,22 @@ fun run_am_app_comp am_comp default_A b = case b of
    | False => fromSome default_A optRes) end end
 | False => default_A
 
+(** val run_am_app_comp_init :
+    'a1 coq_AM -> coq_AM_St -> 'a1 -> bool -> 'a1 **)
+
+fun run_am_app_comp_init am_comp st default_A b = case b of
+  True =>
+  let val optRes = evalErr am_comp st in
+  let val v =
+    case optRes of
+      Coq_errC e => print_am_error e b
+    | Coq_resultC _ => negb b
+  in
+  (case v of
+     True => default_A
+   | False => fromSome default_A optRes) end end
+| False => default_A
+
 (** val get_AM_amConfig : coq_AM_Config coq_AM **)
 
 val get_AM_amConfig : coq_AM_Config coq_AM =

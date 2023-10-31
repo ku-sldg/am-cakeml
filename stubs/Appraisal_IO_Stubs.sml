@@ -112,7 +112,7 @@ fun print_am_error e _ =
         let val _ = print ("\n\n\n" ^ s ^ "\n\n\n") in True
         end
     | Coq_am_dispatch_error s =>
-        let val _ =  print ("\n\n\n" ^ (dispatch_error_toString s) ^ "\n\n\n") in True
+        let val _ =  print ("\n\n\n\n\n" ^ (dispatch_error_toString s) ^ "\n\n\n") in True
         end
 
 

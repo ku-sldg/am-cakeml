@@ -3,9 +3,22 @@
 (* appraise_appraise_meas_asp_stub :: coq_ASP_PARAMS -> coq_Plc -> coq_BS -> coq_RawEv -> coq_BS *)
 fun appraise_appraise_meas_asp_stub ps p bs ls =
     case ps of Coq_asp_paramsC aspid args tpl tid =>
-        let val _ = print ("Appraising ASP with ID: \n" ^ aspid ^ "...\n\n") in 
+        let val _ = print ("Appraising ASP with ID: \n" ^ aspid ^ "...\n\n") 
+        (*
+            val et = eval example_phrase_p2_appraise coq_P0 (Coq_nn O)
+            val appres = gen_appraise_AM et ls
+        *)
+                in 
                 Coq_resultC passed_bs
         end
+
+        (*
+        (** val gen_appraise_AM :
+            coq_Evidence -> coq_RawEv -> coq_AppResultC coq_AM **)
+
+            fun gen_appraise_AM et ls =
+
+        *)
 
         (*
                (* let val _ = () in ()
