@@ -61,6 +61,8 @@ val uuidServer_cb = (fn _ => fn _ => (Coq_resultC "OUTPUT_PLC")) : (coq_ASP_Addr
 val server_am_library = 
   (Build_AM_Library 
     aspServer_cb pubKeyServer_cb plcServer_cb uuidServer_cb
+
+    ""
     
     "ASP_SERVER:5000" "PubKeyServer:5000" "PlcServer:5000" "UUIDServer:5000"
 

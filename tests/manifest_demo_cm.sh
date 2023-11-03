@@ -7,13 +7,13 @@ DEMO_FILES=../tests/DemoFiles/Cm
 
 # Server Variables
 SERVER_P0_FORM_MAN=$DEMO_FILES/FormalManifest_P0.json
+SERVER_P3_FORM_MAN=$DEMO_FILES/FormalManifest_P3.json
 
-#SERVER_P1_FORM_MAN=$DEMO_FILES/FormalManifest_P1.json
 SERVER_AM_LIB=$DEMO_FILES/Test_Am_Lib_Cm.sml
 SERVER_PRIV_KEY=$DEMO_FILES/Test_Server_PrivKey
 
-SERVER_P0_EXE_NAME=TEST_SERVER_AM_P0_EXE
-#SERVER_P1_EXE_NAME=TEST_SERVER_AM_EXE
+#SERVER_P0_EXE_NAME=TEST_SERVER_AM_P0_EXE
+SERVER_P3_EXE_NAME=TEST_SERVER_AM_P3_EXE
 
 # Client Variables
 CLIENT_FORM_MAN=$SERVER_P0_FORM_MAN
@@ -42,26 +42,26 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   #sleep 2
 
   # Now compile the servers, before starting tmux (to prevent race condition)
-  #$MAN_COMP -s -o $SERVER_P1_EXE_NAME -m $SERVER_P1_FORM_MAN -l $SERVER_AM_LIB
-  $MAN_COMP -s -o $SERVER_P0_EXE_NAME -m $SERVER_P0_FORM_MAN -l $SERVER_AM_LIB
+  $MAN_COMP -s -o $SERVER_P3_EXE_NAME -m $SERVER_P3_FORM_MAN -l $SERVER_AM_LIB
+  #$MAN_COMP -s -o $SERVER_P0_EXE_NAME -m $SERVER_P0_FORM_MAN -l $SERVER_AM_LIB
   
   
-  #BUILT_SERVER_AM_ONE=./build/$SERVER_P1_EXE_NAME
-  BUILT_SERVER_AM_P0=./build/$SERVER_P0_EXE_NAME
+  BUILT_SERVER_AM_P3=./build/$SERVER_P3_EXE_NAME
+  #BUILT_SERVER_AM_P0=./build/$SERVER_P0_EXE_NAME
 
   BUILT_CLIENT_AM=./build/$CLIENT_EXE_NAME
 
   # Setup tmux windows
   tmux new-session -d -s ServerProcess 'bash -i'
-  #tmux split-window -v 'bash -i'
-  tmux split-window -h 'bash -i'
+  tmux split-window -v 'bash -i'
+  #tmux split-window -h 'bash -i'
   tmux select-layout even-horizontal
 
    # Start the P0 server
-  tmux send-keys -t 0 "( $BUILT_SERVER_AM_P0 -m $SERVER_P0_FORM_MAN -k $SERVER_PRIV_KEY )" Enter
+  #tmux send-keys -t 0 "( $BUILT_SERVER_AM_P0 -m $SERVER_P0_FORM_MAN -k $SERVER_PRIV_KEY )" Enter
 
-  # Start the P1 server
-  #tmux send-keys -t 1 "( $BUILT_SERVER_AM_ONE -m $SERVER_P1_FORM_MAN -k $SERVER_PRIV_KEY )" Enter
+  # Start the P3 server
+  tmux send-keys -t 0 "( $BUILT_SERVER_AM_P3 -m $SERVER_P3_FORM_MAN -k $SERVER_PRIV_KEY )" Enter
 
   # Now manifest compile and run the Client AM
   # Sending a chain of first AM comp, then run AM

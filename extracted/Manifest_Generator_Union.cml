@@ -15,16 +15,10 @@ fun env_list_union ls =
 fun mangen_plcTerm_list_union ls =
   env_list_union (manifest_generator_plcTerm_list ls)
 
-(** val empty_Manifest_plc : coq_Plc -> coq_Manifest **)
-
-fun empty_Manifest_plc myPlc =
-  Build_Manifest myPlc manifest_set_empty manifest_set_empty
-    manifest_set_empty manifest_set_empty manifest_set_empty empty_PolicyT
-
 (** val mangen_app_plc : coq_Evidence -> coq_Plc -> coq_Manifest **)
 
 fun mangen_app_plc et p =
-  manifest_union (empty_Manifest_plc p) (manifest_generator_app et)
+  manifest_union (empty_Manifest_plc p) (manifest_generator_app et p)
 
 (** val lift_manifest_to_env : coq_Manifest -> coq_EnvironmentM **)
 
@@ -58,13 +52,15 @@ fun end_to_end_mangen ls ts =
   environment_union app_env att_env end end
 
 (** val get_all_unique_places :
-    (coq_Term, coq_Plc) prod list -> coq_Plc list **)
+    (coq_Term, coq_Plc) prod list -> (coq_Evidence, coq_Plc) prod list ->
+    coq_Plc list **)
 
-fun get_all_unique_places ls =
+fun get_all_unique_places ls ets =
   let val lss =
     map (fn pat => let val Coq_pair t p = pat in places p t end) ls
   in
-  let val res_dup = concat lss in dedup_list res_dup end end
+  let val ets_ps = map (fn pat => let val Coq_pair _ p = pat in p end) ets in
+  let val ts_res_dup = concat lss in dedup_list (app ts_res_dup ets_ps) end end end
 
 (** val end_to_end_mangen_final :
     (coq_Evidence, coq_Plc) prod list -> (coq_Term, coq_Plc) prod list ->
@@ -72,7 +68,7 @@ fun get_all_unique_places ls =
 
 fun end_to_end_mangen_final ls ts =
   let val env = end_to_end_mangen ls ts in
-  let val unique_plcs = get_all_unique_places ts in
+  let val unique_plcs = get_all_unique_places ts ls in
   let val res' =
     map knowsof_myPlc_manifest_update
       (get_unique_manifests_env' unique_plcs env)

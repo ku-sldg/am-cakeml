@@ -29,7 +29,7 @@ fun manifest_union m1 m2 =
 fun environment_union'' p m1 e2 =
   case map_get coq_Eq_Class_ID_Type e2 p of
     Some m2 =>
-    let val new_man = manifest_union m1 m2 in
+    let val new_man = manifest_union m2 m1 in
     map_set coq_Eq_Class_ID_Type e2 p new_man end
   | None => map_set coq_Eq_Class_ID_Type e2 p m1
 

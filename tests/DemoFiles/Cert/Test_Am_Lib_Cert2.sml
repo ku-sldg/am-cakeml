@@ -58,6 +58,8 @@ val am_library =
     
     "ASP_SERVER:5000" "PubKeyServer:5000" "PlcServer:5000" "UUIDServer:5000"
 
+    ""
+
     aspMapping
     appAspMapping
     (mapD_from_pairList [("P0", "localhost:5005"),("P1", "localhost:5001"),("P2", "localhost:5002")])

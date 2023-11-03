@@ -40,14 +40,14 @@ datatype coq_AM_Library =
   Build_AM_Library ((coq_ASP_Address -> coq_CallBackErrors coq_ASPCallback))
    ((coq_ASP_Address -> coq_PubKeyCallback))
    ((coq_ASP_Address -> coq_PlcCallback))
-   ((coq_ASP_Address -> coq_UUIDCallback)) coq_ASP_Address coq_ASP_Address
-   coq_ASP_Address coq_ASP_Address
+   ((coq_ASP_Address -> coq_UUIDCallback)) coq_UUID coq_ASP_Address
+   coq_ASP_Address coq_ASP_Address coq_ASP_Address
    ((coq_ASP_ID, coq_CallBackErrors coq_ASPCallback) coq_MapC)
    (((coq_Plc, coq_ASP_ID) prod, coq_CallBackErrors coq_ASPCallback) coq_MapC)
    ((coq_Plc, coq_UUID) coq_MapD) ((coq_Plc, coq_PublicKey) coq_MapD)
 
 datatype coq_AM_Config =
-  Coq_mkAmConfig coq_Manifest (coq_DispatcherErrors coq_ASPCallback)
+  Coq_mkAmConfig coq_Manifest coq_UUID (coq_DispatcherErrors coq_ASPCallback)
    (coq_DispatcherErrors coq_ASPCallback) coq_PlcCallback coq_PubKeyCallback
    coq_UUIDCallback
 
@@ -61,5 +61,6 @@ fun empty_aspCb _ _ _ _ =
 (** val empty_am_config : coq_AM_Config **)
 
 val empty_am_config : coq_AM_Config =
-  Coq_mkAmConfig empty_Manifest empty_aspCb empty_aspCb (fn _ => Coq_errC
-    Unavailable) (fn _ => Coq_errC Unavailable) (fn _ => Coq_errC Unavailable)
+  Coq_mkAmConfig empty_Manifest default_uuid empty_aspCb empty_aspCb (fn _ =>
+    Coq_errC Unavailable) (fn _ => Coq_errC Unavailable) (fn _ => Coq_errC
+    Unavailable)

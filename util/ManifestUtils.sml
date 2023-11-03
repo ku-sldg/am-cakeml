@@ -12,6 +12,8 @@ structure ManifestUtils = struct
 
   val local_formal_manifest = Ref (Err "Formal Manifest not set") : ((coq_Manifest, string) result) ref
 
+  val local_uuid_clone = Ref (Err "UUID clone not set") : ((coq_UUID, string) result) ref
+
   val local_amConfig = Ref (Err "AM_Config not set") : ((coq_AM_Config, string) result) ref
 
   val local_amLib = Ref (Err "AM_Lib not set") : ((coq_AM_Library, string) result) ref
@@ -47,6 +49,13 @@ structure ManifestUtils = struct
       (Ok v) => v
       | Err e => raise Excn e) : coq_Manifest
 
+  (* Retrieves the UUID clone address, or exception if not configured 
+    : _ -> coq_UUID *)
+  fun get_Clone_uuid _ =
+    (case (!local_uuid_clone) of
+      (Ok v) => v
+      | Err e => raise Excn e) : coq_UUID
+
     (* Retrieves the plc corresponding to this processes Manifest/AM_Config
       throws an exception if configuration not completed
     : _ -> coq_Plc *)
@@ -59,14 +68,15 @@ structure ManifestUtils = struct
       : coq_Manifest -> coq_AM_Library -> () *)
   fun setup_AM_config (fm : coq_Manifest) (al : coq_AM_Library) (privKey : privateKey_t) (* (t:coq_Term) *) =
     (case (manifest_compiler fm al) of
-      Coq_mkAmConfig compiled_fm aspDisp appDisp plcDisp pubKeyDisp uuidDisp =>
+      Coq_mkAmConfig compiled_fm clone_uuid aspDisp appDisp plcDisp pubKeyDisp uuidDisp =>
         let val _ = local_formal_manifest := Ok compiled_fm
+            val _ = local_uuid_clone := Ok clone_uuid
             val _ = local_aspCb := Ok aspDisp
             val _ = local_plcCb := Ok plcDisp
             val _ = local_pubKeyCb := Ok pubKeyDisp
             val _ = local_uuidCb := Ok uuidDisp
             val _ = local_PrivKey := Ok privKey
-            val _ = local_amConfig := Ok (Coq_mkAmConfig compiled_fm aspDisp appDisp plcDisp pubKeyDisp uuidDisp)
+            val _ = local_amConfig := Ok (Coq_mkAmConfig compiled_fm clone_uuid aspDisp appDisp plcDisp pubKeyDisp uuidDisp)
             val _ = local_amLib := Ok al
         in
           ()
@@ -151,12 +161,13 @@ structure ManifestUtils = struct
   fun get_AM_config _ =
     (
     let val fm = get_FormalManifest()
+        val clone_uuid = get_Clone_uuid()
         val aspCb = get_ASPCallback()
         val plcCb = get_PlcCallback()
         val pubKeyCb = get_PubKeyCallback()
         val uuidCb = get_UUIDCallback()
     in
-      Coq_mkAmConfig fm aspCb aspCb plcCb pubKeyCb uuidCb
+      Coq_mkAmConfig fm clone_uuid aspCb aspCb plcCb pubKeyCb uuidCb
     end) : AM_Config
 
   (* Directly combines setup and get steps in one function call. 

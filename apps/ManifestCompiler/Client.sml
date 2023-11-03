@@ -37,6 +37,10 @@ fun main () =
             (* the bool here is to force evaluation of unit-typed error prints from extracted code *)
 
 
+
+        (* 
+
+
         val my_amconfig = ManifestUtils.get_AM_config ()
         val da_manifest = 
             case my_amconfig of Coq_mkAmConfig m _ _ _ _ _ => m 
@@ -56,6 +60,9 @@ fun main () =
         val _ = case app_cb_resultT of 
                 Coq_resultC _ => print "\n\nAPP CB Succeeded\n\n"
                 | Coq_errC Unavailable => print "\n\nAPP CB Error (Unavailable)\n\n"
+
+        *)
+        
 
     in
         print ( ("\n\nClient Result:\n" ^ am_result_ToString (am_res))  ^ "\n\n")

@@ -9,7 +9,7 @@ fun encodeEvRaw rawev = BString.empty
     -> (coq_BS, coq_DispatcherErrors) coq_ResultT **)
 
 fun do_asp params e mpl _ ac =
-  let val Coq_mkAmConfig _ aspCb _ _ _ _ = ac in
+  let val Coq_mkAmConfig _ _ aspCb _ _ _ _ = ac in
   aspCb params mpl (encodeEvRaw e) e end
 
 (** val doRemote_uuid :
@@ -36,7 +36,7 @@ fun doRemote_uuid t uuid rawEv =
 
 fun do_remote t pTo e ac =
   let val remote_uuid_res =
-    let val Coq_mkAmConfig _ _ _ plcCb _ _ = ac in plcCb pTo end
+    let val Coq_mkAmConfig _ _ _ _ plcCb _ _ = ac in plcCb pTo end
   in
   (case remote_uuid_res of
      Coq_errC e0 => Coq_errC e0

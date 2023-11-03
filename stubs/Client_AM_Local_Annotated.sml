@@ -23,7 +23,7 @@ fun get_my_absman_generated t myPlc =
 
 fun aspid_in_amlib_bool al i =
   case map_get coq_Eq_Class_ID_Type
-         (let val Build_AM_Library _ _ _ _ _ _ _ _ local_ASPS _ _ _ = al in
+         (let val Build_AM_Library _ _ _ _ _ _ _ _ _ local_ASPS _ _ _ = al in
           local_ASPS end) i of
     Some _ => True
   | None => False
@@ -32,7 +32,7 @@ fun aspid_in_amlib_bool al i =
 
 fun uuid_plc_in_amlib_bool al p =
   case map_get coq_Eq_Class_ID_Type
-         (let val Build_AM_Library _ _ _ _ _ _ _ _ _ _ local_Plcs _ = al in
+         (let val Build_AM_Library _ _ _ _ _ _ _ _ _ _ _ local_Plcs _ = al in
           local_Plcs end) p of
     Some _ => True
   | None => False
@@ -41,7 +41,7 @@ fun uuid_plc_in_amlib_bool al p =
 
 fun pubkey_plc_in_amlib_bool al p =
   case map_get coq_Eq_Class_ID_Type
-         (let val Build_AM_Library _ _ _ _ _ _ _ _ _ _ _ local_PubKeys = al in
+         (let val Build_AM_Library _ _ _ _ _ _ _ _ _ _ _ _ local_PubKeys = al in
           local_PubKeys end) p of
     Some _ => True
   | None => False
@@ -51,7 +51,7 @@ fun pubkey_plc_in_amlib_bool al p =
 
 fun appraisal_aspid_in_amlib_bool al pr =
   case map_get (pair_EqClass coq_Eq_Class_ID_Type coq_Eq_Class_ID_Type)
-         (let val Build_AM_Library _ _ _ _ _ _ _ _ _ local_Appraisal_ASPS _
+         (let val Build_AM_Library _ _ _ _ _ _ _ _ _ _ local_Appraisal_ASPS _
             _ = al
           in
           local_Appraisal_ASPS end) pr of

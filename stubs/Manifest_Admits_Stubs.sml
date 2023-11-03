@@ -28,3 +28,5 @@ val empty_PolicyT : coq_PolicyT = False (*[] *) (* [(Coq_pair "hi" "hey")] *)
 val empty_Manifest_Plc = "empty_Plc"
 
 val empty_ASP_Address = "empty_ASP_ID"
+
+val default_uuid = ""

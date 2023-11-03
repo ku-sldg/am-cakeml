@@ -34,7 +34,7 @@ fun generate_ASP_dispatcher' al am par p bs rawEv =
     let val Build_Manifest _ asps _ _ _ _ _ = am in asps end
   in
   let val local_asps_map =
-    let val Build_AM_Library _ _ _ _ _ _ _ _ local_ASPS _ _ _ = al in
+    let val Build_AM_Library _ _ _ _ _ _ _ _ _ local_ASPS _ _ _ = al in
     local_ASPS end
   in
   let val shrunk_map =
@@ -68,7 +68,7 @@ fun generate_appraisal_ASP_dispatcher' al am par p bs rawEv =
     appraisal_asps end
   in
   let val local_asps_map =
-    let val Build_AM_Library _ _ _ _ _ _ _ _ _ local_Appraisal_ASPS _ _ = al
+    let val Build_AM_Library _ _ _ _ _ _ _ _ _ _ local_Appraisal_ASPS _ _ = al
     in
     local_Appraisal_ASPS end
   in
@@ -102,7 +102,7 @@ fun generate_appraisal_ASP_dispatcher _ =
 
 fun generate_Plc_dispatcher hID al am =
   let val local_plc_map =
-    let val Build_AM_Library _ _ _ _ _ _ _ _ _ _ local_Plcs _ = al in
+    let val Build_AM_Library _ _ _ _ _ _ _ _ _ _ _ local_Plcs _ = al in
     local_Plcs end
   in
   let val abstract_plcs =
@@ -125,7 +125,7 @@ fun generate_Plc_dispatcher hID al am =
 
 fun generate_PubKey_dispatcher hID al am =
   let val local_pubkey_map =
-    let val Build_AM_Library _ _ _ _ _ _ _ _ _ _ _ local_PubKeys = al in
+    let val Build_AM_Library _ _ _ _ _ _ _ _ _ _ _ _ local_PubKeys = al in
     local_PubKeys end
   in
   let val abstract_plcs =
@@ -149,7 +149,7 @@ fun generate_PubKey_dispatcher hID al am =
 
 fun generate_UUUID_dispatcher hID al am =
   let val local_plc_map =
-    let val Build_AM_Library _ _ _ _ _ _ _ _ _ _ local_Plcs _ = al in
+    let val Build_AM_Library _ _ _ _ _ _ _ _ _ _ _ local_Plcs _ = al in
     local_Plcs end
   in
   let val abstract_plcs =
@@ -170,7 +170,9 @@ fun generate_UUUID_dispatcher hID al am =
     coq_Manifest -> coq_AM_Library -> coq_AM_Config **)
 
 fun manifest_compiler m al =
-  Coq_mkAmConfig m (generate_ASP_dispatcher coq_Eq_Class_ID_Type al m)
+  Coq_mkAmConfig m
+    (let val Build_AM_Library _ _ _ _ uUID_AM_Clone _ _ _ _ _ _ _ _ = al in
+     uUID_AM_Clone end) (generate_ASP_dispatcher coq_Eq_Class_ID_Type al m)
     (generate_appraisal_ASP_dispatcher coq_Eq_Class_ID_Type al m)
     (generate_Plc_dispatcher coq_Eq_Class_ID_Type al m)
     (generate_PubKey_dispatcher coq_Eq_Class_ID_Type al m)

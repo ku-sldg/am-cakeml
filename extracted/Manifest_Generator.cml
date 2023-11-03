@@ -187,7 +187,13 @@ fun manifest_generator_app' et m =
   | Coq_ss e1 e2 => manifest_generator_app' e2 (manifest_generator_app' e1 m)
   | _ => m
 
-(** val manifest_generator_app : coq_Evidence -> coq_Manifest **)
+(** val empty_Manifest_plc : coq_Plc -> coq_Manifest **)
 
-fun manifest_generator_app et =
-  manifest_generator_app' et empty_Manifest
+fun empty_Manifest_plc myPlc =
+  Build_Manifest myPlc manifest_set_empty manifest_set_empty
+    manifest_set_empty manifest_set_empty manifest_set_empty empty_PolicyT
+
+(** val manifest_generator_app : coq_Evidence -> coq_Plc -> coq_Manifest **)
+
+fun manifest_generator_app et p =
+  manifest_generator_app' et (empty_Manifest_plc p)
