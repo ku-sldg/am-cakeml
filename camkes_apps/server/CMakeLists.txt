@@ -4,8 +4,8 @@ cakeml_component(
     server_am
     CML_SOURCES
        ${server_am_src_camkes}
-       ${CMAKE_CURRENT_LIST_DIR}/example_server-ini.sml
-       ${CMAKE_CURRENT_LIST_DIR}/camkes_server.sml
+       ${CMAKE_CURRENT_LIST_DIR}/../../tests/DemoFiles/Cm/Test_Am_Lib_Cm.sml
+       ${CMAKE_CURRENT_LIST_DIR}/Server.sml
     C_SOURCES
         ${camkes_c_files}
     LIBS
