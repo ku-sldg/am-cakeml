@@ -120,11 +120,6 @@ get_files(cop_src_pre_aspStubs
     stubs/IO_Stubs_extra.sml
     am/CommTypes.sml
     extracted/AM_Helpers.cml
-)
-
-get_files(cop_src_post_aspStubs
-    extracted/StMonad_Coq.cml
-    stubs/Cvm_St_Utils.sml
     extracted/Client_AM_Local.cml
     extracted/Server_AM.cml
 )
@@ -133,12 +128,10 @@ get_files(cop_src
     ${cop_src_pre_aspStubs}
     ${attestation_asps}
     ${appraisal_asps}
-    ${cop_src_post_aspStubs}
 )
 
 get_files(cop_src_noasps
     ${cop_src_pre_aspStubs}
-    ${cop_src_post_aspStubs}
 )
 
 get_files(server_am_src_noasps ${util_src} ${posix_src_cake} ${cop_src_noasps})

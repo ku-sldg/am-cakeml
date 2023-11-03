@@ -5,13 +5,44 @@ fun appraise_asp_stub ps e =
     case ps of Coq_asp_paramsC aspid args tpl tid =>
                let val _ = (print ("Matched aspid:  " ^ aspid ^ "\n");
                             print ("Performing ASP " ^ aspid ^ "\n\n")) 
+
+                    val my_amlib = ManifestUtils.get_local_amLib ()
+
+                    val appServerAddr = 
+                      case my_amlib of  
+                            Build_AM_Library _ _ _ _ addr _ _ _ _ _ _ _ _ => addr
+
+                    val appresult = run_appraisal_client 
+                                      example_phrase_p2_appraise
+                                      coq_P0 
+                                      (Coq_nn O)
+                                      e 
+                                      appServerAddr
+
+                     val _ = print ("\n\nAppraised Evidence structure:  \n" ^ (evidenceCToString appresult) ^ "\n\n")
+                    
                
+
+
+
+
+              (*
+
+              (** val run_appraisal_client :
+                coq_Term -> coq_Plc -> coq_Evidence -> coq_RawEv -> coq_UUID ->
+                coq_AppResultC **)
+
+            fun run_appraisal_client t p et re addr =
+              am_sendReq'_app addr t p et re
+
+
+              *)
+
+
+
+
                (*
                
-
-
-
-
                    val my_amconfig = ManifestUtils.get_AM_config ()
                    val da_manifest = 
                         case my_amconfig of Coq_mkAmConfig m _ _ _ _ _ => m 
