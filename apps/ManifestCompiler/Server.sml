@@ -52,8 +52,8 @@ fun startServer () =
 
 (* () -> () *)
 fun main () =
-  let val (manifestFileName, privKey, _) = ManifestJsonConfig.retrieve_CLI_args () 
-      val formal_manifest = ManifestJsonConfig.read_FormalManifest_file_json manifestFileName
+  let val (manifestFileName, privKey, _) = BashFunctions.retrieve_CLI_args () 
+      val formal_manifest = BashFunctions.read_FormalManifest_file_json manifestFileName
       val _ = ManifestUtils.setup_and_get_AM_config formal_manifest am_library privKey
       (* Retrieving implicit self place from manifest here *)
       val my_plc = ManifestUtils.get_myPlc()

@@ -66,7 +66,7 @@ fun main () =
                 *)
                 (* END:  UNCOMMENT FOR PROVISIONING SERVER TERMPLC LIST JSON FILE  *)
               
-                  val ts = ManifestJsonConfig.read_termPlcList_file_json cvmPlcTermsFilepath in 
+                  val ts = BashFunctions.read_termPlcList_file_json cvmPlcTermsFilepath in 
                     ts
               end
 
@@ -143,7 +143,7 @@ datatype coq_Evidence =
               (* END:    UNCOMMENT FOR PROVISIONING APPRAISAL EVIDENCEPLC LIST JSON FILE  *)
                   
                   
-                  val ls = ManifestJsonConfig.read_EvidencePlcList_file_json appEvidencePlcFilepath in 
+                  val ls = BashFunctions.read_EvidencePlcList_file_json appEvidencePlcFilepath in 
                     ls
               end
 
@@ -158,7 +158,7 @@ datatype coq_Evidence =
                   (* ets_parmut *)
                   (* ets_layeredbg *)
 
-        val _ = ManifestJsonConfig.write_form_man_list_json_and_print_json_app 
+        val _ = BashFunctions.write_form_man_list_json_and_print_json_app 
                   outFilePathPrefix ets phrases
         val _ = print "\n\n" in
       ()

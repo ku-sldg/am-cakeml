@@ -2,7 +2,7 @@
 
 
 fun main () =
-    let val (manifestFileName, privKey, phraseFileName) : (string * coq_PrivateKey * string) = ManifestJsonConfig.retrieve_CLI_args () 
+    let val (manifestFileName, privKey, phraseFileName) : (string * coq_PrivateKey * string) = BashFunctions.retrieve_CLI_args () 
 
         
 
@@ -16,10 +16,10 @@ fun main () =
     (* END:  UNCOMMENT FOR PROVISIONING CLIENT CVM PHRASE *)
        
 
-        val main_phrase = ManifestJsonConfig.read_term_file_json phraseFileName
+        val main_phrase = BashFunctions.read_term_file_json phraseFileName
 
 
-        val formal_manifest = ManifestJsonConfig.read_FormalManifest_file_json manifestFileName
+        val formal_manifest = BashFunctions.read_FormalManifest_file_json manifestFileName
         val _ = ManifestUtils.setup_and_get_AM_config formal_manifest am_library privKey
         (* Retrieving implicit self place from manifest here *)
         val my_plc = ManifestUtils.get_myPlc()

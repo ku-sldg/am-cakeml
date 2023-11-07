@@ -102,6 +102,7 @@ get_files(cop_src_pre_aspStubs
     extracted/Cvm_St.cml
     extracted/AM_St.cml
     copland/json/ManifestJsonConfig.sml
+    copland/json/BashFunctions.sml
     util/ManifestUtils.sml
     am/CoplandCommUtil.sml
     stubs/IO_Stubs.sml
