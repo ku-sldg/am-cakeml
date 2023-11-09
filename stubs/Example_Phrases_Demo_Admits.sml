@@ -9,7 +9,7 @@ val source_plc = "0"
 
 (** val dest_plc : coq_Plc **)
 
-val dest_plc = "1"
+val dest_plc = "P1"
 
 val demo_plc_1 = "1"
 val demo_plc_2 = "2"

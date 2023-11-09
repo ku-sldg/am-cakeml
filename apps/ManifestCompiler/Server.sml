@@ -52,7 +52,9 @@ fun startServer () =
 
 (* () -> () *)
 fun main () =
-  let val (manifestFileName, privKey, _) = ManifestJsonConfig.retrieve_CLI_args () 
+  let (* val _ = print "\n\nDEBUG PRINT:  BEFORE retrieve_CLI_args call in Server... \n\n" *)
+      val (manifestFileName, privKey, _) = ManifestJsonConfig.retrieve_CLI_args () 
+      (* val _ = print "\n\nDEBUG PRINT:  AFTER retrieve_CLI_args call in Server... \n\n" *)
       val formal_manifest = ManifestJsonConfig.read_FormalManifest_file_json manifestFileName
       val _ = ManifestUtils.setup_and_get_AM_config formal_manifest am_library privKey
       (* Retrieving implicit self place from manifest here *)

@@ -9,7 +9,7 @@ fun ssl_enc_asp_stub ps e =
                            BString.toString (encode_RawEv e) 
                        val ciphertext =
                            Crypto.encryptOneShot
-                               priv1 pub2 plaintext in
+                               priv2 (* pub *)pub1 plaintext in
                        Coq_resultC (ciphertext)
                    end
                end

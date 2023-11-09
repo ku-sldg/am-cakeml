@@ -398,7 +398,7 @@ fun write_form_man_list_json_and_print_json_app (pathPrefix : string) (ets:(coq_
   handle Excn e => TextIOExtra.printLn e
 
 
-
+(* TODO: better error handling here -- i.e. reasonable error message if file not found... *)
 fun parse_private_key file =
   BString.unshow (TextIOExtra.readFile file)
 
@@ -410,7 +410,8 @@ fun argIndPresent (i:int) = (i <> ~1)
   : () -> (string, string) 
 *)
 fun retrieve_CLI_args _ =
-  let val name = CommandLine.name ()
+  let (* val _ = print "\n\nDEBUG PRINT:  START of retrieve_CLI_args... \n\n" *)
+      val name = CommandLine.name ()
       val usage = ("Usage: " ^ name ^ " -m <ManifestFile>.json -k <privateKeyFile> (-t <ClientTermFile>.json)\n " ^
                     "e.g.\t" ^ name ^ " -m formMan.json -k ~/.ssh/id_ed25519 -t clientPhrase.json\n")
       val (manFileName, privKey, termFileName) = 
@@ -431,11 +432,14 @@ fun retrieve_CLI_args _ =
                           else (
                               let val manFileName = List.nth argList (manInd + 1)
                                   val privKeyFile = List.nth argList (keyInd + 1)
-                                  val termFile = List.nth argList (termFileInd + 1) in
+                                  val termFile = List.nth argList (termFileInd + 1) 
+                                  (* val _ = print "\n\nDEBUG PRINT:  In retrieve_CLI_args... \n\n" *)
+                                  in
                                   (
                                     case (parseJsonFile manFileName) of
                                       Err e => raise (Excn ("Could not parse JSON file: " ^ e ^ "\n"))
                                     | Ok _ => (manFileName, (parse_private_key privKeyFile), termFile)
+                                           (* TODO: case match on parse_private_key for better error handling here...  *)
                                   )
                                 end )))
                   end ))

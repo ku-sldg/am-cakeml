@@ -134,7 +134,7 @@ get_files(cop_src_noasps
     ${cop_src_pre_aspStubs}
 )
 
-get_files(server_am_src_noasps ${util_src} ${posix_src_cake} ${cop_src_noasps})
+get_files(server_am_src_noasps ${util_src} ${posix_src} ${cop_src_noasps})
 
 get_files(server_am_src ${util_src} ${posix_src} ${cop_src})
 get_files(server_am_src_hacl ${util_src} ${posix_src_hacl} ${cop_src})
