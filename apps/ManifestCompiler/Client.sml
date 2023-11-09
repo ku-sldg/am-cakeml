@@ -9,13 +9,14 @@ fun main () =
 
     (* START:  UNCOMMENT FOR PROVISIONING CLIENT CVM PHRASE *)
 
+    (*
         (* TODO: move kim_enc_phrase to shared lib and/or extract it from Coq... *)
         val kim_enc_phrase = Coq_att coq_P1  (Coq_lseq (kim_meas dest_plc kim_meas_targid) (Coq_asp (ENC coq_P0)))
     
         val main_phrase = kim_enc_phrase (* example_phrase *) (* cert_style *)
         val _ = ManifestJsonConfig.write_term_file_json phraseFileName main_phrase
 
-    
+    *)    
     (* END:  UNCOMMENT FOR PROVISIONING CLIENT CVM PHRASE *)
        
 

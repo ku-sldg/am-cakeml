@@ -63,9 +63,9 @@ fun main () =
               let 
 
                 (* START:  UNCOMMENT FOR PROVISIONING SERVER TERMPLC LIST JSON FILE *)
-                
+                (*
                   val _ = ManifestJsonConfig.write_termPlcList_file_json cvmPlcTermsFilepath kim_enc_phrases (* cert_phrases *) (* kim_phrases *)
-                
+                *)
                 (* END:  UNCOMMENT FOR PROVISIONING SERVER TERMPLC LIST JSON FILE  *)
               
                   val ts = ManifestJsonConfig.read_termPlcList_file_json cvmPlcTermsFilepath in 
@@ -141,10 +141,10 @@ datatype coq_Evidence =
                   
 
               (* START:  UNCOMMENT FOR PROVISIONING APPRAISAL EVIDENCEPLC LIST JSON FILE  *)
-                
+                (*
                   val temp_ets = ets_kim_enc (* ets_cert *) (* ets_example_phrase *)(* ets_kim *) (* ets_cert *)
                   val _ = ManifestJsonConfig.write_EvidencePlcList_file_json appEvidencePlcFilepath temp_ets
-                
+                *)
               (* END:    UNCOMMENT FOR PROVISIONING APPRAISAL EVIDENCEPLC LIST JSON FILE  *)
                   
                   
