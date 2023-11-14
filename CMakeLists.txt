@@ -142,11 +142,18 @@ get_files(server_am_src_noasps ${util_src} ${posix_src} ${cop_src_noasps})
 get_files(server_am_src ${util_src} ${posix_src} ${cop_src})
 get_files(server_am_src_hacl ${util_src} ${posix_src_hacl} ${cop_src})
 get_files(server_am_src_tpm ${util_src} ${posix_src_tpm} ${cop_src})
-get_files(server_am_src_camkes ${util_src} ${crypto_src_hacl}
-${cop_src_pre_aspStubs} ${cop_src_post_aspStubs} util/Log.sml
-system/camkes/measurement_RPC/Measurement_RPC.sml)
-get_files(server_am_src_camkes ${util_src} ${crypto_src_hacl}
-${cop_src_pre_aspStubs} ${cop_src_post_aspStubs} util/Log.sml)
+get_files(server_am_src_camkes 
+    ${util_src}
+    util/Log.sml
+    system/camkes/measurement_RPC/Measurement_RPC.sml
+    system/camkes/fileserver_RPC/FileServer_RPC.sml
+    ${crypto_src_hacl}
+    ${cop_src_pre_aspStubs}
+    system/camkes/commutil_RPC/CommUtil_RPC.sml
+    ${attestation_asps}
+    ${appraisal_asps}
+    ${cop_src_post_aspStubs}
+)
 
 get_files(posix_c_files_base
     system/posix/sockets/socket_ffi.c
@@ -181,6 +188,9 @@ get_files(camkes_c_files
     system/camkes/basis_ffi.c
     system/crypto/evercrypt/crypto_ffi.c
     system/camkes/dataports/dataport_ffi.c
+    system/camkes/measurement_RPC/measurement_RPC.c
+    system/camkes/fileserver_RPC/fileserver_RPC.c
+    system/camkes/commutil_RPC/commutil_RPC.c
 )
 
 # OS Config
