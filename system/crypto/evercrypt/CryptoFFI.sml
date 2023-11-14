@@ -16,9 +16,10 @@ structure Crypto = struct
         val pubkeyLen = 64
         val privkeyLen = 32
         val signLen = 64
+        val digestLen = 64
     in
         (* bstring -> bstring *)
-        val hash = FFI.call ffi_sha512 64
+        val hash = FFI.call ffi_sha512 digestLen
 
         (* bstring -> bstring -> bstring *)
         fun signMsg priv msg =
@@ -34,6 +35,7 @@ structure Crypto = struct
                 raise (Err "Wrong public key size, Error in sigCheck FFI")
             else
                 FFI.callBool ffi_sigCheck (BString.concatList [pub, sign, msg])
+
         (* generateSignaturePublicKey: bstring -> bstring
          * From a private signing key, generate the corresponding public key.
          *)
@@ -57,6 +59,15 @@ structure Crypto = struct
             in
                 FFI.call ffi_chacha20_decrypt (BString.length text) payload
             end
+        
+        (* bstring -> bstring -> string -> bstring *)
+        fun encryptOneShot privKey pubKey msg =
+            encrypt privKey (BString.n2w2 0) 0 (BString.fromString msg)
+            
+        (* bstring -> bstring -> string -> bstring *)
+        fun decryptOneShot privKey pubKey ciphertext = 
+            decrypt pubKey (BString.n2w2 0) 0 (BString.fromString ciphertext)
+
         (* generateDHSecret : bstring -> bstring -> bstring
          * `generate_dh_secret priv pub`
          * Runs the ECDH Curve25519 algorithm with a 32 byte private key `priv`
