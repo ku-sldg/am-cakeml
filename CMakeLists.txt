@@ -122,6 +122,7 @@ get_files(cop_src_pre_aspStubs
     extracted/AM_Helpers.cml
     extracted/Client_AM_Local.cml
     extracted/Server_AM.cml
+    stubs/ManGenConfig.sml
 )
 
 get_files(cop_src

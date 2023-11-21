@@ -1,3 +1,4 @@
+(* Depends:  TODO *)
 structure ManCompConfig = struct
   exception Excn string
 
