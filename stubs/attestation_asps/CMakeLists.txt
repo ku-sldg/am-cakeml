@@ -9,6 +9,7 @@ get_files(attestation_asps
     kim_meas_ASP_Stub.sml
     attest_ASP_Stub.sml
     appraise_ASP_Stub.sml
+    appraise_inline_ASP_Stub.sml
     cert_ASP_Stub.sml
     cache_ASP_Stub.sml
     sig_ASP_Stub.sml

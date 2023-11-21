@@ -78,8 +78,9 @@ val example_phrase : coq_Term =
   Coq_att coq_P1 (Coq_lseq (Coq_bseq (Coq_pair ALL ALL) (Coq_asp (ASPC ALL
     EXTD (Coq_asp_paramsC attest1_id [] coq_P1 sys))) (Coq_asp (ASPC ALL EXTD
     (Coq_asp_paramsC attest2_id [] coq_P1 sys)))) (Coq_att coq_P2 (Coq_lseq
-    (Coq_asp (ASPC ALL EXTD (Coq_asp_paramsC appraise_id [] coq_P2 sys)))
-    (Coq_asp (ASPC ALL EXTD (Coq_asp_paramsC cert_id [] coq_P2 sys))))))
+    (Coq_asp (ASPC ALL EXTD (Coq_asp_paramsC appraise_inline_id [] coq_P2
+    sys))) (Coq_asp (ASPC ALL EXTD (Coq_asp_paramsC cert_id [] coq_P2
+    sys))))))
 
 (** val example_phrase_p2_appraise : coq_Term **)
 

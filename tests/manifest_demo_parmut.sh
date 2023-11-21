@@ -35,6 +35,7 @@ CLIENT_P0_TERM_FILE_JSON=$DEMO_FILES/ClientCvmTermParmutP0.json
 CLIENT_P1_TERM_FILE_JSON=$DEMO_FILES/ClientCvmTermParmutP1.json
 
 MANGEN_TERMS_FILE=$DEMO_FILES/ServerPlcTermsParmut.json
+MANGEN_EVS_FILE=$DEMO_FILES/ServerPlcEvsParmut.json
 
 if [[ "$PWD" == */am-cakeml/tests ]]; then
   repoRoot=$(dirname "$PWD")
@@ -45,7 +46,7 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   make manifest_compiler
 
   # First, generate the formal manifests
-  $MAN_GEN -om $DEMO_FILES -t $MANGEN_TERMS_FILE
+  $MAN_GEN -om $DEMO_FILES -t $MANGEN_TERMS_FILE -e $MANGEN_EVS_FILE
 
   # First we need to compile the AMs, before starting tmux (to prevent race condition)
   $MAN_COMP -s -o $SERVER_P0_EXE_NAME -m $SERVER_P0_FORM_MAN -l $SERVER_AM_LIB

@@ -27,6 +27,7 @@ CLIENT_EXE_NAME=TEST_CLIENT_AM_EXE
 CLIENT_TERM_FILE_JSON=$DEMO_FILES/ClientCvmTermKim.json
 
 MANGEN_TERMS_FILE=$DEMO_FILES/ServerPlcTermsKim.json
+MANGEN_EVS_FILE=$DEMO_FILES/ServerPlcEvsKim.json
 
 
 if [[ "$PWD" == */am-cakeml/tests ]]; then
@@ -39,7 +40,7 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
 
 
   # First, generate the formal manifests
-  $MAN_GEN -om $DEMO_FILES -t $MANGEN_TERMS_FILE
+  $MAN_GEN -om $DEMO_FILES -t $MANGEN_TERMS_FILE -e $MANGEN_EVS_FILE
 
   #sleep 2
 

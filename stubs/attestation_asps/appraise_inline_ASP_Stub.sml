@@ -1,18 +1,10 @@
-(* Stub code for ASP with asp ID:  appraise_id *)
+(* Stub code for ASP with asp ID:  appraise_inline_id *)
 
-(* appraise_asp_stub :: coq_ASP_PARAMS -> coq_RawEv -> coq_BS *)
-fun appraise_asp_stub ps e =
+(* appraise_inline_asp_stub :: coq_ASP_PARAMS -> coq_RawEv -> coq_BS *)
+fun appraise_inline_asp_stub ps e =
     case ps of Coq_asp_paramsC aspid args tpl tid =>
                let val _ = (print ("Matched aspid:  " ^ aspid ^ "\n");
                             print ("Performing ASP " ^ aspid ^ "\n\n")) 
-
-
-
-
-
-
-
-                    (*
 
                     val my_amlib = ManifestUtils.get_local_amLib ()
 
@@ -29,15 +21,7 @@ fun appraise_asp_stub ps e =
 
                      val _ = print ("\n\nAppraised Evidence structure:  \n" ^ (evidenceCToString appresult) ^ "\n\n")
                     
-
-                    *)
                
-
-
-
-
-
-
 
 
 

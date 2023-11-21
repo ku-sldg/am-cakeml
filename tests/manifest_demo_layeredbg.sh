@@ -30,6 +30,7 @@ CLIENT_P0_EXE_NAME=TEST_CLIENT_AM_ONE_EXE
 CLIENT_P0_TERM_FILE_JSON=$DEMO_FILES/ClientCvmTermLayeredBGP0.json
 
 MANGEN_TERMS_FILE=$DEMO_FILES/ServerPlcTermsLayeredBG.json
+MANGEN_EVS_FILE=$DEMO_FILES/ServerPlcEvsLayeredBG.json
 
 
 if [[ "$PWD" == */am-cakeml/tests ]]; then
@@ -41,7 +42,7 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   make manifest_compiler
 
   # First, generate the formal manifests
-  $MAN_GEN -om $DEMO_FILES -t $MANGEN_TERMS_FILE
+  $MAN_GEN -om $DEMO_FILES -t $MANGEN_TERMS_FILE -e $MANGEN_EVS_FILE
 
   # First we need to compile the AMs, before starting tmux (to prevent race condition)
   $MAN_COMP -s -o $SERVER_P3_EXE_NAME -m $SERVER_P3_FORM_MAN -l $SERVER_AM_LIB

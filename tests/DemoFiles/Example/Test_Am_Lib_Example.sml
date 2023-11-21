@@ -21,6 +21,8 @@ val aspMapping = (mapC_from_pairList
       fn par => fn plc => fn bs => fn rawEv => attest2_asp_stub par rawEv),
     (appraise_id,
       fn par => fn plc => fn bs => fn rawEv => appraise_asp_stub par rawEv),
+    (appraise_inline_id,
+      fn par => fn plc => fn bs => fn rawEv => appraise_inline_asp_stub par rawEv),
     (cert_id,
       fn par => fn plc => fn bs => fn rawEv => cert_asp_stub par rawEv)
   ]
@@ -40,6 +42,9 @@ val appAspMapping = (mapC_from_pairList [
         
       ((Coq_pair coq_P2 appraise_id), 
         fn par => fn p => fn bs => fn rawEv => appraise_appraise_meas_asp_stub par p bs rawEv), 
+
+      ((Coq_pair coq_P2 appraise_inline_id), 
+        fn par => fn p => fn bs => fn rawEv => appraise_appraise_meas_asp_stub par p bs rawEv),
 
       ((Coq_pair coq_P2 cert_id), 
         fn par => fn p => fn bs => fn rawEv => appraise_cert_meas_asp_stub par p bs rawEv), 

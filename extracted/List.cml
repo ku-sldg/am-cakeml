@@ -19,6 +19,12 @@ fun count_occ eq_dec l x =
        Coq_left => S n
      | Coq_right => n) end
 
+(** val rev : 'a1 list -> 'a1 list **)
+
+fun rev l = case l of
+  [] => []
+| x :: l' => app (rev l') (x :: [])
+
 (** val concat : 'a1 list list -> 'a1 list **)
 
 fun concat l = case l of

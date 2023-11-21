@@ -32,6 +32,7 @@ CLIENT_P0_TERM_FILE_JSON=$DEMO_FILES/ClientCvmTermCacheP0.json
 CLIENT_P1_TERM_FILE_JSON=$DEMO_FILES/ClientCvmTermCacheP1.json
 
 MANGEN_TERMS_FILE=$DEMO_FILES/ServerPlcTermsCache.json
+MANGEN_EVS_FILE=$DEMO_FILES/ServerPlcEvsCache.json
 
 
 if [[ "$PWD" == */am-cakeml/tests ]]; then
@@ -43,7 +44,7 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   make manifest_compiler
 
   # First, generate the formal manifests
-  $MAN_GEN -om $DEMO_FILES -t $MANGEN_TERMS_FILE
+  $MAN_GEN -om $DEMO_FILES -t $MANGEN_TERMS_FILE -e $MANGEN_EVS_FILE
   
   #sleep 5
 

@@ -35,6 +35,9 @@ val attest2_id = "attest2_aspid"
 val appraise_id = "appraise_aspid"
  (* failwith "AXIOM TO BE REALIZED" *)
 
+val appraise_inline_id = "appraise_inline_aspid"
+ (* failwith "AXIOM TO BE REALIZED" *)
+
 (** val cert_id : coq_ASP_ID **)
 
 val cert_id = "cert_aspid"

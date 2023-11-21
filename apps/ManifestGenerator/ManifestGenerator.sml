@@ -2,9 +2,10 @@
 
 type FormalManifestPath_Out = string
 type TermPlcConfigPath_In = string
+type EvPlcConfigPath_In = string
 
 
-type ManGenArgs = (FormalManifestPath_Out * TermPlcConfigPath_In)
+type ManGenArgs = (FormalManifestPath_Out * TermPlcConfigPath_In * EvPlcConfigPath_In * bool)
 
 
   (**
@@ -13,27 +14,37 @@ type ManGenArgs = (FormalManifestPath_Out * TermPlcConfigPath_In)
   *)
 fun get_args () = 
     let val name = CommandLine.name()
-        val usage = ("Usage: " ^ name ^ "-om <formal_manifest_outfile> -t <term_plc_file>")
+        val usage = ("Usage: " ^ name ^ "-om <manifest_outfiles_prefix> -t <term_plc_file> -e <evidence_plc_file> [ -p ] (provisioning) ")
     in
       case (CommandLine.arguments()) of
         argList =>
-          let val formManOutInd = ListExtra.find_index argList "-om"
-              val termPlcInInd = ListExtra.find_index argList "-t" in
-            if (formManOutInd = ~1)
-            then raise (Exception "Manifest Generator Arg Error: required field '-om' for Formal Manifest Output FileName missing\n")
-            else
-              if (termPlcInInd = ~1)
-              then raise (Exception "Manifest Generator Arg Error: required field '-t' for Input Term Plc List FileName missing\n")
-              else
+          let val formManOutInd =    ListExtra.find_index argList "-om"
+              val termPlcInInd =     ListExtra.find_index argList "-t"
+              val evPlcInInd = ListExtra.find_index argList "-e"
+              val provisionInd =     ListExtra.find_index argList "-p"
+
+              val omb = (formManOutInd <> ~1)
+              val tb = (termPlcInInd <> ~1)
+              val eb = (evPlcInInd <> ~1)
+              val pb = (provisionInd <> ~1)
+               in
+
+            if ((not omb) andalso (not pb)) 
+            then raise (Exception "Manifest Generator Arg Error: One of '-om' or '-p' args required\n")
+            else (* Now one of -om or -p is specified *)
+              if ((not tb) andalso (not eb))
+              then raise (Exception "Manifest Generator Arg Error: One of '-t' or '-e' args required\n")
+              else 
                 let val formManOutFile = List.nth argList (formManOutInd + 1)
-                    val termPlcInFile  = List.nth argList (termPlcInInd + 1) in
-                      ((formManOutFile, termPlcInFile))
+                    val termPlcInFile  = List.nth argList (termPlcInInd + 1) 
+                    val evPlcInFile    = List.nth argList (evPlcInInd + 1) in
+                      ((formManOutFile, termPlcInFile, evPlcInFile, pb))
                  end
            end
      end
 
 fun main () =
-    let val (outFilePathPrefix, cvmPlcTermsFilepath) = get_args ()
+    let val (outFilePathPrefix, cvmPlcTermsFilepath, appEvidencePlcFilePath, provisionBool) = get_args ()
 
         val _ = print "\n\n"
         val phrases =  (* TODO:  add "provisioning" capability (to exe for Manifest Generator? Copland Parser?), 
@@ -44,7 +55,7 @@ fun main () =
 
                 (* START:  UNCOMMENT FOR PROVISIONING SERVER TERMPLC LIST JSON FILE *)
                 (*
-                  val _ = ManifestJsonConfig.write_termPlcList_file_json cvmPlcTermsFilepath kim_enc_phrases (* cert_phrases *) (* kim_phrases *)
+                  val _ = ManifestJsonConfig.write_termPlcList_file_json cvmPlcTermsFilepath ManGenConfig.demo_phrases (* kim_enc_phrases *) (* cert_phrases *) (* kim_phrases *)
                 *)
                 (* END:  UNCOMMENT FOR PROVISIONING SERVER TERMPLC LIST JSON FILE  *)
               
@@ -58,20 +69,20 @@ fun main () =
 
               (* TODO:  add additinoal CLI param to generator executable for specifying path 
                         to EvidencePlc list input (avoid hardcoding _Evidence.json path...) *)
-              let val appEvidencePlcFilepath = cvmPlcTermsFilepath ^ "_Evidence.json"
+              (* let val appEvidencePlcFilepath = cvmPlcTermsFilepath ^ "_Evidence.json" *)
                   
 
               (* START:  UNCOMMENT FOR PROVISIONING APPRAISAL EVIDENCEPLC LIST JSON FILE  *)
                 (*
-                  val temp_ets = ets_kim_enc (* ets_cert *) (* ets_example_phrase *)(* ets_kim *) (* ets_cert *)
-                  val _ = ManifestJsonConfig.write_EvidencePlcList_file_json appEvidencePlcFilepath temp_ets
+                  let val temp_ets = ManGenConfig.ets_example_phrase (* ets_kim_enc *) (* ets_cert *) (* ets_example_phrase *)(* ets_kim *) (* ets_cert *)
+                      val _ = ManifestJsonConfig.write_EvidencePlcList_file_json appEvidencePlcFilePath temp_ets
                 *)
               (* END:    UNCOMMENT FOR PROVISIONING APPRAISAL EVIDENCEPLC LIST JSON FILE  *)
                   
                   
-                  val ls = ManifestJsonConfig.read_EvidencePlcList_file_json appEvidencePlcFilepath in 
-                    ls
-              end
+                       let val ls = ManifestJsonConfig.read_EvidencePlcList_file_json appEvidencePlcFilePath in
+                            ls   
+                        end
 
         val _ = ManifestJsonConfig.write_form_man_list_json_and_print_json_app 
                   outFilePathPrefix ets phrases

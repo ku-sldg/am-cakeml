@@ -353,7 +353,7 @@ fun read_EvidencePlcList_file_json (filepath:string) =
   in
     (extract_EvidencePlcList evidencePlcListJson)
   end
-  handle 
+  handle  (* TODO: handle bad json parsing here?! *)
     TextIO.BadFileName => raise Excn ("Bad file name in read_evidencePlcList_file_json: " ^ filepath)
     | TextIO.InvalidFD   => raise Excn "Invalid file descriptor in read_evidencePlcList_file_json") : ((coq_Evidence, coq_Plc) prod) list
 

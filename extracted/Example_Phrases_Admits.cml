@@ -38,6 +38,11 @@ val attest_id : coq_ASP_ID =
 val appraise_id : coq_ASP_ID =
   failwith "AXIOM TO BE REALIZED"
 
+(** val appraise_inline_id : coq_ASP_ID **)
+
+val appraise_inline_id : coq_ASP_ID =
+  failwith "AXIOM TO BE REALIZED"
+
 (** val cert_id : coq_ASP_ID **)
 
 val cert_id : coq_ASP_ID =
