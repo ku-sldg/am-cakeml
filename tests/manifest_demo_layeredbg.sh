@@ -88,7 +88,7 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   tmux send-keys -t 3 "($BUILT_SERVER_AM_P4 -m $SERVER_P4_FORM_MAN -k $SERVER_PRIV_KEY )" Enter
 
   # Start the P0 client
-  tmux send-keys -t 4 "($BUILT_CLIENT_AM_P0 -m $CLIENT_P0_FORM_MAN -k $CLIENT_PRIV_KEY -t $CLIENT_P0_TERM_FILE_JSON)" Enter
+  tmux send-keys -t 4 "($BUILT_CLIENT_AM_P0 -m $CLIENT_P0_FORM_MAN -k $CLIENT_PRIV_KEY -t $CLIENT_P0_TERM_FILE_JSON )" Enter
 
   tmux attach-session -d -t ServerProcess
 

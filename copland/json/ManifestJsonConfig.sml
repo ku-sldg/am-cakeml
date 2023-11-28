@@ -414,14 +414,16 @@ fun retrieve_CLI_args _ =
       val name = CommandLine.name ()
       val usage = ("Usage: " ^ name ^ " -m <ManifestFile>.json -k <privateKeyFile> (-t <ClientTermFile>.json)\n " ^
                     "e.g.\t" ^ name ^ " -m formMan.json -k ~/.ssh/id_ed25519 -t clientPhrase.json\n")
-      val (manFileName, privKey, termFileName) = 
+      val (manFileName, privKey, termFileName, provisioningBool) = 
               (case CommandLine.arguments () of 
                   argList => (
                     let val manInd = ListExtra.find_index argList "-m"
                         val keyInd = ListExtra.find_index argList "-k"
                         val termFileInd = ListExtra.find_index argList "-t"
+                        val provInd = ListExtra.find_index argList "-p" 
                         val manIndBool = argIndPresent manInd 
                         val keyIndBool = argIndPresent keyInd
+                        val provIndBool = argIndPresent provInd
                     in
                     (
                       if (manIndBool = False)
@@ -438,12 +440,12 @@ fun retrieve_CLI_args _ =
                                   (
                                     case (parseJsonFile manFileName) of
                                       Err e => raise (Excn ("Could not parse JSON file: " ^ e ^ "\n"))
-                                    | Ok _ => (manFileName, (parse_private_key privKeyFile), termFile)
+                                    | Ok _ => (manFileName, (parse_private_key privKeyFile), termFile, provIndBool)
                                            (* TODO: case match on parse_private_key for better error handling here...  *)
                                   )
                                 end )))
                   end ))
         in
-          (manFileName, privKey, termFileName) : (string * pubKey_t * string)
+          (manFileName, privKey, termFileName, provisioningBool) : (string * pubKey_t * string * bool)
       end
 end

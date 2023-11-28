@@ -119,7 +119,7 @@ fun startServer () =
 
 (* () -> () *)
 fun main () =
-  let val (manFilename, privKey, _) = ManifestJsonConfig.retrieve_CLI_args () 
+  let val (manFilename, privKey, _, _) = ManifestJsonConfig.retrieve_CLI_args () 
       val auth_phrase = ssl_sig_parameterized coq_P0
       val _ = ManifestUtils.setup_and_get_AM_config server_formal_manifest server_am_library privKey
       (* Retrieving implicit self place from manifest here *)

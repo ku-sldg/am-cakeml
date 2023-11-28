@@ -95,11 +95,11 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   # Start the P2 server
   tmux send-keys -t 3 "($BUILT_SERVER_AM_P2 -m $SERVER_P2_FORM_MAN -k $SERVER_PRIV_KEY )" Enter
 
-  # Start the P1 server (with slight delay to protect against race conditions)
-  tmux send-keys -t 4 "sleep 1 && ($BUILT_CLIENT_AM_P1 -m $CLIENT_P1_FORM_MAN -k $CLIENT_PRIV_KEY -t $CLIENT_P0_TERM_FILE_JSON)" Enter
+  # Start the P1 client (with slight delay to protect against race conditions)
+  tmux send-keys -t 4 "sleep 1 && ($BUILT_CLIENT_AM_P1 -m $CLIENT_P1_FORM_MAN -k $CLIENT_PRIV_KEY -t $CLIENT_P1_TERM_FILE_JSON )" Enter
   
-  # Start the P0 server (with slight delay to protect against race conditions)
-  tmux send-keys -t 5 "sleep 1 && ($BUILT_CLIENT_AM_P0 -m $CLIENT_P0_FORM_MAN -k $CLIENT_PRIV_KEY -t $CLIENT_P1_TERM_FILE_JSON)" Enter
+  # Start the P0 client (with slight delay to protect against race conditions)
+  tmux send-keys -t 5 "sleep 1 && ($BUILT_CLIENT_AM_P0 -m $CLIENT_P0_FORM_MAN -k $CLIENT_PRIV_KEY -t $CLIENT_P0_TERM_FILE_JSON )" Enter
 
   tmux attach-session -d -t ServerProcess
 

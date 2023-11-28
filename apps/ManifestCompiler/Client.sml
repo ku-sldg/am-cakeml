@@ -2,9 +2,19 @@
 
 
 fun main () =
-    let val (manifestFileName, privKey, phraseFileName) : (string * coq_PrivateKey * string) = ManifestJsonConfig.retrieve_CLI_args () 
+    let val (manifestFileName, privKey, phraseFileName, provisioningBool) : (string * coq_PrivateKey * string * bool) = ManifestJsonConfig.retrieve_CLI_args () 
 
-        
+        val _ = 
+            (
+            if(provisioningBool) 
+            then (
+                let val provisioningPhrase = ManGenConfig.demo_phrase in 
+                            ManifestJsonConfig.write_term_file_json phraseFileName provisioningPhrase
+                end
+            )
+            else ()
+            )
+
 
 
     (* START:  UNCOMMENT FOR PROVISIONING CLIENT CVM PHRASE *)
