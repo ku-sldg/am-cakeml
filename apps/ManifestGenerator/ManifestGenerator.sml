@@ -44,45 +44,28 @@ fun get_args () =
      end
 
 fun main () =
-    let val (outFilePathPrefix, cvmPlcTermsFilepath, appEvidencePlcFilePath, provisionBool) = get_args ()
+    let val (outFilePathPrefix, cvmPlcTermsFilepath, appEvidencePlcFilePath, provisioningBool) = get_args ()
 
         val _ = print "\n\n"
-        val phrases =  (* TODO:  add "provisioning" capability (to exe for Manifest Generator? Copland Parser?), 
-                                 to output Json files with ((coq_Term, coq_Plc) prod) lists that become inputs 
-                                 to the Generator exe *)
 
-              let 
-
-                (* START:  UNCOMMENT FOR PROVISIONING SERVER TERMPLC LIST JSON FILE *)
-                (*
-                  val _ = ManifestJsonConfig.write_termPlcList_file_json cvmPlcTermsFilepath ManGenConfig.demo_phrases (* kim_enc_phrases *) (* cert_phrases *) (* kim_phrases *)
-                *)
-                (* END:  UNCOMMENT FOR PROVISIONING SERVER TERMPLC LIST JSON FILE  *)
-              
-                  val ts = ManifestJsonConfig.read_termPlcList_file_json cvmPlcTermsFilepath in 
-                    ts
+        val _ = 
+          (
+          if(provisioningBool) 
+          then (
+              let val plcTerms = ManGenConfig.cache_phrases 
+                  val _ = ManifestJsonConfig.write_termPlcList_file_json cvmPlcTermsFilepath plcTerms
+                  val plcEts = ManGenConfig.ets_cache
+                  val _ = ManifestJsonConfig.write_EvidencePlcList_file_json appEvidencePlcFilePath plcEts in 
+                          ()
               end
+          )
+          else ()
+          )
 
-        val ets = (* TODO:  add "provisioning" capability (to exe for Manifest Generator? Copland Parser?), 
-                                 to output Json files with ((coq_Evidence, coq_Plc) prod) lists that become inputs 
-                                 to the Generator exe *)
+        val phrases = ManifestJsonConfig.read_termPlcList_file_json cvmPlcTermsFilepath
 
-              (* TODO:  add additinoal CLI param to generator executable for specifying path 
-                        to EvidencePlc list input (avoid hardcoding _Evidence.json path...) *)
-              (* let val appEvidencePlcFilepath = cvmPlcTermsFilepath ^ "_Evidence.json" *)
-                  
-
-              (* START:  UNCOMMENT FOR PROVISIONING APPRAISAL EVIDENCEPLC LIST JSON FILE  *)
-                (*
-                  let val temp_ets = ManGenConfig.ets_example_phrase (* ets_kim_enc *) (* ets_cert *) (* ets_example_phrase *)(* ets_kim *) (* ets_cert *)
-                      val _ = ManifestJsonConfig.write_EvidencePlcList_file_json appEvidencePlcFilePath temp_ets
-                *)
-              (* END:    UNCOMMENT FOR PROVISIONING APPRAISAL EVIDENCEPLC LIST JSON FILE  *)
-                  
-                  
-                       let val ls = ManifestJsonConfig.read_EvidencePlcList_file_json appEvidencePlcFilePath in
-                            ls   
-                        end
+        val ets = ManifestJsonConfig.read_EvidencePlcList_file_json appEvidencePlcFilePath
+                            
 
         val _ = ManifestJsonConfig.write_form_man_list_json_and_print_json_app 
                   outFilePathPrefix ets phrases

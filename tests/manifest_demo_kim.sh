@@ -40,7 +40,7 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
 
 
   # First, generate the formal manifests
-  $MAN_GEN -om $DEMO_FILES -t $MANGEN_TERMS_FILE -e $MANGEN_EVS_FILE
+  $MAN_GEN -om $DEMO_FILES -t $MANGEN_TERMS_FILE -e $MANGEN_EVS_FILE 
 
   #sleep 2
 
