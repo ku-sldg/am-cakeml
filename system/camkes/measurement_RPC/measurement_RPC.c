@@ -14,7 +14,7 @@ void * memcpy_volatile_src(void *dest, const volatile void *src, size_t n) {
     return dest;
 }
 
-bool ffimeasurementRequest(const uint8_t * c, const long clen, uint8_t * a, const long alen)
+void ffimeasurementRequest(const uint8_t * c, const long clen, uint8_t * a, const long alen)
 {
     assert(clen >= 2);
     assert(alen >= 1);
@@ -37,7 +37,7 @@ bool ffimeasurementRequest(const uint8_t * c, const long clen, uint8_t * a, cons
     a[0] = FFI_SUCCESS;
 }
 
-bool ffimeasurementAppraise(const uint8_t * c, const long clen, uint8_t * a, const long alen)
+void ffimeasurementAppraise(const uint8_t * c, const long clen, uint8_t * a, const long alen)
 {
     assert(clen >= 2);
     assert(alen >= 1);
