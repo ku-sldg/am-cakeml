@@ -187,7 +187,6 @@ get_files(posix_c_files_tpm
 get_files(camkes_c_files
     system/camkes/basis_ffi.c
     system/crypto/evercrypt/crypto_ffi.c
-    system/camkes/dataports/dataport_ffi.c
     system/camkes/measurement_RPC/measurement_RPC.c
     system/camkes/fileserver_RPC/fileserver_RPC.c
     system/camkes/commutil_RPC/commutil_RPC.c
