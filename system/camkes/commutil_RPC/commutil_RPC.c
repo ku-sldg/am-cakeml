@@ -126,3 +126,102 @@ bool ffisendCoplandAppRequest(const uint8_t * c, const long clen, uint8_t * a, c
 
     a[0] = FFI_SUCCESS;
 }
+
+bool ffirecvCoplandRequestFromLinux(const uint8_t * c, const long clen, uint8_t * a, const long alen)
+{
+    assert(clen >= 2);
+    assert(alen >= 1);
+    int am_id = byte2_to_int(c); //from the cakeml_basis.c
+
+    if(am_id < 0)
+    {
+        printf("Negative ID passed to recvCoplandRequestFromLinux\n");
+        a[0] = FFI_FAILURE;
+        return;
+    }
+
+    printf("DEBUG: id is %d\n", am_id);
+
+    printf("Dying now. Need implemented, thanks.\n");
+    /* char* response = NULL; // we are bound to free this */
+    /* bool rpc_result = comm_util_do_what_do( ip, port, json_request, &response ); */
+    /* if(!rpc_result) */
+    /* { */
+    /*     a[0] = FFI_FAILURE; */
+    /*     return; */
+    /* } */
+
+    /* // Should we fail if output buffer is too long? */
+    /* memcpy_volatile_src((void *)(a+1), response, alen-1); */
+
+    /* // We are bound to free this. */
+    /* free(response); */
+
+    a[0] = FFI_SUCCESS;
+}
+
+
+bool ffirecvCoplandAppRequestFromLinux(const uint8_t * c, const long clen, uint8_t * a, const long alen)
+{
+    assert(clen >= 2);
+    assert(alen >= 1);
+    int am_id = byte2_to_int(c); //from the cakeml_basis.c
+
+    if(am_id < 0)
+    {
+        printf("Negative ID passed to recvCoplandAppRequestFromLinux\n");
+        a[0] = FFI_FAILURE;
+        return;
+    }
+
+    printf("DEBUG: id is %d\n", am_id);
+
+    printf("Dying now. Need implemented, thanks.\n");
+    /* char* response = NULL; // we are bound to free this */
+    /* bool rpc_result = comm_util_do_what_do( ip, port, json_request, &response ); */
+    /* if(!rpc_result) */
+    /* { */
+    /*     a[0] = FFI_FAILURE; */
+    /*     return; */
+    /* } */
+
+    /* // Should we fail if output buffer is too long? */
+    /* memcpy_volatile_src((void *)(a+1), response, alen-1); */
+
+    /* // We are bound to free this. */
+    /* free(response); */
+
+    a[0] = FFI_SUCCESS;
+}
+
+bool ffirespondToLinux(const uint8_t * c, const long clen, uint8_t * a, const long alen)
+{
+    assert(clen >= 2);
+    assert(alen >= 1);
+
+    if(c == NULL)
+    {
+        printf("No response passed to recvCoplandAppRequestFromLinux\n");
+        a[0] = FFI_FAILURE;
+        return;
+    }
+
+    printf("DEBUG: response is %s\n", c);
+
+    printf("Dying now. Need implemented, thanks.\n");
+    /* char* response = NULL; // we are bound to free this */
+    /* bool rpc_result = comm_util_do_what_do( ip, port, json_request, &response ); */
+    /* if(!rpc_result) */
+    /* { */
+    /*     a[0] = FFI_FAILURE; */
+    /*     return; */
+    /* } */
+
+    /* // Should we fail if output buffer is too long? */
+    /* memcpy_volatile_src((void *)(a+1), response, alen-1); */
+
+    /* // We are bound to free this. */
+    /* free(response); */
+
+    a[0] = FFI_SUCCESS;
+}

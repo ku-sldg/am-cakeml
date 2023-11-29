@@ -12,27 +12,25 @@ When things go wrong, handle_AM_request returns a raw error message string.
   In the future, we may want to wrap said error messages in JSON as well to make 
   it easier on the client. *)
 
-  (*
-fun respondToMsg client = 
-  let val inString  = Socket.inputAll client 
-      val ac = ManifestUtils.get_local_amConfig ()
-      val outString = handle_AM_request inString ac am_library
-      val _ = print ("\n\nSending response string: \n" ^ outString) in 
-    Socket.output client outString
-  end
-  handle Json.Exn s1 s2 =>
-          (TextIO.print_err ("JSON error" ^ s1 ^ ": " ^ s2 ^ "\n"); ())
-  (*| USMexpn s => (TextIO.print_err (String.concat ["USM error: ", s, "\n"]);
-            "USM failure")   *)
-            
-fun handleIncoming listener =
-    let val client = Socket.accept listener
-     in respondToMsg client;
-        Socket.close client
+fun respondToMsg inString = 
+    let 
+        val ac = ManifestUtils.get_local_amConfig ()
+        val outString = handle_AM_request inString ac am_library
+        val _ = print ("\n\nSending response string: \n" ^ outString)
+    in 
+        respondToLinux outString
     end
-    handle Socket.Err s     => TextIOExtra.printLn_err ("Socket failure: " ^ s)
-         | Socket.InvalidFD => TextIOExtra.printLn_err "Invalid file descriptor"
-
+    handle Json.Exn s1 s2 => (TextIO.print_err ("JSON error" ^ s1 ^ ": " ^ s2 ^ "\n"); ())
+            
+fun handleIncoming () =
+    let
+        val receivedMessage = recvCoplandReqFromLinux ()
+    in
+        respondToMsg receivedMessage
+    end
+    handle
+          RPCCallErr s => TextIOExtra.printLn_err ("RPC Call Error: " ^ s ^ "\n")
+         | Exception s => TextIO.print_err ("EXCEPTION: " ^ s ^ "\n")
 
 (* () -> () *)
 fun startServer () =
@@ -42,15 +40,16 @@ fun startServer () =
         val _ = TextIOExtra.printLn ("Starting up Server")
         val _ = TextIOExtra.printLn ("On port: " ^ (Int.toString port) ^ "\nQueue Length: " ^ (Int.toString queueLength))
     in 
-     loop handleIncoming (Socket.listen port queueLength)
+    (* loop handleIncoming (Socket.listen port queueLength) *)
+        handleIncoming ()
     end
-    handle Socket.Err s => TextIO.print_err ("Socket failure on listener instantiation: " ^ s ^ "\n")
-         | Crypto.Err s => TextIO.print_err ("Crypto error: " ^ s ^ "\n")
+    handle 
+           (* Socket.Err s => TextIO.print_err ("Socket failure on listener instantiation: " ^ s ^ "\n") *)
+          Crypto.Err s => TextIO.print_err ("Crypto error: " ^ s ^ "\n")
          | Exception s => TextIO.print_err ("EXCEPTION: " ^ s ^ "\n")
          | Json.Exn s1 s2 => TextIO.print_err ("Json Exception: " ^ s1 ^ "\n" ^ s2 ^ "\n")
          | Result.Exn => TextIO.print_err ("Result Exn:\n")
          | Undef => TextIO.print_err ("Undefined Exception:\n")
-*)
 
 (* () -> () *)
 fun main () =
@@ -67,8 +66,7 @@ fun main () =
         val my_plc = ManifestUtils.get_myPlc()
         val _ = print ("My Place (retrieved from Manifest): " ^ my_plc ^ "\n\n")
     in
-        (* startServer() *)
-        ()
+        startServer()
     end
     handle 
         Exception e => TextIO.print_err e 
