@@ -1,7 +1,11 @@
-
+(*
+This file is for communication
+    FROM a CAmkES component
+    TO a linux VM
+*)
 exception DispatchErr string
 
-(* same as in SocketCommUtil *)
+(* same as in networkCommUtil *)
 (* such entries as "localhost:5000" *)
 fun decodeUUID (u : coq_UUID) = 
   (* Splits at ":" character, into (ip, port) *)
@@ -21,12 +25,12 @@ fun decodeUUID (u : coq_UUID) =
 
 (*
     These are the two functions we need to export
-    They must match, in signature, the samely named functions in SocketCommUtil
-    We'll use these misnomers ("socket") here, for historical reasons :smirk:
+    sendCoplandReq and sendCoplandAppReq here are implemented as RPC calls.
+    See system/camkes/CommUtil for more
 *)
 
 (* coq_Plc -> nsMap -> coq_Plc -> coq_ReqAuthTok -> (bs list) -> coq_Term -> (bs list) *)
-fun socketDispatch (target : coq_UUID) (authTok : coq_ReqAuthTok) (ev : (bs list)) (t : coq_Term) =
+fun networkDispatch (target : coq_UUID) (authTok : coq_ReqAuthTok) (ev : (bs list)) (t : coq_Term) =
     let 
         val (ip, port) = decodeUUID target
         val req  = (REQ t authTok ev)
@@ -37,7 +41,7 @@ fun socketDispatch (target : coq_UUID) (authTok : coq_ReqAuthTok) (ev : (bs list
     end
 
 (* coq_UUID -> coq_Term -> coq_Plc -> coq_Evidence -> coq_RawEv -> coq_AppResultC *)
-fun socketDispatchApp (target : coq_UUID) (t : coq_Term) (p:coq_Plc) (et:coq_Evidence) (ev : coq_RawEv)  =
+fun networkDispatchApp (target : coq_UUID) (t : coq_Term) (p:coq_Plc) (et:coq_Evidence) (ev : coq_RawEv)  =
     let
         val (ip, port) = decodeUUID target
         val req  = (REQ_APP t p et ev)

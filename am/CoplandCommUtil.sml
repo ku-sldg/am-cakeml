@@ -1,10 +1,13 @@
-
+(*
+Top Level file for dispatch functions
+Some platform-dependent functions implemented in PosixCommUtil.sml and seL4CommUtil.sml
+*)
 exception DispatchErr string
 
 (* coq_Term -> coq_UUID -> coq_ReqAuthTok -> (bs list) -> (bs list) *)
 fun am_sendReq' (t : coq_Term) (targUUID : coq_UUID) (authTok : coq_ReqAuthTok) (ev : (bs list))  =
     let val _ = TextIO.print ("Received Request to Dispatch term to UUID: '" ^ targUUID ^ "'\n\n")
-        val resev = socketDispatch targUUID authTok ev t
+        val resev = networkDispatch targUUID authTok ev t
     in
         (print ("Sent term:\n" ^ termToString t ^
                 "\n\nInitial raw evidence (Sent):\n" ^
@@ -24,7 +27,7 @@ fun am_sendReq (t : coq_Term) (targPlc : coq_Plc) (authTok : coq_ReqAuthTok) (ev
 (* coq_UUID -> coq_Term -> coq_Plc -> coq_Evidence -> coq_RawEv -> coq_AppResultC *)
 fun am_sendReq'_app (targUUID : coq_UUID) (t : coq_Term) (p:coq_Plc) (et:coq_Evidence) (ev : coq_RawEv)  =
     let val _ = TextIO.print ("Received Request to Dispatch Appraisal term to UUID: '" ^ targUUID ^ "'\n\n")
-        val resapp = socketDispatchApp targUUID t p et ev 
+        val resapp = networkDispatchApp targUUID t p et ev 
     in
         (print ("Sent Appraisal term:\n" ^ termToString t ^
                 "\n\nInitial raw evidence (Sent):\n" ^

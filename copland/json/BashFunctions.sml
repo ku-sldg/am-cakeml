@@ -131,7 +131,6 @@ structure BashFunctions = struct
             ()
     end
     handle Excn e => TextIOExtra.printLn e
-    *)
 
     fun write_form_man_list_json_and_print_json_app (pathPrefix : string) (ets:(coq_Evidence, coq_Plc) prod list) (ls:(coq_Term, coq_Plc) prod list) = 
     let val man_list : coq_Manifest list = end_to_end_mangen_final ets ls (* man_gen_run_attify ls *)
@@ -140,6 +139,7 @@ structure BashFunctions = struct
             ()
     end
     handle Excn e => TextIOExtra.printLn e
+    *)
 
 
 

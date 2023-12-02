@@ -152,6 +152,19 @@ get_files(server_am_src_camkes
     system/camkes/commutil_RPC/CommUtil_RPC.sml
     ${attestation_asps}
     ${appraisal_asps}
+    am/seL4CommUtil.sml
+    ${cop_src_post_aspStubs}
+)
+get_files(client_am_src_camkes
+    ${util_src}
+    util/Log.sml
+    ${posix_src_hacl}
+    ${cop_src_pre_aspStubs}
+    copland/json/BashFunctions.sml
+    system/posix/dataports/DataportFFI.sml
+    ${attestation_asps}
+    ${appraisal_asps}
+    am/PosixCommUtil.sml
     ${cop_src_post_aspStubs}
 )
 
@@ -160,6 +173,7 @@ get_files(posix_c_files_base
     system/posix/time/time_ffi.c
     system/posix/meas/meas_ffi.c
     system/posix/sys/sys_ffi.c
+    system/posix/dataports/dataport_ffi.c
 )
 
 
