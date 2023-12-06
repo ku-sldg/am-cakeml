@@ -68,7 +68,8 @@ fun am_newNonce bs =
     in
     let val newMap = map_set nat_EqClass oldMap oldId bs in
     let val newId = add oldId (S O) in
-    bind (put (Coq_mkAM_St newMap newId oldAMConfig)) (fn _ => ret oldId) end end end end end)
+    bind (put (Coq_mkAM_St newMap newId oldAMConfig)) (fn _ =>
+      ret oldId) end end end end end)
 
 (** val am_getNonce : nat -> coq_BS coq_AM **)
 

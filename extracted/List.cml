@@ -1,4 +1,5 @@
-(** val in_dec : ('a1 -> 'a1 -> sumbool) -> 'a1 -> 'a1 list -> sumbool **)
+(** val in_dec :
+    ('a1 -> 'a1 -> sumbool) -> 'a1 -> 'a1 list -> sumbool **)
 
 fun in_dec h a l = case l of
   [] => Coq_right
@@ -8,7 +9,8 @@ fun in_dec h a l = case l of
      Coq_left => Coq_left
    | Coq_right => in_dec h a l0) end
 
-(** val count_occ : ('a1 -> 'a1 -> sumbool) -> 'a1 list -> 'a1 -> nat **)
+(** val count_occ :
+    ('a1 -> 'a1 -> sumbool) -> 'a1 list -> 'a1 -> nat **)
 
 fun count_occ eq_dec l x =
   case l of
@@ -55,9 +57,10 @@ fun forallb f l = case l of
 
 fun filter f l = case l of
   [] => []
-| x :: l0 => (case f x of
-                True => x :: (filter f l0)
-              | False => filter f l0)
+| x :: l0 =>
+  (case f x of
+     True => x :: (filter f l0)
+   | False => filter f l0)
 
 (** val firstn : nat -> 'a1 list -> 'a1 list **)
 

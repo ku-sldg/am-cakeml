@@ -11,7 +11,8 @@ datatype coq_AM_Error =
 | Coq_am_error coq_StringT
 | Coq_am_dispatch_error coq_DispatcherErrors
 
-(** val am_failm : coq_AM_Error -> (coq_AM_St, 'a1, coq_AM_Error) coq_Err **)
+(** val am_failm :
+    coq_AM_Error -> (coq_AM_St, 'a1, coq_AM_Error) coq_Err **)
 
 fun am_failm e s =
   Coq_pair (Coq_errC e) s

@@ -37,9 +37,11 @@ fun enc_params enc_targplc =
   Coq_asp_paramsC enc_aspid enc_aspargs enc_targplc enc_targid
 
 (** val term_discloses_aspid_to_remote_enc_bool :
-    coq_Term -> coq_Plc -> coq_Evidence -> coq_ASP_ID -> coq_Plc -> bool **)
+    coq_Term -> coq_Plc -> coq_Evidence -> coq_ASP_ID -> coq_Plc ->
+    bool **)
 
 val term_discloses_aspid_to_remote_enc_bool : (coq_Term -> coq_Plc ->
-                                              coq_Evidence -> coq_ASP_ID ->
-                                              coq_Plc -> bool) =
+                                              coq_Evidence ->
+                                              coq_ASP_ID -> coq_Plc
+                                              -> bool) =
   failwith "AXIOM TO BE REALIZED"

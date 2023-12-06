@@ -2,7 +2,8 @@
     (coq_Term, coq_Plc) prod list -> coq_EnvironmentM list **)
 
 fun manifest_generator_plcTerm_list ls =
-  map (fn pat => let val Coq_pair t p = pat in manifest_generator t p end) ls
+  map (fn pat =>
+    let val Coq_pair t p = pat in manifest_generator t p end) ls
 
 (** val env_list_union : coq_EnvironmentM list -> coq_EnvironmentM **)
 
@@ -32,7 +33,8 @@ fun lift_manifest_to_env m =
 
 fun manifest_generator_plcEvidence_list ls =
   let val ms =
-    map (fn pat => let val Coq_pair et p = pat in mangen_app_plc et p end) ls
+    map (fn pat =>
+      let val Coq_pair et p = pat in mangen_app_plc et p end) ls
   in
   map lift_manifest_to_env ms end
 
@@ -43,8 +45,8 @@ fun mangen_plcEvidence_list_union ls =
   env_list_union (manifest_generator_plcEvidence_list ls)
 
 (** val end_to_end_mangen :
-    (coq_Evidence, coq_Plc) prod list -> (coq_Term, coq_Plc) prod list ->
-    coq_EnvironmentM **)
+    (coq_Evidence, coq_Plc) prod list -> (coq_Term, coq_Plc) prod
+    list -> coq_EnvironmentM **)
 
 fun end_to_end_mangen ls ts =
   let val app_env = mangen_plcEvidence_list_union ls in
@@ -52,19 +54,22 @@ fun end_to_end_mangen ls ts =
   environment_union app_env att_env end end
 
 (** val get_all_unique_places :
-    (coq_Term, coq_Plc) prod list -> (coq_Evidence, coq_Plc) prod list ->
-    coq_Plc list **)
+    (coq_Term, coq_Plc) prod list -> (coq_Evidence, coq_Plc) prod
+    list -> coq_Plc list **)
 
 fun get_all_unique_places ls ets =
   let val lss =
     map (fn pat => let val Coq_pair t p = pat in places p t end) ls
   in
-  let val ets_ps = map (fn pat => let val Coq_pair _ p = pat in p end) ets in
-  let val ts_res_dup = concat lss in dedup_list (app ts_res_dup ets_ps) end end end
+  let val ets_ps =
+    map (fn pat => let val Coq_pair _ p = pat in p end) ets
+  in
+  let val ts_res_dup = concat lss in
+  dedup_list (app ts_res_dup ets_ps) end end end
 
 (** val end_to_end_mangen_final :
-    (coq_Evidence, coq_Plc) prod list -> (coq_Term, coq_Plc) prod list ->
-    coq_Manifest list **)
+    (coq_Evidence, coq_Plc) prod list -> (coq_Term, coq_Plc) prod
+    list -> coq_Manifest list **)
 
 fun end_to_end_mangen_final ls ts =
   let val env = end_to_end_mangen ls ts in

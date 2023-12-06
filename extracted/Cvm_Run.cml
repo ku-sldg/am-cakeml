@@ -19,4 +19,5 @@ fun run_cvm_w_config t p e ac =
 
 fun run_cvm_rawEv t p e ac =
   get_bits
-    (let val Coq_mk_st st_ev _ _ _ _ = run_cvm_w_config t p e ac in st_ev end)
+    (let val Coq_mk_st st_ev _ _ _ _ = run_cvm_w_config t p e ac in
+     st_ev end)

@@ -15,7 +15,8 @@ val jsonToStr : (coq_JsonT -> coq_StringT) =
 val responseToJson : (coq_CvmResponseMessage -> coq_JsonT) =
   failwith "AXIOM TO BE REALIZED"
 
-(** val appResponseToJson : coq_AppraisalResponseMessage -> coq_JsonT **)
+(** val appResponseToJson :
+    coq_AppraisalResponseMessage -> coq_JsonT **)
 
 val appResponseToJson : (coq_AppraisalResponseMessage -> coq_JsonT) =
   failwith "AXIOM TO BE REALIZED"

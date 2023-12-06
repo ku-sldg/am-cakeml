@@ -18,8 +18,8 @@ fun map_get h m x =
      | False => map_get h m' x) end
 
 (** val map_set :
-    'a1 coq_EqClass -> ('a1, 'a2) coq_MapC -> 'a1 -> 'a2 -> ('a1, 'a2)
-    coq_MapC **)
+    'a1 coq_EqClass -> ('a1, 'a2) coq_MapC -> 'a1 -> 'a2 -> ('a1,
+    'a2) coq_MapC **)
 
 fun map_set h m x v =
   case m of
@@ -33,8 +33,8 @@ fun map_set h m x v =
 type ('a, 'b) coq_MapD = ('a, 'b) prod list
 
 (** val mapD_get_key :
-    'a1 coq_EqClass -> 'a2 coq_EqClass -> ('a1, 'a2) coq_MapD -> 'a2 -> 'a1
-    option **)
+    'a1 coq_EqClass -> 'a2 coq_EqClass -> ('a1, 'a2) coq_MapD -> 'a2
+    -> 'a1 option **)
 
 fun mapD_get_key h h1 m v =
   case m of

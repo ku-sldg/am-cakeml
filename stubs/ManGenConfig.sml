@@ -31,6 +31,8 @@ structure ManGenConfig = struct
     val demo_phrase_p2_appraise = example_phrase_p2_appraise
     val demo_phrases = [(Coq_pair demo_phrase coq_P0)] @ (auth_phrase_list coq_P0)
 
+    val inline_auth_phrase = inline_auth_phrase
+    val inline_auth_phrases = [(Coq_pair inline_auth_phrase coq_P0)] @ (auth_phrase_list coq_P0)
 
 
 
@@ -43,6 +45,8 @@ structure ManGenConfig = struct
     val appraiser_evidence_parmut_p0 = eval parmut_phrase_p0 coq_P0 (Coq_nn O)
     val appraiser_evidence_parmut_p1 = eval parmut_phrase_p1 coq_P1 (Coq_nn O)
     val appraiser_evidence_layeredbg = eval layered_bg_phrase coq_P0 (Coq_nn O)
+
+    val appraiser_evidence_inlineauth = eval inline_auth_phrase coq_P0 (Coq_nn O)
 
     val ets_kim = [(Coq_pair appraiser_evidence_kim coq_P0),
                     (Coq_pair appraiser_evidence_kim coq_P3)]
@@ -62,6 +66,9 @@ structure ManGenConfig = struct
                         (Coq_pair appraiser_evidence_parmut_p1 coq_P3)]
     val ets_layeredbg = [(Coq_pair appraiser_evidence_layeredbg coq_P0),
                             (Coq_pair appraiser_evidence_layeredbg coq_P3)]
+
+    val ets_inlineauth = [(Coq_pair appraiser_evidence_inlineauth coq_P0),
+                            (Coq_pair appraiser_evidence_inlineauth coq_P3)]
 
     val appraiser_evidence_demo_phrase = eval demo_phrase coq_P0 (Coq_nn O)
 

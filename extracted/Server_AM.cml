@@ -18,8 +18,9 @@ fun am_serve_auth_tok_req t fromPl myPl authTok init_ev ac al =
       True =>
       bind
         (config_AM_if_lib_supported
-          (let val Coq_mkAmConfig absMan _ _ _ _ _ _ = ac in absMan end) al)
-        (fn _ => ret (run_cvm_rawEv t myPl init_ev ac))
+          (let val Coq_mkAmConfig absMan _ _ _ _ _ _ = ac in
+           absMan end) al) (fn _ =>
+        ret (run_cvm_rawEv t myPl init_ev ac))
     | False => am_failm (Coq_am_error errStr_app_auth_tok))
 
 (** val run_am_server_auth_tok_req :
@@ -28,7 +29,8 @@ fun am_serve_auth_tok_req t fromPl myPl authTok init_ev ac al =
 
 fun run_am_server_auth_tok_req t fromPlc myPl authTok init_ev ac al =
   run_am_app_comp
-    (am_serve_auth_tok_req t fromPlc myPl authTok init_ev ac al) [] True
+    (am_serve_auth_tok_req t fromPlc myPl authTok init_ev ac al) []
+    True
 
 (** val do_cvm_session :
     coq_CvmRequestMessage -> coq_AM_Config -> coq_AM_Library ->
@@ -36,7 +38,8 @@ fun run_am_server_auth_tok_req t fromPlc myPl authTok init_ev ac al =
 
 fun do_cvm_session req ac al =
   let val REQ t tok ev = req in
-  run_am_server_auth_tok_req t default_place default_place tok ev ac al end
+  run_am_server_auth_tok_req t default_place default_place tok ev ac
+    al end
 
 (** val do_appraisal_session :
     coq_AppraisalRequestMessage -> coq_AM_Config -> coq_BS ->
@@ -52,7 +55,8 @@ fun do_appraisal_session appreq ac nonceVal =
   run_am_app_comp_init comp my_amst Coq_mtc_app True end end end end end end
 
 (** val handle_AM_request :
-    coq_StringT -> coq_AM_Config -> coq_AM_Library -> coq_BS -> coq_StringT **)
+    coq_StringT -> coq_AM_Config -> coq_AM_Library -> coq_BS ->
+    coq_StringT **)
 
 fun handle_AM_request s ac al nonceVal =
   let val js = strToJson s in
@@ -60,7 +64,8 @@ fun handle_AM_request s ac al nonceVal =
   let val json_resp =
     case am_req of
       CVM_REQ r =>
-      let val cvm_resp = do_cvm_session r ac al in responseToJson cvm_resp end
+      let val cvm_resp = do_cvm_session r ac al in
+      responseToJson cvm_resp end
     | APP_REQ appreq =>
       let val app_resp = do_appraisal_session appreq ac nonceVal in
       appResponseToJson app_resp end

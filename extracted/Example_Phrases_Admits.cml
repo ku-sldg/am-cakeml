@@ -92,3 +92,8 @@ val att_tid : coq_TARG_ID =
 
 val it : coq_TARG_ID =
   failwith "AXIOM TO BE REALIZED"
+
+(** val check_ssl_sig_aspid : coq_ASP_ID **)
+
+val check_ssl_sig_aspid : coq_ASP_ID =
+  failwith "AXIOM TO BE REALIZED"

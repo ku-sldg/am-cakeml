@@ -72,3 +72,6 @@ val cache = "cache_targid"
 
 (** val retrieve_args : coq_Arg list **)
 val retrieve_args = []
+
+(** val check_ssl_sig_aspid : coq_ASP_ID **)
+val check_ssl_sig_aspid = "check_ssl_sig_aspid"
