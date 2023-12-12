@@ -20,3 +20,12 @@ get_files(attestation_asps
     attest1_ASP_Stub.sml
     attest2_ASP_Stub.sml
 )
+
+get_files(posix_cm_attestation_asp
+    cm_ASP_Stub_posix.sml
+)
+
+get_files(camkes_cm_attestation_asp
+    cm_ASP_Stub_camkes.sml
+)
+

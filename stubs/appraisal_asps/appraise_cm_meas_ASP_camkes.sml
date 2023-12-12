@@ -5,6 +5,7 @@ fun appraise_cm_asp_stub ps p bs ls =
     case ps of Coq_asp_paramsC aspid args tpl tid =>
                 let 
                     val _ = print ("Appraising ASP with ID:  " ^ aspid ^ "\n");
+                    val result = kernelAppraisal 0 bs
                 in 
                     (Coq_resultC passed_bs)
 

@@ -13,8 +13,8 @@ structure Crypto = struct
         fun ffi_curve25519_ecdh x y = #(curve25519_ecdh) x y
         fun ffi_signSecretToPublic x y = #(signSecretToPublic) x y
         fun ffi_curve25519_secretToPublic x y = #(curve25519_secretToPublic) x y
-        val pubkeyLen = 64
-        val privkeyLen = 32
+        val pubkeyLen = 270
+        val privkeyLen = 1219
         val signLen = 64
         val digestLen = 64
     in
@@ -24,15 +24,15 @@ structure Crypto = struct
         (* bstring -> bstring -> bstring *)
         fun signMsg priv msg =
             if BString.length priv <> privkeyLen then
-                raise (Err "Wrong private key size, Error in signMsg FFI")
+                raise (Err ("Wrong private key size (" ^ (Int.toString (BString.length priv)) ^ "), Error in signMsg FFI"))
             else 
                 FFI.call ffi_signMsg signLen (BString.concat priv msg)
 
 
         (* bstring -> bstring -> bstring -> bool *)
         fun sigCheck pub sign msg = 
-            if BString.length pub <> signLen then
-                raise (Err "Wrong public key size, Error in sigCheck FFI")
+            if BString.length pub <> pubkeyLen then
+                raise (Err ("Wrong public key size (" ^ (Int.toString (BString.length pub)) ^ "), Error in sigCheck FFI"))
             else
                 FFI.callBool ffi_sigCheck (BString.concatList [pub, sign, msg])
 

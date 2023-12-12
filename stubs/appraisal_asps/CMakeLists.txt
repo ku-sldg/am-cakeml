@@ -12,3 +12,11 @@ get_files(appraisal_asps ./appraise_kim_meas_ASP.sml
   appraise_attest2_meas_ASP.sml
   )
  
+get_files(posix_cm_appraisal_asp
+    appraise_cm_meas_ASP_posix.sml
+)
+
+get_files(camkes_cm_appraisal_asp
+    appraise_cm_meas_ASP_camkes.sml
+)
+

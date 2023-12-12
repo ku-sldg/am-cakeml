@@ -4,10 +4,17 @@
 fun cm_asp_stub ps e =
     case ps of Coq_asp_paramsC aspid args tpl tid =>
                 let 
-                    val _ = () 
                     val _ = print ("Matched aspid:  " ^ aspid ^ "\n\n");
                     val _ = print ("Running ASP with aspid:  " ^ aspid ^ "\n\n");
-                    val evidence = kernelMeasurement 0
+                    val authEv = [];
+                    val authEt = Coq_mt;
+                    val authToken = (Coq_evc authEv authEt);
+                    val result = (am_sendReq [] "dataport:uio0" authToken []);
+                    (*
+                    val _ = emitDataport "/dev/uio0";
+                    val _ = waitDataport "/dev/uio0";
+                    *)
+                    val _ = print ("Hi mom")
                 in
                     (Coq_resultC passed_bs)
                    (*

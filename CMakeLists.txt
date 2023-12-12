@@ -151,7 +151,9 @@ get_files(server_am_src_camkes
     ${cop_src_pre_aspStubs}
     system/camkes/commutil_RPC/CommUtil_RPC.sml
     ${attestation_asps}
+    ${camkes_cm_attestation_asp}
     ${appraisal_asps}
+    ${camkes_cm_appraisal_asp}
     am/seL4CommUtil.sml
     ${cop_src_post_aspStubs}
 )
@@ -164,8 +166,10 @@ get_files(client_am_src_camkes
     system/posix/dataports/DataportFFI.sml
     ${attestation_asps}
     ${appraisal_asps}
+    ${posix_cm_appraisal_asp}
     am/PosixCommUtil.sml
     ${cop_src_post_aspStubs}
+    ${posix_cm_attestation_asp}
 )
 
 get_files(posix_c_files_base
