@@ -1,7 +1,9 @@
-(** val coq_P0 : coq_Plc **)
 
+(*
+(** val coq_P0 : coq_Plc **)
 val coq_P0 = "P0"
   (* failwith "AXIOM TO BE REALIZED" *)
+*)
 
 (** val coq_P1 : coq_Plc **)
 (*
@@ -54,12 +56,24 @@ val store_args = []
 
 (** val appraise_inline_args : coq_Arg list **)
 val appraise_inline_args : coq_Arg list = 
-  let val appReq = (REQ_APP example_phrase_p2_appraise coq_P1 (Coq_nn O) [])
+  let val appTerm = example_phrase_p2_appraise
+      val appReq = (REQ_APP appTerm coq_P1 (Coq_nn O) [])
       val jsonAppReq = appRequestToJson appReq
       val strJsonAppReq = jsonToStr jsonAppReq in 
         [(strJsonAppReq)]
   end
   (* failwith "AXIOM TO BE REALIZED"  *)
+
+(** val check_ssl_sig_args : coq_Arg list **)
+val check_ssl_sig_args : coq_Arg list = 
+  let val appTerm = (Coq_asp (ASPC ALL EXTD (Coq_asp_paramsC ssl_sig_aspid []
+                                   coq_P0 sys)))
+      val appReq = (REQ_APP appTerm coq_P0 (Coq_nn O) [])
+      val jsonAppReq = appRequestToJson appReq
+      val strJsonAppReq = jsonToStr jsonAppReq in 
+        [(strJsonAppReq)]
+  end
+
 
 (* 
 

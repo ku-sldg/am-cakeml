@@ -48,6 +48,9 @@ val appAspMapping = (mapC_from_pairList [
       ((Coq_pair coq_P2 appraise_inline_id), 
         fn par => fn p => fn bs => fn rawEv => appraise_appraise_meas_asp_stub par p bs rawEv),
 
+      ((Coq_pair coq_P1 appraise_inline_id), 
+        fn par => fn p => fn bs => fn rawEv => appraise_appraise_meas_asp_stub par p bs rawEv),
+
       ((Coq_pair coq_P2 cert_id), 
         fn par => fn p => fn bs => fn rawEv => appraise_cert_meas_asp_stub par p bs rawEv), 
 

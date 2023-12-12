@@ -3,11 +3,6 @@
 val ssl_sig_targid : coq_ASP_ID =
   failwith "AXIOM TO BE REALIZED"
 
-(** val ssl_sig_aspid : coq_ASP_ID **)
-
-val ssl_sig_aspid : coq_ASP_ID =
-  failwith "AXIOM TO BE REALIZED"
-
 (** val ssl_sig_args : coq_Arg list **)
 
 val ssl_sig_args : coq_Arg list =

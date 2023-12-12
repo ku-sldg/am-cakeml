@@ -1,3 +1,8 @@
+(** val coq_P0 : coq_Plc **)
+
+val coq_P0 : coq_Plc =
+  failwith "AXIOM TO BE REALIZED"
+
 (** val coq_P1 : coq_Plc **)
 
 val coq_P1 : coq_Plc =
@@ -11,6 +16,11 @@ val attest1_id : coq_ASP_ID =
 (** val attest2_id : coq_ASP_ID **)
 
 val attest2_id : coq_ASP_ID =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val ssl_sig_aspid : coq_ASP_ID **)
+
+val ssl_sig_aspid : coq_ASP_ID =
   failwith "AXIOM TO BE REALIZED"
 
 (** val sys : coq_TARG_ID **)
