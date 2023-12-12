@@ -19,8 +19,7 @@ fun gen_appraise_AM et ls =
        ENCR =>
        bind (peel_bs_am ls) (fn v =>
          let val Coq_pair bs _ = v in
-         bind (decrypt_bs_to_rawev' bs params et')
-           (fn decrypted_ls =>
+         bind (decrypt_bs_to_rawev' bs params et') (fn decrypted_ls =>
            bind (gen_appraise_AM et' decrypted_ls) (fn rest =>
              ret (Coq_eec_app p params passed_bs rest))) end)
      | EXTD =>

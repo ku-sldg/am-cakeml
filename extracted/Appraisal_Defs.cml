@@ -1,6 +1,5 @@
 (** val check_et_size :
-    coq_Evidence -> coq_RawEv -> (unit, coq_DispatcherErrors)
-    coq_ResultT **)
+    coq_Evidence -> coq_RawEv -> (unit, coq_DispatcherErrors) coq_ResultT **)
 
 fun check_et_size et ls =
   case eqb nat_EqClass (et_size et) (length ls) of
@@ -13,8 +12,7 @@ fun check_et_size et ls =
 
 fun decrypt_bs_to_rawev bs params ac =
   let val Coq_asp_paramsC _ _ p _ = params in
-  (case let val Coq_mkAmConfig _ _ _ _ _ pubKeyCb _ = ac in
-        pubKeyCb p end of
+  (case let val Coq_mkAmConfig _ _ _ _ _ pubKeyCb _ = ac in pubKeyCb p end of
      Coq_errC e => Coq_errC e
    | Coq_resultC pubkey => decrypt_bs_to_rawev_prim bs params pubkey) end
 
@@ -31,8 +29,8 @@ fun decrypt_bs_to_rawev' bs params et =
        | Coq_resultC _ => ret r))
 
 (** val check_asp_EXTD :
-    coq_ASP_PARAMS -> coq_Plc -> coq_BS -> coq_RawEv -> coq_AM_Config
-    -> (coq_BS, coq_DispatcherErrors) coq_ResultT **)
+    coq_ASP_PARAMS -> coq_Plc -> coq_BS -> coq_RawEv -> coq_AM_Config ->
+    (coq_BS, coq_DispatcherErrors) coq_ResultT **)
 
 fun check_asp_EXTD params p sig0 ls ac =
   let val Coq_mkAmConfig _ _ _ app_aspCb _ _ _ = ac in

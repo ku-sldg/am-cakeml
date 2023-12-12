@@ -7,14 +7,13 @@ type coq_CallBackErrors =
   (* singleton inductive, whose constructor was messageLift *)
 
 type 'errType coq_ASPCallback =
-  coq_ASP_PARAMS -> coq_Plc -> coq_BS -> coq_RawEv -> (coq_BS,
-  'errType) coq_ResultT
+  coq_ASP_PARAMS -> coq_Plc -> coq_BS -> coq_RawEv -> (coq_BS, 'errType)
+  coq_ResultT
 
 type coq_PubKeyCallback =
   coq_Plc -> (coq_PublicKey, coq_DispatcherErrors) coq_ResultT
 
-type coq_PlcCallback =
-  coq_Plc -> (coq_UUID, coq_DispatcherErrors) coq_ResultT
+type coq_PlcCallback = coq_Plc -> (coq_UUID, coq_DispatcherErrors) coq_ResultT
 
 type coq_UUIDCallback =
   coq_UUID -> (coq_Plc, coq_DispatcherErrors) coq_ResultT
@@ -34,27 +33,23 @@ datatype coq_Manifest =
 (** val empty_Manifest : coq_Manifest **)
 
 val empty_Manifest : coq_Manifest =
-  Build_Manifest empty_Manifest_Plc manifest_set_empty
-    manifest_set_empty manifest_set_empty manifest_set_empty
-    manifest_set_empty empty_PolicyT
+  Build_Manifest empty_Manifest_Plc manifest_set_empty manifest_set_empty
+    manifest_set_empty manifest_set_empty manifest_set_empty empty_PolicyT
 
 datatype coq_AM_Library =
-  Build_AM_Library ((coq_ASP_Address -> coq_CallBackErrors
-                    coq_ASPCallback))
+  Build_AM_Library ((coq_ASP_Address -> coq_CallBackErrors coq_ASPCallback))
    ((coq_ASP_Address -> coq_PubKeyCallback))
    ((coq_ASP_Address -> coq_PlcCallback))
    ((coq_ASP_Address -> coq_UUIDCallback)) coq_UUID coq_ASP_Address
    coq_ASP_Address coq_ASP_Address coq_ASP_Address
    ((coq_ASP_ID, coq_CallBackErrors coq_ASPCallback) coq_MapC)
-   (((coq_Plc, coq_ASP_ID) prod, coq_CallBackErrors coq_ASPCallback)
-    coq_MapC) ((coq_Plc, coq_UUID) coq_MapD)
-   ((coq_Plc, coq_PublicKey) coq_MapD)
+   (((coq_Plc, coq_ASP_ID) prod, coq_CallBackErrors coq_ASPCallback) coq_MapC)
+   ((coq_Plc, coq_UUID) coq_MapD) ((coq_Plc, coq_PublicKey) coq_MapD)
 
 datatype coq_AM_Config =
-  Coq_mkAmConfig coq_Manifest coq_UUID
-   (coq_DispatcherErrors coq_ASPCallback)
-   (coq_DispatcherErrors coq_ASPCallback) coq_PlcCallback
-   coq_PubKeyCallback coq_UUIDCallback
+  Coq_mkAmConfig coq_Manifest coq_UUID (coq_DispatcherErrors coq_ASPCallback)
+   (coq_DispatcherErrors coq_ASPCallback) coq_PlcCallback coq_PubKeyCallback
+   coq_UUIDCallback
 
 (** val empty_aspCb :
     coq_ASP_PARAMS -> coq_Plc -> coq_BS -> coq_RawEv -> (coq_BS,
@@ -66,6 +61,6 @@ fun empty_aspCb _ _ _ _ =
 (** val empty_am_config : coq_AM_Config **)
 
 val empty_am_config : coq_AM_Config =
-  Coq_mkAmConfig empty_Manifest default_uuid empty_aspCb empty_aspCb
-    (fn _ => Coq_errC Unavailable) (fn _ => Coq_errC Unavailable)
-    (fn _ => Coq_errC Unavailable)
+  Coq_mkAmConfig empty_Manifest default_uuid empty_aspCb empty_aspCb (fn _ =>
+    Coq_errC Unavailable) (fn _ => Coq_errC Unavailable) (fn _ => Coq_errC
+    Unavailable)

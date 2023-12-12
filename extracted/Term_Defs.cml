@@ -16,8 +16,7 @@ fun asp_term_to_core a = case a of
 fun copland_compile t = case t of
   Coq_asp a => asp_term_to_core a
 | Coq_att q t' => Coq_attc q t'
-| Coq_lseq t1 t2 =>
-  Coq_lseqc (copland_compile t1) (copland_compile t2)
+| Coq_lseq t1 t2 => Coq_lseqc (copland_compile t1) (copland_compile t2)
 | Coq_bseq s t1 t2 =>
   let val Coq_pair s0 s1 = s in
   (case s0 of
@@ -109,18 +108,16 @@ datatype coq_AM_RequestMessage =
 (** val splitEv_T_l : coq_Split -> coq_Evidence -> coq_Evidence **)
 
 fun splitEv_T_l sp e =
-  let val Coq_pair s _ = sp in
-  (case s of
-     ALL => e
-   | NONE => Coq_mt) end
+  let val Coq_pair s _ = sp in (case s of
+                                  ALL => e
+                                | NONE => Coq_mt) end
 
 (** val splitEv_T_r : coq_Split -> coq_Evidence -> coq_Evidence **)
 
 fun splitEv_T_r sp e =
-  let val Coq_pair _ s0 = sp in
-  (case s0 of
-     ALL => e
-   | NONE => Coq_mt) end
+  let val Coq_pair _ s0 = sp in (case s0 of
+                                   ALL => e
+                                 | NONE => Coq_mt) end
 
 (** val sp_ev : coq_SP -> coq_Evidence -> coq_Evidence **)
 
@@ -129,8 +126,7 @@ fun sp_ev sp e =
     ALL => e
   | NONE => Coq_mt
 
-(** val eval_asp :
-    coq_ASP -> coq_Plc -> coq_Evidence -> coq_Evidence **)
+(** val eval_asp : coq_ASP -> coq_Plc -> coq_Evidence -> coq_Evidence **)
 
 fun eval_asp t p e =
   case t of
@@ -178,11 +174,9 @@ val empty_am_result : coq_AM_Result =
   Coq_am_rawev []
 
 (** val policy_list_not_disclosed :
-    coq_Term -> coq_Plc -> coq_Evidence -> (coq_Plc, coq_ASP_ID) prod
-    list -> bool **)
+    coq_Term -> coq_Plc -> coq_Evidence -> (coq_Plc, coq_ASP_ID) prod list ->
+    bool **)
 
 fun policy_list_not_disclosed t p e ls =
   forallb (fn pr =>
-    negb
-      (term_discloses_aspid_to_remote_enc_bool t p e (fst pr)
-        (snd pr))) ls
+    negb (term_discloses_aspid_to_remote_enc_bool t p e (fst pr) (snd pr))) ls

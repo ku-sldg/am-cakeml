@@ -10,8 +10,8 @@ fun ret a s =
   Coq_pair (Coq_resultC a) s
 
 (** val bind :
-    ('a1, 'a2, 'a4) coq_Err -> ('a2 -> ('a1, 'a3, 'a4) coq_Err) ->
-    ('a1, 'a3, 'a4) coq_Err **)
+    ('a1, 'a2, 'a4) coq_Err -> ('a2 -> ('a1, 'a3, 'a4) coq_Err) -> ('a1, 'a3,
+    'a4) coq_Err **)
 
 fun bind m f s =
   let val Coq_pair a s' = m s in
@@ -40,14 +40,12 @@ fun get s =
   Coq_pair (Coq_resultC s) s
 
 (** val runErr :
-    ('a1, 'a2, 'a3) coq_Err -> 'a1 -> (('a2, 'a3) coq_ResultT, 'a1)
-    prod **)
+    ('a1, 'a2, 'a3) coq_Err -> 'a1 -> (('a2, 'a3) coq_ResultT, 'a1) prod **)
 
 fun runErr h =
   h
 
-(** val evalErr :
-    ('a1, 'a2, 'a3) coq_Err -> 'a1 -> ('a2, 'a3) coq_ResultT **)
+(** val evalErr : ('a1, 'a2, 'a3) coq_Err -> 'a1 -> ('a2, 'a3) coq_ResultT **)
 
 fun evalErr h s =
   fst (runErr h s)

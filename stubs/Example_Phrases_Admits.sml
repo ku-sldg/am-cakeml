@@ -4,9 +4,10 @@ val coq_P0 = "P0"
   (* failwith "AXIOM TO BE REALIZED" *)
 
 (** val coq_P1 : coq_Plc **)
-
+(*
 val coq_P1 = "P1"
   (* failwith "AXIOM TO BE REALIZED" *)
+*)
 
 (** val coq_P2 : coq_Plc **)
 
@@ -27,8 +28,10 @@ val default_place = "default_place"
 val attest_id = "attest_aspid"
   (* failwith "AXIOM TO BE REALIZED" *)
 
+(*
 val attest1_id = "attest1_aspid"
 val attest2_id = "attest2_aspid"
+*)
 
 (** val appraise_id : coq_ASP_ID **)
 
@@ -49,10 +52,35 @@ val cache_id = "cache_aspid"
 val store_args = []
   (* failwith "AXIOM TO BE REALIZED" *)
 
-(** val sys : coq_TARG_ID **)
+(** val appraise_inline_args : coq_Arg list **)
+val appraise_inline_args : coq_Arg list = 
+  let val appReq = (REQ_APP example_phrase_p2_appraise coq_P1 (Coq_nn O) [])
+      val jsonAppReq = appRequestToJson appReq
+      val strJsonAppReq = jsonToStr jsonAppReq in 
+        [(strJsonAppReq)]
+  end
+  (* failwith "AXIOM TO BE REALIZED"  *)
 
+(* 
+
+datatype coq_AppraisalRequestMessage =
+  REQ_APP coq_Term coq_Plc coq_Evidence coq_RawEv
+  
+  val jsonReq = appRequestToJson req
+      val strJsonReq = jsonToStr jsonReq
+  
+  
+  
+  
+  
+   *)
+
+
+(*
+(** val sys : coq_TARG_ID **)
 val sys = "sys_targid"
   (* failwith "AXIOM TO BE REALIZED" *)
+*)
 
 (** val att_tid : coq_TARG_ID **)
 

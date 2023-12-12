@@ -87,6 +87,8 @@ get_files(cop_src_pre_aspStubs
     stubs/Maps.sml
     stubs/Manifest_Admits_Stubs.sml
     extracted/ErrorStMonad_Coq.cml
+    stubs/Example_Phrases_Pre_Admits.sml
+    extracted/Example_Phrases_Pre.cml
     stubs/Example_Phrases_Admits.sml
     extracted/Manifest_Set.cml
     extracted/Manifest.cml

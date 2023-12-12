@@ -3,11 +3,6 @@
 val coq_P0 : coq_Plc =
   failwith "AXIOM TO BE REALIZED"
 
-(** val coq_P1 : coq_Plc **)
-
-val coq_P1 : coq_Plc =
-  failwith "AXIOM TO BE REALIZED"
-
 (** val coq_P2 : coq_Plc **)
 
 val coq_P2 : coq_Plc =
@@ -53,16 +48,6 @@ val cert_id : coq_ASP_ID =
 val cache_id : coq_ASP_ID =
   failwith "AXIOM TO BE REALIZED"
 
-(** val attest1_id : coq_ASP_ID **)
-
-val attest1_id : coq_ASP_ID =
-  failwith "AXIOM TO BE REALIZED"
-
-(** val attest2_id : coq_ASP_ID **)
-
-val attest2_id : coq_ASP_ID =
-  failwith "AXIOM TO BE REALIZED"
-
 (** val store_args : coq_Arg list **)
 
 val store_args : coq_Arg list =
@@ -73,9 +58,9 @@ val store_args : coq_Arg list =
 val retrieve_args : coq_Arg list =
   failwith "AXIOM TO BE REALIZED"
 
-(** val sys : coq_TARG_ID **)
+(** val appraise_inline_args : coq_Arg list **)
 
-val sys : coq_TARG_ID =
+val appraise_inline_args : coq_Arg list =
   failwith "AXIOM TO BE REALIZED"
 
 (** val cache : coq_TARG_ID **)

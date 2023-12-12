@@ -18,5 +18,4 @@ fun build_cvm t = case t of
       bind (start_par_thread loc t2 e) (fn _ =>
         bind (build_cvm t1) (fn _ =>
           bind get_ev (fn e1r =>
-            bind (wait_par_thread loc t2 e) (fn e2r =>
-              join_seq e1r e2r))))))
+            bind (wait_par_thread loc t2 e) (fn e2r => join_seq e1r e2r))))))

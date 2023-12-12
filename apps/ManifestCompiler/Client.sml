@@ -8,7 +8,7 @@ fun main () =
             (
             if(provisioningBool) 
             then (
-                let val provisioningPhrase = ManGenConfig.inline_auth_phrase in 
+                let val provisioningPhrase = ManGenConfig.demo_phrase in 
                             ManifestJsonConfig.write_term_file_json phraseFileName provisioningPhrase
                 end
             )

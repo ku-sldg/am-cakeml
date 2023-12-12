@@ -4,10 +4,8 @@ fun event_id_span' t = case t of
   Coq_asp _ => S O
 | Coq_att _ x => add (S (S O)) (event_id_span' x)
 | Coq_lseq x y => add (event_id_span' x) (event_id_span' y)
-| Coq_bseq _ x y =>
-  add (S (S O)) (add (event_id_span' x) (event_id_span' y))
-| Coq_bpar _ x y =>
-  add (S (S O)) (add (event_id_span' x) (event_id_span' y))
+| Coq_bseq _ x y => add (S (S O)) (add (event_id_span' x) (event_id_span' y))
+| Coq_bpar _ x y => add (S (S O)) (add (event_id_span' x) (event_id_span' y))
 
 (** val event_id_span : coq_Core_Term -> nat **)
 
@@ -17,7 +15,5 @@ fun event_id_span t = case t of
                  | _ => S O)
 | Coq_attc _ x => add (S (S O)) (event_id_span' x)
 | Coq_lseqc x y => add (event_id_span x) (event_id_span y)
-| Coq_bseqc x y =>
-  add (S (S O)) (add (event_id_span x) (event_id_span y))
-| Coq_bparc _ x y =>
-  add (S (S O)) (add (event_id_span x) (event_id_span y))
+| Coq_bseqc x y => add (S (S O)) (add (event_id_span x) (event_id_span y))
+| Coq_bparc _ x y => add (S (S O)) (add (event_id_span x) (event_id_span y))

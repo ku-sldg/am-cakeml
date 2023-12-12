@@ -9,15 +9,13 @@ fun cons_gg sig0 e p ps =
     coq_BS -> coq_EvC -> coq_Plc -> coq_ASP_PARAMS -> coq_EvC **)
 
 fun cons_hsh hsh e p ps =
-  let val Coq_evc _ et = e in
-  Coq_evc (hsh :: []) (Coq_uu p COMP ps et) end
+  let val Coq_evc _ et = e in Coq_evc (hsh :: []) (Coq_uu p COMP ps et) end
 
 (** val cons_enc :
     coq_BS -> coq_EvC -> coq_Plc -> coq_ASP_PARAMS -> coq_EvC **)
 
 fun cons_enc enc e p ps =
-  let val Coq_evc _ et = e in
-  Coq_evc (enc :: []) (Coq_uu p ENCR ps et) end
+  let val Coq_evc _ et = e in Coq_evc (enc :: []) (Coq_uu p ENCR ps et) end
 
 (** val ss_cons : coq_EvC -> coq_EvC -> coq_EvC **)
 

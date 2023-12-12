@@ -1,5 +1,4 @@
-(** val gen_nonce_if_none_local :
-    coq_EvC option -> coq_EvC coq_AM **)
+(** val gen_nonce_if_none_local : coq_EvC option -> coq_EvC coq_AM **)
 
 fun gen_nonce_if_none_local initEv = case initEv of
   Some _ => ret mt_evc
@@ -30,16 +29,13 @@ fun check_et_length et ls =
   | False => am_failm (Coq_am_dispatch_error (Runtime errStr_et_size))
 
 (** val am_appraise :
-    coq_Term -> coq_Plc -> coq_Evidence -> coq_RawEv ->
-    coq_AppResultC coq_AM **)
+    coq_Term -> coq_Plc -> coq_Evidence -> coq_RawEv -> coq_AppResultC coq_AM **)
 
 fun am_appraise t toPlc init_et cvm_ev =
   let val expected_et = eval t toPlc init_et in
   bind (check_et_length expected_et cvm_ev) (fn _ =>
     bind get_am_clone_uuid (fn uuid =>
-      let val app_res =
-        run_appraisal_client t toPlc init_et cvm_ev uuid
-      in
+      let val app_res = run_appraisal_client t toPlc init_et cvm_ev uuid in
       ret app_res end)) end
 
 (** val run_cvm_local_am :
@@ -75,8 +71,8 @@ fun check_disclosure_policy t p e =
       am_failm (Coq_am_dispatch_error (Runtime errStr_disclosePolicy)))
 
 (** val am_client_gen_local :
-    coq_Term -> coq_Plc -> coq_EvC option -> coq_Manifest ->
-    coq_AM_Library -> coq_AM_Result coq_AM **)
+    coq_Term -> coq_Plc -> coq_EvC option -> coq_Manifest -> coq_AM_Library
+    -> coq_AM_Result coq_AM **)
 
 fun am_client_gen_local t myPlc initEvOpt absMan amLib =
   bind (gen_nonce_if_none_local initEvOpt) (fn evcIn =>
