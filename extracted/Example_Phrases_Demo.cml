@@ -14,3 +14,7 @@ fun ssl_sig_parameterized p =
 
 fun cm_meas p targ =
   Coq_asp (ASPC ALL EXTD (Coq_asp_paramsC cm_aspid cm_args p targ))
+
+val layered_meas : coq_Term =
+  Coq_att coq_P1 (Coq_lseq (cm_meas coq_P1 sys) (Coq_asp SIG))
+

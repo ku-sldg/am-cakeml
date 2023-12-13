@@ -55,19 +55,24 @@ fun receiveCoplandAppRespSocket fd =
 (*
 Code for writing to seL4 dataports from within the Linux VM
 *)
-fun sendCoplandReqDataport fd req =
+fun sendCoplandReqDataport port req =
     let
+        val thisDataport = "/dev/uio" ^ (Int.toString port)
         val jsonReq = requestToJson req
         val strJsonReq = jsonToStr jsonReq
         val _ = print ("\n\n" ^ "JSON CVM request string (sendCoplandReq): \n" ^ strJsonReq ^ "\n")
     in
-        writeDataport "/dev/uio0" (BString.fromString strJsonReq)
+        writeDataport thisDataport (BString.fromString strJsonReq)
     end
 
-fun receiveCoplandRespDataport fd =
+fun receiveCoplandRespDataport port =
     let
-        val _ = waitDataport "/dev/uio0"
-        val inByteStr = readDataport "/dev/uio0" 4096
+        val thisDataport = "/dev/uio" ^ (Int.toString port)
+        val _ = emitDataport thisDataport
+        (*
+        val _ = waitDataport thisDataport
+        *)
+        val inByteStr = readDataport thisDataport 4096
         val inStr = BString.toCString inByteStr
         val _ = print ("\n\n" ^ "String received (receiveCoplandResp): \n" ^ inStr ^ "\n\n")
         val inStrJson = strToJson inStr
@@ -76,19 +81,21 @@ fun receiveCoplandRespDataport fd =
         resp
     end
 
-fun sendCoplandAppReqDataport fd req =
+fun sendCoplandAppReqDataport port req =
     let
+        val thisDataport = "/dev/uio" ^ (Int.toString port)
         val jsonReq = appRequestToJson req
         val strJsonReq = jsonToStr jsonReq
         val _ = print ("\n\n" ^ "JSON CVM request string (sendCoplandAppReq): \n" ^ strJsonReq ^ "\n")
     in
-        writeDataport "/dev/uio0" (BString.fromString strJsonReq)
+        writeDataport ("/dev/uio" ^ (Int.toString port)) (BString.fromString strJsonReq)
     end
 
-fun receiveCoplandAppRespDataport fd =
+fun receiveCoplandAppRespDataport port =
     let
-        val _ = waitDataport "/dev/uio0"
-        val inByteStr = readDataport "/dev/uio0" 4096
+        val thisDataport = "/dev/uio" ^ (Int.toString port)
+        val _ = waitDataport thisDataport
+        val inByteStr = readDataport thisDataport 4096
         val inStr = BString.toCString inByteStr
         val _ = print ("\n\n" ^ "String received (receiveCoplandAppResp): \n" ^ inStr ^ "\n\n")
         val inStrJson = strToJson inStr
@@ -115,7 +122,7 @@ fun networkDispatch (target : coq_UUID) (authTok : coq_ReqAuthTok) (ev : (bs lis
                         resev
                     end
            |True => let
-                        val resev = (sendCoplandReqDataport req; receiveCoplandRespDataport ())
+                        val resev = (sendCoplandReqDataport port req; receiveCoplandRespDataport port)
                     in
                         resev
                     end
@@ -138,7 +145,7 @@ fun networkDispatchApp (target : coq_UUID) (t : coq_Term) (p:coq_Plc) (et:coq_Ev
                         resapp
                     end
            |True => let
-                        val resapp = (sendCoplandAppReqDataport req; receiveCoplandAppRespDataport ())
+                        val resapp = (sendCoplandAppReqDataport port req; receiveCoplandAppRespDataport port)
                     in
                         resapp
                     end

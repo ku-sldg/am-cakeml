@@ -9,8 +9,8 @@ fun cm_asp_stub ps e =
                     val authEv = [];
                     val authEt = Coq_mt;
                     val authToken = (Coq_evc authEv authEt);
-                    val result = (am_sendReq [] "dataport:uio0" authToken []);
                     (*
+                    val result = (am_sendReq [] "dataport:uio0" authToken []);
                     val _ = emitDataport "/dev/uio0";
                     val _ = waitDataport "/dev/uio0";
                     *)

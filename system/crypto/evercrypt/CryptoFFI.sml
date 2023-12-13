@@ -14,7 +14,7 @@ structure Crypto = struct
         fun ffi_signSecretToPublic x y = #(signSecretToPublic) x y
         fun ffi_curve25519_secretToPublic x y = #(curve25519_secretToPublic) x y
         val pubkeyLen = 270
-        val privkeyLen = 1219
+        val privkeyLen = 14
         val signLen = 64
         val digestLen = 64
     in
