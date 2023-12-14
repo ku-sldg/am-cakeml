@@ -27,6 +27,9 @@ structure ManGenConfig = struct
         (* Coq_lseq (cm_meas coq_P0 cm_targid) (ssl_sig_parameterized coq_P0) *)
     val cm_phrases = [(Coq_pair cm_phrase coq_P0)] (* @ (auth_phrase_list coq_P0) *)
 
+    val cm_layered_phrase : coq_Term = Coq_att coq_P1 (Coq_lseq (cm_meas coq_P1 sys) (Coq_asp SIG))
+    val cm_layered_phrases = [(Coq_pair cm_layered_phrase coq_P0)] @ (auth_phrase_list coq_P0)
+
     val demo_phrase = example_phrase
     val demo_phrase_p2_appraise = example_phrase_p2_appraise
     val demo_phrases = [(Coq_pair demo_phrase coq_P0)] @ (auth_phrase_list coq_P0)
@@ -39,6 +42,8 @@ structure ManGenConfig = struct
     val appraiser_evidence_kim = eval kim_phrase coq_P0 (Coq_nn O)
     val appraiser_evidence_kim_enc = eval kim_enc_phrase coq_P0 (Coq_nn O)
     val appraiser_evidence_cm = eval cm_phrase coq_P0 (Coq_nn O)
+    val appraiser_evidence_cm_layered = eval cm_layered_phrase coq_P0 (Coq_nn O)
+
     val appraiser_evidence_cert = eval cert_phrase coq_P0 (Coq_nn O)
     val appraiser_evidence_cache_p0 = eval cache_phrase_p0 coq_P0 (Coq_nn O)
     val appraiser_evidence_cache_p1 = eval cache_phrase_p1 coq_P1 (Coq_nn O)
@@ -54,6 +59,8 @@ structure ManGenConfig = struct
                     (Coq_pair appraiser_evidence_kim_enc coq_P3)]
     val ets_cm = [(Coq_pair appraiser_evidence_cm coq_P0), 
                     (Coq_pair appraiser_evidence_cm coq_P3)]
+    val ets_cm_layered = [(Coq_pair appraiser_evidence_cm_layered coq_P0), 
+                    (Coq_pair appraiser_evidence_cm_layered coq_P3)]
     val ets_cert = [(Coq_pair appraiser_evidence_cert coq_P0),
                     (Coq_pair appraiser_evidence_cert coq_P3)]
     val ets_cache = [(Coq_pair appraiser_evidence_cache_p0 coq_P0),
