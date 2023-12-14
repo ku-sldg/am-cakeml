@@ -37,7 +37,7 @@ val appAspMapping = (mapC_from_pairList [
       ((Coq_pair coq_P1 kim_meas_aspid), 
         fn par => fn p => fn bs => fn rawEv => appraise_kim_meas_asp_stub par p bs rawEv),
 
-      ((Coq_pair coq_P0 cm_aspid), 
+      ((Coq_pair coq_P1 cm_aspid), 
         fn par => fn p => fn bs => fn rawEv => appraise_cm_asp_stub par p bs rawEv)
 
 

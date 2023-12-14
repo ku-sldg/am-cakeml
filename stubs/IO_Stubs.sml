@@ -39,10 +39,10 @@ fun do_remote t pTo e ac =
     let val Coq_mkAmConfig _ _ _ _ plcCb _ _ = ac in plcCb pTo end
   in
   (case remote_uuid_res of
-     Coq_errC e0 => Coq_errC e0
+     Coq_errC e0 => let val _ = print "There was a do_remote problem. Verify your AM Lib." in Coq_errC e0 end
    | Coq_resultC uuid =>
      (case doRemote_uuid t uuid (get_bits e) of
-        Coq_errC _ => Coq_errC (Runtime errStr_doRemote_uuid)
+        Coq_errC _ => let val _ = print "There was a doRemote_uuid problem. Verify your AM Lib." in Coq_errC (Runtime errStr_doRemote_uuid) end
       | Coq_resultC v => Coq_resultC v)) end
 
 (** val parallel_vm_thread : coq_Loc -> coq_EvC **)
