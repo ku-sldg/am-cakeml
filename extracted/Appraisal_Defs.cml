@@ -42,7 +42,7 @@ fun check_asp_EXTD params p sig0 ls ac =
 fun check_asp_EXTD' params p sig0 ls =
   bind get_AM_amConfig (fn ac =>
     case check_asp_EXTD params p sig0 ls ac of
-      Coq_errC e => am_failm (Coq_am_dispatch_error e)
+      Coq_errC e => let val _ = print "\nerror me out\n" in am_failm (Coq_am_dispatch_error e) end
     | Coq_resultC r => ret r)
 
 (** val checkNonce' : nat -> coq_BS -> coq_BS coq_AM **)
