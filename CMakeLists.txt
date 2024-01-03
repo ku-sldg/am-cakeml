@@ -65,7 +65,7 @@ ${posix_src_cake})
 include(./stubs/appraisal_asps/CMakeLists.txt)
 include(./stubs/attestation_asps/CMakeLists.txt)
 
-get_files(cop_src_pre_aspStubs
+get_files(cop_src_pre_platform_stubs
     stubs/BS.sml
     stubs/StringT.sml
     stubs/ErrorStringConstants.sml
@@ -105,6 +105,9 @@ get_files(cop_src_pre_aspStubs
     extracted/AM_St.cml
     copland/json/ManifestJsonConfig.sml
     util/ManifestUtils.sml
+)
+
+get_files(cop_src_post_platform_stubs
     am/CoplandCommUtil.sml
     stubs/IO_Stubs.sml
     stubs/Axioms_Io.sml
@@ -128,13 +131,15 @@ get_files(cop_src_pre_aspStubs
 )
 
 get_files(cop_src
-    ${cop_src_pre_aspStubs}
+    ${cop_src_pre_platform_stubs}
+    ${cop_src_post_platform_stubs}
     ${attestation_asps}
     ${appraisal_asps}
 )
 
 get_files(cop_src_noasps
-    ${cop_src_pre_aspStubs}
+    ${cop_src_pre_platform_stubs}
+    ${cop_src_post_platform_stubs}
 )
 
 get_files(server_am_src_noasps ${util_src} ${posix_src} ${cop_src_noasps})
@@ -148,28 +153,28 @@ get_files(server_am_src_camkes
     system/camkes/measurement_RPC/Measurement_RPC.sml
     system/camkes/fileserver_RPC/FileServer_RPC.sml
     ${crypto_src_hacl}
-    ${cop_src_pre_aspStubs}
+    ${cop_src_pre_platform_stubs}
     system/camkes/commutil_RPC/CommUtil_RPC.sml
+    am/seL4CommUtil.sml
+    ${cop_src_post_platform_stubs}
     ${attestation_asps}
     ${camkes_cm_attestation_asp}
     ${appraisal_asps}
     ${camkes_cm_appraisal_asp}
-    am/seL4CommUtil.sml
-    ${cop_src_post_aspStubs}
 )
 get_files(client_am_src_camkes
     ${util_src}
     util/Log.sml
     ${posix_src_hacl}
-    ${cop_src_pre_aspStubs}
+    ${cop_src_pre_platform_stubs}
     copland/json/BashFunctions.sml
     system/posix/dataports/DataportFFI.sml
+    am/PosixCommUtil.sml
+    ${cop_src_post_platform_stubs}
     ${attestation_asps}
     ${posix_cm_attestation_asp}
     ${appraisal_asps}
     ${posix_cm_appraisal_asp}
-    am/PosixCommUtil.sml
-    ${cop_src_post_aspStubs}
 )
 
 get_files(posix_c_files_base
