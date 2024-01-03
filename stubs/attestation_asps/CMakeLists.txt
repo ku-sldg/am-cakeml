@@ -13,8 +13,6 @@ get_files(attestation_asps
     cert_ASP_Stub.sml
     cache_ASP_Stub.sml
     sig_ASP_Stub.sml
-    cm_ASP_Stub.sml
-    check_ssl_sig_ASP_Stub.sml
 
     # For Demo Phrase
     attest1_ASP_Stub.sml

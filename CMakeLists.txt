@@ -165,11 +165,11 @@ get_files(client_am_src_camkes
     copland/json/BashFunctions.sml
     system/posix/dataports/DataportFFI.sml
     ${attestation_asps}
+    ${posix_cm_attestation_asp}
     ${appraisal_asps}
     ${posix_cm_appraisal_asp}
     am/PosixCommUtil.sml
     ${cop_src_post_aspStubs}
-    ${posix_cm_attestation_asp}
 )
 
 get_files(posix_c_files_base
