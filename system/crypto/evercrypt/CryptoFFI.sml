@@ -64,9 +64,9 @@ structure Crypto = struct
         fun encryptOneShot privKey pubKey msg =
             encrypt privKey (BString.n2w2 0) 0 (BString.fromString msg)
             
-        (* bstring -> bstring -> string -> bstring *)
+        (* bstring -> bstring -> bstring -> string *)
         fun decryptOneShot privKey pubKey ciphertext = 
-            decrypt pubKey (BString.n2w2 0) 0 (BString.fromString ciphertext)
+            BString.toString (decrypt pubKey (BString.n2w2 0) 0 ciphertext)
 
         (* generateDHSecret : bstring -> bstring -> bstring
          * `generate_dh_secret priv pub`

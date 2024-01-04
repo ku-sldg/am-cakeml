@@ -94,8 +94,9 @@ val gen_nonce_bits = (BString.fromString "anonce") (* TODO: real nonce gen *)
 (** val decrypt_bs_to_rawev_prim :
     coq_BS -> coq_ASP_PARAMS -> coq_PublicKey -> (coq_RawEv,
     coq_DispatcherErrors) coq_ResultT **)
-fun decrypt_bs_to_rawev_prim bs params pubkey = Coq_errC (Runtime errStr_decryption_prim)
 (*
+fun decrypt_bs_to_rawev_prim bs params pubkey = Coq_errC (Runtime errStr_decryption_prim)
+*)
 fun decrypt_bs_to_rawev_prim bs params pubkey = 
     let val recoveredtext = Crypto.decryptOneShot priv2 pubkey (*pub1*) (* priv1 pubkey *) bs (*priv2 pub1 bs *)
         val bs_recovered = BString.fromString recoveredtext
@@ -103,7 +104,6 @@ fun decrypt_bs_to_rawev_prim bs params pubkey =
         val _ = print ("\nDecryption Succeeded: \n" ^ (rawEvToString res) ^ "\n" ) in
         (Coq_resultC res)
     end
-*)
 
 
 
