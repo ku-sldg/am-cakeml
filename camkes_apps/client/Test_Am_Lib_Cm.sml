@@ -34,6 +34,9 @@ val appAspMapping = (mapC_from_pairList [
       ((Coq_pair coq_P1 sig_aspid), 
         fn par => fn p => fn bs => fn rawEv => appraise_ssl_sig par p bs rawEv), 
 
+      ((Coq_pair coq_P0 ssl_sig_aspid), 
+        fn par => fn p => fn bs => fn rawEv => appraise_ssl_sig par p bs rawEv), 
+
       ((Coq_pair coq_P1 ssl_sig_aspid), 
         fn par => fn p => fn bs => fn rawEv => appraise_ssl_sig par p bs rawEv), 
 

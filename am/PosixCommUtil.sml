@@ -57,6 +57,7 @@ Code for writing to seL4 dataports from within the Linux VM
 *)
 fun sendCoplandReqDataport port req =
     let
+        val _ = print "Sending Attestation Request to dataport\n"
         val thisDataport = "/dev/uio" ^ (Int.toString port)
         val jsonReq = requestToJson req
         val strJsonReq = jsonToStr jsonReq
@@ -83,6 +84,7 @@ fun receiveCoplandRespDataport port =
 
 fun sendCoplandAppReqDataport port req =
     let
+        val _ = print "Sending Appraisal Request to dataport\n"
         val thisDataport = "/dev/uio" ^ (Int.toString port)
         val jsonReq = appRequestToJson req
         val strJsonReq = jsonToStr jsonReq

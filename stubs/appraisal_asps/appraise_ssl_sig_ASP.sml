@@ -6,6 +6,7 @@
    Performs openssl signature checking *)
 fun appraise_ssl_sig (ps : coq_ASP_PARAMS) (p : coq_Plc) (bs : coq_BS) (ls : coq_RawEv)  =
     let
+        val _ = print "Appraising signature via SSL\n"
         val msg = encode_RawEv ls
         val signGood_loc = bs
 
