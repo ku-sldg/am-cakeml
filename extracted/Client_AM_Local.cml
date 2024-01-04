@@ -29,14 +29,20 @@ fun check_et_length et ls =
   | False => am_failm (Coq_am_dispatch_error (Runtime errStr_et_size))
 
 (** val am_appraise :
-    coq_Term -> coq_Plc -> coq_Evidence -> coq_RawEv -> coq_AppResultC coq_AM **)
+    coq_Term -> coq_Plc -> coq_Evidence -> coq_RawEv -> bool ->
+    coq_AppResultC coq_AM **)
 
-fun am_appraise t toPlc init_et cvm_ev =
+fun am_appraise t toPlc init_et cvm_ev local_appraisal =
   let val expected_et = eval t toPlc init_et in
   bind (check_et_length expected_et cvm_ev) (fn _ =>
     bind get_am_clone_uuid (fn uuid =>
-      let val app_res = run_appraisal_client t toPlc init_et cvm_ev uuid in
-      ret app_res end)) end
+      bind
+        (case local_appraisal of
+           True =>
+           let val expected_et0 = eval t toPlc init_et in
+           gen_appraise_AM expected_et0 cvm_ev end
+         | False => ret (run_appraisal_client t toPlc init_et cvm_ev uuid))
+        ret)) end
 
 (** val run_cvm_local_am :
     coq_Term -> coq_Plc -> coq_RawEv -> coq_RawEv coq_AM **)
@@ -80,5 +86,5 @@ fun am_client_gen_local t myPlc initEvOpt absMan amLib =
     bind (config_AM_if_lib_supported absMan amLib) (fn _ =>
       bind (check_disclosure_policy t myPlc init_et) (fn _ =>
         bind (run_cvm_local_am t myPlc init_ev) (fn resev =>
-          bind (am_appraise t myPlc init_et resev) (fn app_res =>
-            ret (Coq_am_appev app_res))))) end)
+          bind (am_appraise t myPlc init_et resev (is_local_appraisal amLib))
+            (fn app_res => ret (Coq_am_appev app_res))))) end)

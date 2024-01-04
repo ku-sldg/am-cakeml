@@ -83,6 +83,22 @@ fun appraise_auth_tok appres = True
   (* failwith "AXIOM TO BE REALIZED" *)
 
 
+
+(** val is_local_appraisal : coq_AM_Library -> bool **)
+fun is_local_appraisal amLib =
+  case amLib of 
+    Build_AM_Library _
+   _
+   _
+   _ addr _ _ _ _
+   _
+   _
+   _
+   _ => addr = ""
+  
+  (* failwith "AXIOM TO BE REALIZED" *)
+
+
 (** val lib_supports_manifest_bool :
     coq_AM_Library -> coq_Manifest -> bool **)
 

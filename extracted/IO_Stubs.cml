@@ -68,6 +68,11 @@ val requester_bound : (coq_Term -> coq_Plc -> coq_ReqAuthTok -> bool) =
 val appraise_auth_tok : (coq_AppResultC -> bool) =
   failwith "AXIOM TO BE REALIZED"
 
+(** val is_local_appraisal : coq_AM_Library -> bool **)
+
+val is_local_appraisal : (coq_AM_Library -> bool) =
+  failwith "AXIOM TO BE REALIZED"
+
 (** val pretty_print_manifest : coq_Manifest -> coq_StringT **)
 
 val pretty_print_manifest : (coq_Manifest -> coq_StringT) =

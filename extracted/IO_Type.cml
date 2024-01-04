@@ -1,1 +1,0 @@
-type 'a coq_IO = 'a coq_CVM

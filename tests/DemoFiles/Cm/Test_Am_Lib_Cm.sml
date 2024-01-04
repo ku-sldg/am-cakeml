@@ -82,7 +82,7 @@ val am_library =
   (Build_AM_Library 
     aspServer_cb pubKeyServer_cb plcServer_cb uuidServer_cb
 
-    "localhost:5003"
+    ""
     
     "ASP_SERVER:5000" "PubKeyServer:5000" "PlcServer:5000" "UUIDServer:5000"
 
