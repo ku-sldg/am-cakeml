@@ -42,7 +42,7 @@ fun startServer () =
         val _ = TextIOExtra.printLn ("On port: " ^ (Int.toString port) ^ "\nQueue Length: " ^ (Int.toString queueLength))
     in 
     (* loop handleIncoming (Socket.listen port queueLength) *)
-        handleIncoming ()
+        loop handleIncoming ()
     end
     handle 
            (* Socket.Err s => TextIO.print_err ("Socket failure on listener instantiation: " ^ s ^ "\n") *)

@@ -94,7 +94,7 @@ fun sendCoplandAppReqDataport port req =
 fun receiveCoplandAppRespDataport port =
     let
         val thisDataport = "/dev/uio" ^ (Int.toString port)
-        val _ = waitDataport thisDataport
+        val _ = emitDataport thisDataport
         val inByteStr = readDataport thisDataport 4096
         val inStr = BString.toCString inByteStr
         val _ = print ("\n\n" ^ "String received (receiveCoplandAppResp): \n" ^ inStr ^ "\n\n")
