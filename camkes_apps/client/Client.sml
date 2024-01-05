@@ -32,7 +32,18 @@ val _ = main ()
 
 fun main () =
     let
-        val (manifestFileName, privKey, phraseFileName) : (string * coq_PrivateKey * string) = BashFunctions.retrieve_CLI_args ()
+        val (manifestFileName, privKey, phraseFileName, provisioningBool) : (string * coq_PrivateKey * string * bool) = BashFunctions.retrieve_CLI_args ()
+        val _ = 
+                (
+                if(provisioningBool) 
+                then (
+                    let val provisioningPhrase = ManGenConfig.cm_layered_phrase in 
+                                BashFunctions.write_term_file_json phraseFileName provisioningPhrase
+                    end
+                )
+                else ()
+                )
+
     (* START:  UNCOMMENT FOR PROVISIONING CLIENT CVM PHRASE *)
     (*
         val main_phrase = example_phrase (* cert_style *)

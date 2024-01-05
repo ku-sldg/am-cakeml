@@ -3,6 +3,8 @@
 structure BashFunctions = struct
   exception Excn string
 
+  type pubKey_t               = coq_PublicKey
+
   (* Writes json to a file
     : Json.json -> string -> unit *)
     fun writeJsonFile (j : Json.json) (file : string) =
@@ -159,18 +161,25 @@ structure BashFunctions = struct
 
     fun argIndPresent (i:int) = (i <> ~1)
 
+    (* Retrieves the manifest filename and private key (as strings)
+    based upon Command Line arguments
+    : () -> (string, string)
+    *)
     fun retrieve_CLI_args _ =
-    let val name = CommandLine.name ()
+    let (* val _ = print "\n\nDEBUG PRINT:  START of retrieve_CLI_args... \n\n" *)
+        val name = CommandLine.name ()
         val usage = ("Usage: " ^ name ^ " -m <ManifestFile>.json -k <privateKeyFile> (-t <ClientTermFile>.json)\n " ^
                         "e.g.\t" ^ name ^ " -m formMan.json -k ~/.ssh/id_ed25519 -t clientPhrase.json\n")
-        val (manFileName, privKey, termFileName) = 
-                (case CommandLine.arguments () of 
+        val (manFileName, privKey, termFileName, provisioningBool) =
+                (case CommandLine.arguments () of
                     argList => (
                         let val manInd = ListExtra.find_index argList "-m"
                             val keyInd = ListExtra.find_index argList "-k"
                             val termFileInd = ListExtra.find_index argList "-t"
-                            val manIndBool = argIndPresent manInd 
+                            val provInd = ListExtra.find_index argList "-p"
+                            val manIndBool = argIndPresent manInd
                             val keyIndBool = argIndPresent keyInd
+                            val provIndBool = argIndPresent provInd
                         in
                         (
                         if (manIndBool = False)
@@ -181,15 +190,18 @@ structure BashFunctions = struct
                             else (
                                 let val manFileName = List.nth argList (manInd + 1)
                                     val privKeyFile = List.nth argList (keyInd + 1)
-                                    val termFile = List.nth argList (termFileInd + 1) in
+                                    val termFile = List.nth argList (termFileInd + 1)
+                                    (* val _ = print "\n\nDEBUG PRINT:  In retrieve_CLI_args... \n\n" *)
+                                    in
                                     (
                                         case (parseJsonFile manFileName) of
                                         Err e => raise (Excn ("Could not parse JSON file: " ^ e ^ "\n"))
-                                        | Ok _ => (manFileName, (parse_private_key privKeyFile), termFile)
+                                        | Ok _ => (manFileName, (parse_private_key privKeyFile), termFile, provIndBool)
+                                            (* TODO: case match on parse_private_key for better error handling here...  *)
                                     )
                                     end )))
                     end ))
             in
-                (manFileName, privKey, termFileName) : (string * coq_PublicKey * string)
+            (manFileName, privKey, termFileName, provisioningBool) : (string * pubKey_t * string * bool)
         end
     end

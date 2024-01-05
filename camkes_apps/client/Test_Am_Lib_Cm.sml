@@ -28,9 +28,6 @@ val aspMapping = (mapC_from_pairList
 
 val appAspMapping = (mapC_from_pairList [
 
-      ((Coq_pair coq_P0 sig_aspid), 
-        fn par => fn p => fn bs => fn rawEv => appraise_ssl_sig par p bs rawEv), 
-
       ((Coq_pair coq_P1 sig_aspid), 
         fn par => fn p => fn bs => fn rawEv => appraise_ssl_sig par p bs rawEv), 
 
@@ -42,9 +39,6 @@ val appAspMapping = (mapC_from_pairList [
 
       ((Coq_pair coq_P1 kim_meas_aspid), 
         fn par => fn p => fn bs => fn rawEv => appraise_kim_meas_asp_stub par p bs rawEv),
-
-      ((Coq_pair coq_P0 cm_aspid), 
-        fn par => fn p => fn bs => fn rawEv => appraise_cm_asp_stub par p bs rawEv),
 
       ((Coq_pair coq_P1 cm_aspid), 
         fn par => fn p => fn bs => fn rawEv => appraise_cm_asp_stub par p bs rawEv)
@@ -70,7 +64,7 @@ val aspServer_cb = (fn aspServerAddr => fn aspParams => fn plc => fn bs => fn ra
 val pubKeyServer_cb = (fn _ => fn _ => (Coq_resultC (BString.unshow "OUTPUT_PUBKEY"))) :  (coq_ASP_Address -> coq_PubKeyCallback)
 
 val plcServer_cb = (fn plcServerAddr => fn plc => 
-  case (plc = "1") of
+  case (plc = "0") of
     True => (Coq_resultC "localhost:5001")
     | _ => 
       let val _ = print ("Encountered Plc not in Local Plcs: '" ^ plc ^ "'\n") 

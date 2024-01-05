@@ -82,7 +82,7 @@ void ffirecvCoplandRequestFromLinux(const uint8_t * c, const long clen, uint8_t 
         a[0] = FFI_FAILURE;
         return;
     }
-    printf("DEBUG: request was: %s\n", request);
+    //printf("DEBUG: request was: %s\n", request);
 
     /* // Should we fail if output buffer is too long? */
     memcpy_volatile_src_commutil((void *)(a+1), request, alen-1);
@@ -105,7 +105,7 @@ bool ffirespondToLinux(const uint8_t * c, const long clen, uint8_t * a, const lo
         return false;
     }
 
-    printf("DEBUG: response is %s\n", c);
+    //printf("DEBUG: response is %s\n", c);
 
     bool rpc_result = linux_comm_fire_and_forget(c);
     if(!rpc_result)
