@@ -28,6 +28,12 @@ fun decrypt_bs_to_rawev' bs params et =
          Coq_errC e => am_failm (Coq_am_dispatch_error e)
        | Coq_resultC _ => ret r))
 
+(** val checkNonce' : nat -> coq_BS -> coq_BS coq_AM **)
+
+fun checkNonce' nid nonceCandidate =
+  bind (am_getNonce nid) (fn nonceGolden =>
+    ret (checkNonce nonceGolden nonceCandidate))
+
 (** val check_asp_EXTD :
     coq_ASP_PARAMS -> coq_Plc -> coq_BS -> coq_RawEv -> coq_AM_Config ->
     (coq_BS, coq_DispatcherErrors) coq_ResultT **)
@@ -44,9 +50,3 @@ fun check_asp_EXTD' params p sig0 ls =
     case check_asp_EXTD params p sig0 ls ac of
       Coq_errC e => am_failm (Coq_am_dispatch_error e)
     | Coq_resultC r => ret r)
-
-(** val checkNonce' : nat -> coq_BS -> coq_BS coq_AM **)
-
-fun checkNonce' nid nonceCandidate =
-  bind (am_getNonce nid) (fn nonceGolden =>
-    ret (checkNonce nonceGolden nonceCandidate))

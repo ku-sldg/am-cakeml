@@ -122,7 +122,7 @@ get_files(cop_src_pre_aspStubs
     stubs/IO_Stubs_extra.sml
     am/CommTypes.sml
     extracted/AM_Helpers.cml
-    extracted/Client_AM_Local.cml
+    extracted/Client_AM.cml
     extracted/Server_AM.cml
     stubs/ManGenConfig.sml
 )
