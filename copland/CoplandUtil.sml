@@ -79,7 +79,7 @@ fun evToString e = concatWith " "
         | Coq_ss ev1 ev2   => ["SS_E", parens ev1, parens ev2]
     end
 
-(* evidenceCToString :: coq_EvidenceC -> string *)
+(* evidenceCToString :: coq_AppResultC -> string *)
 fun evidenceCToString e = concatWith " "
     let fun parens e = "(" ^ evidenceCToString e ^ ")"
      in case e of

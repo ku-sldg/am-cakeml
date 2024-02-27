@@ -1,7 +1,7 @@
 (** val peel_bs_am : coq_RawEv -> (coq_BS, coq_RawEv) prod coq_AM **)
 
 fun peel_bs_am ls = case ls of
-  [] => failm
+  [] => am_failm (Coq_am_error errStr_peel_bs_am)
 | bs :: ls' => ret (Coq_pair bs ls')
 
 (** val gen_appraise_AM :
@@ -19,7 +19,7 @@ fun gen_appraise_AM et ls =
        ENCR =>
        bind (peel_bs_am ls) (fn v =>
          let val Coq_pair bs _ = v in
-         bind (decrypt_bs_to_rawev' bs params) (fn decrypted_ls =>
+         bind (decrypt_bs_to_rawev' bs params et') (fn decrypted_ls =>
            bind (gen_appraise_AM et' decrypted_ls) (fn rest =>
              ret (Coq_eec_app p params passed_bs rest))) end)
      | EXTD =>

@@ -11,6 +11,6 @@ fun store_clientData_asp_stub ps e =
                    val _ = TextIO.closeOut ostream
                                          
                in 
-                   BString.empty
+                   Coq_resultC (BString.empty)
                end
                    

@@ -3,20 +3,20 @@ structure ManifestUtils = struct
   exception Excn string
 
   type privateKey_t       = coq_PrivateKey
-  type Partial_ASP_CB     = coq_ConcreteManifest -> coq_CakeML_ASPCallback
-  type Partial_Plc_CB     = coq_ConcreteManifest -> coq_CakeML_PlcCallback
-  type Partial_PubKey_CB  = coq_ConcreteManifest -> coq_CakeML_PubKeyCallback
-  type Partial_UUID_CB    = coq_ConcreteManifest -> coq_CakeML_uuidCallback
+  type Partial_ASP_CB     = coq_DispatcherErrors coq_ASPCallback
+  type Partial_Plc_CB     = coq_PlcCallback
+  type Partial_PubKey_CB  = coq_PubKeyCallback
+  type Partial_UUID_CB    = coq_UUIDCallback
 
-  type AM_Config = (coq_ConcreteManifest * privateKey_t *
-      (coq_CakeML_ASPCallback) * 
-      (coq_CakeML_PlcCallback) * 
-      (coq_CakeML_PubKeyCallback) * 
-      (coq_CakeML_uuidCallback))
+  type AM_Config = coq_AM_Config 
 
   val local_formal_manifest = Ref (Err "Formal Manifest not set") : ((coq_Manifest, string) result) ref
 
-  val local_concreteManifest = Ref (Err "Concrete Manifest not set") : ((coq_ConcreteManifest, string) result) ref
+  val local_uuid_clone = Ref (Err "UUID clone not set") : ((coq_UUID, string) result) ref
+
+  val local_amConfig = Ref (Err "AM_Config not set") : ((coq_AM_Config, string) result) ref
+
+  val local_amLib = Ref (Err "AM_Lib not set") : ((coq_AM_Library, string) result) ref
 
   val local_aspCb = Ref (Err "ASP Callback not set") : ((Partial_ASP_CB, string) result) ref
 
@@ -27,109 +27,111 @@ structure ManifestUtils = struct
   val local_uuidCb = Ref (Err "UUID callback not set") : ((Partial_UUID_CB, string) result) ref
 
   val local_PrivKey = Ref (Err "Private Key not set") : ((privateKey_t, string) result) ref
-
-  (* Retrieves the concrete manifest, or exception if not configured 
-    : _ -> coq_ConcreteManifest *)
-  fun get_ConcreteManifest _ =
-    (case (!local_concreteManifest) of
+  
+   (* Retrieves the AM_Config, or exception if not configured 
+    : _ -> coq_AM_Config *)
+  fun get_local_amConfig _ =
+    (case (!local_amConfig) of
       (Ok v) => v
-      | Err e => raise Excn e) : coq_ConcreteManifest
+      | Err e => raise Excn e) : coq_AM_Config
 
-    (* Retrieves the plc corresponding to this processes Manifest/AM_Config
-      throws an exception if configuration not completed
-    : _ -> coq_Plc *)
-  fun get_myPlc _ = 
-    (let val (Build_ConcreteManifest my_plc _ _ _ _ _ _ _ _) = get_ConcreteManifest() in
-      my_plc
-    end) : coq_Plc
+  (* Retrieves the AM_Lib, or exception if not configured 
+    : _ -> coq_AM_Library *)
+  fun get_local_amLib _ =
+    (case (!local_amLib) of
+      (Ok v) => v
+      | Err e => raise Excn e) : coq_AM_Library
 
-  (* Compiles a concrete manifest from a Formal Manifest and AM Lib
-    : coq_Manifest -> coq_AM_Library -> coq_ConcreteManifest *)
-  fun compile_manifest (fm : coq_Manifest) (al : coq_AM_Library) =
-    (case (manifest_compiler fm al) of
-      Coq_pair (Coq_pair (Coq_pair (Coq_pair concrete _) _) _) _ => concrete
-    ) : coq_ConcreteManifest
-
-  (* Setups up the relevant information and compiles the manifest
-      : coq_Manifest -> coq_AM_Library -> () *)
-  fun setup_AM_config (fm : coq_Manifest) (al : coq_AM_Library) (privKey : privateKey_t) (* (t:coq_Term) *) =
-    (case (manifest_compiler fm al) of
-      Coq_pair (Coq_pair (Coq_pair (Coq_pair concrete aspDisp) plcDisp) pubKeyDisp) uuidDisp =>
-        let val _ = local_formal_manifest := Ok fm
-            val _ = local_concreteManifest := Ok concrete
-            val _ = local_aspCb := Ok aspDisp
-            val _ = local_plcCb := Ok plcDisp
-            val _ = local_pubKeyCb := Ok pubKeyDisp
-            val _ = local_uuidCb := Ok uuidDisp
-            val _ = local_PrivKey := Ok privKey
-            (* val _ = local_authTerm := Ok t *)
-            (*
-            val _ = local_authEv := 
-              let val myPlc = get_myPlc () in 
-                run_cvm_rawEv t myPlc coq_mt
-              end
-              *)
-        in
-          ()
-        end) : unit
-
-  (* Retrieves the formal manifest, or exception if not configured 
+    (* Retrieves the formal manifest, or exception if not configured 
     : _ -> coq_Manifest *)
   fun get_FormalManifest _ =
     (case (!local_formal_manifest) of
       (Ok v) => v
       | Err e => raise Excn e) : coq_Manifest
 
-  (* Sets the concrete manifest, should not throw
-    : coq_ConcreteManifest -> () *)
-  fun set_ConcreteManifest (c : coq_ConcreteManifest) =
-    let val _ = local_concreteManifest := Ok c
+  (* Retrieves the UUID clone address, or exception if not configured 
+    : _ -> coq_UUID *)
+  fun get_Clone_uuid _ =
+    (case (!local_uuid_clone) of
+      (Ok v) => v
+      | Err e => raise Excn e) : coq_UUID
+
+    (* Retrieves the plc corresponding to this processes Manifest/AM_Config
+      throws an exception if configuration not completed
+    : _ -> coq_Plc *)
+  fun get_myPlc _ = 
+    (let val (Build_Manifest my_plc _ _ _ _ _ _) = get_FormalManifest() in
+      my_plc
+    end) : coq_Plc
+
+  (* Setups up the relevant information and compiles the manifest
+      : coq_Manifest -> coq_AM_Library -> () *)
+  fun setup_AM_config (fm : coq_Manifest) (al : coq_AM_Library) (privKey : privateKey_t) (* (t:coq_Term) *) =
+    (case (manifest_compiler fm al) of
+      Coq_mkAmConfig compiled_fm clone_uuid aspDisp appDisp plcDisp pubKeyDisp uuidDisp =>
+        let val _ = local_formal_manifest := Ok compiled_fm
+            val _ = local_uuid_clone := Ok clone_uuid
+            val _ = local_aspCb := Ok aspDisp
+            val _ = local_plcCb := Ok plcDisp
+            val _ = local_pubKeyCb := Ok pubKeyDisp
+            val _ = local_uuidCb := Ok uuidDisp
+            val _ = local_PrivKey := Ok privKey
+            val _ = local_amConfig := Ok (Coq_mkAmConfig compiled_fm clone_uuid aspDisp appDisp plcDisp pubKeyDisp uuidDisp)
+            val _ = local_amLib := Ok al
+        in
+          ()
+        end) : unit
+
+  (* Sets the AM_Config, should not throw an exception
+  : coq_AM_Config -> () *)
+  fun set_AM_Config (c : coq_AM_Config) =
+    let val _ = local_amConfig := Ok c
     in 
       ()
     end
 
+(*
+  (* TODO:  consider removing this setter...might be unwise to expose this interface *)
+  (* Sets the AM_Library, should not throw an exception
+  : coq_AM_Library -> () *)
+  fun set_AM_Lib (al : coq_AM_Library) =
+    let val _ = local_amLib := Ok al
+    in 
+      ()
+    end
+*)
+
   (* Retrieves the asp callback, or exception if not configured 
-    : _ -> coq_CakeML_ASPCallback *)
+    : _ -> coq_ASPCallback *)
   fun get_ASPCallback _ =
-    (let val cm = get_ConcreteManifest() 
-    in
+    (
       case (!local_aspCb) of
-      (Ok v) => (v cm)
-      | Err e => raise Excn e
-    end) : coq_CakeML_ASPCallback
+      (Ok v) => v
+      | Err e => raise Excn e) : coq_DispatcherErrors coq_ASPCallback
 
   (* Retrieves the plc callback, or exception if not configured 
-    : _ -> coq_CakeML_PlcCallback *)
+    : _ -> coq_PlcCallback *)
   fun get_PlcCallback _ =
-    (let val cm = get_ConcreteManifest()
-    in
+    (
       case (!local_plcCb) of
-      (Ok v) => (v cm)
-      | Err e => raise Excn e
-    end) : coq_CakeML_PlcCallback
+      (Ok v) => v
+      | Err e => raise Excn e) : coq_PlcCallback
 
   (* Retrieves the asp callback, or exception if not configured 
-    : _ -> coq_CakeML_PubKeyCallback *)
+    : _ -> coq_PubKeyCallback *)
   fun get_PubKeyCallback _ =
-    (let val cm = get_ConcreteManifest()
-    in
+    (
       case (!local_pubKeyCb) of
-      (Ok v) =>
-      let val _ = print "\n\nLooking up pubkey callback\n\n" in
-        (v cm)
-      end
-      | Err e => raise Excn e
-    end) : coq_CakeML_PubKeyCallback
+      (Ok v) => v
+      | Err e => raise Excn e) : coq_PubKeyCallback
 
   (* Retrieves the asp callback, or exception if not configured 
-    : _ -> coq_CakeML_uuidCallback *)
+    : _ -> coq_UUIDCallback *)
   fun get_UUIDCallback _ =
-    (let val cm = get_ConcreteManifest()
-    in
+    (
       case (!local_uuidCb) of
-      (Ok v) => (v cm)
-      | Err e => raise Excn e
-    end) : coq_CakeML_uuidCallback
+      (Ok v) => v
+      | Err e => raise Excn e) : coq_UUIDCallback
 
   
   (* Retrieves the uuid corresponding to this processes Manifest/AM_Config
@@ -138,9 +140,11 @@ structure ManifestUtils = struct
   fun get_myUUID _ = 
     (let val my_plc = get_myPlc()
         val plc_to_uuid = get_PlcCallback()
-        val my_uuid = plc_to_uuid my_plc
+        val res_uuid = plc_to_uuid my_plc
     in
-      my_uuid
+      case res_uuid of 
+        Coq_errC e => raise Excn ("get_myUUID error") 
+      | Coq_resultC my_uuid => my_uuid
     end) : coq_UUID
 
   (* Retrieves the private key corresponding to this processes Manifest/AM_Config
@@ -155,23 +159,22 @@ structure ManifestUtils = struct
       if a Manifest has not be compiled yet it will throw an error
     : _ -> AM_Config *)
   fun get_AM_config _ =
-    (let val cm = get_ConcreteManifest()
-        val privKey = get_myPrivateKey()
+    (
+    let val fm = get_FormalManifest()
+        val clone_uuid = get_Clone_uuid()
         val aspCb = get_ASPCallback()
         val plcCb = get_PlcCallback()
         val pubKeyCb = get_PubKeyCallback()
         val uuidCb = get_UUIDCallback()
     in
-      (cm, privKey, aspCb, plcCb, pubKeyCb, uuidCb)
+      Coq_mkAmConfig fm clone_uuid aspCb aspCb plcCb pubKeyCb uuidCb
     end) : AM_Config
 
   (* Directly combines setup and get steps in one function call. 
-      Additionally, we must provide a "fresh" Concrete Manifest to 
-      use for manifest operations
-    : coq_Manifest -> coq_AM_Library -> AM_Config *)
-  fun setup_and_get_AM_config (fm : coq_Manifest) (al : coq_AM_Library) (cm : coq_ConcreteManifest) (privKey : privateKey_t) (* (t:coq_Term) *) =
-    (let val _ = setup_AM_config fm al privKey (*t*)
-         val _ = set_ConcreteManifest cm in
-      get_AM_config()
+    : coq_Manifest -> coq_AM_Library -> privateKey_t -> AM_Config *)
+  fun setup_and_get_AM_config (fm : coq_Manifest) (al : coq_AM_Library) (privKey : privateKey_t) =
+    (let val _ = setup_AM_config fm al privKey
+      in 
+        get_AM_config()
     end) : AM_Config
 end

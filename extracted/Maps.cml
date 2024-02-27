@@ -13,7 +13,7 @@ fun map_get h m x =
     [] => None
   | p :: m' =>
     let val Coq_pair k v = p in
-    (case eqb h x k of
+    (case eqb h k x of
        True => Some v
      | False => map_get h m' x) end
 
@@ -21,8 +21,14 @@ fun map_get h m x =
     'a1 coq_EqClass -> ('a1, 'a2) coq_MapC -> 'a1 -> 'a2 -> ('a1, 'a2)
     coq_MapC **)
 
-fun map_set _ m x v =
-  (Coq_pair x v) :: m
+fun map_set h m x v =
+  case m of
+    [] => (Coq_pair x v) :: []
+  | p :: t =>
+    let val Coq_pair hk hv = p in
+    (case eqb h hk x of
+       True => (Coq_pair hk v) :: t
+     | False => (Coq_pair hk hv) :: (map_set h t x v)) end
 
 type ('a, 'b) coq_MapD = ('a, 'b) prod list
 

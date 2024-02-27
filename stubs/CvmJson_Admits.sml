@@ -2,7 +2,9 @@
 
 type coq_JsonT = Json.json
 
+(*
 type coq_StringT = string
+*)
 
 
 (*

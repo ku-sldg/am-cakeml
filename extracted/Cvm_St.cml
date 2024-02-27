@@ -1,4 +1,9 @@
 datatype cvm_st =
-  Coq_mk_st coq_EvC (coq_Ev list) coq_Plc coq_Event_ID
+  Coq_mk_st coq_EvC (coq_Ev list) coq_Plc coq_Event_ID coq_AM_Config
 
-type 'a coq_CVM = (cvm_st, 'a) coq_St
+datatype coq_CVM_Error =
+  Coq_at_error_static coq_Term coq_Plc coq_EvC
+| Coq_at_error_dynamic coq_Term coq_UUID coq_EvC
+| Coq_dispatch_error coq_DispatcherErrors
+
+type 'a coq_CVM = (cvm_st, 'a, coq_CVM_Error) coq_Err

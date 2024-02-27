@@ -18,8 +18,8 @@ fun appraise_kim_meas_asp_stub ps p bs ls =
                    in
                        if bool_res
                        then (print ("KIM Appraisal Check PASSED\n\n");
-                             passed_bs)
+                             Coq_resultC passed_bs)
                        else (print ("KIM Appraisal Check FAILED\n\n");
-                             failed_bs)
+                             Coq_resultC failed_bs)
                    end
               (* end *)

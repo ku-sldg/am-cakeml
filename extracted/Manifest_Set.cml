@@ -1,0 +1,51 @@
+type 'a manifest_set = 'a list
+
+(** val manifest_set_empty : 'a1 manifest_set **)
+
+val manifest_set_empty =
+  []
+
+(** val manset_add :
+    'a1 coq_EqClass -> 'a1 -> 'a1 manifest_set -> 'a1 manifest_set **)
+
+fun manset_add hA a s = case s of
+  [] => a :: []
+| h :: t => (case eqb hA a h of
+               True => s
+             | False => h :: (manset_add hA a t))
+
+(** val list_to_manset' : 'a1 coq_EqClass -> 'a1 list -> 'a1 manifest_set **)
+
+fun list_to_manset' hA l = case l of
+  [] => []
+| h :: t => manset_add hA h (list_to_manset' hA t)
+
+(** val list_to_manset : 'a1 coq_EqClass -> 'a1 list -> 'a1 manifest_set **)
+
+fun list_to_manset hA l =
+  rev (list_to_manset' hA l)
+
+(** val filter_manset :
+    ('a1 -> bool) -> 'a1 manifest_set -> 'a1 manifest_set **)
+
+val filter_manset =
+  filter
+
+(** val is_empty_manset : 'a1 manifest_set -> bool **)
+
+fun is_empty_manset s = case s of
+  [] => True
+| _ :: _ => False
+
+(** val in_dec_set : 'a1 coq_EqClass -> 'a1 -> 'a1 manifest_set -> sumbool **)
+
+fun in_dec_set hA a s =
+  in_dec (coq_EqClass_impl_DecEq hA) a s
+
+(** val manset_union :
+    'a1 coq_EqClass -> 'a1 manifest_set -> 'a1 manifest_set -> 'a1
+    manifest_set **)
+
+fun manset_union hA a b = case b of
+  [] => a
+| h :: t => manset_union hA (manset_add hA h a) t

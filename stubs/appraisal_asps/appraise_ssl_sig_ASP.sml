@@ -11,7 +11,11 @@ fun appraise_ssl_sig (ps : coq_ASP_PARAMS) (p : coq_Plc) (bs : coq_BS) (ls : coq
 
         val _ = print ("Looking up Pubkey for place " ^ (plToString p) ^ "\n"  (*^ (BString.show pubkey) ^  "\n\n" *))
 
-        val pubkey = (ManifestUtils.get_PubKeyCallback() p) : BString.bstring
+        val res_pubkey = (ManifestUtils.get_PubKeyCallback() p) (* ): BString.bstring *)
+        val pubkey = 
+            case res_pubkey of 
+                Coq_errC e => BString.empty(* raise Excn ("get_PubKeyCallback error")  *)
+            | Coq_resultC v => v
 
         (* val _ = print "\n\nPast looking up pubkey\n\n" *)
         val pub_len = BString.length pubkey
@@ -29,7 +33,7 @@ fun appraise_ssl_sig (ps : coq_ASP_PARAMS) (p : coq_Plc) (bs : coq_BS) (ls : coq
     in
         if checkGood
         then (print ("\nSSL Sig Check PASSED\n\n");
-              passed_bs)
+              (Coq_resultC passed_bs))
         else (print ("\nSSL Sig Check FAILED\n\n");
-              failed_bs)
+              (Coq_resultC failed_bs))
     end

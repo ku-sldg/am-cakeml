@@ -77,58 +77,6 @@ fun concatWith s l =
       | x::[] => x
       | x::xs => x ^ s ^ (concatWith s xs)
 
-(* Map functions *)
-
-
-(*
-
-type ('a, 'b) mymap = ('a * 'b) list
-
-val map_empty = []
-
-fun map_get m x = case m
-                   of [] => None
-                    | ((k,v)::ms) => if k = x then Some v else map_get ms x
-
-fun map_set m k v = (k,v)::m
-
-fun map_dom m = case m
-                 of [] => []
-                  | ((i,a)::ms) => i :: map_dom ms
-
-*)
-
-                             
-
-(* It'd be nice if this could work *)
-(* 'f = 'a -> 'a -> order *)
-(* type ('a, 'b, 'f) map = ('a * 'b) list * 'f *)
-
-(* fun map_empty cmp_f = ([], cmp_f) *)
-
-(* fun map_get m x = *)
-(*     (* case m of *) *)
-(*         (* (m' f) => Map.lookup f *) *)
-(*     let val (m', f) = m *)
-(*     in case m' *)
-(*         of [] => None *)
-(*          | _  => let val m'' = Map.fromList f m' in Map.lookup f x m'' end *)
-(*     end *)
-
-(* fun map_set m i v = let val (m', f) = m *)
-(*                     in let val m'' = Map.fromList f m' *)
-(*                        in let val m''' = Map.toAscList (Map.insert f i v m'') *)
-(*                           in (m''', f) *)
-(*                           end *)
-(*                        end *)
-(*                     end *)
-
-(* fun map_dom m = let val (m', f) = m *)
-(*                 in case m' *)
-(*                     of [] => [] *)
-(*                      | ((i,a)::ms) => i :: map_dom (ms, f) *)
-(*                 end *)
-
 (* Pair functions *)
 fun pair_compare p f1 f2 = let val (p1, p2) = p in
                                let val fst_cmp = f1 p1 in

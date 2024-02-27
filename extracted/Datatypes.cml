@@ -1,3 +1,9 @@
+(** val negb : bool -> bool **)
+
+fun negb b = case b of
+  True => False
+| False => True
+
 datatype ('a, 'b) prod =
   Coq_pair 'a 'b
 
@@ -10,6 +16,12 @@ fun fst p = case p of
 
 fun snd p = case p of
   Coq_pair _ y => y
+
+(** val length : 'a1 list -> nat **)
+
+fun length l = case l of
+  [] => O
+| _ :: l' => S (length l')
 
 (** val app : 'a1 list -> 'a1 list -> 'a1 list **)
 

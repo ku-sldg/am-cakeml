@@ -1,1 +1,0 @@
-This provides a template for writing your own CakeML apps extending the attestation manager. See the CMakeLists.txt file for information on adding source files.

@@ -1,10 +1,12 @@
 (* Depends on: util, copland, am/Measurements, am/ServerAm *)
 
-type TermPlcConfigPath_In = string
 type FormalManifestPath_Out = string
+type TermPlcConfigPath_In = string
+type EvPlcConfigPath_In = string
 
 
-type ManGenArgs = (string * string)
+type ManGenArgs = (FormalManifestPath_Out * TermPlcConfigPath_In * EvPlcConfigPath_In * bool)
+
 
   (**
     gets the command line arguments used to configure the manifest generator
@@ -12,55 +14,61 @@ type ManGenArgs = (string * string)
   *)
 fun get_args () = 
     let val name = CommandLine.name()
-        val usage = ("Usage: " ^ name ^ "-om <formal_manifest_outfile> -t <term_plc_file>")
+        val usage = ("Usage: " ^ name ^ "-om <manifest_outfiles_prefix> -t <term_plc_file> -e <evidence_plc_file> [ -p ] (provisioning) ")
     in
       case (CommandLine.arguments()) of
         argList =>
-          let val formManOutInd = ListExtra.find_index argList "-om"
-              val termPlcInInd = ListExtra.find_index argList "-t" in
-            if (formManOutInd = ~1)
-            then raise (Exception "Manifest Generator Arg Error: required field '-om' for Formal Manifest Output FileName missing\n")
-            else
-              if (termPlcInInd = ~1)
-              then raise (Exception "Manifest Generator Arg Error: required field '-t' for Input Term Plc List FileName missing\n")
-              else
+          let val formManOutInd =    ListExtra.find_index argList "-om"
+              val termPlcInInd =     ListExtra.find_index argList "-t"
+              val evPlcInInd = ListExtra.find_index argList "-e"
+              val provisionInd =     ListExtra.find_index argList "-p"
+
+              val omb = (formManOutInd <> ~1)
+              val tb = (termPlcInInd <> ~1)
+              val eb = (evPlcInInd <> ~1)
+              val pb = (provisionInd <> ~1)
+               in
+
+            if ((not omb) andalso (not pb)) 
+            then raise (Exception "Manifest Generator Arg Error: One of '-om' or '-p' args required\n")
+            else (* Now one of -om or -p is specified *)
+              if ((not tb) andalso (not eb))
+              then raise (Exception "Manifest Generator Arg Error: One of '-t' or '-e' args required\n")
+              else 
                 let val formManOutFile = List.nth argList (formManOutInd + 1)
-                    val termPlcInFile  = List.nth argList (termPlcInInd + 1) in
-                      ((formManOutFile, termPlcInFile))
+                    val termPlcInFile  = List.nth argList (termPlcInInd + 1) 
+                    val evPlcInFile    = List.nth argList (evPlcInInd + 1) in
+                      ((formManOutFile, termPlcInFile, evPlcInFile, pb))
                  end
            end
      end
 
 fun main () =
-    let val (outFilePathPrefix, typeSwitch) = get_args ()
-        val auth_phrase = ssl_sig_parameterized default_place
-        fun auth_phrase_list p = [(Coq_pair auth_phrase p)]
-        val kim_phrase = Coq_att coq_P1 (kim_meas dest_plc kim_meas_targid)
-        val kim_phrases =   [(Coq_pair kim_phrase coq_P0)] @ (auth_phrase_list coq_P0)
-        val cert_phrases =  [(Coq_pair cert_style coq_P0)] @ (auth_phrase_list coq_P0)
-        val cache_phrases = [(Coq_pair cert_cache_p0 coq_P0), (Coq_pair cert_cache_p1 coq_P1)] @ (auth_phrase_list coq_P0) @ (auth_phrase_list coq_P1)
-        val parmut_phrases' = [(Coq_pair par_mut_p0 coq_P3), (Coq_pair par_mut_p0 coq_P0), (Coq_pair par_mut_p1 coq_P1), (Coq_pair par_mut_p1 coq_P4)] 
-        val parmut_phrases_auth = (auth_phrase_list coq_P3) @ (auth_phrase_list coq_P0) @ (auth_phrase_list coq_P1) @ (auth_phrase_list coq_P4)
-        val parmut_phrases = parmut_phrases' @ parmut_phrases_auth
-        val layered_bg_phrases = [(Coq_pair layered_bg_strong coq_P0)] @ (auth_phrase_list coq_P0)
+    let val (outFilePathPrefix, cvmPlcTermsFilepath, appEvidencePlcFilePath, provisioningBool) = get_args ()
+
         val _ = print "\n\n"
-        val phrases = 
-          if (typeSwitch = "kim")
-          then (kim_phrases)
-          else (
-            if (typeSwitch = "cert")
-            then (cert_phrases)
-            else (
-              if (typeSwitch = "cache")
-              then (cache_phrases)
-              else (
-                if (typeSwitch = "parmut")
-                then (parmut_phrases)
-                else (
-                  if (typeSwitch = "lbg")
-                  then (layered_bg_phrases)
-                  else (kim_phrases)))))
-        val _ = ManifestJsonConfig.write_form_man_list_and_print_json outFilePathPrefix phrases
+
+        val _ = 
+          (
+          if(provisioningBool) 
+          then (
+              let val plcTerms = ManGenConfig.cm_layered_phrases
+                  val _ = ManifestJsonConfig.write_termPlcList_file_json cvmPlcTermsFilepath plcTerms
+                  val plcEts = ManGenConfig.ets_cm_layered
+                  val _ = ManifestJsonConfig.write_EvidencePlcList_file_json appEvidencePlcFilePath plcEts in 
+                          ()
+              end
+          )
+          else ()
+          )
+
+        val phrases = ManifestJsonConfig.read_termPlcList_file_json cvmPlcTermsFilepath
+
+        val ets = ManifestJsonConfig.read_EvidencePlcList_file_json appEvidencePlcFilePath
+                            
+
+        val _ = ManifestJsonConfig.write_form_man_list_json_and_print_json_app 
+                  outFilePathPrefix ets phrases
         val _ = print "\n\n" in
       ()
     end

@@ -16,5 +16,22 @@ fun coq_EqClass_impl_DecEq h x y =
 
 (** val nat_EqClass : nat coq_EqClass **)
 
-val nat_EqClass =
+val nat_EqClass : nat coq_EqClass =
   Nat.eqb
+
+(** val eqbPair :
+    'a1 coq_EqClass -> 'a2 coq_EqClass -> ('a1, 'a2) prod -> ('a1, 'a2) prod
+    -> bool **)
+
+fun eqbPair h h' p1 p2 =
+  let val Coq_pair a1 b1 = p1 in
+  let val Coq_pair a2 b2 = p2 in
+  (case eqb h a1 a2 of
+     True => eqb h' b1 b2
+   | False => False) end end
+
+(** val pair_EqClass :
+    'a1 coq_EqClass -> 'a2 coq_EqClass -> ('a1, 'a2) prod coq_EqClass **)
+
+val pair_EqClass =
+  eqbPair

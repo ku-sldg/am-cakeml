@@ -1,17 +1,52 @@
+(** val check_et_size :
+    coq_Evidence -> coq_RawEv -> (unit, coq_DispatcherErrors) coq_ResultT **)
+
+fun check_et_size et ls =
+  case eqb nat_EqClass (et_size et) (length ls) of
+    True => Coq_resultC ()
+  | False => Coq_errC (Runtime errStr_et_size)
+
+(** val decrypt_bs_to_rawev :
+    coq_BS -> coq_ASP_PARAMS -> coq_AM_Config -> (coq_RawEv,
+    coq_DispatcherErrors) coq_ResultT **)
+
+fun decrypt_bs_to_rawev bs params ac =
+  let val Coq_asp_paramsC _ _ p _ = params in
+  (case let val Coq_mkAmConfig _ _ _ _ _ pubKeyCb _ = ac in pubKeyCb p end of
+     Coq_errC e => Coq_errC e
+   | Coq_resultC pubkey => decrypt_bs_to_rawev_prim bs params pubkey) end
+
 (** val decrypt_bs_to_rawev' :
-    coq_BS -> coq_ASP_PARAMS -> coq_RawEv coq_AM **)
+    coq_BS -> coq_ASP_PARAMS -> coq_Evidence -> coq_RawEv coq_AM **)
 
-fun decrypt_bs_to_rawev' bs params =
-  ret (decrypt_bs_to_rawev bs params)
-
-(** val check_asp_EXTD' :
-    coq_ASP_PARAMS -> coq_Plc -> coq_BS -> coq_RawEv -> coq_BS coq_AM **)
-
-fun check_asp_EXTD' params p sig0 ls =
-  ret (check_asp_EXTD params p sig0 ls)
+fun decrypt_bs_to_rawev' bs params et =
+  bind get_AM_amConfig (fn ac =>
+    case decrypt_bs_to_rawev bs params ac of
+      Coq_errC e => am_failm (Coq_am_dispatch_error e)
+    | Coq_resultC r =>
+      (case check_et_size et r of
+         Coq_errC e => am_failm (Coq_am_dispatch_error e)
+       | Coq_resultC _ => ret r))
 
 (** val checkNonce' : nat -> coq_BS -> coq_BS coq_AM **)
 
 fun checkNonce' nid nonceCandidate =
   bind (am_getNonce nid) (fn nonceGolden =>
     ret (checkNonce nonceGolden nonceCandidate))
+
+(** val check_asp_EXTD :
+    coq_ASP_PARAMS -> coq_Plc -> coq_BS -> coq_RawEv -> coq_AM_Config ->
+    (coq_BS, coq_DispatcherErrors) coq_ResultT **)
+
+fun check_asp_EXTD params p sig0 ls ac =
+  let val Coq_mkAmConfig _ _ _ app_aspCb _ _ _ = ac in
+  app_aspCb params p sig0 ls end
+
+(** val check_asp_EXTD' :
+    coq_ASP_PARAMS -> coq_Plc -> coq_BS -> coq_RawEv -> coq_BS coq_AM **)
+
+fun check_asp_EXTD' params p sig0 ls =
+  bind get_AM_amConfig (fn ac =>
+    case check_asp_EXTD params p sig0 ls ac of
+      Coq_errC e => am_failm (Coq_am_dispatch_error e)
+    | Coq_resultC r => ret r)
