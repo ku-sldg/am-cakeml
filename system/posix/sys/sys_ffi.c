@@ -25,12 +25,14 @@ void ffisystem(const uint8_t * c, const long clen, uint8_t * a, const long alen)
  * @param clen The length of the command
  * @param a The buffer to write the output to
  * @param alen The length of the output buffer
+ * @return void
 */
 void ffipopen(const uint8_t * c, const long clen, uint8_t * a, const long alen) {
     FILE *fp;
     char *output = (char *)malloc(MAX_BUFFER_SIZE * sizeof(char));
     if (output == NULL) {
       perror("Failed to allocate memory");
+      // TODO: How to comm this back to CML *a = 0xf0;
       exit(EXIT_FAILURE);
     }
     
@@ -39,6 +41,7 @@ void ffipopen(const uint8_t * c, const long clen, uint8_t * a, const long alen) 
     fp = popen((char*)c, "r");
     if (fp == NULL) {
       perror("Failed to execute command");
+      // TODO: How to comm this back to CML *a = 0xf1;
       exit(EXIT_FAILURE);
     }
 
@@ -46,6 +49,7 @@ void ffipopen(const uint8_t * c, const long clen, uint8_t * a, const long alen) 
 
     if (pclose(fp) == -1) {
       perror("Failed to close stream");
+      // TODO: How to comm this back to CML *a = 0xf2;
       exit(EXIT_FAILURE);
     }
 
