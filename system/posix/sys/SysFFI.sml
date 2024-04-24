@@ -7,4 +7,10 @@ in
       in
         BString.toInt BString.LittleEndian (FFI.call ffi_system (BString.length bs) bs)
       end
+
+    fun system_exec (command) =
+      let val bs = BString.fromString com
+      in
+        BString.LittleEndian (FFI.call ffi_system (BString.length bs) bs)
+      end
 end
