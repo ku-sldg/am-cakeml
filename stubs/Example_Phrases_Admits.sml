@@ -60,7 +60,7 @@ val appraise_inline_args : coq_Arg list =
       val appReq = (REQ_APP appTerm coq_P1 (Coq_nn O) [])
       val jsonAppReq = appRequestToJson appReq
       val strJsonAppReq = jsonToStr jsonAppReq in 
-        [(strJsonAppReq)]
+        [Arg_ID (strJsonAppReq)]
   end
   (* failwith "AXIOM TO BE REALIZED"  *)
 
@@ -71,7 +71,7 @@ val check_ssl_sig_args : coq_Arg list =
       val appReq = (REQ_APP appTerm coq_P0 (Coq_nn O) [])
       val jsonAppReq = appRequestToJson appReq
       val strJsonAppReq = jsonToStr jsonAppReq in 
-        [(strJsonAppReq)]
+        [Arg_ID (strJsonAppReq)]
   end
 
 

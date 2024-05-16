@@ -19,7 +19,10 @@ fun appraise_inline_asp_stub ps e =
                           case my_amlib of  
                             Build_AM_Library _ _ _ _ addr _ _ _ _ _ _ _ _ => addr
 
-                        val appRequestString = List.hd args 
+                        val appRequestArg = List.hd args 
+                        val appRequestString =
+                          case appRequestArg of 
+                            Arg_ID s => s
                         val inStrJson = strToJson appRequestString 
                         val appReq = jsonToAppRequest inStrJson
 

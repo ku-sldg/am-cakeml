@@ -8,29 +8,6 @@ fun in_dec h a l = case l of
      Coq_left => Coq_left
    | Coq_right => in_dec h a l0) end
 
-(** val count_occ : ('a1 -> 'a1 -> sumbool) -> 'a1 list -> 'a1 -> nat **)
-
-fun count_occ eq_dec l x =
-  case l of
-    [] => O
-  | y :: tl =>
-    let val n = count_occ eq_dec tl x in
-    (case eq_dec y x of
-       Coq_left => S n
-     | Coq_right => n) end
-
-(** val rev : 'a1 list -> 'a1 list **)
-
-fun rev l = case l of
-  [] => []
-| x :: l' => app (rev l') (x :: [])
-
-(** val concat : 'a1 list list -> 'a1 list **)
-
-fun concat l = case l of
-  [] => []
-| x :: l0 => app x (concat l0)
-
 (** val map : ('a1 -> 'a2) -> 'a1 list -> 'a2 list **)
 
 fun map f l = case l of

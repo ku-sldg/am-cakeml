@@ -9,8 +9,23 @@ fun aspIdToString s = s
 (* targIdToString : coq_TARG_ID -> string *)
 fun targIdToString s = s
 
+(*
+datatype coq_Arg =
+  Arg_ID coq_ID_Type
+| Arg_ResID coq_Resource_ID_Arg
+*)
+
+(* : coq_Resource_ID_Arg -> string *)
+fun ridToString rid = 
+  case rid of 
+    Rid_Arg_C1 => "Rid_Arg_C1"
+  | Rid_Arg_C2 => "Rid_Arg_C2"  
+
 (* argToString : coq_Arg -> string *)
-fun argToString s = s
+fun argToString x = 
+  case x of 
+    Arg_ID s => s 
+  | Arg_ResID rid => ridToString rid
 
 (* aspParamsToString : coq_ASP_PARAMS -> string *)
 fun aspParamsToString ps =

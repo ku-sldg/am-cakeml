@@ -14,7 +14,8 @@ fun aspidListToJsonList ids = Json.fromList (List.map aspIdToJson ids)
 
 fun targIdToJson i = Json.fromString i
 
-fun placeToJson pl = Json.fromString pl
+fun placeToJson pl = Json.fromString pl 
+
 
 fun placeListToJsonList ids = Json.fromList (List.map placeToJson ids)
 
@@ -87,23 +88,56 @@ fun spToJson sp = noArgConstructor (spToString sp)
 
 fun fwdToJson fwd = noArgConstructor (fwdToString fwd)
 
+
+(*
+(* : coq_Resource_ID_Arg -> json *)
+fun argResIDToJson rid = noArgConstructor (ridToString rid)
+
+(*
+datatype coq_Arg =
+  Arg_ID coq_ID_Type
+| Arg_ResID coq_Resource_ID_Arg
+*)
+fun argToJson arg = 
+  case arg of 
+    Arg_ID s => constructorWithArgs "Arg_ID" [stringToJson s]
+  | Arg_ResID rid => constructorWithArgs "Arg_ResID" [argResIDToJson rid]  (* [(stringToJson (ridToString rid))] *)
+
+fun argListToJsonList args  =  Json.fromList (List.map argToJson args)
+
+*)
+
+(* : coq_Resource_ID_Arg -> json *)
+fun argResIDToJson rid = noArgConstructor (ridToString rid)
+
+(* : coq_Arg -> json *)
+fun argToJson arg = case arg of
+                     Arg_ID s => constructorWithArgs "Arg_ID" [stringToJson s]
+                   | Arg_ResID rid => constructorWithArgs "Arg_ResID" [argResIDToJson rid]
+
+fun argListToJsonList args  =  Json.fromList (List.map argToJson args) 
+
 (* aspParamsToJson : coq_ASP_PARAMS -> json *)                               
 fun aspParamsToJson ps =
     case ps of
         Coq_asp_paramsC i args tpl tid =>
         constructorWithArgs "Asp_paramsC"
                             [aspIdToJson i,
-                             stringListToJsonList args,
+                             argListToJsonList args,
                              placeToJson tpl,
                              targIdToJson tid]
+
              
 (* aspToJson :: coq_ASP -> json *)                      
 fun aspToJson asp = case asp of
       NULL => noArgConstructor "Null"
     | CPY  => noArgConstructor "Cpy"
     | ASPC sp fwd ps =>
+      let val s = (Json.stringify (aspParamsToJson ps)) 
+          val _ = print ("\n\n" ^ s ^ "\n\n") in 
       constructorWithArgs "Aspc"
                           [spToJson sp, fwdToJson fwd, aspParamsToJson ps]
+          end
     | SIG => noArgConstructor "Sig"
     | HSH => noArgConstructor "Hsh"
     | ENC q => constructorWithArgs "Enc" [placeToJson q]

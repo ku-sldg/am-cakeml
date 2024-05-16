@@ -30,6 +30,12 @@ fun map_set h m x v =
        True => (Coq_pair hk v) :: t
      | False => (Coq_pair hk hv) :: (map_set h t x v)) end
 
+(** val map_vals : 'a1 coq_EqClass -> ('a1, 'a2) coq_MapC -> 'a2 list **)
+
+fun map_vals h m = case m of
+  [] => []
+| p :: m' => let val Coq_pair _ v = p in v :: (map_vals h m') end
+
 type ('a, 'b) coq_MapD = ('a, 'b) prod list
 
 (** val mapD_get_key :

@@ -8,7 +8,13 @@ type coq_ASP_ID = coq_ID_Type
 
 type coq_TARG_ID = coq_ID_Type
 
-type coq_Arg = coq_ID_Type
+datatype coq_Resource_ID_Arg =
+  Rid_Arg_C1 
+| Rid_Arg_C2 
+
+datatype coq_Arg =
+  Arg_ID coq_ID_Type
+| Arg_ResID coq_Resource_ID_Arg
 
 datatype coq_ASP_PARAMS =
   Coq_asp_paramsC coq_ASP_ID (coq_Arg list) coq_Plc coq_TARG_ID

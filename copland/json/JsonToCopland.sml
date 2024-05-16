@@ -70,6 +70,71 @@ fun json_ObToTerm ob f =
         (Json.Object m) => fromJsonMap m f
      | _ => raise Json.Exn "json_ObToTerm" "expected Json.Object parameter"
 
+
+(*
+(*
+datatype coq_Arg =
+  Arg_ID coq_ID_Type
+| Arg_ResID coq_Resource_ID_Arg
+*)
+
+(* : coq_Resource_ID_Arg -> string *)
+fun ridToString rid = 
+  case rid of 
+    Rid_Arg_C1 => "rid_C1"
+  | Rid_Arg_C2 => "rid_C2"
+*)
+
+(* jsonToArg : json -> coq_Arg *
+   (json object to coq_Arg)  *)      
+fun jsonToArg js = 
+  let val s = (Json.stringify js)
+      val _ = print ("\n\n" ^ s ^ "\n\n" ^ "GOT HERE" ^ "\n\n\n\n\n\n\n\n\n\n") in 
+
+      case js of 
+       (Json.Object m) => fromJsonMap m getArg
+      | _ =>   raise Json.Exn "jsonToArg" "Got to this place (not a Json.Object in jsonToArg)"
+
+      end
+(* case (Json.toMap js) of 
+                    (* Json.toMap : json -> ((string,json) map) option *)
+      Some m => fromJsonMap m getArg (* m : (string,json) map *)
+      
+    | None =>
+        raise Json.Exn "jsonToArg" "Copland Arg JSON does not begin as an AList"
+
+        *)
+        
+
+    and
+    getArg constructor (Json.Array args) =
+        case constructor of
+            "Arg_ID"  => getArgId args
+          | "Arg_ResID"  => getArgResID args                                         
+          |  _ => raise Json.Exn "getArg"
+                        ("Unexpected constructor for Copland Arg: " ^
+                         constructor)
+    and getArgId args = 
+      case args of
+        [Json.String q] => Arg_ID q 
+
+    and getArgResID args = 
+      case args of
+        [Json.Object ooo] => fromJsonMap ooo getResIdArg
+
+    and getResIdArg constructor blah =
+        case constructor of
+            "Rid_Arg_C1"  => Arg_ResID Rid_Arg_C1
+                              
+          | "Rid_Arg_C2"  => Arg_ResID Rid_Arg_C2                                        
+          |  _ => raise Json.Exn "getResIdArg"
+                        ("Unexpected constructor for Copland Resource_ID_Arg: " ^
+                         constructor)
+
+fun jsonArgListToList args =
+    List.map jsonToArg args
+
+
 (* getAspParams :: string -> Json.Array(json) -> coq_ASP_PARAMS *)
 fun getAspParams constructor (Json.Array args) =
     case constructor of
@@ -79,14 +144,14 @@ fun getAspParams constructor (Json.Array args) =
 
     (* getAspParamsArray :: json list -> coq_ASP_PARAMS
        Expected:  [Json.String aspid, 
-                   Json.Array [Json.String stringArg1, Json.String stringArg2, ...], 
+                   Json.Array [Json.Object arg1, Json.Object arg2, ...], 
                    Json.Int plc, 
                    Json.String targid] *)              
     and
     getAspParamsArray js = (* Coq_asp_paramsC "" [] O "" *)
       case js of
-          [Json.String aspid, arrayArgs, Json.String plc, Json.String targid] =>
-            Coq_asp_paramsC aspid (jsonStringListToList arrayArgs) plc targid
+          [Json.String aspid, (Json.Array arrayArgs), Json.String plc, Json.String targid] =>
+            Coq_asp_paramsC aspid (jsonArgListToList arrayArgs) plc targid
         | _ => raise Json.Exn "getAspParamsArray" "unexpected Coq_asp_paramsC params"                     
 
 fun jsonToSp js =
