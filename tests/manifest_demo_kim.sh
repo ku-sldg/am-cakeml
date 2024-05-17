@@ -40,7 +40,7 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
 
 
   # First, generate the formal manifests
-  $MAN_GEN -om $DEMO_FILES -t $MANGEN_TERMS_FILE -e $MANGEN_EVS_FILE 
+  $MAN_GEN -om $DEMO_FILES -t $MANGEN_TERMS_FILE -e $MANGEN_EVS_FILE
 
   #sleep 2
 
@@ -71,7 +71,7 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   # Sending a chain of first AM comp, then run AM
   tmux send-keys -t 2 \
     "($MAN_COMP -c -o $CLIENT_EXE_NAME -m $CLIENT_FORM_MAN -l $CLIENT_AM_LIB) && \
-     ($BUILT_CLIENT_AM -m $CLIENT_FORM_MAN -k $CLIENT_PRIV_KEY -t $CLIENT_TERM_FILE_JSON -p)" Enter
+     ($BUILT_CLIENT_AM -m $CLIENT_FORM_MAN -k $CLIENT_PRIV_KEY -t $CLIENT_TERM_FILE_JSON)" Enter
 
   tmux attach-session -d -t ServerProcess
 

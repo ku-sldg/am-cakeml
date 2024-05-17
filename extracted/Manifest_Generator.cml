@@ -18,6 +18,13 @@ fun knowsof_manifest_update toPlc m =
   (manset_add coq_Eq_Class_ID_Type toPlc oldKnowsOf) oldContext oldTargets
   oldPolicy end
 
+(** val knowsof_myPlc_manifest_update : coq_Manifest -> coq_Manifest **)
+
+fun knowsof_myPlc_manifest_update m =
+  knowsof_manifest_update
+    (let val Build_Manifest my_abstract_plc _ _ _ _ _ _ = m in
+     my_abstract_plc end) m
+
 (** val myPlc_manifest_update : coq_Plc -> coq_Manifest -> coq_Manifest **)
 
 fun myPlc_manifest_update p m =

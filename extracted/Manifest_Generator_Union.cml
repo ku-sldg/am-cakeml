@@ -28,14 +28,32 @@ fun manifest_generator_plcEvidence_list ls =
 fun mangen_plcEvidence_list_union ls =
   env_list_union (manifest_generator_plcEvidence_list ls)
 
+(** val knowsof_myPlc_manifest_update_env' :
+    (coq_Plc, coq_Manifest) prod -> (coq_Plc, coq_Manifest) prod **)
+
+fun knowsof_myPlc_manifest_update_env' p =
+  Coq_pair (fst p) (knowsof_myPlc_manifest_update (snd p))
+
+(** val update_knowsOf_myPlc_env : coq_EnvironmentM -> coq_EnvironmentM **)
+
+fun update_knowsOf_myPlc_env env =
+  map knowsof_myPlc_manifest_update_env' env
+
+(** val end_to_end_mangen' :
+    (coq_Evidence, coq_Plc) prod list -> (coq_Term, coq_Plc) prod list ->
+    coq_EnvironmentM **)
+
+fun end_to_end_mangen' ls ts =
+  let val app_env = mangen_plcEvidence_list_union ls in
+  let val att_env = mangen_plcTerm_list_union ts in
+  environment_union app_env att_env end end
+
 (** val end_to_end_mangen :
     (coq_Evidence, coq_Plc) prod list -> (coq_Term, coq_Plc) prod list ->
     coq_EnvironmentM **)
 
 fun end_to_end_mangen ls ts =
-  let val app_env = mangen_plcEvidence_list_union ls in
-  let val att_env = mangen_plcTerm_list_union ts in
-  environment_union app_env att_env end end
+  update_knowsOf_myPlc_env (end_to_end_mangen' ls ts)
 
 (** val end_to_end_mangen_final :
     (coq_Evidence, coq_Plc) prod list -> (coq_Term, coq_Plc) prod list ->

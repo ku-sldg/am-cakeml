@@ -133,11 +133,13 @@ fun aspToJson asp = case asp of
       NULL => noArgConstructor "Null"
     | CPY  => noArgConstructor "Cpy"
     | ASPC sp fwd ps =>
+    (*
       let val s = (Json.stringify (aspParamsToJson ps)) 
           val _ = print ("\n\n" ^ s ^ "\n\n") in 
+    *)
       constructorWithArgs "Aspc"
                           [spToJson sp, fwdToJson fwd, aspParamsToJson ps]
-          end
+      (*  end  *)
     | SIG => noArgConstructor "Sig"
     | HSH => noArgConstructor "Hsh"
     | ENC q => constructorWithArgs "Enc" [placeToJson q]

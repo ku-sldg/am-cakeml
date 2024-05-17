@@ -88,14 +88,19 @@ fun ridToString rid =
 (* jsonToArg : json -> coq_Arg *
    (json object to coq_Arg)  *)      
 fun jsonToArg js = 
+
+(*
   let val s = (Json.stringify js)
       val _ = print ("\n\n" ^ s ^ "\n\n" ^ "GOT HERE" ^ "\n\n\n\n\n\n\n\n\n\n") in 
+      *)
 
       case js of 
        (Json.Object m) => fromJsonMap m getArg
       | _ =>   raise Json.Exn "jsonToArg" "Got to this place (not a Json.Object in jsonToArg)"
 
-      end
+      (* end *)
+
+
 (* case (Json.toMap js) of 
                     (* Json.toMap : json -> ((string,json) map) option *)
       Some m => fromJsonMap m getArg (* m : (string,json) map *)

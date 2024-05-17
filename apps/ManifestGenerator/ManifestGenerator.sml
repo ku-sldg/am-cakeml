@@ -52,9 +52,9 @@ fun main () =
           (
           if(provisioningBool) 
           then (
-              let val plcTerms = ManGenConfig.cm_layered_phrases
+              let val plcTerms = ManGenConfig.kim_phrases
                   val _ = ManifestJsonConfig.write_termPlcList_file_json cvmPlcTermsFilepath plcTerms
-                  val plcEts = ManGenConfig.ets_cm_layered
+                  val plcEts = ManGenConfig.ets_kim
                   val _ = ManifestJsonConfig.write_EvidencePlcList_file_json appEvidencePlcFilePath plcEts in 
                           ()
               end
