@@ -39,6 +39,19 @@ fun knowsof_myPlc_manifest_update_env' p =
 fun update_knowsOf_myPlc_env env =
   map knowsof_myPlc_manifest_update_env' env
 
+(** val update_pubkeys_env' :
+    coq_Plc manifest_set -> (coq_Plc, coq_Manifest) prod -> (coq_Plc,
+    coq_Manifest) prod **)
+
+fun update_pubkeys_env' pubs p =
+  Coq_pair (fst p) (pubkeys_manifest_update pubs (snd p))
+
+(** val update_pubkeys_env :
+    coq_Plc manifest_set -> coq_EnvironmentM -> coq_EnvironmentM **)
+
+fun update_pubkeys_env pubs env =
+  map (update_pubkeys_env' pubs) env
+
 (** val end_to_end_mangen' :
     (coq_Evidence, coq_Plc) prod list -> (coq_Term, coq_Plc) prod list ->
     coq_EnvironmentM **)
@@ -48,12 +61,31 @@ fun end_to_end_mangen' ls ts =
   let val att_env = mangen_plcTerm_list_union ts in
   environment_union app_env att_env end end
 
+(** val manset_union_list :
+    'a1 coq_EqClass -> 'a1 manifest_set manifest_set -> 'a1 manifest_set **)
+
+fun manset_union_list hA lss =
+  fold_right (manset_union hA) [] lss
+
+(** val get_all_unique_places :
+    (coq_Term, coq_Plc) prod list -> (coq_Evidence, coq_Plc) prod list ->
+    coq_Plc manifest_set **)
+
+fun get_all_unique_places ls ets =
+  let val lss =
+    map (fn pat => let val Coq_pair t p = pat in places_manset p t end) ls
+  in
+  let val ts_ps = manset_union_list coq_Eq_Class_ID_Type lss in
+  let val ets_ps = map (fn pat => let val Coq_pair _ p = pat in p end) ets in
+  manset_union coq_Eq_Class_ID_Type ts_ps ets_ps end end end
+
 (** val end_to_end_mangen :
     (coq_Evidence, coq_Plc) prod list -> (coq_Term, coq_Plc) prod list ->
     coq_EnvironmentM **)
 
 fun end_to_end_mangen ls ts =
-  update_knowsOf_myPlc_env (end_to_end_mangen' ls ts)
+  let val ps = get_all_unique_places ts ls in
+  update_pubkeys_env ps (update_knowsOf_myPlc_env (end_to_end_mangen' ls ts)) end
 
 (** val end_to_end_mangen_final :
     (coq_Evidence, coq_Plc) prod list -> (coq_Term, coq_Plc) prod list ->

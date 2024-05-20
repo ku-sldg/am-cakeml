@@ -43,6 +43,17 @@ fun pubkey_manifest_update p m =
   Build_Manifest oldPlc oldasps old_app_asps oldKnowsOf
   (manset_add coq_Eq_Class_ID_Type p oldContext) oldTargets oldPolicy end
 
+(** val pubkeys_manifest_update :
+    coq_Plc manifest_set -> coq_Manifest -> coq_Manifest **)
+
+fun pubkeys_manifest_update ps m =
+  let val Build_Manifest oldMyPlc oldasps old_app_asps oldKnowsOf oldPubs
+    oldTargets oldPolicy = m
+  in
+  Build_Manifest oldMyPlc oldasps old_app_asps oldKnowsOf
+  (fold_right (manset_add coq_Eq_Class_ID_Type) oldPubs ps) oldTargets
+  oldPolicy end
+
 (** val update_manifest_policy_targ :
     coq_Plc -> coq_Plc -> coq_Manifest -> coq_Manifest **)
 

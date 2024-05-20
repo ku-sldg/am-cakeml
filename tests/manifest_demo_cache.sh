@@ -44,7 +44,7 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   make manifest_compiler
 
   # First, generate the formal manifests
-  $MAN_GEN -om $DEMO_FILES -t $MANGEN_TERMS_FILE -e $MANGEN_EVS_FILE
+  $MAN_GEN -om $DEMO_FILES -t $MANGEN_TERMS_FILE -e $MANGEN_EVS_FILE 
   
   #sleep 5
 
@@ -84,7 +84,7 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   tmux send-keys -t 2 "($BUILT_SERVER_AM_P2 -m $SERVER_P2_FORM_MAN -k $SERVER_PRIV_KEY )" Enter
 
   # Start the P0 client
-  tmux send-keys -t 3 "sleep 2 && ($BUILT_CLIENT_AM_P0 -m $CLIENT_P0_FORM_MAN -k $CLIENT_PRIV_KEY -t $CLIENT_P0_TERM_FILE_JSON )" Enter
+  tmux send-keys -t 3 "sleep 2 && ($BUILT_CLIENT_AM_P0 -m $CLIENT_P0_FORM_MAN -k $CLIENT_PRIV_KEY -t $CLIENT_P0_TERM_FILE_JSON)" Enter
 
   # Start the P1 client
   tmux send-keys -t 4 "sleep 2 && ($BUILT_CLIENT_AM_P1 -m $CLIENT_P1_FORM_MAN -k $CLIENT_PRIV_KEY -t $CLIENT_P1_TERM_FILE_JSON )" Enter
