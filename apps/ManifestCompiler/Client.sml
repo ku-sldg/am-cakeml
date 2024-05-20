@@ -8,7 +8,7 @@ fun main () =
             (
             if(provisioningBool) 
             then (
-                let val provisioningPhrase = ManGenConfig.cache_phrase_p1 (* ManGenConfig.cm_layered_phrase *) in 
+                let val provisioningPhrase = ManGenConfig.layered_bg_phrase (* ManGenConfig.cm_layered_phrase *) in 
                             ManifestJsonConfig.write_term_file_json phraseFileName provisioningPhrase
                 end
             )
