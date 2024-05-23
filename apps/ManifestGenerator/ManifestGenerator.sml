@@ -52,9 +52,12 @@ fun main () =
           (
           if(provisioningBool) 
           then (
-              let val plcTerms = ManGenConfig.layered_bg_phrases
+              case ManGenConfig.manGenConfigData of 
+                Build_ManGenConfigData plcTerms plcEts _ => 
+
+              let (* val plcTerms = ManGenConfig.layered_bg_phrases *)
                   val _ = ManifestJsonConfig.write_termPlcList_file_json cvmPlcTermsFilepath plcTerms
-                  val plcEts = ManGenConfig.ets_layeredbg
+                  (* val plcEts = ManGenConfig.ets_layeredbg *)
                   val _ = ManifestJsonConfig.write_EvidencePlcList_file_json appEvidencePlcFilePath plcEts in 
                           ()
               end

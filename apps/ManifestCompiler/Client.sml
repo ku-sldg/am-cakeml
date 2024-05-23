@@ -8,9 +8,14 @@ fun main () =
             (
             if(provisioningBool) 
             then (
+                case ManGenConfig.manGenConfigData of 
+                    Build_ManGenConfigData _ _ clientProvisioningPhrase => 
+                         ManifestJsonConfig.write_term_file_json phraseFileName clientProvisioningPhrase
+            (*
                 let val provisioningPhrase = ManGenConfig.layered_bg_phrase (* ManGenConfig.cm_layered_phrase *) in 
                             ManifestJsonConfig.write_term_file_json phraseFileName provisioningPhrase
                 end
+            *)
             )
             else ()
             )

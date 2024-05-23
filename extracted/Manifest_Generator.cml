@@ -171,3 +171,7 @@ fun manifest_generator_app' p et env =
 
 fun manifest_generator_app et p =
   manifest_generator_app' p et e_empty
+
+datatype coq_ManGenConfigData =
+  Build_ManGenConfigData ((coq_Term, coq_Plc) prod list)
+   ((coq_Evidence, coq_Plc) prod list) coq_Term

@@ -86,6 +86,38 @@ structure ManGenConfig = struct
     val ets_example_phrase = [(Coq_pair appraiser_evidence_demo_phrase coq_P0), 
                                 (Coq_pair appraiser_evidence_demo_phrase coq_P3)]
 
+(* 
+    val plcTermsDemoMain = kim_phrases 
+    val plcEtsDemoMain = ets_kim
+    val clientTermDemoMain = kim_phrase
+*)
+
+    val manGenConfigDataKim = 
+        Build_ManGenConfigData kim_phrases ets_kim kim_phrase
+
+    val manGenConfigDataKimEnc = 
+        Build_ManGenConfigData kim_enc_phrases ets_kim_enc kim_enc_phrase
+
+    val manGenConfigDataCert = 
+        Build_ManGenConfigData cert_phrases ets_cert cert_phrase
+
+    val manGenConfigDataCacheP0 = 
+        Build_ManGenConfigData cache_phrases ets_cache cache_phrase_p0 
+
+    val manGenConfigDataCacheP1 = 
+        Build_ManGenConfigData cache_phrases ets_cache cache_phrase_p1
+
+    val manGenConfigDataParmutP0 = 
+        Build_ManGenConfigData parmut_phrases ets_parmut parmut_phrase_p0
+
+    val manGenConfigDataParmutP1 = 
+        Build_ManGenConfigData parmut_phrases ets_parmut parmut_phrase_p1
+
+    val manGenConfigDataLayeredBG = 
+        Build_ManGenConfigData layered_bg_phrases ets_layeredbg layered_bg_phrase
+
+    val manGenConfigData = manGenConfigDataLayeredBG
+
                                 
 end
 (*  End structure ManGenConfig *)
