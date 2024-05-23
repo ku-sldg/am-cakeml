@@ -150,7 +150,10 @@ fun manifest_generator_app'' et m =
        manifest_generator_app'' e' (pubkey_manifest_update p' m) end
      | EXTD =>
        let val Coq_asp_paramsC a _ _ _ = ps in
-       manifest_generator_app'' e' (app_aspid_manifest_update p a m) end
+       let val m' = app_aspid_manifest_update p a m in
+       (case eqb coq_Eq_Class_ID_Type a sig_aspid of
+          True => manifest_generator_app'' e' (pubkey_manifest_update p m')
+        | False => manifest_generator_app'' e' m') end end
      | KEEP => manifest_generator_app'' e' m
      | _ => m)
   | Coq_ss e1 e2 =>
