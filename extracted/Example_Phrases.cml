@@ -78,13 +78,6 @@ val layered_bg_strong : coq_Term =
 fun appraise_inline_asp_with_args p targ args =
   Coq_asp (ASPC ALL EXTD (Coq_asp_paramsC appraise_inline_id args p targ))
 
-(** val sub1 : coq_Term **)
-
-val sub1 : coq_Term =
-  Coq_bseq (Coq_pair ALL ALL) (Coq_asp (ASPC ALL EXTD (Coq_asp_paramsC
-    attest1_id [] coq_P1 sys))) (Coq_asp (ASPC ALL EXTD (Coq_asp_paramsC
-    attest2_id [] coq_P1 sys)))
-
 (** val sub2 : coq_Term **)
 
 val sub2 : coq_Term =

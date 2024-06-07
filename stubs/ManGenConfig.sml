@@ -84,7 +84,8 @@ structure ManGenConfig = struct
     val appraiser_evidence_demo_phrase' = eval demo_phrase_p2_appraise coq_P0 (Coq_nn O)
 
     val ets_example_phrase = [(Coq_pair appraiser_evidence_demo_phrase coq_P0), 
-                                (Coq_pair appraiser_evidence_demo_phrase coq_P3)]
+                                (Coq_pair appraiser_evidence_demo_phrase coq_P3), 
+                                (Coq_pair appraiser_evidence_demo_phrase' coq_P2)]
 
 (* 
     val plcTermsDemoMain = kim_phrases 
@@ -116,7 +117,10 @@ structure ManGenConfig = struct
     val manGenConfigDataLayeredBG = 
         Build_ManGenConfigData layered_bg_phrases ets_layeredbg layered_bg_phrase
 
-    val manGenConfigData = manGenConfigDataLayeredBG
+    val manGenConfigDataExamplePhrase = 
+        Build_ManGenConfigData demo_phrases ets_example_phrase example_phrase
+
+    val manGenConfigData = manGenConfigDataExamplePhrase
 
                                 
 end
