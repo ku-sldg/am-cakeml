@@ -7,7 +7,7 @@ fun cm_asp_stub ps e =
                     val _ = () 
                     val _ = print ("Matched aspid:  " ^ aspid ^ "\n\n");
                     val _ = print ("Running ASP with aspid:  " ^ aspid ^ "\n\n");
-                    val evidence = kernelMeasurement 0
+                    val _ = kernelMeasurement 0
                 in
                     (Coq_resultC passed_bs)
                    (*

@@ -8,7 +8,6 @@ fun appraise_cm_asp_stub ps p bs ls =
                     val result = kernelAppraisal 0 bs
                     val boolresult = String.isSubstring "PASS" (BString.toString result)
                     val returnBS = if boolresult then passed_bs else failed_bs
-                    val _ = print ((BString.toString returnBS) ^ "\n\n")
                 in 
                     (Coq_resultC returnBS)
                 end

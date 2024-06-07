@@ -17,7 +17,7 @@ fun respondToMsg inString =
         val ac = ManifestUtils.get_local_amConfig ()
         val nonceval = BString.fromString "anonce" (* TODO: should this be hardcoded here? *)
         val outString = handle_AM_request inString ac am_library nonceval
-        val _ = print ("\n\nSending response string: \n" ^ outString)
+        (*val _ = print ("\n\nSending response string: \n" ^ outString)*)
     in 
         respondToLinux outString
     end
