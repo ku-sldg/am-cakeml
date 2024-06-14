@@ -1,0 +1,6 @@
+datatype coq_JSON =
+  JSON_Object ((coq_StringT, coq_JSON) coq_MapC)
+| JSON_Array (coq_JSON list)
+| JSON_String coq_StringT
+| JSON_Boolean bool
+| JSON_Null 

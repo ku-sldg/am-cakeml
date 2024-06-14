@@ -1,29 +1,29 @@
 (** val ssl_sig_targid : coq_ASP_ID **)
 
-val ssl_sig_targid : coq_ASP_ID =
+val ssl_sig_targid =
   failwith "AXIOM TO BE REALIZED"
 
 (** val ssl_sig_args : coq_Arg list **)
 
-val ssl_sig_args : coq_Arg list =
+val ssl_sig_args =
   failwith "AXIOM TO BE REALIZED"
 
 (** val kim_meas_aspid : coq_ASP_ID **)
 
-val kim_meas_aspid : coq_ASP_ID =
+val kim_meas_aspid =
   failwith "AXIOM TO BE REALIZED"
 
 (** val kim_meas_args : coq_Arg list **)
 
-val kim_meas_args : coq_Arg list =
+val kim_meas_args =
   failwith "AXIOM TO BE REALIZED"
 
 (** val cm_aspid : coq_ASP_ID **)
 
-val cm_aspid : coq_ASP_ID =
+val cm_aspid =
   failwith "AXIOM TO BE REALIZED"
 
 (** val cm_args : coq_Arg list **)
 
-val cm_args : coq_Arg list =
+val cm_args =
   failwith "AXIOM TO BE REALIZED"

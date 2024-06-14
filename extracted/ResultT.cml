@@ -1,0 +1,12 @@
+datatype ('a, 'e) coq_ResultT =
+  Coq_errC 'e
+| Coq_resultC 'a
+
+(** val res_bind :
+    ('a1, 'a3) coq_ResultT -> ('a1 -> ('a2, 'a3) coq_ResultT) -> ('a2, 'a3)
+    coq_ResultT **)
+
+fun res_bind m f =
+  case m of
+    Coq_errC e => Coq_errC e
+  | Coq_resultC v => f v

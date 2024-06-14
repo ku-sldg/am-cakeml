@@ -67,12 +67,23 @@ fun et_size e = case e of
 
 type coq_RawEv = coq_BS list
 
+(** val coq_RawEv_to_stringT : coq_RawEv -> coq_StringT **)
+
+val coq_RawEv_to_stringT =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val stringT_to_RawEv :
+    coq_StringT -> (coq_RawEv, coq_StringT) coq_ResultT **)
+
+val stringT_to_RawEv =
+  failwith "AXIOM TO BE REALIZED"
+
 datatype coq_EvC =
   Coq_evc coq_RawEv coq_Evidence
 
 (** val mt_evc : coq_EvC **)
 
-val mt_evc : coq_EvC =
+val mt_evc =
   Coq_evc [] Coq_mt
 
 (** val get_et : coq_EvC -> coq_Evidence **)
@@ -84,26 +95,6 @@ fun get_et e = case e of
 
 fun get_bits e = case e of
   Coq_evc ls _ => ls
-
-type coq_ReqAuthTok = coq_EvC
-
-datatype coq_CvmRequestMessage =
-  REQ coq_Term coq_ReqAuthTok coq_RawEv
-
-type coq_CvmResponseMessage =
-  coq_RawEv
-  (* singleton inductive, whose constructor was RES *)
-
-datatype coq_AppraisalRequestMessage =
-  REQ_APP coq_Term coq_Plc coq_Evidence coq_RawEv
-
-type coq_AppraisalResponseMessage =
-  coq_AppResultC
-  (* singleton inductive, whose constructor was RES_APP *)
-
-datatype coq_AM_RequestMessage =
-  CVM_REQ coq_CvmRequestMessage
-| APP_REQ coq_AppraisalRequestMessage
 
 (** val splitEv_T_l : coq_Split -> coq_Evidence -> coq_Evidence **)
 
@@ -170,7 +161,7 @@ datatype coq_AM_Result =
 
 (** val empty_am_result : coq_AM_Result **)
 
-val empty_am_result : coq_AM_Result =
+val empty_am_result =
   Coq_am_rawev []
 
 (** val policy_list_not_disclosed :

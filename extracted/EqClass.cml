@@ -16,7 +16,7 @@ fun coq_EqClass_impl_DecEq h x y =
 
 (** val nat_EqClass : nat coq_EqClass **)
 
-val nat_EqClass : nat coq_EqClass =
+val nat_EqClass =
   Nat.eqb
 
 (** val eqbPair :

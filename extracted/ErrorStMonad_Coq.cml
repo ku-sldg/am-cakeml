@@ -1,7 +1,3 @@
-datatype ('a, 'e) coq_ResultT =
-  Coq_errC 'e
-| Coq_resultC 'a
-
 type ('s, 'a, 'e) coq_Err = 's -> (('a, 'e) coq_ResultT, 's) prod
 
 (** val ret : 'a2 -> ('a1, 'a2, 'a3) coq_Err **)

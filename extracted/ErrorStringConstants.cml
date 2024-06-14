@@ -1,29 +1,39 @@
 (** val errStr_amNonce : coq_StringT **)
 
-val errStr_amNonce : coq_StringT =
+val errStr_amNonce =
   failwith "AXIOM TO BE REALIZED"
 
 (** val errStr_peel_bs_am : coq_StringT **)
 
-val errStr_peel_bs_am : coq_StringT =
-  failwith "AXIOM TO BE REALIZED"
-
-(** val errStr_requester_bound : coq_StringT **)
-
-val errStr_requester_bound : coq_StringT =
+val errStr_peel_bs_am =
   failwith "AXIOM TO BE REALIZED"
 
 (** val errStr_disclosePolicy : coq_StringT **)
 
-val errStr_disclosePolicy : coq_StringT =
-  failwith "AXIOM TO BE REALIZED"
-
-(** val errStr_app_auth_tok : coq_StringT **)
-
-val errStr_app_auth_tok : coq_StringT =
+val errStr_disclosePolicy =
   failwith "AXIOM TO BE REALIZED"
 
 (** val errStr_et_size : coq_StringT **)
 
-val errStr_et_size : coq_StringT =
+val errStr_et_size =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val errStr_remote_am_failure : coq_StringT **)
+
+val errStr_remote_am_failure =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val errStr_incorrect_resp_type : coq_StringT **)
+
+val errStr_incorrect_resp_type =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val errStr_invalid_request_type : coq_StringT **)
+
+val errStr_invalid_request_type =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val errStr_negotiation_not_implemented : coq_StringT **)
+
+val errStr_negotiation_not_implemented =
   failwith "AXIOM TO BE REALIZED"

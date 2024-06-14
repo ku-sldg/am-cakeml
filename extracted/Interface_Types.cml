@@ -1,0 +1,78 @@
+(** val coq_STR_REQ_PLC : coq_StringT **)
+
+val coq_STR_REQ_PLC =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val coq_STR_TERM : coq_StringT **)
+
+val coq_STR_TERM =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val coq_STR_EV : coq_StringT **)
+
+val coq_STR_EV =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val coq_STR_SUCCESS : coq_StringT **)
+
+val coq_STR_SUCCESS =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val coq_STR_PAYLOAD : coq_StringT **)
+
+val coq_STR_PAYLOAD =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val coq_STR_EVIDENCE : coq_StringT **)
+
+val coq_STR_EVIDENCE =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val coq_STR_ACTION : coq_StringT **)
+
+val coq_STR_ACTION =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val coq_STR_RUN : coq_StringT **)
+
+val coq_STR_RUN =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val coq_STR_NEGOTIATE : coq_StringT **)
+
+val coq_STR_NEGOTIATE =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val coq_STR_APPRAISE : coq_StringT **)
+
+val coq_STR_APPRAISE =
+  failwith "AXIOM TO BE REALIZED"
+
+datatype coq_ProtocolRunRequest =
+  Coq_mkPRReq coq_Term coq_Plc coq_RawEv
+
+datatype coq_ProtocolRunResponse =
+  Coq_mkPRResp bool coq_RawEv
+
+type coq_ProtocolNegotiateRequest =
+  coq_Term
+  (* singleton inductive, whose constructor was mkPNReq *)
+
+datatype coq_ProtocolNegotiateResponse =
+  Coq_mkPNResp bool coq_Term
+
+datatype coq_ProtocolAppraiseRequest =
+  Coq_mkPAReq coq_Term coq_Plc coq_Evidence coq_RawEv
+
+datatype coq_ProtocolAppraiseResponse =
+  Coq_mkPAResp bool coq_AppResultC
+
+datatype coq_AM_Protocol_Requests =
+  Protocol_Run_Request coq_ProtocolRunRequest
+| Protocol_Negotiate_Request coq_ProtocolNegotiateRequest
+| Protocol_Appraise_Request coq_ProtocolAppraiseRequest
+
+datatype coq_AM_Protocol_Responses =
+  Protocol_Run_Response coq_ProtocolRunResponse
+| Protocol_Negotiate_Response coq_ProtocolNegotiateResponse
+| Protocol_Appraise_Response coq_ProtocolAppraiseResponse

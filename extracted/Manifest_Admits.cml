@@ -4,22 +4,22 @@ type coq_UUID (* AXIOM TO BE REALIZED *)
 
 (** val default_uuid : coq_UUID **)
 
-val default_uuid : coq_UUID =
+val default_uuid =
   failwith "AXIOM TO BE REALIZED"
 
 (** val coq_Eq_Class_uuid : coq_UUID coq_EqClass **)
 
-val coq_Eq_Class_uuid : coq_UUID coq_EqClass =
+val coq_Eq_Class_uuid =
   failwith "AXIOM TO BE REALIZED"
 
 type coq_PublicKey (* AXIOM TO BE REALIZED *)
 
 (** val coq_Eq_Class_public_key : coq_PublicKey coq_EqClass **)
 
-val coq_Eq_Class_public_key : coq_PublicKey coq_EqClass =
+val coq_Eq_Class_public_key =
   failwith "AXIOM TO BE REALIZED"
 
 (** val empty_Manifest_Plc : coq_Plc **)
 
-val empty_Manifest_Plc : coq_Plc =
+val empty_Manifest_Plc =
   failwith "AXIOM TO BE REALIZED"

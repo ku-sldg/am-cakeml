@@ -1,1 +1,6 @@
 type coq_StringT (* AXIOM TO BE REALIZED *)
+
+(** val coq_EqClass_StringT : coq_StringT coq_EqClass **)
+
+val coq_EqClass_StringT =
+  failwith "AXIOM TO BE REALIZED"

@@ -1,5 +1,15 @@
 type coq_Plc = coq_ID_Type
 
+(** val coq_Plc_to_stringT : coq_Plc -> coq_StringT **)
+
+val coq_Plc_to_stringT =
+  coq_ID_Type_to_stringT
+
+(** val stringT_to_Plc : coq_StringT -> (coq_Plc, coq_StringT) coq_ResultT **)
+
+val stringT_to_Plc =
+  stringT_to_ID_Type
+
 type coq_N_ID = nat
 
 type coq_Event_ID = nat
@@ -32,6 +42,17 @@ datatype coq_Evidence =
 | Coq_uu coq_Plc coq_FWD coq_ASP_PARAMS coq_Evidence
 | Coq_ss coq_Evidence coq_Evidence
 
+(** val coq_Evidence_to_stringT : coq_Evidence -> coq_StringT **)
+
+val coq_Evidence_to_stringT =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val stringT_to_Evidence :
+    coq_StringT -> (coq_Evidence, coq_StringT) coq_ResultT **)
+
+val stringT_to_Evidence =
+  failwith "AXIOM TO BE REALIZED"
+
 datatype coq_SP =
   ALL 
 | NONE 
@@ -52,6 +73,17 @@ datatype coq_Term =
 | Coq_lseq coq_Term coq_Term
 | Coq_bseq coq_Split coq_Term coq_Term
 | Coq_bpar coq_Split coq_Term coq_Term
+
+(** val coq_Term_to_stringT : coq_Term -> coq_StringT **)
+
+val coq_Term_to_stringT =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val stringT_to_Term :
+    coq_StringT -> (coq_Term, coq_StringT) coq_ResultT **)
+
+val stringT_to_Term =
+  failwith "AXIOM TO BE REALIZED"
 
 datatype coq_ASP_Core =
   NULLC 
@@ -75,3 +107,14 @@ datatype coq_AppResultC =
 | Coq_hhc_app coq_Plc coq_ASP_PARAMS coq_BS coq_AppResultC
 | Coq_eec_app coq_Plc coq_ASP_PARAMS coq_BS coq_AppResultC
 | Coq_ssc_app coq_AppResultC coq_AppResultC
+
+(** val coq_AppResultC_to_stringT : coq_AppResultC -> coq_StringT **)
+
+val coq_AppResultC_to_stringT =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val stringT_to_AppResultC :
+    coq_StringT -> (coq_AppResultC, coq_StringT) coq_ResultT **)
+
+val stringT_to_AppResultC =
+  failwith "AXIOM TO BE REALIZED"
