@@ -67,17 +67,6 @@ fun et_size e = case e of
 
 type coq_RawEv = coq_BS list
 
-(** val coq_RawEv_to_stringT : coq_RawEv -> coq_StringT **)
-
-val coq_RawEv_to_stringT =
-  failwith "AXIOM TO BE REALIZED"
-
-(** val stringT_to_RawEv :
-    coq_StringT -> (coq_RawEv, coq_StringT) coq_ResultT **)
-
-val stringT_to_RawEv =
-  failwith "AXIOM TO BE REALIZED"
-
 datatype coq_EvC =
   Coq_evc coq_RawEv coq_Evidence
 
