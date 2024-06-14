@@ -18,7 +18,7 @@ fun am_serve_auth_tok_req t fromPl myPl authTok init_ev ac al =
       True =>
       bind
         (config_AM_if_lib_supported
-          (let val Coq_mkAmConfig absMan _ _ _ _ _ _ = ac in absMan end) al)
+          (let val Coq_mkAmConfig absMan _ _ _ _ _ _ _ = ac in absMan end) al)
         (fn _ => ret (run_cvm_rawEv t myPl init_ev ac))
     | False => am_failm (Coq_am_error errStr_app_auth_tok))
 

@@ -74,14 +74,44 @@ fun fwd_asp fwd bs e p ps =
   | KILL => mt_evc
   | KEEP => e
 
+(** val do_asp :
+    coq_ASP_PARAMS -> coq_RawEv -> coq_Plc -> coq_Event_ID -> coq_AM_Config
+    -> (coq_BS, coq_DispatcherErrors) coq_ResultT **)
+
+fun do_asp params e mpl _ ac =
+  let val Coq_mkAmConfig _ _ aspCb _ _ _ _ _ = ac in
+  aspCb params mpl (encodeEvRaw e) e end
+
+(** val do_ext_asp :
+    coq_ASP_PARAMS -> coq_AM_Config -> coq_RawEv -> (coq_BS,
+    coq_DispatcherErrors) coq_ResultT **)
+
+fun do_ext_asp ps ac e =
+  let val Coq_asp_paramsC i _ _ _ = ps in
+  let val asp_uuid_res =
+    let val Coq_mkAmConfig _ _ _ _ _ _ _ ext_aspCb = ac in ext_aspCb i end
+  in
+  (case asp_uuid_res of
+     Coq_errC e0 => Coq_errC e0
+   | Coq_resultC uuid =>
+     (case doAsp_uuid uuid e of
+        Coq_errC c => Coq_errC (Runtime c)
+      | Coq_resultC v => Coq_resultC v)) end end
+
 (** val do_asp' :
     coq_ASP_PARAMS -> coq_RawEv -> coq_Plc -> coq_Event_ID -> coq_BS coq_CVM **)
 
 fun do_asp' params e mpl x =
   bind get_CVM_amConfig (fn ac =>
     case do_asp params e mpl x ac of
-      Coq_errC e0 => failm (Coq_dispatch_error e0)
-    | Coq_resultC r => ret r)
+      Coq_errC err =>
+      (case err of
+         Unavailable =>
+         (case do_ext_asp params ac e of
+            Coq_errC err' => failm (Coq_dispatch_error err')
+          | Coq_resultC v => ret v)
+       | Runtime s => failm (Coq_dispatch_error (Runtime s)))
+    | Coq_resultC v => ret v)
 
 (** val invoke_ASP : coq_FWD -> coq_ASP_PARAMS -> coq_EvC coq_CVM **)
 
@@ -164,7 +194,7 @@ val get_cvm_policy : coq_PolicyT coq_CVM =
   bind get_CVM_amConfig (fn ac =>
     ret
       (let val Build_Manifest _ _ _ _ _ _ policy =
-         let val Coq_mkAmConfig absMan _ _ _ _ _ _ = ac in absMan end
+         let val Coq_mkAmConfig absMan _ _ _ _ _ _ _ = ac in absMan end
        in
        policy end))
 
@@ -176,6 +206,21 @@ fun check_cvm_policy t pTo et =
     case policy_list_not_disclosed t pTo et pol of
       True => ret ()
     | False => failm (Coq_dispatch_error (Runtime errStr_disclosePolicy)))
+
+(** val do_remote :
+    coq_Term -> coq_Plc -> coq_EvC -> coq_AM_Config -> (coq_RawEv,
+    coq_DispatcherErrors) coq_ResultT **)
+
+fun do_remote t pTo e ac =
+  let val remote_uuid_res =
+    let val Coq_mkAmConfig _ _ _ _ plcCb _ _ _ = ac in plcCb pTo end
+  in
+  (case remote_uuid_res of
+     Coq_errC e0 => Coq_errC e0
+   | Coq_resultC uuid =>
+     (case doRemote_uuid t uuid (get_bits e) of
+        Coq_errC c => Coq_errC (Runtime c)
+      | Coq_resultC v => Coq_resultC v)) end
 
 (** val doRemote_session' :
     coq_Term -> coq_Plc -> coq_EvC -> coq_EvC coq_CVM **)
@@ -210,6 +255,17 @@ fun join_seq e1 e2 =
     bind inc_id (fn n =>
       bind (put_ev (ss_cons e1 e2)) (fn _ =>
         add_tracem ((Coq_join n p) :: []))))
+
+(** val do_start_par_thread :
+    coq_Loc -> coq_Core_Term -> coq_RawEv -> unit coq_CVM **)
+
+fun do_start_par_thread _ _ _ =
+  ret ()
+
+(** val do_wait_par_thread : coq_Loc -> coq_EvC coq_CVM **)
+
+fun do_wait_par_thread loc =
+  ret (parallel_vm_thread loc)
 
 (** val start_par_thread :
     coq_Loc -> coq_Core_Term -> coq_EvC -> unit coq_CVM **)

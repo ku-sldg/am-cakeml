@@ -12,7 +12,7 @@ fun check_et_size et ls =
 
 fun decrypt_bs_to_rawev bs params ac =
   let val Coq_asp_paramsC _ _ p _ = params in
-  (case let val Coq_mkAmConfig _ _ _ _ _ pubKeyCb _ = ac in pubKeyCb p end of
+  (case let val Coq_mkAmConfig _ _ _ _ _ pubKeyCb _ _ = ac in pubKeyCb p end of
      Coq_errC e => Coq_errC e
    | Coq_resultC pubkey => decrypt_bs_to_rawev_prim bs params pubkey) end
 
@@ -39,7 +39,7 @@ fun checkNonce' nid nonceCandidate =
     (coq_BS, coq_DispatcherErrors) coq_ResultT **)
 
 fun check_asp_EXTD params p sig0 ls ac =
-  let val Coq_mkAmConfig _ _ _ app_aspCb _ _ _ = ac in
+  let val Coq_mkAmConfig _ _ _ app_aspCb _ _ _ _ = ac in
   app_aspCb params p sig0 ls end
 
 (** val check_asp_EXTD' :

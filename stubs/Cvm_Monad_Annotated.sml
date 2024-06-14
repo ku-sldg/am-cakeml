@@ -164,7 +164,7 @@ val get_cvm_policy =
   bind get_amConfig (fn ac =>
     ret
       (let val Build_Manifest _ _ _ _ _ _ policy =
-         let val Coq_mkAmConfig absMan _ _ _ _ _ = ac in absMan end
+         let val Coq_mkAmConfig absMan _ _ _ _ _ _ = ac in absMan end
        in
        policy end))
 

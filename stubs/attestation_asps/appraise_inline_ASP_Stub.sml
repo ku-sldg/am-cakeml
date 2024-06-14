@@ -17,7 +17,7 @@ fun appraise_inline_asp_stub ps e =
 
                     let val appServerAddr = 
                           case my_amlib of  
-                            Build_AM_Library _ _ _ _ addr _ _ _ _ _ _ _ _ => addr
+                            Build_AM_Library _ _ _ _ addr _ _ _ _ _ _ _ _ _ => addr
 
                         val appRequestArg = List.hd args 
                         val appRequestString =

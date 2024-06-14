@@ -23,7 +23,7 @@ fun get_my_absman_generated t myPlc =
 
 fun aspid_in_amlib_bool al i =
   case map_get coq_Eq_Class_ID_Type
-         (let val Build_AM_Library _ _ _ _ _ _ _ _ _ local_ASPS _ _ _ = al in
+         (let val Build_AM_Library _ _ _ _ _ _ _ _ _ local_ASPS _ _ _ _ = al in
           local_ASPS end) i of
     Some _ => True
   | None => False
@@ -32,7 +32,7 @@ fun aspid_in_amlib_bool al i =
 
 fun uuid_plc_in_amlib_bool al p =
   case map_get coq_Eq_Class_ID_Type
-         (let val Build_AM_Library _ _ _ _ _ _ _ _ _ _ _ local_Plcs _ = al in
+         (let val Build_AM_Library _ _ _ _ _ _ _ _ _ _ _ local_Plcs _ _ = al in
           local_Plcs end) p of
     Some _ => True
   | None => False
@@ -41,7 +41,7 @@ fun uuid_plc_in_amlib_bool al p =
 
 fun pubkey_plc_in_amlib_bool al p =
   case map_get coq_Eq_Class_ID_Type
-         (let val Build_AM_Library _ _ _ _ _ _ _ _ _ _ _ _ local_PubKeys = al in
+         (let val Build_AM_Library _ _ _ _ _ _ _ _ _ _ _ _ local_PubKeys _ = al in
           local_PubKeys end) p of
     Some _ => True
   | None => False
@@ -165,7 +165,7 @@ val get_am_policy : coq_PolicyT coq_AM =
   bind get (fn st =>
     ret
       (let val Build_Manifest _ _ _ _ _ _ policy =
-         let val Coq_mkAmConfig absMan _ _ _ _ _ =
+         let val Coq_mkAmConfig absMan _ _ _ _ _ _ =
            let val Coq_mkAM_St _ _ amConfig = st in amConfig end
          in
          absMan end

@@ -120,7 +120,7 @@ structure ManGenConfig = struct
     val manGenConfigDataExamplePhrase = 
         Build_ManGenConfigData demo_phrases ets_example_phrase example_phrase
 
-    val manGenConfigData = manGenConfigDataExamplePhrase
+    val manGenConfigData = manGenConfigDataCacheP1
 
                                 
 end

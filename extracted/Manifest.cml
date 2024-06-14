@@ -45,11 +45,12 @@ datatype coq_AM_Library =
    ((coq_ASP_ID, coq_CallBackErrors coq_ASPCallback) coq_MapC)
    (((coq_Plc, coq_ASP_ID) prod, coq_CallBackErrors coq_ASPCallback) coq_MapC)
    ((coq_Plc, coq_UUID) coq_MapD) ((coq_Plc, coq_PublicKey) coq_MapD)
+   ((coq_ASP_ID, coq_UUID) coq_MapD)
 
 datatype coq_AM_Config =
   Coq_mkAmConfig coq_Manifest coq_UUID (coq_DispatcherErrors coq_ASPCallback)
    (coq_DispatcherErrors coq_ASPCallback) coq_PlcCallback coq_PubKeyCallback
-   coq_UUIDCallback
+   coq_UUIDCallback coq_PlcCallback
 
 (** val empty_aspCb :
     coq_ASP_PARAMS -> coq_Plc -> coq_BS -> coq_RawEv -> (coq_BS,
@@ -63,4 +64,4 @@ fun empty_aspCb _ _ _ _ =
 val empty_am_config : coq_AM_Config =
   Coq_mkAmConfig empty_Manifest default_uuid empty_aspCb empty_aspCb (fn _ =>
     Coq_errC Unavailable) (fn _ => Coq_errC Unavailable) (fn _ => Coq_errC
-    Unavailable)
+    Unavailable) (fn _ => Coq_errC Unavailable)

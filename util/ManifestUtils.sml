@@ -68,7 +68,7 @@ structure ManifestUtils = struct
       : coq_Manifest -> coq_AM_Library -> () *)
   fun setup_AM_config (fm : coq_Manifest) (al : coq_AM_Library) (privKey : privateKey_t) (* (t:coq_Term) *) =
     (case (manifest_compiler fm al) of
-      Coq_mkAmConfig compiled_fm clone_uuid aspDisp appDisp plcDisp pubKeyDisp uuidDisp =>
+      Coq_mkAmConfig compiled_fm clone_uuid aspDisp appDisp plcDisp pubKeyDisp uuidDisp extAspDisp =>
         let val _ = local_formal_manifest := Ok compiled_fm
             val _ = local_uuid_clone := Ok clone_uuid
             val _ = local_aspCb := Ok aspDisp
@@ -76,7 +76,7 @@ structure ManifestUtils = struct
             val _ = local_pubKeyCb := Ok pubKeyDisp
             val _ = local_uuidCb := Ok uuidDisp
             val _ = local_PrivKey := Ok privKey
-            val _ = local_amConfig := Ok (Coq_mkAmConfig compiled_fm clone_uuid aspDisp appDisp plcDisp pubKeyDisp uuidDisp)
+            val _ = local_amConfig := Ok (Coq_mkAmConfig compiled_fm clone_uuid aspDisp appDisp plcDisp pubKeyDisp uuidDisp extAspDisp)
             val _ = local_amLib := Ok al
         in
           ()
@@ -166,8 +166,9 @@ structure ManifestUtils = struct
         val plcCb = get_PlcCallback()
         val pubKeyCb = get_PubKeyCallback()
         val uuidCb = get_UUIDCallback()
+        val extAspCb = get_PlcCallback() (* TODO: implement get_ExtAspCb() *)
     in
-      Coq_mkAmConfig fm clone_uuid aspCb aspCb plcCb pubKeyCb uuidCb
+      Coq_mkAmConfig fm clone_uuid aspCb aspCb plcCb pubKeyCb uuidCb extAspCb
     end) : AM_Config
 
   (* Directly combines setup and get steps in one function call. 

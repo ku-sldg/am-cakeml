@@ -4,6 +4,8 @@
 fun encodeEvRaw rawev = BString.empty
   (* failwith "AXIOM TO BE REALIZED" *)
 
+
+(*
 (** val do_asp :
     coq_ASP_PARAMS -> coq_RawEv -> coq_Plc -> coq_Event_ID -> coq_AM_Config
     -> (coq_BS, coq_DispatcherErrors) coq_ResultT **)
@@ -11,10 +13,18 @@ fun encodeEvRaw rawev = BString.empty
 fun do_asp params e mpl _ ac =
   let val Coq_mkAmConfig _ _ aspCb _ _ _ _ = ac in
   aspCb params mpl (encodeEvRaw e) e end
+*)
 
 (** val doRemote_uuid :
     coq_Term -> coq_UUID -> coq_RawEv -> (coq_RawEv, coq_CallBackErrors)
     coq_ResultT **)
+
+
+(** val doAsp_uuid :
+    coq_UUID -> coq_RawEv -> (coq_BS, coq_CallBackErrors) coq_ResultT **)
+
+fun doAsp_uuid uuid rawev = Coq_resultC passed_bs
+  (* failwith "AXIOM TO BE REALIZED" *)
 
 fun doRemote_uuid t uuid rawEv = 
     let val authEv = []
@@ -30,6 +40,8 @@ fun doRemote_uuid t uuid rawEv =
   
   *)
 
+(*
+
 (** val do_remote :
     coq_Term -> coq_Plc -> coq_EvC -> coq_AM_Config -> (coq_RawEv,
     coq_DispatcherErrors) coq_ResultT **)
@@ -44,6 +56,8 @@ fun do_remote t pTo e ac =
      (case doRemote_uuid t uuid (get_bits e) of
         Coq_errC _ => Coq_errC (Runtime errStr_doRemote_uuid)
       | Coq_resultC v => Coq_resultC v)) end
+
+*)
 
 (** val parallel_vm_thread : coq_Loc -> coq_EvC **)
 
@@ -61,6 +75,9 @@ val am_sendReq =
 
 *)
 
+
+(*
+
 (** val do_start_par_thread :
     coq_Loc -> coq_Core_Term -> coq_RawEv -> unit coq_IO **)
 
@@ -71,6 +88,8 @@ fun do_start_par_thread _ _ _ =
 
 fun do_wait_par_thread loc =
   ret (parallel_vm_thread loc)
+
+*)
 
 (** val requester_bound : coq_Term -> coq_Plc -> coq_ReqAuthTok -> bool **)
 
@@ -94,6 +113,7 @@ fun is_local_appraisal amLib =
    _
    _
    _
+   _ 
    _ => addr = ""
   
   (* failwith "AXIOM TO BE REALIZED" *)
