@@ -33,6 +33,11 @@ val coq_STR_EVIDENCE =
 val coq_STR_ACTION =
   failwith "AXIOM TO BE REALIZED"
 
+(** val coq_STR_TYPE : coq_StringT **)
+
+val coq_STR_TYPE =
+  failwith "AXIOM TO BE REALIZED"
+
 (** val coq_STR_RUN : coq_StringT **)
 
 val coq_STR_RUN =
@@ -46,4 +51,14 @@ val coq_STR_NEGOTIATE =
 (** val coq_STR_APPRAISE : coq_StringT **)
 
 val coq_STR_APPRAISE =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val coq_STR_REQUEST : coq_StringT **)
+
+val coq_STR_REQUEST =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val coq_STR_RESPONSE : coq_StringT **)
+
+val coq_STR_RESPONSE =
   failwith "AXIOM TO BE REALIZED"

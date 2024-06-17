@@ -82,7 +82,7 @@ val stringT_to_JSON =
 val coq_JSON_get_stringT = fn (s : coq_StringT) => fn (js : coq_JSON) =>
   (let val cakejs : Json.json = coq_JSON_to_CakeML_JSON js in
   (case (Json.lookup s cakejs) of
-    None => Coq_errC "Key not found"
+    None => Coq_errC ("Key '" ^ s ^ "' not found")
   | Some js' => 
     case cakeML_JSON_to_coq_JSON js' of
       Coq_resultC (JSON_String s') => Coq_resultC s'
@@ -95,7 +95,7 @@ val coq_JSON_get_stringT = fn (s : coq_StringT) => fn (js : coq_JSON) =>
 val coq_JSON_get_bool = fn s => fn js =>
   let val cakejs : Json.json = coq_JSON_to_CakeML_JSON js in
   (case (Json.lookup s cakejs) of
-    None => Coq_errC "Key not found"
+    None => Coq_errC ("Key '" ^ s ^ "' not found")
   | Some js' => 
     case cakeML_JSON_to_coq_JSON js' of
       Coq_resultC (JSON_Boolean b') => Coq_resultC b'

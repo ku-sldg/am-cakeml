@@ -26,6 +26,10 @@ val coq_STR_EVIDENCE = "EVIDENCE"
 
 val coq_STR_ACTION = "ACTION"
 
+(** val coq_STR_TYPE : coq_StringT **)
+
+val coq_STR_TYPE = "TYPE"
+
 (** val coq_STR_RUN : coq_StringT **)
 
 val coq_STR_RUN = "RUN"
@@ -37,3 +41,13 @@ val coq_STR_NEGOTIATE = "NEGOTIATE"
 (** val coq_STR_APPRAISE : coq_StringT **)
 
 val coq_STR_APPRAISE = "APPRAISE"
+
+
+(** val coq_STR_REQUEST : coq_StringT **)
+
+val coq_STR_REQUEST = "REQUEST"
+
+
+(** val coq_STR_RESPONSE : coq_StringT **)
+
+val coq_STR_RESPONSE = "RESPONSE"

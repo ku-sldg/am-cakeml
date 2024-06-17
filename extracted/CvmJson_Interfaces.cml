@@ -2,7 +2,9 @@
     coq_ProtocolRunRequest -> coq_JSON **)
 
 fun coq_ProtocolRunRequest_to_JSON req =
-  JSON_Object ((Coq_pair coq_STR_REQ_PLC (JSON_String
+  JSON_Object ((Coq_pair coq_STR_TYPE (JSON_String
+    coq_STR_REQUEST)) :: ((Coq_pair coq_STR_ACTION (JSON_String
+    coq_STR_RUN)) :: ((Coq_pair coq_STR_REQ_PLC (JSON_String
     (coq_Plc_to_stringT
       (let val Coq_mkPRReq _ prreq_req_plc _ = req in prreq_req_plc end)))) :: ((Coq_pair
     coq_STR_TERM (JSON_String
@@ -10,7 +12,7 @@ fun coq_ProtocolRunRequest_to_JSON req =
       (let val Coq_mkPRReq prreq_term _ _ = req in prreq_term end)))) :: ((Coq_pair
     coq_STR_EV (JSON_String
     (coq_RawEv_to_stringT
-      (let val Coq_mkPRReq _ _ prreq_ev = req in prreq_ev end)))) :: [])))
+      (let val Coq_mkPRReq _ _ prreq_ev = req in prreq_ev end)))) :: [])))))
 
 (** val coq_JSON_to_ProtocolRunRequest :
     coq_JSON -> (coq_ProtocolRunRequest, coq_StringT) coq_ResultT **)
@@ -28,11 +30,13 @@ fun coq_JSON_to_ProtocolRunRequest req =
     coq_ProtocolRunResponse -> coq_JSON **)
 
 fun coq_ProtocolRunResponse_to_JSON resp =
-  JSON_Object ((Coq_pair coq_STR_SUCCESS (JSON_Boolean
+  JSON_Object ((Coq_pair coq_STR_TYPE (JSON_String
+    coq_STR_RESPONSE)) :: ((Coq_pair coq_STR_ACTION (JSON_String
+    coq_STR_RUN)) :: ((Coq_pair coq_STR_SUCCESS (JSON_Boolean
     (let val Coq_mkPRResp prresp_success _ = resp in prresp_success end))) :: ((Coq_pair
     coq_STR_PAYLOAD (JSON_String
     (coq_RawEv_to_stringT
-      (let val Coq_mkPRResp _ prresp_ev = resp in prresp_ev end)))) :: []))
+      (let val Coq_mkPRResp _ prresp_ev = resp in prresp_ev end)))) :: []))))
 
 (** val coq_JSON_to_ProtocolRunResponse :
     coq_JSON -> (coq_ProtocolRunResponse, coq_StringT) coq_ResultT **)
@@ -63,7 +67,9 @@ fun coq_JSON_to_ProtocolNegotiateResponse resp =
     coq_ProtocolAppraiseRequest -> coq_JSON **)
 
 fun coq_ProtocolAppraiseRequest_to_JSON req =
-  JSON_Object ((Coq_pair coq_STR_TERM (JSON_String
+  JSON_Object ((Coq_pair coq_STR_TYPE (JSON_String
+    coq_STR_REQUEST)) :: ((Coq_pair coq_STR_ACTION (JSON_String
+    coq_STR_APPRAISE)) :: ((Coq_pair coq_STR_TERM (JSON_String
     (coq_Term_to_stringT
       (let val Coq_mkPAReq pareq_term _ _ _ = req in pareq_term end)))) :: ((Coq_pair
     coq_STR_REQ_PLC (JSON_String
@@ -74,7 +80,7 @@ fun coq_ProtocolAppraiseRequest_to_JSON req =
       (let val Coq_mkPAReq _ _ pareq_evidence _ = req in pareq_evidence end)))) :: ((Coq_pair
     coq_STR_EV (JSON_String
     (coq_RawEv_to_stringT
-      (let val Coq_mkPAReq _ _ _ pareq_ev = req in pareq_ev end)))) :: []))))
+      (let val Coq_mkPAReq _ _ _ pareq_ev = req in pareq_ev end)))) :: []))))))
 
 (** val coq_JSON_to_ProtocolAppraiseRequest :
     coq_JSON -> (coq_ProtocolAppraiseRequest, coq_StringT) coq_ResultT **)
@@ -95,11 +101,13 @@ fun coq_JSON_to_ProtocolAppraiseRequest req =
     coq_ProtocolAppraiseResponse -> coq_JSON **)
 
 fun coq_ProtocolAppraiseResponse_to_JSON resp =
-  JSON_Object ((Coq_pair coq_STR_SUCCESS (JSON_Boolean
+  JSON_Object ((Coq_pair coq_STR_TYPE (JSON_String
+    coq_STR_RESPONSE)) :: ((Coq_pair coq_STR_ACTION (JSON_String
+    coq_STR_APPRAISE)) :: ((Coq_pair coq_STR_SUCCESS (JSON_Boolean
     (let val Coq_mkPAResp paresp_success _ = resp in paresp_success end))) :: ((Coq_pair
     coq_STR_PAYLOAD (JSON_String
     (coq_AppResultC_to_stringT
-      (let val Coq_mkPAResp _ paresp_result = resp in paresp_result end)))) :: []))
+      (let val Coq_mkPAResp _ paresp_result = resp in paresp_result end)))) :: []))))
 
 (** val coq_JSON_to_ProtocolAppraiseResponse :
     coq_JSON -> (coq_ProtocolAppraiseResponse, coq_StringT) coq_ResultT **)
@@ -136,7 +144,7 @@ fun coq_JSON_to_AM_Protocol_Request req =
     coq_JSON -> (coq_AM_Protocol_Responses, coq_StringT) coq_ResultT **)
 
 fun coq_JSON_to_AM_Protocol_Response resp =
-  (res_bind (coq_JSON_get_stringT coq_STR_ACTION resp) (fn temp_type =>
+  res_bind (coq_JSON_get_stringT coq_STR_ACTION resp) (fn temp_type =>
     case eqb coq_EqClass_StringT temp_type coq_STR_RUN of
       True =>
       res_bind (coq_JSON_to_ProtocolRunResponse resp) (fn temp_resp =>
@@ -153,7 +161,7 @@ fun coq_JSON_to_AM_Protocol_Response resp =
             res_bind (coq_JSON_to_ProtocolNegotiateResponse resp)
               (fn temp_resp => Coq_resultC (Protocol_Negotiate_Response
               temp_resp))
-          | False => Coq_errC errStr_invalid_request_type)))) : (coq_AM_Protocol_Responses, coq_StringT) coq_ResultT
+          | False => Coq_errC errStr_invalid_request_type)))
 
 (** val coq_ErrorResponseJSON : coq_StringT -> coq_JSON **)
 
