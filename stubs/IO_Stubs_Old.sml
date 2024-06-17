@@ -7,7 +7,7 @@ fun do_asp ps e =
       val my_plc = ManifestUtils.get_myPlc()
   in
     (* Need BS *)
-    asp_cb ps my_plc (encode_RawEv e) e
+    asp_cb ps my_plc (coq_RawEv_to_stringT e) e
   end
 
 (** val doRemote_session : coq_Term -> coq_Plc -> coq_EvC -> coq_EvC **)

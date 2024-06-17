@@ -2,7 +2,7 @@ val formal_manifest =
 	(Build_Manifest 
 		"P1"
 		["attest_aspid"]
-		["attest_aspid"]
+		[(Coq_pair "P2" "attest_aspid")]
 		["P1", "P2"]
 		[]
 		[]

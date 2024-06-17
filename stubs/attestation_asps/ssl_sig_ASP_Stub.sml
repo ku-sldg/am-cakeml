@@ -5,9 +5,9 @@ fun ssl_sig_asp_stub (ps : coq_ASP_PARAMS) (e : coq_RawEv) =
     case ps of Coq_asp_paramsC aspid args tpl tid =>
         let val _ = () in
             print ("Matched aspid:  " ^ aspid ^ "\n");
-            let val data = encode_RawEv e
+            let val data = coq_RawEv_to_stringT e
                 val privKey = ManifestUtils.get_myPrivateKey()
-                val sigRes = Crypto.signMsg privKey data 
+                val sigRes = Crypto.signMsg privKey (BString.fromCString data)
             in
                 Coq_resultC (sigRes)
             end

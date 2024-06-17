@@ -71,10 +71,10 @@ val coq_JSON_to_stringT =
     coq_StringT -> (coq_JSON, coq_StringT) coq_ResultT **)
 
 val stringT_to_JSON =
-  fn s => 
-    case Json.parse s of
+  fn (s : coq_StringT) => 
+    (case Json.parse s of
       Err s => Coq_errC s
-    | Ok j => Coq_resultC (cakeML_JSON_to_coq_JSON j)
+    | Ok j => cakeML_JSON_to_coq_JSON j) : (coq_JSON, coq_StringT) coq_ResultT
 
 (** val coq_JSON_get_stringT :
     coq_StringT -> coq_JSON -> (coq_StringT, coq_StringT) coq_ResultT **)

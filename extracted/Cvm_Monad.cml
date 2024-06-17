@@ -103,10 +103,10 @@ fun copyEv s =
 
 (** val nullEv : coq_EvC coq_CVM **)
 
-val nullEv =
+fun nullEv s =
   bind get_pl (fn p =>
     bind inc_id (fn x =>
-      bind (add_tracem ((Coq_null x p) :: [])) (fn _ => ret mt_evc)))
+      bind (add_tracem ((Coq_null x p) :: [])) (fn _ => ret mt_evc))) s
 
 (** val clearEv : unit -> coq_EvC coq_CVM **)
 
@@ -159,12 +159,12 @@ fun tag_RPY p q e =
 (** val get_cvm_policy : coq_PolicyT coq_CVM **)
 
 val get_cvm_policy =
-  bind get_CVM_amConfig (fn ac =>
+  (bind get_CVM_amConfig (fn ac =>
     ret
       (let val Build_Manifest _ _ _ _ _ _ policy =
          let val Coq_mkAmConfig absMan _ _ _ _ _ _ = ac in absMan end
        in
-       policy end))
+       policy end))) : coq_PolicyT coq_CVM
 
 (** val check_cvm_policy :
     coq_Term -> coq_Plc -> coq_Evidence -> unit coq_CVM **)

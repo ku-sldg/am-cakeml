@@ -6,7 +6,7 @@
    Performs openssl signature checking *)
 fun appraise_ssl_sig (ps : coq_ASP_PARAMS) (p : coq_Plc) (bs : coq_BS) (ls : coq_RawEv)  =
     let
-        val msg = encode_RawEv ls
+        val msg = BString.fromCString (coq_RawEv_to_stringT ls)
         val signGood_loc = bs
 
         val _ = print ("Looking up Pubkey for place " ^ (plToString p) ^ "\n"  (*^ (BString.show pubkey) ^  "\n\n" *))

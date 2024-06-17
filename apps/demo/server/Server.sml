@@ -6,7 +6,7 @@ val server_formal_manifest =
   (Build_Manifest 
     "0" 
     [ssl_sig_aspid] 
-    [ssl_sig_aspid]
+    [(Coq_pair "0" ssl_sig_aspid)]
     ["0", "1", "2"]
     ["0", "1", "2"]
     []

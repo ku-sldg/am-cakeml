@@ -52,7 +52,8 @@ val stringT_to_AppResultC = fn s =>
 
 (** val coq_RawEv_to_stringT : coq_RawEv -> coq_StringT **)
 
-val coq_RawEv_to_stringT = fn rawEv => Json.stringify (Json.fromList (List.map (Json.fromString o BString.toCString) rawEv))
+val coq_RawEv_to_stringT = fn rawEv => 
+  (Json.stringify (Json.fromList (List.map (Json.fromString o BString.toCString) rawEv))) : coq_StringT
 
 
 (** val stringT_to_RawEv_helper 
@@ -72,7 +73,7 @@ fun stringT_to_RawEv_helper js_list =
     coq_StringT -> (coq_RawEv, coq_StringT) coq_ResultT **)
 
 val stringT_to_RawEv = fn s =>
-  case (Json.parse s) of 
+  (case (Json.parse s) of 
     Err s => Coq_errC s
   | Ok js =>
     case (Json.toList js) of
@@ -81,4 +82,4 @@ val stringT_to_RawEv = fn s =>
       stringT_to_RawEv_helper ls
   handle
     Json.Exn s1 s2 => Coq_errC s2
-    | _ => Coq_errC "Failed to parse raw evidence"
+    | _ => Coq_errC "Failed to parse raw evidence") : (coq_RawEv, coq_StringT) coq_ResultT

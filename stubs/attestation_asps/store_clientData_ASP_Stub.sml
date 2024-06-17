@@ -6,8 +6,8 @@ fun store_clientData_asp_stub ps e =
                let val _ = (print ("\nRunning store_clientData asp ...\n"))
                    val outfile = "client_data.txt"
                    val ostream = TextIO.openOut outfile
-                   val client_data = encode_RawEv e
-                   val _ = TextIO.output ostream (BString.toString client_data)
+                   val client_data = coq_RawEv_to_stringT e
+                   val _ = TextIO.output ostream client_data
                    val _ = TextIO.closeOut ostream
                                          
                in 

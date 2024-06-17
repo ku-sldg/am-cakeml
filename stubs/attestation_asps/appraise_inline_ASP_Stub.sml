@@ -23,22 +23,24 @@ fun appraise_inline_asp_stub ps e =
                         val appRequestString =
                           case appRequestArg of 
                             Arg_ID s => s
-                        val inStrJson = strToJson appRequestString 
-                        val appReq = jsonToAppRequest inStrJson
-
-                        
+                        val inStrJson = case Json.parse appRequestString of
+                                          Err e => raise (Exception e)
+                                        | Ok j => case cakeML_JSON_to_coq_JSON j of
+                                                    Coq_errC s => raise (Exception s)
+                                                  | Coq_resultC r => r
+                        val appReq = case (coq_JSON_to_ProtocolAppraiseRequest inStrJson) of
+                                      Coq_errC s => raise (Exception s)
+                                    | Coq_resultC r => r
 
                         val res' = 
                         case appReq of 
-                          REQ_APP t p et _ (*ev*) => 
-                            (let val appresult = run_appraisal_client 
-                                             t 
-                                             p 
-                                             et 
-                                             e 
-                                             appServerAddr
+                          
+                          Coq_mkPAReq t p et _ (*ev*) => 
+                            (let val appresult = case (run_appraisal_client t p et e appServerAddr) of
+                                                  Coq_errC s => raise (Exception s)
+                                                | Coq_resultC r => r
 
-                                val _ = print ("\n\nAppraised Evidence structure:  \n" ^ (evidenceCToString appresult) ^ "\n\n")
+                                val _ = print ("\n\nAppraised Evidence structure:  \n" ^ (coq_AppResultC_to_stringT appresult) ^ "\n\n")
                                 val _ = print ("\n\n\n\n\n\n\n\n\n\n DECODED APP REQUEST in 'appraise_inline_asp_stub...\n\n\n\n\n\n\n\n\n\n")
                                 in
                                   Coq_resultC (passed_bs)

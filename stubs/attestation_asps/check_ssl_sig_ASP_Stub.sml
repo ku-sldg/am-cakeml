@@ -17,14 +17,11 @@ fun check_ssl_sig_asp_stub ps e =
 
 
 
-                    val appresult = run_appraisal_client 
-                                      appTerm
-                                      coq_P0 
-                                      (Coq_nn O)
-                                      e 
-                                      appServerAddr
+                    val appresult = case (run_appraisal_client appTerm coq_P0 (Coq_nn O) e appServerAddr) of
+                                        Coq_errC e => raise (Exception e)
+                                      | Coq_resultC v => v
 
-                     val _ = print ("\n\nAppraised Evidence structure:  \n" ^ (evidenceCToString appresult) ^ "\n\n") 
+                     val _ = print ("\n\nAppraised Evidence structure:  \n" ^ (coq_AppResultC_to_stringT appresult) ^ "\n\n") 
                      
                      in
                         Coq_resultC (passed_bs)

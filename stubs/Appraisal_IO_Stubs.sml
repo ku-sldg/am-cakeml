@@ -7,16 +7,6 @@ Change CMake structure so that
 build their own folders respectively
  *)
 
-
-
-(* CLEANUP: Add this as a stub in Coq (Appraisal_IO_Stubs.v?) *)
-(* 
-   fun decode_RawEv : coq_BS -> coq_RawEv
-   This should be the inverse of encode_RawEv.
-*)
-fun decode_RawEv bsval = jsonBsListToList (strToJson (BString.toString bsval))
-
-
 val pub = BString.unshow "3082010a0282010100c822fb2b7842e61fa6a779a48f2164793e21d640687146b48ac4e977a4a69f90383c94f3ea5e5336052b728f0a83151603edef890b2a6099376ae87a384a6b236ed51c7f19d94c8b4acb9b00de6cb1c6fc40ff9fec7967ebdbc48cd9b15103411a3b8978d93e59988a7baa21dd3e6fa220359e228f847b81be77bf2467bea40496135a8d06a42c3416bffec3646c8fda7eee19a74275fa2b21bfaa5c8b0dc8e82511b2d8b9a7b760b1d0ae0be03cd98615f3e6c2bc51b1ab11f5b87aad9b44264a2470f26a3a55e4dbd1fa6ea52e66093b4a3eae73bcd7237f07b1ea394a9f893b32d6da15a46f5d7e77c5a6b12ebf41cc7743f4cc241266e58566645dfbbd210203010001"
                          
 val priv1 = BString.unshow "308202260201003082011706092a864886f70d010301308201080282010100c4bdfbb69055be49894bffad8f70c4dc6bb37672f925b84ef1d42f8488cefc207c9f082b6436431649917f77e833ccb34d2c886fcb3eb7cbd0b4139f5bc4d353c826400ca4b470ace06a28a7fa66240e819aea538ba0468eeb4d72bdd63b6929d377ab48a50477c4297a151a88631d8bf21851eb8b16d1ace2f3a33aee09fa54eb6f7cacca2e04169e3018eafbff583db0ded4222c438b463cb5fdaf41b842ebccc1a41b2603fc958c48f63628b5040fddcdb330c64a39f1f162501edaa080b5371798c1e334163076faf1e9ea8cdd82588d9635f84a302998ea9c38e236dd374e7bb25f793a937e4e0dc4b4c5777309a0a1ea837951cab0b120e649a496dabf02010204820104028201005b984694c9b5728c00b22440bbe8dd629cb915cc2cc8c46bef8e24aa007f3b516c4c7807e65de2bc041d1304b1f82707f69ff7b6e4f87ce146d7e25a52a9ac1e2168b0e64a22c6b7daccd4577ed323b0574897c8b292cabec38b3f2e2d4ddc5066b6fcbf46a9f1daf1d78304536793bd0333bccde98976705446b84599dc4c9219de4f350fae7a7c905b301bff54c25925f22cb713fa6ac568bcc1b59a56278b3a3ab616942903ef35e7d40c018731ab1cadd78f89e357549826582f586ec8d67fe5480912c65f97fd97226bf8b457e6083971fb1419661f9b0998ac1c52bc83645e3d7cdf5451e171bf0c64bf4fe072670e67f35e54f59a6a17f4baed47ce45"
@@ -95,10 +85,11 @@ val gen_nonce_bits = (BString.fromString "anonce") (* TODO: real nonce gen *)
     coq_BS -> coq_ASP_PARAMS -> coq_PublicKey -> (coq_RawEv,
     coq_DispatcherErrors) coq_ResultT **)
 fun decrypt_bs_to_rawev_prim bs params pubkey = 
-    let val recoveredtext = Crypto.decryptOneShot priv2 pubkey (*pub1*) (* priv1 pubkey *) bs (*priv2 pub1 bs *)
-        val bs_recovered = BString.fromString recoveredtext
-        val res = decode_RawEv bs_recovered
-        val _ = print ("\nDecryption Succeeded: \n" ^ (rawEvToString res) ^ "\n" ) in
+    let val recoveredtext : string = Crypto.decryptOneShot priv2 pubkey (*pub1*) (* priv1 pubkey *) bs (*priv2 pub1 bs *)
+        val res = case stringT_to_RawEv recoveredtext of
+                      Coq_resultC r => r
+                    | Coq_errC e => raise Exception e
+        val _ = print ("\nDecryption Succeeded: \n" ^ (coq_RawEv_to_stringT res) ^ "\n" ) in
         (Coq_resultC res)
     end
 

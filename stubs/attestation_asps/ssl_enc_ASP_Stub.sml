@@ -5,8 +5,7 @@ fun ssl_enc_asp_stub ps e =
     case ps of Coq_asp_paramsC aspid args tpl tid =>
                let val _ = () in
                    print ("Matched aspid:  " ^ aspid ^ "\n");
-                   let val plaintext =
-                           BString.toString (encode_RawEv e) 
+                   let val plaintext = coq_RawEv_to_stringT e
                        val ciphertext =
                            Crypto.encryptOneShot
                                priv2 (* pub *)pub1 plaintext in

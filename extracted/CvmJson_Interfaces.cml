@@ -136,7 +136,7 @@ fun coq_JSON_to_AM_Protocol_Request req =
     coq_JSON -> (coq_AM_Protocol_Responses, coq_StringT) coq_ResultT **)
 
 fun coq_JSON_to_AM_Protocol_Response resp =
-  res_bind (coq_JSON_get_stringT coq_STR_ACTION resp) (fn temp_type =>
+  (res_bind (coq_JSON_get_stringT coq_STR_ACTION resp) (fn temp_type =>
     case eqb coq_EqClass_StringT temp_type coq_STR_RUN of
       True =>
       res_bind (coq_JSON_to_ProtocolRunResponse resp) (fn temp_resp =>
@@ -153,7 +153,7 @@ fun coq_JSON_to_AM_Protocol_Response resp =
             res_bind (coq_JSON_to_ProtocolNegotiateResponse resp)
               (fn temp_resp => Coq_resultC (Protocol_Negotiate_Response
               temp_resp))
-          | False => Coq_errC errStr_invalid_request_type)))
+          | False => Coq_errC errStr_invalid_request_type)))) : (coq_AM_Protocol_Responses, coq_StringT) coq_ResultT
 
 (** val coq_ErrorResponseJSON : coq_StringT -> coq_JSON **)
 

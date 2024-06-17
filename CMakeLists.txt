@@ -129,6 +129,7 @@ get_files(cop_src_pre_aspStubs
     extracted/Example_Phrases_Demo.cml
     stubs/IO_Stubs_extra.sml
     am/CommTypes.sml
+    extracted/AM_Json_Interfaces.cml
     extracted/AM_Helpers.cml
     extracted/Client_AM.cml
     extracted/Server_AM.cml
