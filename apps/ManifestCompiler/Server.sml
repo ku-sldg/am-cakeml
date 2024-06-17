@@ -13,6 +13,7 @@ When things go wrong, handle_AM_request returns a raw error message string.
   it easier on the client. *)
 fun respondToMsg client = 
   let val inString  = Socket.inputAll client 
+      val _ = print ("\n\nReceived request string: \n" ^ inString)
       val ac = ManifestUtils.get_local_amConfig ()
       val nonceval = BString.fromString "anonce" (* TODO: should this be hardcoded here? *)
       val outString = handle_AM_request inString ac am_library nonceval
