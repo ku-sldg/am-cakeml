@@ -10,35 +10,35 @@ fun put_ev e =
 
 (** val get_ev : coq_EvC coq_CVM **)
 
-val get_ev =
-  bind get (fn st => ret (let val Coq_mk_st st_ev _ _ _ = st in st_ev end))
+fun get_ev s =
+  bind get (fn st => ret (let val Coq_mk_st st_ev _ _ _ = st in st_ev end)) s
 
 (** val get_CVM_amConfig : coq_AM_Config coq_CVM **)
 
-val get_CVM_amConfig =
+fun get_CVM_amConfig s =
   bind get (fn st =>
-    ret (let val Coq_mk_st _ _ _ st_AM_config = st in st_AM_config end))
+    ret (let val Coq_mk_st _ _ _ st_AM_config = st in st_AM_config end)) s
 
 (** val get_pl : coq_Plc coq_CVM **)
 
-val get_pl =
+fun get_pl s =
   bind get_CVM_amConfig (fn ac =>
     ret
       (let val Build_Manifest my_abstract_plc _ _ _ _ _ _ =
          let val Coq_mkAmConfig absMan _ _ _ _ _ _ = ac in absMan end
        in
-       my_abstract_plc end))
+       my_abstract_plc end)) s
 
 (** val inc_id : coq_Event_ID coq_CVM **)
 
-val inc_id =
+fun inc_id s =
   bind get (fn st =>
     let val tr' = let val Coq_mk_st _ st_trace _ _ = st in st_trace end in
     let val e' = let val Coq_mk_st st_ev _ _ _ = st in st_ev end in
     let val i = let val Coq_mk_st _ _ st_evid _ = st in st_evid end in
     let val ac = let val Coq_mk_st _ _ _ st_AM_config = st in st_AM_config end
     in
-    bind (put (Coq_mk_st e' tr' (add i (S O)) ac)) (fn _ => ret i) end end end end)
+    bind (put (Coq_mk_st e' tr' (add i (S O)) ac)) (fn _ => ret i) end end end end) s
 
 (** val add_trace : coq_Ev list -> cvm_st -> cvm_st **)
 
@@ -52,9 +52,9 @@ fun add_tracem tr =
 
 (** val split_ev : unit coq_CVM **)
 
-val split_ev =
+fun split_ev s =
   bind get_pl (fn p =>
-    bind inc_id (fn i => add_tracem ((Coq_split i p) :: [])))
+    bind inc_id (fn i => add_tracem ((Coq_split i p) :: []))) s
 
 (** val tag_ASP :
     coq_ASP_PARAMS -> coq_Plc -> coq_EvC -> coq_Event_ID coq_CVM **)
@@ -96,10 +96,10 @@ fun invoke_ASP fwd params =
 
 (** val copyEv : coq_EvC coq_CVM **)
 
-val copyEv =
+fun copyEv s =
   bind get_pl (fn p =>
     bind inc_id (fn x =>
-      bind (add_tracem ((Coq_copy x p) :: [])) (fn _ => get_ev)))
+      bind (add_tracem ((Coq_copy x p) :: [])) (fn _ => get_ev))) s
 
 (** val nullEv : coq_EvC coq_CVM **)
 

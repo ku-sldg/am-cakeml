@@ -43,3 +43,19 @@ val errStr_lib_supports_man_app_check = "errStr_lib_supports_man_app_check"
 (** val errStr_lib_supports_man_check : coq_StringT **)
 
 val errStr_lib_supports_man_check = "errStr_lib_supports_man_check"
+
+(** val errStr_remote_am_failure : coq_StringT **)
+
+val errStr_remote_am_failure = "errStr_remote_am_failure"
+
+(** val errStr_incorrect_resp_type : coq_StringT **)
+
+val errStr_incorrect_resp_type = "errStr_incorrect_resp_type"
+
+(** val errStr_invalid_request_type : coq_StringT **)
+
+val errStr_invalid_request_type = "errStr_invalid_request_type"
+
+(** val errStr_negotiation_not_implemented : coq_StringT **)
+
+val errStr_negotiation_not_implemented = "errStr_negotiation_not_implemented"

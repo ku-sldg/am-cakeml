@@ -209,6 +209,8 @@ fun evcToJson e =
         Coq_evc ev et => constructorWithArgs "EvC" [ bsListToJsonList ev,
                                                      evToJson et ]
 
+(* NOTE: These are no longer necessary I think 
+
 (* fun requestToJson : coq_CvmRequestMessage -> coq_JsonT *)
 fun requestToJson (REQ t authTok ev) = Json.fromPairList
     [("reqTerm", termToJson t), 
@@ -230,3 +232,5 @@ fun appRequestToJson (REQ_APP t p et ev) = Json.fromPairList
 (* fun appResponseToJson : coq_AppraisalResponseMessage -> coq_JsonT *)
 fun appResponseToJson (appres) = Json.fromPairList
     [("appRespRes", appResultToJson appres)]
+
+*)

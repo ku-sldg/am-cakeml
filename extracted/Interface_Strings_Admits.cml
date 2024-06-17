@@ -1,0 +1,49 @@
+(** val coq_STR_REQ_PLC : coq_StringT **)
+
+val coq_STR_REQ_PLC =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val coq_STR_TERM : coq_StringT **)
+
+val coq_STR_TERM =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val coq_STR_EV : coq_StringT **)
+
+val coq_STR_EV =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val coq_STR_SUCCESS : coq_StringT **)
+
+val coq_STR_SUCCESS =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val coq_STR_PAYLOAD : coq_StringT **)
+
+val coq_STR_PAYLOAD =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val coq_STR_EVIDENCE : coq_StringT **)
+
+val coq_STR_EVIDENCE =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val coq_STR_ACTION : coq_StringT **)
+
+val coq_STR_ACTION =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val coq_STR_RUN : coq_StringT **)
+
+val coq_STR_RUN =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val coq_STR_NEGOTIATE : coq_StringT **)
+
+val coq_STR_NEGOTIATE =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val coq_STR_APPRAISE : coq_StringT **)
+
+val coq_STR_APPRAISE =
+  failwith "AXIOM TO BE REALIZED"

@@ -8,7 +8,7 @@ val coq_ID_Type_to_stringT = fn x => x
 (** val stringT_to_ID_Type :
     coq_StringT -> (coq_ID_Type, coq_StringT) coq_ResultT **)
 
-val stringT_to_ID_Type = fn x => x
+val stringT_to_ID_Type = fn x => Coq_resultC x
 
 (** val coq_Eq_Class_ID_Type : coq_ID_Type coq_EqClass **)
 

@@ -54,6 +54,7 @@ val cache_id = "cache_aspid"
 val store_args = []
   (* failwith "AXIOM TO BE REALIZED" *)
 
+(* NOTE: These are no longer necessary 
 (** val appraise_inline_args : coq_Arg list **)
 val appraise_inline_args : coq_Arg list = 
   let val appTerm = example_phrase_p2_appraise
@@ -73,6 +74,7 @@ val check_ssl_sig_args : coq_Arg list =
       val strJsonAppReq = jsonToStr jsonAppReq in 
         [Arg_ID (strJsonAppReq)]
   end
+*)
 
 
 (* 

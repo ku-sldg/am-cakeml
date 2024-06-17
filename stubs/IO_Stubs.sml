@@ -4,6 +4,37 @@
 fun encodeEvRaw rawev = BString.empty
   (* failwith "AXIOM TO BE REALIZED" *)
 
+fun decodeUUID (u : coq_UUID) = 
+  (* Splits at ":" character, into (ip, port) *)
+  let val colonInt = 
+        case (String.findi (fn c => (Char.chr 58) = c) 0 u) of
+          None => raise Exception "Unable to decode UUID, no splitting ':' found"
+          | Some v => v
+      val ip = String.substring u 0 colonInt
+      (* This is retrieving the rest of the string *)
+      val port = String.extract u (colonInt + 1) None
+      val port' = case Int.fromString port of
+                    Some v => v
+                    | None => raise Exception "Unable to decode UUID, port not integer"
+  in
+    (ip, port')
+  end
+
+(** val make_JSON_Network_Request : coq_UUID -> coq_JSON -> coq_JSON **)
+
+fun make_JSON_Network_Request (u : coq_UUID) (js : coq_JSON) =
+  let val (ip, port) = decodeUUID u
+      val fd = Socket.connect ip port
+      val sendReq = Socket.output fd (coq_JSON_to_stringT js)
+      val resp = Socket.inputAll fd
+  in
+    (* TODO: I should really be managing with a resultC rather than alway JS response *)
+    case (stringT_to_JSON resp) of 
+      Coq_errC e => Coq_resultC (JSON_Object ((Coq_pair coq_STR_SUCCESS (JSON_Boolean False)) :: []))
+    | Coq_resultC js => js
+  end
+
+(* NOTE: Deprecated Features 
 (** val do_asp :
     coq_ASP_PARAMS -> coq_RawEv -> coq_Plc -> coq_Event_ID -> coq_AM_Config
     -> (coq_BS, coq_DispatcherErrors) coq_ResultT **)
@@ -44,6 +75,7 @@ fun do_remote t pTo e ac =
      (case doRemote_uuid t uuid (get_bits e) of
         Coq_errC _ => Coq_errC (Runtime errStr_doRemote_uuid)
       | Coq_resultC v => Coq_resultC v)) end
+*)
 
 (** val parallel_vm_thread : coq_Loc -> coq_EvC **)
 

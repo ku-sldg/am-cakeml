@@ -403,6 +403,8 @@ fun jsonToEvC js = case (Json.toMap js) of (* Json.toMap : json -> ((string,json
                                            Coq_evc (jsonBsListToList ev) (jsonToEv et)
 
 
+
+(* NOTE: These are no longer necessary as well 
 (* fun jsonToRequest : coq_JsonT -> coq_CvmRequestMessage  *)
 fun jsonToRequest js = case (Json.toMap js) of
           Some js' => fromAList js'
@@ -508,3 +510,5 @@ fun jsonToStr js  = Json.stringify js
 *)
 (* CLEANUP: Find a place to move this so it better fits *)
 fun encode_RawEv ls = BString.fromString (jsonToStr (bsListToJsonList ls))
+
+*)

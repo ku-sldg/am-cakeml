@@ -69,6 +69,8 @@ get_files(cop_src_pre_aspStubs
     stubs/BS.sml
     stubs/StringT.sml
     stubs/ErrorStringConstants.sml
+    
+    extracted/ResultT.cml
     extracted/Specif.cml
     extracted/Datatypes.cml
     extracted/EqClass.cml
@@ -78,13 +80,19 @@ get_files(cop_src_pre_aspStubs
     extracted/Eqb_Evidence.cml
     stubs/Params_Admits_hardcoded.sml
     extracted/Term_Defs.cml
-    extracted/Anno_Term_Defs.cml
     copland/CoplandUtil.sml
     copland/json/CoplandToJson.sml
     copland/json/JsonToCopland.sml
-    stubs/CvmJson_Admits.sml
+    stubs/Term_Defs_Admits.sml
+    extracted/Anno_Term_Defs.cml
     extracted/Maps.cml
-    stubs/Maps.sml
+    stubs/Maps_Helpers.sml
+    extracted/JSON_Type.cml
+    stubs/JSON_Admits.sml
+    stubs/Interface_Strings_Admits.sml
+    extracted/Interface_Types.cml
+    # stubs/CvmJson_Admits.sml
+    extracted/CvmJson_Interfaces.cml
     stubs/Manifest_Admits_Stubs.sml
     extracted/ErrorStMonad_Coq.cml
     stubs/Example_Phrases_Pre_Admits.sml
@@ -105,7 +113,7 @@ get_files(cop_src_pre_aspStubs
     extracted/AM_St.cml
     copland/json/ManifestJsonConfig.sml
     util/ManifestUtils.sml
-    am/CoplandCommUtil.sml
+    # am/CoplandCommUtil.sml
     stubs/IO_Stubs.sml
     stubs/Axioms_Io.sml
     extracted/Evidence_Bundlers.cml

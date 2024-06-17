@@ -1,8 +1,4 @@
 (* custom Maps impl in cakeml to match the Coq version:  coq_MapC *)
-(* 
-type ('a, 'b) coq_MapC = ('a, 'b) map (* ('a, 'b) prod list *)
-
-type ('a, 'b) coq_MapD = ('a, 'b) map *)
 
 type 'a coq_eqClass = unit
 

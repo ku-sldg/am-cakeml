@@ -255,13 +255,17 @@ fun write_FormalManifest_file_json (pathPrefix : string) (c : coq_Manifest) =
 
 fun read_FormalManifest_file_json (*(pathPrefix : string)*) (manfile:string) =
       (let val s = TextIOExtra.readFile manfile
-          val jsonman = strToJson s 
+          val jsonman = 
+            case Json.parse s of
+              Ok j => j
+            | Err e => raise Excn ("Could not parse JSON file: " ^ e ^ "\n")
   in
     (extract_Manifest jsonman)
   end
   handle 
     TextIO.BadFileName => raise Excn ("Bad file name: " ^ manfile)(* (pathPrefix ^ "FormalManifest_<PLCNAMEHERE>.sml")) *)
-    | TextIO.InvalidFD   => raise Excn "Invalid file descriptor") : coq_Manifest
+    | TextIO.InvalidFD   => raise Excn "Invalid file descriptor"
+    | Excn e => raise Excn ("Could not parse JSON file: " ^ e ^ "\n")) : coq_Manifest
 
 
 
@@ -295,7 +299,9 @@ fun write_term_file_json (filepath : string) (t : coq_Term) =
 
 fun read_term_file_json (filepath:string) =
       (let val s = TextIOExtra.readFile filepath
-          val termJson = strToJson s 
+          val termJson = case Json.parse s of
+              Ok j => j
+            | Err e => raise Excn ("Could not parse JSON file: " ^ e ^ "\n")
   in
     (jsonToTerm termJson)
   end
@@ -322,7 +328,9 @@ fun write_termPlcList_file_json (filepath : string) (ts : ((coq_Term, coq_Plc) p
 
 fun read_termPlcList_file_json (filepath:string) =
       (let val s = TextIOExtra.readFile filepath
-          val termPlcListJson = strToJson s 
+          val termPlcListJson = case Json.parse s of
+              Ok j => j
+            | Err e => raise Excn ("Could not parse JSON file: " ^ e ^ "\n")
   in
     (extract_termPlcList termPlcListJson)
   end
@@ -349,7 +357,9 @@ fun write_EvidencePlcList_file_json (filepath : string) (ts : ((coq_Evidence, co
 
 fun read_EvidencePlcList_file_json (filepath:string) =
       (let val s = TextIOExtra.readFile filepath
-          val evidencePlcListJson = strToJson s 
+          val evidencePlcListJson = case Json.parse s of
+              Ok j => j
+            | Err e => raise Excn ("Could not parse JSON file: " ^ e ^ "\n")
   in
     (extract_EvidencePlcList evidencePlcListJson)
   end
