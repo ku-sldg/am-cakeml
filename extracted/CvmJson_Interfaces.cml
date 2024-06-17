@@ -128,12 +128,12 @@ fun coq_JSON_to_AM_Protocol_Request req =
       res_bind (coq_JSON_to_ProtocolRunRequest req) (fn temp_req =>
         Coq_resultC (Protocol_Run_Request temp_req))
     | False =>
-      (case eqb coq_EqClass_StringT temp_type coq_STR_NEGOTIATE of
+      (case eqb coq_EqClass_StringT temp_type coq_STR_APPRAISE of
          True =>
          res_bind (coq_JSON_to_ProtocolAppraiseRequest req) (fn temp_req =>
            Coq_resultC (Protocol_Appraise_Request temp_req))
        | False =>
-         (case eqb coq_EqClass_StringT temp_type coq_STR_APPRAISE of
+         (case eqb coq_EqClass_StringT temp_type coq_STR_NEGOTIATE of
             True =>
             res_bind (coq_JSON_to_ProtocolNegotiateRequest req)
               (fn temp_req => Coq_resultC (Protocol_Negotiate_Request
