@@ -53,7 +53,7 @@ val stringT_to_AppResultC = fn s =>
 (** val coq_RawEv_to_stringT : coq_RawEv -> coq_StringT **)
 
 val coq_RawEv_to_stringT = fn rawEv => 
-  (Json.stringify (Json.fromList (List.map (Json.fromString o BString.toCString) rawEv))) : coq_StringT
+  (Json.stringify (Json.fromList (List.map (Json.fromString o BString.show) rawEv))) : coq_StringT
 
 
 (** val stringT_to_RawEv_helper 
@@ -67,7 +67,7 @@ fun stringT_to_RawEv_helper js_list =
       | Some s =>
         case stringT_to_RawEv_helper t of
           Coq_errC s1 => Coq_errC s1
-        | Coq_resultC ls => Coq_resultC (BString.fromCString s :: ls)
+        | Coq_resultC ls => Coq_resultC (BString.unshow s :: ls)
 
 (** val stringT_to_RawEv :
     coq_StringT -> (coq_RawEv, coq_StringT) coq_ResultT **)

@@ -97,20 +97,6 @@ fun jsonToArg js =
       case js of 
        (Json.Object m) => fromJsonMap m getArg
       | _ =>   raise Json.Exn "jsonToArg" "Got to this place (not a Json.Object in jsonToArg)"
-
-      (* end *)
-
-
-(* case (Json.toMap js) of 
-                    (* Json.toMap : json -> ((string,json) map) option *)
-      Some m => fromJsonMap m getArg (* m : (string,json) map *)
-      
-    | None =>
-        raise Json.Exn "jsonToArg" "Copland Arg JSON does not begin as an AList"
-
-        *)
-        
-
     and
     getArg constructor (Json.Array args) =
         case constructor of
