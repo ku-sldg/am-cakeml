@@ -38,22 +38,22 @@ val cert_id =
 val cache_id =
   failwith "AXIOM TO BE REALIZED"
 
-(** val store_args : coq_Arg list **)
+(** val store_args : coq_ASP_ARGS **)
 
 val store_args =
   failwith "AXIOM TO BE REALIZED"
 
-(** val retrieve_args : coq_Arg list **)
+(** val retrieve_args : coq_ASP_ARGS **)
 
 val retrieve_args =
   failwith "AXIOM TO BE REALIZED"
 
-(** val appraise_inline_args : coq_Arg list **)
+(** val appraise_inline_args : coq_ASP_ARGS **)
 
 val appraise_inline_args =
   failwith "AXIOM TO BE REALIZED"
 
-(** val check_ssl_sig_args : coq_Arg list **)
+(** val check_ssl_sig_args : coq_ASP_ARGS **)
 
 val check_ssl_sig_args =
   failwith "AXIOM TO BE REALIZED"

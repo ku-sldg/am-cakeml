@@ -1,8 +1,4 @@
 
-(** val encodeEvRaw : coq_RawEv -> coq_BS **)
-
-fun encodeEvRaw rawev = BString.empty
-  (* failwith "AXIOM TO BE REALIZED" *)
 
 fun decodeUUID (u : coq_UUID) = 
   (* Splits at ":" character, into (ip, port) *)
@@ -33,6 +29,12 @@ fun make_JSON_Network_Request (u : coq_UUID) (js : coq_JSON) =
       Coq_errC e => JSON_Object ((Coq_pair coq_STR_SUCCESS (JSON_Boolean False)) :: [])
     | Coq_resultC js => js
   end) : coq_JSON
+
+(** val make_JSON_FS_Location_Request :
+    coq_FS_Location -> coq_JSON -> coq_JSON **)
+
+val make_JSON_FS_Location_Request =
+  failwith "AXIOM TO BE REALIZED"
 
 (* NOTE: Deprecated Features 
 (** val do_asp :

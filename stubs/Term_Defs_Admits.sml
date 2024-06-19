@@ -83,3 +83,9 @@ val stringT_to_RawEv = fn s =>
   handle
     Json.Exn s1 s2 => Coq_errC s2
     | _ => Coq_errC "Failed to parse raw evidence") : (coq_RawEv, coq_StringT) coq_ResultT
+
+
+(** val coq_ASP_ARGS_to_stringT : coq_ASP_ARGS -> coq_StringT **)
+
+val coq_ASP_ARGS_to_stringT =
+  failwith "AXIOM TO BE REALIZED"

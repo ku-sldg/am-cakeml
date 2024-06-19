@@ -1,6 +1,6 @@
 (** val example_phrase_p2_appraise : coq_Term **)
 
 val example_phrase_p2_appraise =
-  Coq_att coq_P1 (Coq_bseq (Coq_pair ALL ALL) (Coq_asp (ASPC ALL EXTD
-    (Coq_asp_paramsC attest1_id [] coq_P1 sys))) (Coq_asp (ASPC ALL EXTD
-    (Coq_asp_paramsC attest2_id [] coq_P1 sys))))
+  Coq_att coq_P1 (Coq_bseq (Coq_pair ALL ALL) (Coq_asp (ASPC ALL (EXTD (S O))
+    (Coq_asp_paramsC attest1_id [] coq_P1 sys))) (Coq_asp (ASPC ALL (EXTD (S
+    O)) (Coq_asp_paramsC attest2_id [] coq_P1 sys))))

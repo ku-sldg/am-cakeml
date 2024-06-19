@@ -7,7 +7,7 @@ fun asp_term_to_core a = case a of
   (case sp of
      ALL => Coq_aspc (ASPCC fwd params)
    | NONE => Coq_lseqc (Coq_aspc CLEAR) (Coq_aspc (ASPCC fwd params)))
-| SIG => Coq_aspc (ASPCC EXTD sig_params)
+| SIG => Coq_aspc (ASPCC (EXTD (S O)) sig_params)
 | HSH => Coq_aspc (ASPCC COMP hsh_params)
 | ENC q => Coq_aspc (ASPCC ENCR (enc_params q))
 
@@ -59,13 +59,11 @@ fun et_size e = case e of
 | Coq_nn _ => S O
 | Coq_uu _ fwd _ e' =>
   (case fwd of
-     EXTD => add (S O) (et_size e')
+     EXTD n => add n (et_size e')
    | KILL => O
    | KEEP => et_size e'
    | _ => S O)
 | Coq_ss e1 e2 => add (et_size e1) (et_size e2)
-
-type coq_RawEv = coq_BS list
 
 datatype coq_EvC =
   Coq_evc coq_RawEv coq_Evidence
@@ -117,7 +115,7 @@ fun eval_asp t p e =
        KILL => Coq_mt
      | KEEP => sp_ev sp e
      | _ => Coq_uu p fwd params (sp_ev sp e))
-  | SIG => Coq_uu p EXTD sig_params e
+  | SIG => Coq_uu p (EXTD (S O)) sig_params e
   | HSH => Coq_uu p COMP hsh_params e
   | ENC q => Coq_uu p ENCR (enc_params q) e
 

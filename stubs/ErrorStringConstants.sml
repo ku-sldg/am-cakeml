@@ -4,11 +4,15 @@ val errStr_amNonce = "Nonce not in AM monad state (nonceMap)"
 
 (** val errStr_peel_bs_am : coq_StringT **)
 
-val errStr_peel_bs_am = ""
+val errStr_peel_bs_am = "errStr_peel_bs_am"
+
+(** val errStr_peel_n_am : coq_StringT **)
+
+val errStr_peel_n_am = "errStr_peel_n_am"
 
 (** val errStr_requester_bound : coq_StringT **)
 
-val errStr_requester_bound = ""
+val errStr_requester_bound = "errStr_requester_bound"
 
 (** val errStr_privPolicy : coq_StringT **)
 
@@ -31,6 +35,14 @@ val errStr_decryption_prim = "errStr_decryption_prim"
 (** val errStr_et_size : coq_StringT **)
 
 val errStr_et_size = "errStr_et_size"
+
+(** val errStr_empty_raw_ev : coq_StringT **)
+
+val errStr_empty_raw_ev = "errStr_empty_raw_ev"
+
+(** val errStr_raw_evidence_too_long : coq_StringT **)
+
+val errStr_raw_evidence_too_long = "errStr_raw_evidence_too_long"
 
 (** val errStr_doRemote_uuid : coq_StringT **)
 

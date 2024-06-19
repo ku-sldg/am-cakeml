@@ -143,14 +143,14 @@ fun app_aspid_manifest_update i p m =
 
 fun manifest_generator_app'' et m =
   case et of
-    Coq_uu p fwd ps e' =>
+    Coq_uu _ fwd ps e' =>
     (case fwd of
        ENCR =>
        let val Coq_asp_paramsC _ _ p' _ = ps in
        manifest_generator_app'' e' (pubkey_manifest_update p' m) end
-     | EXTD =>
-       let val Coq_asp_paramsC a _ _ _ = ps in
-       manifest_generator_app'' e' (app_aspid_manifest_update p a m) end
+     | EXTD _ =>
+       let val Coq_asp_paramsC a _ targ _ = ps in
+       manifest_generator_app'' e' (app_aspid_manifest_update targ a m) end
      | KEEP => manifest_generator_app'' e' m
      | _ => m)
   | Coq_ss e1 e2 =>

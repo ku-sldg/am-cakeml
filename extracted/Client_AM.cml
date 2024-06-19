@@ -34,7 +34,7 @@ fun run_appraisal_client t p et re addr =
 val get_am_clone_uuid =
   bind get_AM_amConfig (fn ac =>
     ret
-      (let val Coq_mkAmConfig _ am_clone_addr _ _ _ _ _ = ac in
+      (let val Coq_mkAmConfig _ am_clone_addr _ _ _ _ = ac in
        am_clone_addr end))
 
 (** val check_et_length : coq_Evidence -> coq_RawEv -> unit coq_AM **)
@@ -73,15 +73,15 @@ fun run_cvm_local_am t ls =
 (** val get_am_policy : coq_PolicyT coq_AM **)
 
 val get_am_policy =
-  (bind get (fn st =>
+  bind get (fn st =>
     ret
       (let val Build_Manifest _ _ _ _ _ _ policy =
-         let val Coq_mkAmConfig absMan _ _ _ _ _ _ =
+         let val Coq_mkAmConfig absMan _ _ _ _ _ =
            let val Coq_mkAM_St _ _ amConfig = st in amConfig end
          in
          absMan end
        in
-       policy end))) : coq_PolicyT coq_AM
+       policy end))
 
 (** val check_disclosure_policy :
     coq_Term -> coq_Plc -> coq_Evidence -> unit coq_AM **)

@@ -38,8 +38,8 @@ fun run_am_app_comp_init am_comp st default_A b = case b of
 (** val get_AM_amConfig : coq_AM_Config coq_AM **)
 
 val get_AM_amConfig =
-  (bind get (fn st =>
-    ret (let val Coq_mkAM_St _ _ amConfig = st in amConfig end))) : coq_AM_Config coq_AM
+  bind get (fn st =>
+    ret (let val Coq_mkAM_St _ _ amConfig = st in amConfig end))
 
 (** val put_amConfig : coq_AM_Config -> unit coq_AM **)
 

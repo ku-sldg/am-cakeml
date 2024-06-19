@@ -1,21 +1,38 @@
-(** val cons_gg :
-    coq_BS -> coq_EvC -> coq_Plc -> coq_ASP_PARAMS -> coq_EvC **)
+(** val extd_bundle :
+    coq_RawEv -> coq_EvC -> coq_Plc -> nat -> coq_ASP_PARAMS -> (coq_EvC,
+    coq_StringT) coq_ResultT **)
 
-fun cons_gg sig0 e p ps =
+fun extd_bundle sig0 e p n ps =
   let val Coq_evc bits et = e in
-  Coq_evc (sig0 :: bits) (Coq_uu p EXTD ps et) end
+  (case eqb (length sig0) n of
+     True => Coq_resultC (Coq_evc (app sig0 bits) (Coq_uu p (EXTD n) ps et))
+   | False => Coq_errC errStr_raw_evidence_too_long) end
 
-(** val cons_hsh :
-    coq_BS -> coq_EvC -> coq_Plc -> coq_ASP_PARAMS -> coq_EvC **)
+(** val comp_bundle :
+    coq_RawEv -> coq_EvC -> coq_Plc -> coq_ASP_PARAMS -> (coq_EvC,
+    coq_StringT) coq_ResultT **)
 
-fun cons_hsh hsh e p ps =
-  let val Coq_evc _ et = e in Coq_evc (hsh :: []) (Coq_uu p COMP ps et) end
+fun comp_bundle hsh e p ps =
+  let val Coq_evc _ et = e in
+  (case hsh of
+     [] => Coq_errC errStr_empty_raw_ev
+   | h :: l =>
+     (case l of
+        [] => Coq_resultC (Coq_evc (h :: []) (Coq_uu p COMP ps et))
+      | _ :: _ => Coq_errC errStr_raw_evidence_too_long)) end
 
-(** val cons_enc :
-    coq_BS -> coq_EvC -> coq_Plc -> coq_ASP_PARAMS -> coq_EvC **)
+(** val encr_bundle :
+    coq_RawEv -> coq_EvC -> coq_Plc -> coq_ASP_PARAMS -> (coq_EvC,
+    coq_StringT) coq_ResultT **)
 
-fun cons_enc enc e p ps =
-  let val Coq_evc _ et = e in Coq_evc (enc :: []) (Coq_uu p ENCR ps et) end
+fun encr_bundle enc e p ps =
+  let val Coq_evc _ et = e in
+  (case enc of
+     [] => Coq_errC errStr_empty_raw_ev
+   | h :: l =>
+     (case l of
+        [] => Coq_resultC (Coq_evc (h :: []) (Coq_uu p ENCR ps et))
+      | _ :: _ => Coq_errC errStr_raw_evidence_too_long)) end
 
 (** val ss_cons : coq_EvC -> coq_EvC -> coq_EvC **)
 

@@ -16,23 +16,27 @@ type coq_Event_ID = nat
 
 type coq_ASP_ID = coq_ID_Type
 
+(** val coq_ASP_ID_to_stringT : coq_ASP_ID -> coq_StringT **)
+
+val coq_ASP_ID_to_stringT =
+  coq_ID_Type_to_stringT
+
 type coq_TARG_ID = coq_ID_Type
 
-datatype coq_Resource_ID_Arg =
-  Rid_Arg_C1 
-| Rid_Arg_C2 
+(** val coq_TARG_ID_to_stringT : coq_TARG_ID -> coq_StringT **)
 
-datatype coq_Arg =
-  Arg_ID coq_ID_Type
-| Arg_ResID coq_Resource_ID_Arg
+val coq_TARG_ID_to_stringT =
+  coq_ID_Type_to_stringT
+
+type coq_ASP_ARGS = (coq_StringT, coq_StringT) coq_MapC
 
 datatype coq_ASP_PARAMS =
-  Coq_asp_paramsC coq_ASP_ID (coq_Arg list) coq_Plc coq_TARG_ID
+  Coq_asp_paramsC coq_ASP_ID coq_ASP_ARGS coq_Plc coq_TARG_ID
 
 datatype coq_FWD =
   COMP 
 | ENCR 
-| EXTD 
+| EXTD nat
 | KILL 
 | KEEP 
 
@@ -78,10 +82,12 @@ datatype coq_Core_Term =
 | Coq_bseqc coq_Core_Term coq_Core_Term
 | Coq_bparc coq_Loc coq_Core_Term coq_Core_Term
 
+type coq_RawEv = coq_BS list
+
 datatype coq_AppResultC =
   Coq_mtc_app 
 | Coq_nnc_app coq_N_ID coq_BS
-| Coq_ggc_app coq_Plc coq_ASP_PARAMS coq_BS coq_AppResultC
+| Coq_ggc_app coq_Plc coq_ASP_PARAMS coq_RawEv coq_AppResultC
 | Coq_hhc_app coq_Plc coq_ASP_PARAMS coq_BS coq_AppResultC
 | Coq_eec_app coq_Plc coq_ASP_PARAMS coq_BS coq_AppResultC
 | Coq_ssc_app coq_AppResultC coq_AppResultC

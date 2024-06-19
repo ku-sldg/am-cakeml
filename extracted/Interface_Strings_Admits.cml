@@ -62,3 +62,28 @@ val coq_STR_REQUEST =
 
 val coq_STR_RESPONSE =
   failwith "AXIOM TO BE REALIZED"
+
+(** val coq_STR_ASP_RUN : coq_StringT **)
+
+val coq_STR_ASP_RUN =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val coq_STR_ASP_ID : coq_StringT **)
+
+val coq_STR_ASP_ID =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val coq_STR_ASP_ARGS : coq_StringT **)
+
+val coq_STR_ASP_ARGS =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val coq_STR_TARG_PLC : coq_StringT **)
+
+val coq_STR_TARG_PLC =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val coq_STR_TARG : coq_StringT **)
+
+val coq_STR_TARG =
+  failwith "AXIOM TO BE REALIZED"

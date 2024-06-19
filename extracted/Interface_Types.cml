@@ -17,6 +17,12 @@ datatype coq_ProtocolAppraiseRequest =
 datatype coq_ProtocolAppraiseResponse =
   Coq_mkPAResp bool coq_AppResultC
 
+datatype coq_ASPRunRequest =
+  Coq_mkASPRReq coq_ASP_ID coq_ASP_ARGS coq_Plc coq_TARG_ID coq_RawEv
+
+datatype coq_ASPRunResponse =
+  Coq_mkASPRResp bool coq_RawEv
+
 datatype coq_AM_Protocol_Requests =
   Protocol_Run_Request coq_ProtocolRunRequest
 | Protocol_Negotiate_Request coq_ProtocolNegotiateRequest

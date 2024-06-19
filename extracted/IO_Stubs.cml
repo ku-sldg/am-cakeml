@@ -1,11 +1,12 @@
-(** val encodeEvRaw : coq_RawEv -> coq_BS **)
-
-val encodeEvRaw =
-  failwith "AXIOM TO BE REALIZED"
-
 (** val make_JSON_Network_Request : coq_UUID -> coq_JSON -> coq_JSON **)
 
 val make_JSON_Network_Request =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val make_JSON_FS_Location_Request :
+    coq_FS_Location -> coq_JSON -> coq_JSON **)
+
+val make_JSON_FS_Location_Request =
   failwith "AXIOM TO BE REALIZED"
 
 (** val parallel_vm_thread : coq_Loc -> coq_EvC **)

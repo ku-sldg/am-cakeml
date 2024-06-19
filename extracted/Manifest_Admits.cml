@@ -1,4 +1,4 @@
-type coq_ASP_Address (* AXIOM TO BE REALIZED *)
+type coq_FS_Location (* AXIOM TO BE REALIZED *)
 
 type coq_UUID (* AXIOM TO BE REALIZED *)
 

@@ -8,6 +8,11 @@ val errStr_amNonce =
 val errStr_peel_bs_am =
   failwith "AXIOM TO BE REALIZED"
 
+(** val errStr_peel_n_am : coq_StringT **)
+
+val errStr_peel_n_am =
+  failwith "AXIOM TO BE REALIZED"
+
 (** val errStr_disclosePolicy : coq_StringT **)
 
 val errStr_disclosePolicy =
@@ -16,6 +21,16 @@ val errStr_disclosePolicy =
 (** val errStr_et_size : coq_StringT **)
 
 val errStr_et_size =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val errStr_empty_raw_ev : coq_StringT **)
+
+val errStr_empty_raw_ev =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val errStr_raw_evidence_too_long : coq_StringT **)
+
+val errStr_raw_evidence_too_long =
   failwith "AXIOM TO BE REALIZED"
 
 (** val errStr_remote_am_failure : coq_StringT **)

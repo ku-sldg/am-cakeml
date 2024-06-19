@@ -1,22 +1,18 @@
+datatype coq_ASP_Locator =
+  Local_ASP coq_FS_Location
+| Remote_ASP coq_UUID
+
 datatype coq_DispatcherErrors =
   Unavailable 
 | Runtime coq_StringT
 
-type coq_CallBackErrors =
-  coq_StringT
-  (* singleton inductive, whose constructor was messageLift *)
-
 type 'errType coq_ASPCallback =
-  coq_ASP_PARAMS -> coq_Plc -> coq_BS -> coq_RawEv -> (coq_BS, 'errType)
-  coq_ResultT
+  coq_ASP_PARAMS -> coq_RawEv -> (coq_RawEv, 'errType) coq_ResultT
 
 type coq_PubKeyCallback =
   coq_Plc -> (coq_PublicKey, coq_DispatcherErrors) coq_ResultT
 
 type coq_PlcCallback = coq_Plc -> (coq_UUID, coq_DispatcherErrors) coq_ResultT
-
-type coq_UUIDCallback =
-  coq_UUID -> (coq_Plc, coq_DispatcherErrors) coq_ResultT
 
 type coq_PolicyT = (coq_Plc, coq_ASP_ID) prod list
 
@@ -37,30 +33,23 @@ val empty_Manifest =
     manifest_set_empty manifest_set_empty manifest_set_empty empty_PolicyT
 
 datatype coq_AM_Library =
-  Build_AM_Library ((coq_ASP_Address -> coq_CallBackErrors coq_ASPCallback))
-   ((coq_ASP_Address -> coq_PubKeyCallback))
-   ((coq_ASP_Address -> coq_PlcCallback))
-   ((coq_ASP_Address -> coq_UUIDCallback)) coq_UUID coq_ASP_Address
-   coq_ASP_Address coq_ASP_Address coq_ASP_Address
-   ((coq_ASP_ID, coq_CallBackErrors coq_ASPCallback) coq_MapC)
-   (((coq_Plc, coq_ASP_ID) prod, coq_CallBackErrors coq_ASPCallback) coq_MapC)
+  Build_AM_Library coq_UUID ((coq_ASP_ID, coq_ASP_Locator) coq_MapC)
+   (((coq_Plc, coq_ASP_ID) prod, coq_ASP_Locator) coq_MapC)
    ((coq_Plc, coq_UUID) coq_MapD) ((coq_Plc, coq_PublicKey) coq_MapD)
 
 datatype coq_AM_Config =
   Coq_mkAmConfig coq_Manifest coq_UUID (coq_DispatcherErrors coq_ASPCallback)
    (coq_DispatcherErrors coq_ASPCallback) coq_PlcCallback coq_PubKeyCallback
-   coq_UUIDCallback
 
 (** val empty_aspCb :
-    coq_ASP_PARAMS -> coq_Plc -> coq_BS -> coq_RawEv -> (coq_BS,
-    coq_DispatcherErrors) coq_ResultT **)
+    coq_ASP_PARAMS -> coq_RawEv -> (coq_RawEv, coq_DispatcherErrors)
+    coq_ResultT **)
 
-fun empty_aspCb _ _ _ _ =
+fun empty_aspCb _ _ =
   Coq_errC Unavailable
 
 (** val empty_am_config : coq_AM_Config **)
 
 val empty_am_config =
   Coq_mkAmConfig empty_Manifest default_uuid empty_aspCb empty_aspCb (fn _ =>
-    Coq_errC Unavailable) (fn _ => Coq_errC Unavailable) (fn _ => Coq_errC
-    Unavailable)
+    Coq_errC Unavailable) (fn _ => Coq_errC Unavailable)

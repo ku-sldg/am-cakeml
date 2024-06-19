@@ -51,3 +51,23 @@ val coq_STR_REQUEST = "REQUEST"
 (** val coq_STR_RESPONSE : coq_StringT **)
 
 val coq_STR_RESPONSE = "RESPONSE"
+
+(** val coq_STR_ASP_RUN : coq_StringT **)
+
+val coq_STR_ASP_RUN = "ASP_RUN"
+
+(** val coq_STR_ASP_ID : coq_StringT **)
+
+val coq_STR_ASP_ID = "ASP_ID"
+
+(** val coq_STR_ASP_ARGS : coq_StringT **)
+
+val coq_STR_ASP_ARGS = "ASP_ARGS"
+
+(** val coq_STR_TARG_PLC : coq_StringT **)
+
+val coq_STR_TARG_PLC = "TARG_PLC"
+
+(** val coq_STR_TARG : coq_StringT **)
+
+val coq_STR_TARG = "TARG"

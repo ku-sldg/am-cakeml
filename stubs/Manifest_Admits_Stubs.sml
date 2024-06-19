@@ -1,4 +1,7 @@
 
+(* Used for locating something on the local filesystem *)
+type coq_FS_Location = string
+
 type coq_ASP_Address = string (* AXIOM TO BE REALIZED *)
 
 type coq_UUID = string (* AXIOM TO BE REALIZED *)
