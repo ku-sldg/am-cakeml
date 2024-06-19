@@ -5,13 +5,6 @@ fun appraise_asp_stub ps e =
     case ps of Coq_asp_paramsC aspid args tpl tid =>
                let val _ = (print ("Matched aspid:  " ^ aspid ^ "\n");
                             print ("Performing ASP " ^ aspid ^ "\n\n")) 
-
-
-
-
-
-
-
                     (*
 
                     val my_amlib = ManifestUtils.get_local_amLib ()
@@ -31,17 +24,6 @@ fun appraise_asp_stub ps e =
                     
 
                     *)
-               
-
-
-
-
-
-
-
-
-
-
               (*
 
               (** val run_appraisal_client :
@@ -198,107 +180,3 @@ fun appraise_asp_stub ps e =
                    in
                    Coq_resultC (passed_bs)
                end
-
-(*
-datatype coq_AM_Config =
-  Coq_mkAmConfig coq_Manifest (coq_DispatcherErrors coq_ASPCallback)
-   (coq_DispatcherErrors coq_ASPCallback) coq_PlcCallback coq_PubKeyCallback
-   coq_UUIDCallback
-*)
-
-
-(*
-
-(** val map_get :
-    'a1 coq_EqClass -> ('a1, 'a2) coq_MapC -> 'a1 -> 'a2 option **)
-
-fun map_get h m x =
-  case m of
-    [] => None
-  | p :: m' =>
-    let val Coq_pair k v = p in
-    (case eqb h k x of
-       True => Some v
-     | False => map_get h m' x) end
-
-
-map_get (pair_EqClass coq_Eq_Class_ID_Type coq_Eq_Class_ID_Type)
-          shrunk_map (Coq_pair p aspid)
-
-
-*)
-
-
-(*
-
-datatype coq_AM_Library =
-  Build_AM_Library ((coq_ASP_Address -> coq_CallBackErrors coq_ASPCallback))
-   ((coq_ASP_Address -> coq_PubKeyCallback))
-   ((coq_ASP_Address -> coq_PlcCallback))
-   ((coq_ASP_Address -> coq_UUIDCallback)) coq_ASP_Address coq_ASP_Address
-   coq_ASP_Address coq_ASP_Address
-   ((coq_ASP_ID, coq_CallBackErrors coq_ASPCallback) coq_MapC)
-   (((coq_Plc, coq_ASP_ID) prod, coq_CallBackErrors coq_ASPCallback) coq_MapC)
-   ((coq_Plc, coq_UUID) coq_MapD) ((coq_Plc, coq_PublicKey) coq_MapD)
-
-
-
-*)
-
-(*
-
-(* evToString :: Evidence -> string *)  
-
-(* rawEvToString :: coq_RawEv -> string *)
-
-
-*)
-
-
-(*
-
-get_AM_config
-
-datatype coq_AM_St =
-  Coq_mkAM_St ((coq_N_ID, coq_BS) coq_MapC) coq_N_ID coq_AM_Config
-
-(** val empty_amst : coq_AM_St **)
-
-val empty_amst : coq_AM_St =
-  Coq_mkAM_St (map_empty nat_EqClass) O empty_am_config
-
-
-*)
-
-(*
-(** val map_set :
-    'a1 coq_EqClass -> ('a1, 'a2) coq_MapC -> 'a1 -> 'a2 -> ('a1, 'a2)
-    coq_MapC **)
-
-fun map_set h m x v =
-  case m of
-    [] => (Coq_pair x v) :: []
-*)
-
-
-(* 
-
-datatype coq_AppResultC =
-  Coq_mtc_app 
-| Coq_nnc_app coq_N_ID coq_BS
-| Coq_ggc_app coq_Plc coq_ASP_PARAMS coq_BS coq_AppResultC
-| Coq_hhc_app coq_Plc coq_ASP_PARAMS coq_BS coq_AppResultC
-| Coq_eec_app coq_Plc coq_ASP_PARAMS coq_BS coq_AppResultC
-| Coq_ssc_app coq_AppResultC coq_AppResultC
-
-*)
-
-(*
-
-(* am_result_ToString :: coq_AM_Result -> string *)
-fun am_result_ToString e = 
-  case e of 
-      Coq_am_rawev e' => "RawEv AM result: \n" ^ (rawEvToString e')
-    | Coq_am_appev e' => "AppResultC AM result: \n" ^ (evidenceCToString e')
-
-*)

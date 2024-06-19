@@ -17,12 +17,13 @@ fun appraise_inline_asp_stub ps e =
 
                     let val appServerAddr = 
                           case my_amlib of  
-                            Build_AM_Library _ _ _ _ addr _ _ _ _ _ _ _ _ => addr
+                            Build_AM_Library addr _ _ _ _ => addr
 
-                        val appRequestArg = List.hd args 
                         val appRequestString =
-                          case appRequestArg of 
-                            Arg_ID s => s
+                          case map_get coq_Eq_Class_ID_Type args "APPR_INLINE" of
+                            Some s => s
+                          | None => raise (Exception "Error:  expected 'APPR_INLINE' arg in 'appraise_inline_asp_stub'...")
+                        
                         val inStrJson = case Json.parse appRequestString of
                                           Err e => raise (Exception e)
                                         | Ok j => case cakeML_JSON_to_coq_JSON j of

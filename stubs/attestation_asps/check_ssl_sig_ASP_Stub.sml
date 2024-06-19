@@ -10,9 +10,9 @@ fun check_ssl_sig_asp_stub ps e =
 
                     val appServerAddr = 
                       case my_amlib of  
-                            Build_AM_Library _ _ _ _ addr _ _ _ _ _ _ _ _ => addr
+                            Build_AM_Library addr _ _ _ _ => addr
 
-                    val appTerm = (Coq_asp (ASPC ALL EXTD (Coq_asp_paramsC ssl_sig_aspid []
+                    val appTerm = (Coq_asp (ASPC ALL (EXTD (S O)) (Coq_asp_paramsC ssl_sig_aspid []
                                    coq_P0 sys)))
 
 
