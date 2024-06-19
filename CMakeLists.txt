@@ -75,6 +75,8 @@ get_files(cop_src_pre_aspStubs
     extracted/Datatypes.cml
     extracted/EqClass.cml
     extracted/List.cml
+    extracted/Maps.cml
+    stubs/Maps_Helpers.sml
     stubs/AbstractedTypes.sml
     extracted/Term_Defs_Core.cml
     extracted/Eqb_Evidence.cml
@@ -85,8 +87,6 @@ get_files(cop_src_pre_aspStubs
     copland/json/JsonToCopland.sml
     stubs/Term_Defs_Admits.sml
     extracted/Anno_Term_Defs.cml
-    extracted/Maps.cml
-    stubs/Maps_Helpers.sml
     extracted/JSON_Type.cml
     stubs/JSON_Admits.sml
     stubs/Interface_Strings_Admits.sml
@@ -108,13 +108,13 @@ get_files(cop_src_pre_aspStubs
     extracted/ManCompSoundness_Helpers.cml
     extracted/ManCompSoundness.cml
     extracted/Manifest_Generator_Union.cml
+    stubs/IO_Stubs.sml
     extracted/Manifest_Compiler.cml
     extracted/Cvm_St.cml
     extracted/AM_St.cml
     copland/json/ManifestJsonConfig.sml
     util/ManifestUtils.sml
     # am/CoplandCommUtil.sml
-    stubs/IO_Stubs.sml
     stubs/Axioms_Io.sml
     extracted/Evidence_Bundlers.cml
     extracted/Cvm_Monad.cml

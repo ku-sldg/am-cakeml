@@ -33,8 +33,15 @@ fun make_JSON_Network_Request (u : coq_UUID) (js : coq_JSON) =
 (** val make_JSON_FS_Location_Request :
     coq_FS_Location -> coq_JSON -> coq_JSON **)
 
-val make_JSON_FS_Location_Request =
-  failwith "AXIOM TO BE REALIZED"
+fun make_JSON_FS_Location_Request (loc : coq_FS_Location) (js : coq_JSON) =
+  (let val resp = c_system_string (loc ^ " " ^ (coq_JSON_to_stringT js))
+      val resp_js = stringT_to_JSON resp
+  in
+  (* TODO: I should really be managing with a resultC rather than alway JS response *)
+    case (stringT_to_JSON resp) of 
+      Coq_errC e => JSON_Object ((Coq_pair coq_STR_SUCCESS (JSON_Boolean False)) :: [])
+    | Coq_resultC js => js
+  end) : coq_JSON
 
 (* NOTE: Deprecated Features 
 (** val do_asp :
@@ -120,6 +127,8 @@ fun appraise_auth_tok appres = True
 
 (** val is_local_appraisal : coq_AM_Library -> bool **)
 fun is_local_appraisal amLib =
+  raise (Exception "is_local_appraisal does not work properly i think")
+(* NOTE: This is the old code it would run, but it didnt seem right to me
   case amLib of 
     Build_AM_Library _
    _
@@ -129,8 +138,8 @@ fun is_local_appraisal amLib =
    _
    _
    _ => addr = ""
+*)
   
-  (* failwith "AXIOM TO BE REALIZED" *)
 
 
 (** val lib_supports_manifest_bool :

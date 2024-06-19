@@ -57,23 +57,23 @@ val store_args = []
 (** val appraise_inline_args : coq_Arg list **)
 (* NOTE: These functions seems worthless, 
 nothing is actually happening I feel like? *)
-val appraise_inline_args : coq_Arg list = 
+val appraise_inline_args : coq_ASP_ARGS = 
   let val appTerm = example_phrase_p2_appraise
       val appReq = (Coq_mkPAReq appTerm coq_P1 (Coq_nn O) [])
       val jsonAppReq = coq_ProtocolAppraiseRequest_to_JSON appReq
       val strJsonAppReq = coq_JSON_to_stringT jsonAppReq in
-        [Arg_ID (strJsonAppReq)]
+        [Coq_pair "APPR_INLINE" (strJsonAppReq)]
   end
   (* failwith "AXIOM TO BE REALIZED"  *)
 
 (** val check_ssl_sig_args : coq_Arg list **)
-val check_ssl_sig_args : coq_Arg list = 
-  let val appTerm = (Coq_asp (ASPC ALL EXTD (Coq_asp_paramsC ssl_sig_aspid []
+val check_ssl_sig_args : coq_ASP_ARGS = 
+  let val appTerm = (Coq_asp (ASPC ALL (EXTD (S O)) (Coq_asp_paramsC ssl_sig_aspid []
                                    coq_P0 sys)))
       val appReq = (Coq_mkPAReq appTerm coq_P0 (Coq_nn O) [])
       val jsonAppReq = coq_ProtocolAppraiseRequest_to_JSON appReq
       val strJsonAppReq = coq_JSON_to_stringT jsonAppReq in
-        [Arg_ID (strJsonAppReq)]
+        [Coq_pair "CHECK_SSL_SIG" (strJsonAppReq)]
   end
 
 

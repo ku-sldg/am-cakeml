@@ -6,7 +6,6 @@ structure ManifestUtils = struct
   type Partial_ASP_CB     = coq_DispatcherErrors coq_ASPCallback
   type Partial_Plc_CB     = coq_PlcCallback
   type Partial_PubKey_CB  = coq_PubKeyCallback
-  type Partial_UUID_CB    = coq_UUIDCallback
 
   type AM_Config = coq_AM_Config 
 
@@ -23,8 +22,6 @@ structure ManifestUtils = struct
   val local_plcCb = Ref (Err "Plc Callback not set") : ((Partial_Plc_CB, string) result) ref
 
   val local_pubKeyCb = Ref (Err "PubKey Callback not set") : ((Partial_PubKey_CB, string) result) ref
-
-  val local_uuidCb = Ref (Err "UUID callback not set") : ((Partial_UUID_CB, string) result) ref
 
   val local_PrivKey = Ref (Err "Private Key not set") : ((privateKey_t, string) result) ref
   
@@ -68,15 +65,14 @@ structure ManifestUtils = struct
       : coq_Manifest -> coq_AM_Library -> () *)
   fun setup_AM_config (fm : coq_Manifest) (al : coq_AM_Library) (privKey : privateKey_t) (* (t:coq_Term) *) =
     (case (manifest_compiler fm al) of
-      Coq_mkAmConfig compiled_fm clone_uuid aspDisp appDisp plcDisp pubKeyDisp uuidDisp =>
+      Coq_mkAmConfig compiled_fm clone_uuid aspDisp appDisp plcDisp pubKeyDisp =>
         let val _ = local_formal_manifest := Ok compiled_fm
             val _ = local_uuid_clone := Ok clone_uuid
             val _ = local_aspCb := Ok aspDisp
             val _ = local_plcCb := Ok plcDisp
             val _ = local_pubKeyCb := Ok pubKeyDisp
-            val _ = local_uuidCb := Ok uuidDisp
             val _ = local_PrivKey := Ok privKey
-            val _ = local_amConfig := Ok (Coq_mkAmConfig compiled_fm clone_uuid aspDisp appDisp plcDisp pubKeyDisp uuidDisp)
+            val _ = local_amConfig := Ok (Coq_mkAmConfig compiled_fm clone_uuid aspDisp appDisp plcDisp pubKeyDisp)
             val _ = local_amLib := Ok al
         in
           ()
@@ -125,14 +121,6 @@ structure ManifestUtils = struct
       (Ok v) => v
       | Err e => raise Excn e) : coq_PubKeyCallback
 
-  (* Retrieves the asp callback, or exception if not configured 
-    : _ -> coq_UUIDCallback *)
-  fun get_UUIDCallback _ =
-    (
-      case (!local_uuidCb) of
-      (Ok v) => v
-      | Err e => raise Excn e) : coq_UUIDCallback
-
   
   (* Retrieves the uuid corresponding to this processes Manifest/AM_Config
       throws an exception if configuration not completed
@@ -165,9 +153,8 @@ structure ManifestUtils = struct
         val aspCb = get_ASPCallback()
         val plcCb = get_PlcCallback()
         val pubKeyCb = get_PubKeyCallback()
-        val uuidCb = get_UUIDCallback()
     in
-      Coq_mkAmConfig fm clone_uuid aspCb aspCb plcCb pubKeyCb uuidCb
+      Coq_mkAmConfig fm clone_uuid aspCb aspCb plcCb pubKeyCb 
     end) : AM_Config
 
   (* Directly combines setup and get steps in one function call. 

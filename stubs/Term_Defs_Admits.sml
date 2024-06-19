@@ -87,5 +87,4 @@ val stringT_to_RawEv = fn s =>
 
 (** val coq_ASP_ARGS_to_stringT : coq_ASP_ARGS -> coq_StringT **)
 
-val coq_ASP_ARGS_to_stringT =
-  failwith "AXIOM TO BE REALIZED"
+val coq_ASP_ARGS_to_stringT = coq_ASP_ARGS_to_string

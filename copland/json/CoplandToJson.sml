@@ -6,7 +6,7 @@ fun stringToJson s = Json.fromString s
 
 fun stringListToJsonList args  =  Json.fromList (List.map stringToJson args) 
 
-fun byteStringToJson bs = Json.fromString (BString.show bs)
+fun coq_BS_to_Json bs = Json.fromString (BString.show bs)
 
 fun aspIdToJson i = Json.fromString i
 
@@ -19,7 +19,7 @@ fun placeToJson pl = Json.fromString pl
 
 fun placeListToJsonList ids = Json.fromList (List.map placeToJson ids)
 
-fun bsListToJsonList args  =  Json.fromList (List.map byteStringToJson args)
+fun coq_RawEv_to_Json args  =  Json.fromList (List.map coq_BS_to_Json args)
 
 (* spPairToJson : (coq_SP * coq_SP) -> json *)
 fun spPairToJson (sp1, sp2) =
@@ -88,34 +88,7 @@ fun spToJson sp = noArgConstructor (spToString sp)
 
 fun fwdToJson fwd = noArgConstructor (fwdToString fwd)
 
-
-(*
-(* : coq_Resource_ID_Arg -> json *)
-fun argResIDToJson rid = noArgConstructor (ridToString rid)
-
-(*
-datatype coq_Arg =
-  Arg_ID coq_ID_Type
-| Arg_ResID coq_Resource_ID_Arg
-*)
-fun argToJson arg = 
-  case arg of 
-    Arg_ID s => constructorWithArgs "Arg_ID" [stringToJson s]
-  | Arg_ResID rid => constructorWithArgs "Arg_ResID" [argResIDToJson rid]  (* [(stringToJson (ridToString rid))] *)
-
-fun argListToJsonList args  =  Json.fromList (List.map argToJson args)
-
-*)
-
-(* : coq_Resource_ID_Arg -> json *)
-fun argResIDToJson rid = noArgConstructor (ridToString rid)
-
-(* : coq_Arg -> json *)
-fun argToJson arg = case arg of
-                     Arg_ID s => constructorWithArgs "Arg_ID" [stringToJson s]
-                   | Arg_ResID rid => constructorWithArgs "Arg_ResID" [argResIDToJson rid]
-
-fun argListToJsonList args  =  Json.fromList (List.map argToJson args) 
+fun coq_ASP_ARGS_to_Json x = coq_MapC_to_Json x (fn x => x)
 
 (* aspParamsToJson : coq_ASP_PARAMS -> json *)                               
 fun aspParamsToJson ps =
@@ -123,7 +96,7 @@ fun aspParamsToJson ps =
         Coq_asp_paramsC i args tpl tid =>
         constructorWithArgs "Asp_paramsC"
                             [aspIdToJson i,
-                             argListToJsonList args,
+                             coq_ASP_ARGS_to_Json args,
                              placeToJson tpl,
                              targIdToJson tid]
 
@@ -179,24 +152,24 @@ fun appResultToJson e = case e of
                       Coq_mtc_app => noArgConstructor "mtc_app"
                     | Coq_nnc_app nid bs => 
                       constructorWithArgs "nnc_app" [intToJson (natToInt nid), 
-                                                     (byteStringToJson bs)]
+                                                     (coq_BS_to_Json bs)]
                     | Coq_ggc_app p ps bs e' =>
                      constructorWithArgs "ggc_app"
                                          [ placeToJson p,
                                            aspParamsToJson ps,
-                                           byteStringToJson bs,
+                                           coq_RawEv_to_Json bs,
                                            appResultToJson e' ]
                     | Coq_hhc_app p ps bs e' =>
                      constructorWithArgs "hhc_app"
                                          [ placeToJson p,
                                            aspParamsToJson ps,
-                                           byteStringToJson bs,
+                                           coq_BS_to_Json bs,
                                            appResultToJson e' ]
                     | Coq_eec_app p ps bs e' =>
                      constructorWithArgs "eec_app"
                                          [ placeToJson p,
                                            aspParamsToJson ps,
-                                           byteStringToJson bs,
+                                           coq_BS_to_Json bs,
                                            appResultToJson e' ]
                   
                    | Coq_ssc_app e1 e2 =>
@@ -206,31 +179,5 @@ fun appResultToJson e = case e of
 
 fun evcToJson e =
     case e of
-        Coq_evc ev et => constructorWithArgs "EvC" [ bsListToJsonList ev,
+        Coq_evc ev et => constructorWithArgs "EvC" [ coq_RawEv_to_Json ev,
                                                      evToJson et ]
-
-(* NOTE: These are no longer necessary I think 
-
-(* fun requestToJson : coq_CvmRequestMessage -> coq_JsonT *)
-fun requestToJson (REQ t authTok ev) = Json.fromPairList
-    [("reqTerm", termToJson t), 
-     ("reqAuthTok", evcToJson authTok), 
-     ("reqEv", bsListToJsonList ev)]
-
-(* fun responseToJson : coq_CvmResponseMessage -> coq_JsonT *)
-fun responseToJson (ev) = Json.fromPairList
-    [("respEv", bsListToJsonList ev)]
-
-
-(* fun appRequestToJson : coq_AppraisalRequestMessage -> coq_JsonT *)
-fun appRequestToJson (REQ_APP t p et ev) = Json.fromPairList
-    [("appReqTerm", termToJson t), 
-     ("appReqPlc", placeToJson p), 
-     ("appReqEt", evToJson et), 
-     ("appReqEv", bsListToJsonList ev)]
-
-(* fun appResponseToJson : coq_AppraisalResponseMessage -> coq_JsonT *)
-fun appResponseToJson (appres) = Json.fromPairList
-    [("appRespRes", appResultToJson appres)]
-
-*)

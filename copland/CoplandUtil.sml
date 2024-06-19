@@ -9,30 +9,16 @@ fun aspIdToString s = s
 (* targIdToString : coq_TARG_ID -> string *)
 fun targIdToString s = s
 
-(*
-datatype coq_Arg =
-  Arg_ID coq_ID_Type
-| Arg_ResID coq_Resource_ID_Arg
-*)
-
-(* : coq_Resource_ID_Arg -> string *)
-fun ridToString rid = 
-  case rid of 
-    Rid_Arg_C1 => "Rid_Arg_C1"
-  | Rid_Arg_C2 => "Rid_Arg_C2"  
-
-(* argToString : coq_Arg -> string *)
-fun argToString x = 
-  case x of 
-    Arg_ID s => s 
-  | Arg_ResID rid => ridToString rid
+(* argToString : coq_ASP_ARGS -> string *)
+fun coq_ASP_ARGS_to_string x = 
+  Json.stringify (coq_MapC_to_Json x (fn x => x))
 
 (* aspParamsToString : coq_ASP_PARAMS -> string *)
 fun aspParamsToString ps =
     case ps of
         Coq_asp_paramsC aspid args tpl tid =>
         concatWith " " ["(ASP_PARAMS", aspIdToString aspid,
-                        listToString args argToString,
+                        coq_ASP_ARGS_to_string args,
                         plToString tpl, targIdToString tid, ")"]
 (* spToString : coq_SP -> string *)
 fun spToString sp =
@@ -44,7 +30,7 @@ fun spToString sp =
 fun fwdToString fwd =
     case fwd of
         COMP => "COMP"
-      | EXTD => "EXTD"
+      | (EXTD n) => "(EXTD " ^ (natToString n) ^ ")"
       | ENCR => "ENCR"
       | KILL => "KILL"
       | KEEP => "KEEP"
@@ -94,15 +80,18 @@ fun evToString e = concatWith " "
         | Coq_ss ev1 ev2   => ["SS_E", parens ev1, parens ev2]
     end
 
+(* rawEvToString :: coq_RawEv -> string *)
+fun rawEvToString e = listToString e BString.toString
+
 (* evidenceCToString :: coq_AppResultC -> string *)
 fun evidenceCToString e = concatWith " "
     let fun parens e = "(" ^ evidenceCToString e ^ ")"
      in case e of
             Coq_mtc_app         => ["Mtc"]
           | Coq_nnc_app i bs => ["NNc", nIdToString i, BString.toString bs]
-          | Coq_ggc_app p ps bs e' =>
+          | Coq_ggc_app p ps rawEv e' =>
             ["GGc", plToString p, aspParamsToString ps,
-             BString.toString bs, parens e' ]
+              rawEvToString rawEv, parens e' ]
           | Coq_hhc_app p ps bs e' => ["HHc", plToString p, aspParamsToString ps,
                                    BString.toString bs, parens e' (* evToString et *)]
           | Coq_eec_app p ps bs e' => ["EEc", plToString p, aspParamsToString ps,
@@ -111,12 +100,6 @@ fun evidenceCToString e = concatWith " "
                                 evToString et] *)
           | Coq_ssc_app ev1 ev2   => ["SSc", parens ev1, parens ev2]
     end
-
-    
-    
-
-(* rawEvToString :: coq_RawEv -> string *)
-fun rawEvToString e = listToString e BString.toString
 
 (* evCToString : coq_EvC -> string *)
 fun evCToString evc =

@@ -6,15 +6,6 @@ fun spFromString n =
     of  "ALL" => ALL
     |   "NONE" => NONE
 
-(* fwdFromString :: string -> coq_FWD *)
-fun fwdFromString n =
-    case n of
-        "COMP" => COMP
-      | "EXTD" => EXTD
-      | "ENCR" => ENCR
-      | "KILL" => KILL
-      | "KEEP" => KEEP
-
 fun jsonStringToString (Json.String s) = s
 fun jsonStringListToList (Json.Array args) =
     List.map jsonStringToString args
@@ -22,8 +13,8 @@ fun jsonStringListToList (Json.Array args) =
 (* jsonStringToBS : json -> coq_BS *)
 fun jsonStringToBS (Json.String s) = BString.unshow s
 
-(* jsonBsListToList : json -> coq_BS list *)
-fun jsonBsListToList (Json.Array args) =
+(* json_to_coq_RawEv : json -> coq_BS list *)
+fun json_to_coq_RawEv (Json.Array args) =
     List.map jsonStringToBS args
 
 fun jsonIntToNat (Json.Int i) = natFromInt i
@@ -70,61 +61,9 @@ fun json_ObToTerm ob f =
         (Json.Object m) => fromJsonMap m f
      | _ => raise Json.Exn "json_ObToTerm" "expected Json.Object parameter"
 
-
-(*
-(*
-datatype coq_Arg =
-  Arg_ID coq_ID_Type
-| Arg_ResID coq_Resource_ID_Arg
-*)
-
-(* : coq_Resource_ID_Arg -> string *)
-fun ridToString rid = 
-  case rid of 
-    Rid_Arg_C1 => "rid_C1"
-  | Rid_Arg_C2 => "rid_C2"
-*)
-
-(* jsonToArg : json -> coq_Arg *
-   (json object to coq_Arg)  *)      
-fun jsonToArg js = 
-
-(*
-  let val s = (Json.stringify js)
-      val _ = print ("\n\n" ^ s ^ "\n\n" ^ "GOT HERE" ^ "\n\n\n\n\n\n\n\n\n\n") in 
-      *)
-
-      case js of 
-       (Json.Object m) => fromJsonMap m getArg
-      | _ =>   raise Json.Exn "jsonToArg" "Got to this place (not a Json.Object in jsonToArg)"
-    and
-    getArg constructor (Json.Array args) =
-        case constructor of
-            "Arg_ID"  => getArgId args
-          | "Arg_ResID"  => getArgResID args                                         
-          |  _ => raise Json.Exn "getArg"
-                        ("Unexpected constructor for Copland Arg: " ^
-                         constructor)
-    and getArgId args = 
-      case args of
-        [Json.String q] => Arg_ID q 
-
-    and getArgResID args = 
-      case args of
-        [Json.Object ooo] => fromJsonMap ooo getResIdArg
-
-    and getResIdArg constructor blah =
-        case constructor of
-            "Rid_Arg_C1"  => Arg_ResID Rid_Arg_C1
-                              
-          | "Rid_Arg_C2"  => Arg_ResID Rid_Arg_C2                                        
-          |  _ => raise Json.Exn "getResIdArg"
-                        ("Unexpected constructor for Copland Resource_ID_Arg: " ^
-                         constructor)
-
-fun jsonArgListToList args =
-    List.map jsonToArg args
-
+(* Json_to_coq_ASP_ARGS :: json list -> coq_ASP_ARGS *)
+fun json_list_to_coq_ASP_ARGS js_list = 
+  (json_to_coq_MapC (Json.Array js_list) (fn x => x)) : coq_ASP_ARGS
 
 (* getAspParams :: string -> Json.Array(json) -> coq_ASP_PARAMS *)
 fun getAspParams constructor (Json.Array args) =
@@ -142,7 +81,7 @@ fun getAspParams constructor (Json.Array args) =
     getAspParamsArray js = (* Coq_asp_paramsC "" [] O "" *)
       case js of
           [Json.String aspid, (Json.Array arrayArgs), Json.String plc, Json.String targid] =>
-            Coq_asp_paramsC aspid (jsonArgListToList arrayArgs) plc targid
+            Coq_asp_paramsC aspid (json_list_to_coq_ASP_ARGS arrayArgs) plc targid
         | _ => raise Json.Exn "getAspParamsArray" "unexpected Coq_asp_paramsC params"                     
 
 fun jsonToSp js =
@@ -166,12 +105,21 @@ fun jsonToFwd js =
   and
   getFwd constructor (Json.Array args) =
     case constructor of
-        "EXTD" => EXTD
-      | "COMP" => COMP 
+        "COMP" => COMP 
       | "ENCR" => ENCR 
       | "KILL" => KILL
       | "KEEP" => KEEP
-      |  _ => raise Json.Exn "getFwd"
+      | s =>
+          if (String.isPrefix "(EXTD" s andalso String.isSuffix ")" s)
+          then
+            let val n' = (String.substring s 5 (String.size s - 6))
+                val n = case Int.fromString n' of
+                          Some n => n
+                        | None => raise Json.Exn "getFwd" "could not parse EXTD number"
+            in (EXTD (natFromInt n))
+            end
+          else
+            raise Json.Exn "getFwd"
                     ("Unexpected constructor name for Fwd: " ^
                      constructor)
 
@@ -339,9 +287,9 @@ fun jsonToAppResultC js = case (Json.toMap js) of
     and
     getGG args =
     case args of
-        [Json.String q, paramsJsonOb, bs, e'] =>
+        [Json.String q, paramsJsonOb, rawev, e'] =>
         Coq_ggc_app q (json_ObToTerm paramsJsonOb getAspParams)
-                      (jsonStringToBS bs) (jsonToAppResultC e')
+                      (json_to_coq_RawEv rawev) (jsonToAppResultC e')
       | _ => raise Json.Exn "getGG" "unexpected argument list for AppResultC"
     and
     getHH args =
@@ -386,7 +334,7 @@ fun jsonToEvC js = case (Json.toMap js) of (* Json.toMap : json -> ((string,json
                      and                              
                      getEvcArgs args = case args of
                                            [ev, et] =>
-                                           Coq_evc (jsonBsListToList ev) (jsonToEv et)
+                                           Coq_evc (json_to_coq_RawEv ev) (jsonToEv et)
 
 
 
