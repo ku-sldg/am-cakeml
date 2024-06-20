@@ -1,45 +1,23 @@
-(** val fromSome : 'a1 -> ('a1, 'a2) coq_ResultT -> 'a1 **)
+(** val am_error_to_stringT : coq_AM_Error -> coq_StringT **)
 
-fun fromSome default opt = case opt of
-  Coq_errC _ => default
-| Coq_resultC x => x
-
-(** val run_am_app_comp : 'a1 coq_AM -> 'a1 -> bool -> 'a1 **)
-
-fun run_am_app_comp am_comp default_A b = case b of
-  True =>
-  let val optRes = evalErr am_comp empty_amst in
-  let val v =
-    case optRes of
-      Coq_errC e => print_am_error e b
-    | Coq_resultC _ => negb b
-  in
-  (case v of
-     True => default_A
-   | False => fromSome default_A optRes) end end
-| False => default_A
+fun am_error_to_stringT err = case err of
+  Coq_cvm_error _ => errStr_cvm_error
+| Coq_am_error s => s
+| Coq_am_dispatch_error _ => errStr_dispatch_error
 
 (** val run_am_app_comp_init :
-    'a1 coq_AM -> coq_AM_St -> 'a1 -> bool -> 'a1 **)
+    'a1 coq_AM -> coq_AM_St -> ('a1, coq_StringT) coq_ResultT **)
 
-fun run_am_app_comp_init am_comp st default_A b = case b of
-  True =>
-  let val optRes = evalErr am_comp st in
-  let val v =
-    case optRes of
-      Coq_errC e => print_am_error e b
-    | Coq_resultC _ => negb b
-  in
-  (case v of
-     True => default_A
-   | False => fromSome default_A optRes) end end
-| False => default_A
+fun run_am_app_comp_init am_comp st =
+  case fst (am_comp st) of
+    Coq_errC e => Coq_errC (am_error_to_stringT e)
+  | Coq_resultC x => Coq_resultC x
 
 (** val get_AM_amConfig : coq_AM_Config coq_AM **)
 
 val get_AM_amConfig =
-  (bind get (fn st =>
-    ret (let val Coq_mkAM_St _ _ amConfig = st in amConfig end))) : coq_AM_Config coq_AM
+  bind get (fn st =>
+    ret (let val Coq_mkAM_St _ _ amConfig = st in amConfig end))
 
 (** val put_amConfig : coq_AM_Config -> unit coq_AM **)
 

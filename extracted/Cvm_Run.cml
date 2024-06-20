@@ -1,22 +1,38 @@
-(** val run_cvm : coq_Core_Term -> cvm_st -> cvm_st **)
+(** val run_core_cvm :
+    coq_Core_Term -> cvm_st -> (cvm_st, coq_CVM_Error) coq_ResultT **)
+
+fun run_core_cvm t st =
+  let val Coq_pair res st' = build_cvm t st in
+  (case res of
+     Coq_errC e => Coq_errC e
+   | Coq_resultC _ => Coq_resultC st') end
+
+(** val run_cvm :
+    coq_Term -> cvm_st -> (cvm_st, coq_CVM_Error) coq_ResultT **)
 
 fun run_cvm t st =
-  execErr (build_cvm t) st
-
-(** val run_cvm' : coq_Term -> cvm_st -> cvm_st **)
-
-fun run_cvm' t st =
-  run_cvm (copland_compile t) st
+  run_core_cvm (copland_compile t) st
 
 (** val run_cvm_w_config :
-    coq_Term -> coq_RawEv -> coq_AM_Config -> cvm_st **)
+    coq_Term -> coq_RawEv -> coq_AM_Config -> (cvm_st, coq_CVM_Error)
+    coq_ResultT **)
 
 fun run_cvm_w_config t e ac =
-  run_cvm' t (Coq_mk_st (Coq_evc e Coq_mt) [] O ac)
+  run_cvm t (Coq_mk_st (Coq_evc e Coq_mt) [] O ac)
 
 (** val run_cvm_rawEv :
-    coq_Term -> coq_RawEv -> coq_AM_Config -> coq_RawEv **)
+    coq_Term -> coq_RawEv -> coq_AM_Config -> (coq_RawEv, coq_StringT)
+    coq_ResultT **)
 
 fun run_cvm_rawEv t e ac =
-  get_bits
-    (let val Coq_mk_st st_ev _ _ _ = run_cvm_w_config t e ac in st_ev end)
+  case run_cvm_w_config t e ac of
+    Coq_errC e0 =>
+    (case e0 of
+       Coq_at_error_static _ _ _ => Coq_errC errStr_run_cvm_at_error_static
+     | Coq_at_error_dynamic _ _ _ => Coq_errC errStr_run_cvm_at_error_dynamic
+     | Coq_dispatch_error d =>
+       (case d of
+          Unavailable => Coq_errC errStr_dispatch_error
+        | Runtime s => Coq_errC s))
+  | Coq_resultC st =>
+    Coq_resultC (get_bits (let val Coq_mk_st st_ev _ _ _ = st in st_ev end))

@@ -18,6 +18,16 @@ val errStr_peel_n_am =
 val errStr_disclosePolicy =
   failwith "AXIOM TO BE REALIZED"
 
+(** val errStr_dispatch_error : coq_StringT **)
+
+val errStr_dispatch_error =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val errStr_cvm_error : coq_StringT **)
+
+val errStr_cvm_error =
+  failwith "AXIOM TO BE REALIZED"
+
 (** val errStr_et_size : coq_StringT **)
 
 val errStr_et_size =
@@ -51,4 +61,14 @@ val errStr_invalid_request_type =
 (** val errStr_negotiation_not_implemented : coq_StringT **)
 
 val errStr_negotiation_not_implemented =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val errStr_run_cvm_at_error_dynamic : coq_StringT **)
+
+val errStr_run_cvm_at_error_dynamic =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val errStr_run_cvm_at_error_static : coq_StringT **)
+
+val errStr_run_cvm_at_error_static =
   failwith "AXIOM TO BE REALIZED"

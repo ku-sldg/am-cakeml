@@ -34,19 +34,3 @@ fun put s _ =
 
 fun get s =
   Coq_pair (Coq_resultC s) s
-
-(** val runErr :
-    ('a1, 'a2, 'a3) coq_Err -> 'a1 -> (('a2, 'a3) coq_ResultT, 'a1) prod **)
-
-fun runErr h =
-  h
-
-(** val evalErr : ('a1, 'a2, 'a3) coq_Err -> 'a1 -> ('a2, 'a3) coq_ResultT **)
-
-fun evalErr h s =
-  fst (runErr h s)
-
-(** val execErr : ('a1, 'a2, 'a3) coq_Err -> 'a1 -> 'a1 **)
-
-fun execErr h s =
-  snd (h s)

@@ -66,14 +66,16 @@ fun am_appraise t toPlc init_et cvm_ev local_appraisal =
 
 fun run_cvm_local_am t ls =
   bind get (fn st =>
-    ret
-      (run_cvm_rawEv t ls
-        (let val Coq_mkAM_St _ _ amConfig = st in amConfig end)))
+    case run_cvm_w_config t ls
+           (let val Coq_mkAM_St _ _ amConfig = st in amConfig end) of
+      Coq_errC e => am_failm (Coq_cvm_error e)
+    | Coq_resultC cvm_st =>
+      ret (get_bits (let val Coq_mk_st st_ev _ _ _ = cvm_st in st_ev end)))
 
 (** val get_am_policy : coq_PolicyT coq_AM **)
 
 val get_am_policy =
-  (bind get (fn st =>
+  bind get (fn st =>
     ret
       (let val Build_Manifest _ _ _ _ _ _ policy =
          let val Coq_mkAmConfig absMan _ _ _ _ _ =
@@ -81,7 +83,7 @@ val get_am_policy =
          in
          absMan end
        in
-       policy end))) : coq_PolicyT coq_AM
+       policy end))
 
 (** val check_disclosure_policy :
     coq_Term -> coq_Plc -> coq_Evidence -> unit coq_AM **)

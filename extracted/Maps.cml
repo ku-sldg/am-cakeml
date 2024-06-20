@@ -1,10 +1,5 @@
 type ('a, 'b) coq_MapC = ('a, 'b) prod list
 
-(** val map_empty : 'a1 coq_EqClass -> ('a1, 'a2) coq_MapC **)
-
-fun map_empty _ =
-  []
-
 (** val map_get :
     'a1 coq_EqClass -> ('a1, 'a2) coq_MapC -> 'a1 -> 'a2 option **)
 

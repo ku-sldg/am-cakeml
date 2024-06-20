@@ -2,11 +2,6 @@ type coq_FS_Location (* AXIOM TO BE REALIZED *)
 
 type coq_UUID (* AXIOM TO BE REALIZED *)
 
-(** val default_uuid : coq_UUID **)
-
-val default_uuid =
-  failwith "AXIOM TO BE REALIZED"
-
 (** val coq_Eq_Class_uuid : coq_UUID coq_EqClass **)
 
 val coq_Eq_Class_uuid =

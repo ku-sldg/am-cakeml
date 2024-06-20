@@ -14,11 +14,3 @@ val decrypt_bs_to_rawev_prim =
 
 val checkNonce =
   failwith "AXIOM TO BE REALIZED"
-
-(** val print_am_error : coq_AM_Error -> bool -> bool **)
-
-fun print_am_error _ b = case b of
-  True => (case b of
-             True => b
-           | False => negb b)
-| False => negb b

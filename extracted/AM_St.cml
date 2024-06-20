@@ -1,11 +1,6 @@
 datatype coq_AM_St =
   Coq_mkAM_St ((coq_N_ID, coq_BS) coq_MapC) coq_N_ID coq_AM_Config
 
-(** val empty_amst : coq_AM_St **)
-
-val empty_amst =
-  Coq_mkAM_St (map_empty nat_EqClass) O empty_am_config
-
 datatype coq_AM_Error =
   Coq_cvm_error coq_CVM_Error
 | Coq_am_error coq_StringT

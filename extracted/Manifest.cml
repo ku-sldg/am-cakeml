@@ -40,16 +40,3 @@ datatype coq_AM_Library =
 datatype coq_AM_Config =
   Coq_mkAmConfig coq_Manifest coq_UUID (coq_DispatcherErrors coq_ASPCallback)
    (coq_DispatcherErrors coq_ASPCallback) coq_PlcCallback coq_PubKeyCallback
-
-(** val empty_aspCb :
-    coq_ASP_PARAMS -> coq_RawEv -> (coq_RawEv, coq_DispatcherErrors)
-    coq_ResultT **)
-
-fun empty_aspCb _ _ =
-  Coq_errC Unavailable
-
-(** val empty_am_config : coq_AM_Config **)
-
-val empty_am_config =
-  Coq_mkAmConfig empty_Manifest default_uuid empty_aspCb empty_aspCb (fn _ =>
-    Coq_errC Unavailable) (fn _ => Coq_errC Unavailable)
