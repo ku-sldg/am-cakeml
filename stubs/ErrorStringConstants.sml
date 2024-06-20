@@ -79,3 +79,11 @@ val errStr_invalid_request_type = "errStr_invalid_request_type"
 (** val errStr_negotiation_not_implemented : coq_StringT **)
 
 val errStr_negotiation_not_implemented = "errStr_negotiation_not_implemented"
+
+(** val errStr_run_cvm_at_error_dynamic : coq_StringT **)
+
+val errStr_run_cvm_at_error_dynamic = "errStr_run_cvm_at_error_dynamic"
+
+(** val errStr_run_cvm_at_error_static : coq_StringT **)
+
+val errStr_run_cvm_at_error_static = "errStr_run_cvm_at_error_static"
