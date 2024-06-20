@@ -76,5 +76,7 @@ fun main () =
           | ManifestUtils.Excn e => TextIO.print_err ("ManifestUtils Error: " ^ e)
           | ManifestJsonConfig.Excn e => TextIO.print_err ("ManifestUtils Error: " ^ e)
           | Word8Extra.InvalidHex => TextIO.print_err "BSTRING UNSHOW ERROR"
+          | Json.Exn s1 s2 => TextIO.print_err ("JSON ERROR: " ^ s1 ^ " " ^ s2 ^ "\n") 
+          | _ => TextIO.print_err "Unknown Error\n"
 
 val _ = main ()

@@ -13,9 +13,9 @@ fun do_appraisal_session appreq ac nonceVal =
   Coq_mkPAResp True appres end end end end end end end
 
 (** val handle_AM_request_JSON :
-    coq_JSON -> coq_AM_Config -> coq_AM_Library -> coq_BS -> coq_JSON **)
+    coq_JSON -> coq_AM_Config -> coq_BS -> coq_JSON **)
 
-fun handle_AM_request_JSON js ac _ nonceVal =
+fun handle_AM_request_JSON js ac nonceVal =
   case coq_JSON_to_AM_Protocol_Request js of
     Coq_errC msg => coq_ErrorResponseJSON msg
   | Coq_resultC a =>

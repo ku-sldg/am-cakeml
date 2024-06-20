@@ -263,7 +263,7 @@ fun read_FormalManifest_file_json (*(pathPrefix : string)*) (manfile:string) =
     (extract_Manifest jsonman)
   end
   handle 
-    TextIO.BadFileName => raise Excn ("Bad file name: " ^ manfile)(* (pathPrefix ^ "FormalManifest_<PLCNAMEHERE>.sml")) *)
+    TextIO.BadFileName => raise Excn ("Bad file name: " ^ manfile)
     | TextIO.InvalidFD   => raise Excn "Invalid file descriptor"
     | Excn e => raise Excn ("Could not parse JSON file: " ^ e ^ "\n")) : coq_Manifest
 

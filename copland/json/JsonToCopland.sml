@@ -61,10 +61,6 @@ fun json_ObToTerm ob f =
         (Json.Object m) => fromJsonMap m f
      | _ => raise Json.Exn "json_ObToTerm" "expected Json.Object parameter"
 
-(* Json_to_coq_ASP_ARGS :: json list -> coq_ASP_ARGS *)
-fun json_list_to_coq_ASP_ARGS js_list = 
-  (json_to_coq_MapC (Json.Array js_list) (fn x => x)) : coq_ASP_ARGS
-
 (* getAspParams :: string -> Json.Array(json) -> coq_ASP_PARAMS *)
 fun getAspParams constructor (Json.Array args) =
     case constructor of
@@ -80,9 +76,9 @@ fun getAspParams constructor (Json.Array args) =
     and
     getAspParamsArray js = (* Coq_asp_paramsC "" [] O "" *)
       case js of
-          [Json.String aspid, (Json.Array arrayArgs), Json.String plc, Json.String targid] =>
-            Coq_asp_paramsC aspid (json_list_to_coq_ASP_ARGS arrayArgs) plc targid
-        | _ => raise Json.Exn "getAspParamsArray" "unexpected Coq_asp_paramsC params"                     
+          [Json.String aspid, (Json.Object argsMap), Json.String plc, Json.String targid] =>
+            Coq_asp_paramsC aspid (json_map_to_coq_MapC argsMap (fn x => x)) plc targid
+        | _ => raise (Json.Exn "getAspParamsArray" ("unexpected Coq_asp_paramsC params" ^ (Json.stringify (Json.Array js))))
 
 fun jsonToSp js =
   case js of 
@@ -112,16 +108,15 @@ fun jsonToFwd js =
       | s =>
           if (String.isPrefix "(EXTD" s andalso String.isSuffix ")" s)
           then
-            let val n' = (String.substring s 5 (String.size s - 6))
+            let val n' = (String.substring s 6 (String.size s - 7))
                 val n = case Int.fromString n' of
                           Some n => n
-                        | None => raise Json.Exn "getFwd" "could not parse EXTD number"
+                        | None => raise (Json.Exn "getFwd" ("could not parse EXTD number out of \"" ^ n' ^ "\"\n"))
             in (EXTD (natFromInt n))
             end
           else
             raise Json.Exn "getFwd"
-                    ("Unexpected constructor name for Fwd: " ^
-                     constructor)
+                    ("Error in parsing for FWD: \"" ^ s ^ "\"\n")
 
 (* jsonToTerm : json -> coq_Term 
    (json object to Copland phrase)  *)      

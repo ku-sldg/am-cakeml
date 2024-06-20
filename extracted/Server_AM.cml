@@ -1,8 +1,8 @@
 (** val handle_AM_request :
-    coq_StringT -> coq_AM_Config -> coq_AM_Library -> coq_BS -> coq_StringT **)
+    coq_StringT -> coq_AM_Config -> coq_BS -> coq_StringT **)
 
-fun handle_AM_request s ac al nonceVal =
+fun handle_AM_request s ac nonceVal =
   case stringT_to_JSON s of
     Coq_errC msg => coq_JSON_to_stringT (coq_ErrorResponseJSON msg)
   | Coq_resultC js =>
-    coq_JSON_to_stringT (handle_AM_request_JSON js ac al nonceVal)
+    coq_JSON_to_stringT (handle_AM_request_JSON js ac nonceVal)

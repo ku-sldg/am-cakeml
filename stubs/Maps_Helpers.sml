@@ -22,14 +22,14 @@ fun coq_MapC_to_Json m toStrFn =
     Json.fromPairList list_json
   end
 
-fun json_to_coq_MapC json fromStrFn = 
-  let val asc_list = case Json.toMap json of
-                    Some l => Map.toAscList l
-                  | None => raise (Exception "json_to_coq_MapC: not a map")
+(* convert a JSON to a coq MapC *)
+(* json_map_to_coq_MapC :: (string,json) map -> (string -> 'a) -> coq_MapC string 'a *)
+fun json_map_to_coq_MapC (jsonMap : (string,Json.json) map) fromStrFn =
+  let val asc_list = Map.toAscList jsonMap
       val aux_fn = fn (k,v) => 
         let val v' = case Json.toString v of
                       Some s => fromStrFn s
-                    | None => raise (Exception "json_to_coq_MapC: not a string")
+                    | None => raise (Exception ("json_to_coq_MapC: not a string: \"" ^ Json.stringify v ^ "\"\n"))
         in (Coq_pair k v') end
   in
     List.map aux_fn asc_list

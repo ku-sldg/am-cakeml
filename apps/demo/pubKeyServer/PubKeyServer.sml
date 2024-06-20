@@ -18,7 +18,7 @@ val aspMapping = (mapC_from_pairList []) : ((coq_ASP_ID, coq_CallBackErrors coq_
 
 val appAspMapping = (mapC_from_pairList []) : (((coq_Plc, coq_ASP_ID) prod, coq_CallBackErrors coq_ASPCallback) coq_MapC)
 
-
+(* 
 (** val do_asp : coq_ASP_Address -> coq_ASP_PARAMS -> coq_RawEv -> coq_BS **)
 fun do_asp asp_server_addr ps e =
     let val _ = print ("Running ASP with params: \n" ^ (aspParamsToString ps) ^ "\n")
@@ -49,19 +49,10 @@ fun do_asp asp_server_addr ps e =
                                                 raise (Exception ("TODO: Dispatch this request to ASP server at '" ^ asp_server_addr ^ "'\n")))
     in
         res
-    end
-
-val aspServer_cb = (fn aspServerAddr => fn aspParams => fn plc => fn bs => fn rawEv => do_asp aspServerAddr aspParams rawEv) : (coq_ASP_Address -> coq_CallBackErrors coq_ASPCallback)
-
-val pubKeyServer_cb = (fn _ => fn _ => (Coq_resultC (BString.unshow "OUTPUT_PUBKEY"))) :  (coq_ASP_Address -> coq_PubKeyCallback)
-
-val plcServer_cb = (fn _ => fn _ => (Coq_resultC "OUTPUT_UUID")) : (coq_ASP_Address ->  coq_PlcCallback)
-
-val uuidServer_cb = (fn _ => fn _ => (Coq_resultC "OUTPUT_PLC")) : (coq_ASP_Address -> coq_UUIDCallback)
+    end *)
 
 val client_am_library = 
   (Build_AM_Library 
-    aspServer_cb pubKeyServer_cb plcServer_cb uuidServer_cb
     
     "ASP_SERVER:5000" "PubKeyServer:5000" "PlcServer:5000" "UUIDServer:5000"
 

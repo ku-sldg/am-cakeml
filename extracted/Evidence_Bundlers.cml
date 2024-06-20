@@ -4,7 +4,7 @@
 
 fun extd_bundle sig0 e p n ps =
   let val Coq_evc bits et = e in
-  (case Nat.eqb (length sig0) n of
+  (case eqb nat_EqClass (length sig0) n of
      True => Coq_resultC (Coq_evc (app sig0 bits) (Coq_uu p (EXTD n) ps et))
    | False => Coq_errC errStr_raw_evidence_too_long) end
 
