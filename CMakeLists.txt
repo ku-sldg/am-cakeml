@@ -91,7 +91,6 @@ get_files(cop_src_pre_aspStubs
     stubs/JSON_Admits.sml
     stubs/Interface_Strings_Admits.sml
     extracted/Interface_Types.cml
-    # stubs/CvmJson_Admits.sml
     extracted/CvmJson_Interfaces.cml
     stubs/Manifest_Admits_Stubs.sml
     extracted/ErrorStMonad_Coq.cml

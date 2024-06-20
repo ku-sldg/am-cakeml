@@ -13,17 +13,15 @@ When things go wrong, handle_AM_request returns a raw error message string.
   it easier on the client. *)
 fun respondToMsg client = 
   let val inString  = Socket.inputAll client 
-      val _ = print ("\n\nReceived request string: \n" ^ inString)
+      val _ = print ("\n\nReceived request string: \n" ^ inString ^ "\n")
       val ac = ManifestUtils.get_local_amConfig ()
       val nonceval = BString.fromString "anonce" (* TODO: should this be hardcoded here? *)
-      val outString = handle_AM_request inString ac am_library nonceval
+      val outString = handle_AM_request inString ac nonceval
       val _ = print ("\n\nSending response string: \n" ^ outString) in 
     Socket.output client outString
   end
   handle Json.Exn s1 s2 =>
           (TextIO.print_err ("JSON error" ^ s1 ^ ": " ^ s2 ^ "\n"); ())
-  (*| USMexpn s => (TextIO.print_err (String.concat ["USM error: ", s, "\n"]);
-            "USM failure")   *)
             
 fun handleIncoming listener =
     let val client = Socket.accept listener
@@ -53,11 +51,12 @@ fun startServer () =
 
 (* () -> () *)
 fun main () =
-  let (* val _ = print "\n\nDEBUG PRINT:  BEFORE retrieve_CLI_args call in Server... \n\n" *)
-      val (manifestFileName, privKey, _, _) = ManifestJsonConfig.retrieve_CLI_args () 
-      (* val _ = print "\n\nDEBUG PRINT:  AFTER retrieve_CLI_args call in Server... \n\n" *)
-      val formal_manifest = ManifestJsonConfig.read_FormalManifest_file_json manifestFileName
-      val _ = ManifestUtils.setup_and_get_AM_config formal_manifest am_library privKey
+  let val (manifestFileName, privKey, _, _) = 
+          ManifestJsonConfig.retrieve_CLI_args () 
+      val formal_manifest = 
+          ManifestJsonConfig.read_FormalManifest_file_json manifestFileName
+      val _ = 
+          ManifestUtils.setup_and_get_AM_config formal_manifest am_library privKey
       (* Retrieving implicit self place from manifest here *)
       val my_plc = ManifestUtils.get_myPlc()
       val _ = print ("My Place (retrieved from Manifest): " ^ my_plc ^ "\n\n")
