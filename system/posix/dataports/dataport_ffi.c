@@ -34,11 +34,19 @@ void ffiwriteDataport(const uint8_t * c, const long clen, uint8_t * a, const lon
         return;
     }
 
-    void * dataport = mmap(NULL, length, PROT_WRITE, MAP_SHARED, fd, getpagesize());
+    // 4096 is the entire size of the buffer
+    void * dataport = mmap(NULL, 4096, PROT_WRITE, MAP_SHARED, fd, getpagesize());
     if (dataport == (void *)(-1)) {
         close(fd);
         a[0] = FFI_FAILURE;
         return;
+    }
+
+    // It's important to zero out the memory.
+    // It removes any data left behind.
+    for(int i=0; i<4096; i++)
+    {
+        ((char*)dataport)[i] = '\0';
     }
 
     memcpy(dataport, msg, length);
@@ -130,3 +138,4 @@ void ffiemitDataport(const uint8_t * c, const long clen, uint8_t * a, const long
 
     a[0] = FFI_SUCCESS;
 }
+
