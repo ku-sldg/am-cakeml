@@ -73,15 +73,8 @@ val coq_JSON_to_stringT =
 val stringT_to_JSON =
   fn (s : coq_StringT) => 
     (case Json.parse s of
-      Err s => 
-        let val _ = print "\n"
-          val _ = print s
-          val _ = print ("\n\n\n IN ERR side of stringT to JSON\n\n\n")
-        in Coq_errC s end
-    | Ok j => 
-        let val _ = print ("\nSTRINGTTOJSON " ^ Json.stringify j ^ "\n") 
-        in cakeML_JSON_to_coq_JSON j
-        end) : (coq_JSON, coq_StringT) coq_ResultT
+      Err s => Coq_errC s
+    | Ok j => cakeML_JSON_to_coq_JSON j) : (coq_JSON, coq_StringT) coq_ResultT
 
 (** val coq_JSON_get_stringT :
     coq_StringT -> coq_JSON -> (coq_StringT, coq_StringT) coq_ResultT **)
@@ -89,13 +82,7 @@ val stringT_to_JSON =
 val coq_JSON_get_stringT = fn (s : coq_StringT) => fn (js : coq_JSON) =>
   (let val cakejs : Json.json = coq_JSON_to_CakeML_JSON js in
   (case (Json.lookup s cakejs) of
-    None => 
-      let val _ = print "IN THE ERR SIDE OF COQJSONGETSTRINGT" 
-          val _ = print "\n"
-          val _ = print (Json.stringify cakejs)
-          val _ = print "\n"
-      in
-      Coq_errC ("Key '" ^ s ^ "' not found") end
+    None => Coq_errC ("Key '" ^ s ^ "' not found")
   | Some js' => 
     case cakeML_JSON_to_coq_JSON js' of
       Coq_resultC (JSON_String s') => Coq_resultC s'
@@ -108,9 +95,7 @@ val coq_JSON_get_stringT = fn (s : coq_StringT) => fn (js : coq_JSON) =>
 val coq_JSON_get_bool = fn s => fn js =>
   let val cakejs : Json.json = coq_JSON_to_CakeML_JSON js in
   (case (Json.lookup s cakejs) of
-    None => 
-            let val _ = print "IN THE ERR SIDE OF coq json get bool" in
-      Coq_errC ("Key '" ^ s ^ "' not found") end
+    None => Coq_errC ("Key '" ^ s ^ "' not found")
   | Some js' => 
     case cakeML_JSON_to_coq_JSON js' of
       Coq_resultC (JSON_Boolean b') => Coq_resultC b'

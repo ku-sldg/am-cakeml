@@ -32,10 +32,6 @@ val errStr_dispatch_error = "errStr_dispatch_error"
 
 val errStr_decryption_prim = "errStr_decryption_prim"
 
-(** val errStr_dispatch_error : coq_StringT **)
-
-val errStr_dispatch_error = "errStr_dispatch_error"
-
 (** val errStr_cvm_error : coq_StringT **)
 
 val errStr_cvm_error = "errStr_cvm_error"

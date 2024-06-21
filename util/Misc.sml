@@ -137,18 +137,11 @@ structure FFI = struct
             let val result = call ffi len input
                 val resp_code = (BString.substring result resp_CODE_START resp_CODE_LEN)
                 val output_len_str = (BString.substring result output_LEN_START output_LEN_LEN)
-                val _ = print ("OUTPUT STRING: " ^ (BString.toString result) ^ "\n")
-                val _ = print ("OUTPUT len STRING: " ^ (BString.toString output_len_str) ^ "\n")
-                val _ = print ("OUTPUT len STRING length: " ^ Int.toString (String.size (BString.toString output_len_str)) ^ "\n")
                 val output_len = BString.toInt BString.LittleEndian output_len_str
             in 
               case resp_code of
                 resp_code_SUCCESS => 
-                  let val _ = print "WE MADE IT THIS FAR"
-                      val _ = print ("Length is " ^ (Int.toString output_len) ^ "\n")
-                  in
-                    BString.substring result header_END output_len
-                  end
+                  BString.substring result header_END output_len
               | resp_code_FAILED_TO_READ_FILE => 
                   raise (Exception "FAILED_TO_READ_FILE")
               | resp_code_FAILED_TO_REALLOC_BUFFER => 

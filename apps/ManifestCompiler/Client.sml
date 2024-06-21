@@ -19,7 +19,7 @@ fun main () =
         val main_phrase = ManifestJsonConfig.read_term_file_json phraseFileName
 
         val formal_manifest = ManifestJsonConfig.read_FormalManifest_file_json manifestFileName
-        val _ = ManifestUtils.setup_and_get_AM_config formal_manifest am_library privKey
+        val ac = ManifestUtils.setup_and_get_AM_config formal_manifest am_library privKey
         (* Retrieving implicit self place from manifest here *)
         val my_plc = ManifestUtils.get_myPlc()
         val auth_phrase = ssl_sig_parameterized my_plc
@@ -29,11 +29,17 @@ fun main () =
         val _ = TextIO.print ("Loaded following implicit UUID from Client Manifest: '" ^ uuid ^ "'\n\n")
 
         val am_comp = am_client_gen_local main_phrase my_plc None formal_manifest am_library 
-        val am_res = run_am_app_comp am_comp empty_am_result True 
-            (* the bool here is to force evaluation of unit-typed error prints from extracted code *)
-        
+        val nonceval = BString.fromString "anonce" (* TODO: should this be hardcoded here? *)
+        val init_noncemap = (Coq_pair O nonceval) :: []
+        val init_nonceid = S O
+        val my_amst = Coq_mkAM_St init_noncemap init_nonceid ac
+        val am_res = run_am_app_comp_init am_comp my_amst
+        val str_result = case am_res of
+                            Coq_resultC res => ("\n\nClient Result:\n" ^ (am_result_ToString res)  ^ "\n\n") 
+                          | Coq_errC e => ("\n\nClient Error:\n" ^ e ^ "\n\n")
+        val _ = print str_result
     in
-        print ( ("\n\nClient Result:\n" ^ am_result_ToString (am_res))  ^ "\n\n")
+      ()
     end
     handle Exception e => TextIO.print_err e 
           | ManifestUtils.Excn e => TextIO.print_err ("ManifestUtils Error: " ^ e)

@@ -138,19 +138,9 @@ fun appraise_auth_tok appres = True
 
 (** val is_local_appraisal : coq_AM_Library -> bool **)
 fun is_local_appraisal amLib =
-  raise (Exception "is_local_appraisal does not work properly i think")
-(* NOTE: This is the old code it would run, but it didnt seem right to me
+  (* Basically if we dont have a clone its local *)
   case amLib of 
-    Build_AM_Library _
-   _
-   _
-   _ addr _ _ _ _
-   _
-   _
-   _
-   _ => addr = ""
-*)
-  
+    Build_AM_Library clone_uuid _ _ _ _ => clone_uuid = ""
 
 
 (** val lib_supports_manifest_bool :

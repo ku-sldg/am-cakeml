@@ -43,9 +43,7 @@ uint8_t read_until_eof(FILE *file, size_t INITIAL_BUFFER_SIZE, char **buffer, si
 {
   size_t buffer_size = INITIAL_BUFFER_SIZE;
   *total_read = 0;
-  printf("Got to file read malloc\n");
   *buffer = malloc(buffer_size);
-  printf("Got after file read malloc\n");
 
   if (buffer == NULL)
   {
@@ -56,7 +54,6 @@ uint8_t read_until_eof(FILE *file, size_t INITIAL_BUFFER_SIZE, char **buffer, si
   size_t bytes_read;
   while ((bytes_read = fread(*buffer + *total_read, 1, buffer_size - *total_read - 1, file)) > 0)
   {
-    printf("Got to start of file read while\n");
     *total_read += bytes_read;
 
     // Check if we need to resize the buffer
@@ -64,9 +61,7 @@ uint8_t read_until_eof(FILE *file, size_t INITIAL_BUFFER_SIZE, char **buffer, si
     {
       buffer_size *= 2;
       // Resize and reallocate (safely moves the ptrs)
-      printf("Got to file read realloc\n");
       char *new_buffer = realloc(*buffer, buffer_size);
-      printf("Got after file read realloc\n");
 
       // Checks if realloc fails
       if (new_buffer == NULL)
@@ -81,7 +76,6 @@ uint8_t read_until_eof(FILE *file, size_t INITIAL_BUFFER_SIZE, char **buffer, si
       *buffer = new_buffer;
     }
   }
-  printf("Got after file read while\n");
 
   // Handle errors in fread
   if (ferror(file))
@@ -92,11 +86,7 @@ uint8_t read_until_eof(FILE *file, size_t INITIAL_BUFFER_SIZE, char **buffer, si
   }
 
   // Null-terminate the buffer
-  printf("Got to file read null term\n");
-  printf("Total Read: %ld\n", *total_read);
-  printf("Buffer Size: %ld\n", buffer_size);
   buffer[*total_read] = '\0';
-  printf("Got after file read null term\n");
 
   return SUCCESS;
 }
@@ -121,17 +111,6 @@ void ffipopen_string(const uint8_t *c, const long clen, uint8_t *a, const long a
   const uint8_t OUTPUT_LENGTH_START = 1;
   const uint8_t OUTPUT_LENGTH_LENGTH = 4;
   const uint8_t HEADER_LENGTH = RESPONSE_CODE_LENGTH + OUTPUT_LENGTH_LENGTH;
-  // Run the program that is given in the input "c" and capture the output to a variable "out"
-  printf("Running command: %s\n", c);
-  printf("Command Length: %ld\n", clen);
-  printf("Current Output: %s\n", a);
-  printf("Output Length: %ld\n", alen);
-
-  // Print out a to debug
-  for (int i = 0; i < alen; i++)
-  {
-    printf("%02x", a[i]);
-  }
 
   FILE *fp = popen((char *)c, "r");
   if (fp == NULL)
@@ -144,10 +123,8 @@ void ffipopen_string(const uint8_t *c, const long clen, uint8_t *a, const long a
   // Read the output running the command into a buffer
   char *buffer = NULL;
   size_t output_length = 0;
-  printf("Got to file read\n");
   uint8_t out_code = read_until_eof(fp, alen - HEADER_LENGTH, &buffer, &output_length);
   fclose(fp);
-  printf("Got past file read\n");
   // Cast the output length to a 32-bit integer, with error if too large
   if (output_length > UINT32_MAX)
   {
@@ -156,7 +133,6 @@ void ffipopen_string(const uint8_t *c, const long clen, uint8_t *a, const long a
   }
 
   uint32_t output_size = (uint32_t)output_length + HEADER_LENGTH;
-  printf("Output Size: %d\n", output_size);
   // Storing output size in the
   // OUTPUT_LENGTH_START - (OUTPUT_LENGTH_START + OUTPUT_LENGTH_LENGTH)
   // bytes of the output
@@ -193,14 +169,6 @@ void ffipopen_string(const uint8_t *c, const long clen, uint8_t *a, const long a
   {
     a[HEADER_LENGTH + i] = (uint8_t)buffer[i];
   }
-  printf("Got to final return\n");
-
-  // Print out a to debug, truncated too
-  for (int i = 0; i < output_size; i++)
-  {
-    printf("%02x", a[i]);
-  }
-  fflush(NULL);
 
   return;
 }
