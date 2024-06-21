@@ -18,7 +18,6 @@ bool ffireadFile(const uint8_t * c, const long clen, uint8_t * a, const long ale
 {
     assert(clen >= 2);
     assert(alen >= 1);
-    printf("your output is %d bytes\n", alen);
     const char* filepath = (char*)c;
     int size = 0;
     bool query_result = file_read_query(filepath, &size);
@@ -27,41 +26,31 @@ bool ffireadFile(const uint8_t * c, const long clen, uint8_t * a, const long ale
         printf("Error! No file at that filepath.\n");
         return FFI_FAILURE;
     }
-
     if(size > 4096)
     {
         printf("Error! File requested was too large.\n");
         return FFI_FAILURE;
     }
-
-
-    printf("your file is %d bytes\n", size);
     char* file = malloc(size);
     if(file == NULL)
     {
         printf("Error! Malloc returned NULL.\n");
         return FFI_FAILURE;
     }
-
     for(int i=0; i<size; i++)
     {
         file[i] = 0x1;
     }
-
     bool result = file_read_request(filepath, &file, size);
     if(!result)
     {
         printf("Error! No file at that filepath.");
+        free(file);
         return FFI_FAILURE;
     }
-
-    printf("your file is as follows:\n%s\n", file);
-
     memcpy_volatile_src((void*)a+1, (void*)file, size);
-
-    // We are bound to free this.
-    free(file);
-
     a[0] = FFI_SUCCESS;
+    free(file);
+    return;
 }
 
