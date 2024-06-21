@@ -61,11 +61,7 @@ ${posix_src_cake})
 get_files(posix_src_tpm ${crypto_src_tpm}
 ${posix_src_cake})
 
-# Includes the CMakeLists for the specific asps types (modularity)
-include(./stubs/appraisal_asps/CMakeLists.txt)
-include(./stubs/attestation_asps/CMakeLists.txt)
-
-get_files(cop_src_pre_aspStubs
+get_files(copland_am_src
     stubs/BS.sml
     stubs/StringT.sml
     stubs/ErrorStringConstants.sml
@@ -133,21 +129,9 @@ get_files(cop_src_pre_aspStubs
     stubs/ManGenConfig.sml
 )
 
-get_files(cop_src
-    ${cop_src_pre_aspStubs}
-    ${attestation_asps}
-    ${appraisal_asps}
-)
-
-get_files(cop_src_noasps
-    ${cop_src_pre_aspStubs}
-)
-
-get_files(server_am_src_noasps ${util_src} ${posix_src} ${cop_src_noasps})
-
-get_files(server_am_src ${util_src} ${posix_src} ${cop_src})
-get_files(server_am_src_hacl ${util_src} ${posix_src_hacl} ${cop_src})
-get_files(server_am_src_tpm ${util_src} ${posix_src_tpm} ${cop_src})
+get_files(server_am_src ${util_src} ${posix_src} ${copland_am_src})
+get_files(server_am_src_hacl ${util_src} ${posix_src_hacl} ${copland_am_src})
+get_files(server_am_src_tpm ${util_src} ${posix_src_tpm} ${copland_am_src})
 
 get_files(posix_c_files_base
     system/posix/sockets/socket_ffi.c
@@ -212,17 +196,6 @@ mark_as_advanced(CLEAR
 add_subdirectory(system/crypto/evercrypt)
 add_subdirectory(system/crypto/openssl)
 add_subdirectory(system/crypto/tpm)
-
-function(build_posix_am_noasps name)
-    build_cake("${name}.cake" SOURCES "${ARGN}")
-    add_executable(${name} ${posix_c_files_noasps})
-    if(${STATIC_LINKING})
-        set(link_flags "-static-libgcc -static -lcrypto")
-    else()
-        set(link_flags "-lcrypto")
-    endif()
-    target_link_libraries(${name} "${name}.cake" ${link_flags})
-endfunction()
 
 function(build_posix_am name)
     build_cake("${name}.cake" SOURCES "${ARGN}")
