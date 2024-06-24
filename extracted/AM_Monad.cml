@@ -16,8 +16,8 @@ fun run_am_app_comp_init am_comp st =
 (** val get_AM_amConfig : coq_AM_Config coq_AM **)
 
 val get_AM_amConfig =
-  bind get (fn st =>
-    ret (let val Coq_mkAM_St _ _ amConfig = st in amConfig end))
+  (bind get (fn st =>
+    ret (let val Coq_mkAM_St _ _ amConfig = st in amConfig end))) : coq_AM_Config coq_AM
 
 (** val am_getNonce : nat -> coq_BS coq_AM **)
 

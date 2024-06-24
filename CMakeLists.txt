@@ -123,7 +123,6 @@ get_files(copland_am_src
     extracted/AM_Helpers.cml
     extracted/Client_AM.cml
     extracted/Server_AM.cml
-    stubs/ManGenConfig.sml
     util/AM_CLI.sml
 )
 
