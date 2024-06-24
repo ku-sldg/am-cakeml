@@ -23,11 +23,6 @@ val attest_id =
 val appraise_id =
   failwith "AXIOM TO BE REALIZED"
 
-(** val appraise_inline_id : coq_ASP_ID **)
-
-val appraise_inline_id =
-  failwith "AXIOM TO BE REALIZED"
-
 (** val cert_id : coq_ASP_ID **)
 
 val cert_id =
@@ -46,16 +41,6 @@ val store_args =
 (** val retrieve_args : coq_ASP_ARGS **)
 
 val retrieve_args =
-  failwith "AXIOM TO BE REALIZED"
-
-(** val appraise_inline_args : coq_ASP_ARGS **)
-
-val appraise_inline_args =
-  failwith "AXIOM TO BE REALIZED"
-
-(** val check_ssl_sig_args : coq_ASP_ARGS **)
-
-val check_ssl_sig_args =
   failwith "AXIOM TO BE REALIZED"
 
 (** val cache : coq_TARG_ID **)
