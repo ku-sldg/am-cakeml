@@ -11,13 +11,13 @@ fun put_ev e =
 (** val get_ev : coq_EvC coq_CVM **)
 
 val get_ev =
-  (bind get (fn st => ret (let val Coq_mk_st st_ev _ _ _ = st in st_ev end))) : coq_EvC coq_CVM
+  bind get (fn st => ret (let val Coq_mk_st st_ev _ _ _ = st in st_ev end))
 
 (** val get_CVM_amConfig : coq_AM_Config coq_CVM **)
 
 val get_CVM_amConfig =
-  (bind get (fn st =>
-    ret (let val Coq_mk_st _ _ _ st_AM_config = st in st_AM_config end))) : coq_AM_Config coq_CVM
+  bind get (fn st =>
+    ret (let val Coq_mk_st _ _ _ st_AM_config = st in st_AM_config end))
 
 (** val get_pl : coq_Plc coq_CVM **)
 
@@ -32,13 +32,13 @@ val get_pl =
 (** val inc_id : coq_Event_ID coq_CVM **)
 
 val inc_id =
-  (bind get (fn st =>
+  bind get (fn st =>
     let val tr' = let val Coq_mk_st _ st_trace _ _ = st in st_trace end in
     let val e' = let val Coq_mk_st st_ev _ _ _ = st in st_ev end in
     let val i = let val Coq_mk_st _ _ st_evid _ = st in st_evid end in
     let val ac = let val Coq_mk_st _ _ _ st_AM_config = st in st_AM_config end
     in
-    bind (put (Coq_mk_st e' tr' (add i (S O)) ac)) (fn _ => ret i) end end end end)) : coq_Event_ID coq_CVM
+    bind (put (Coq_mk_st e' tr' (add i (S O)) ac)) (fn _ => ret i) end end end end)
 
 (** val add_trace : coq_Ev list -> cvm_st -> cvm_st **)
 

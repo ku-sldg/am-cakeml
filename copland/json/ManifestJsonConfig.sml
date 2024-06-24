@@ -5,14 +5,10 @@ structure ManifestJsonConfig = struct
 
   type plc_t                  = coq_Plc
   type uuid_t                 = coq_UUID
-  type privateKey_t           = coq_PrivateKey
+  type privateKey_t           = string
   type pubKey_t               = coq_PublicKey
   type plcMap_t               = ((plc_t, uuid_t) coq_MapD)
   type pubKeyMap_t            = ((plc_t, pubKey_t) coq_MapD)
-  type aspServer_t            = coq_ASP_Address
-  type pubKeyServer_t         = coq_ASP_Address
-  type plcServer_t            = coq_ASP_Address
-  type uuidServer_t           = coq_ASP_Address
 
   (* just a wrapper for bstring.unshow to hoist it into option type 
       : string -> BString.bstring option *)

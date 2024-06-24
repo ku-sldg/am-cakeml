@@ -1,4 +1,6 @@
 (* TODO: dependencies *)
+(* TODO: Get rid of optimally 
+
 structure ManifestUtils = struct
   exception Excn string
 
@@ -165,3 +167,5 @@ structure ManifestUtils = struct
         get_AM_config()
     end) : AM_Config
 end
+
+*)

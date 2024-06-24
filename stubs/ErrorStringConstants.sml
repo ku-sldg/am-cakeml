@@ -83,3 +83,25 @@ val errStr_run_cvm_at_error_dynamic = "errStr_run_cvm_at_error_dynamic"
 (** val errStr_run_cvm_at_error_static : coq_StringT **)
 
 val errStr_run_cvm_at_error_static = "errStr_run_cvm_at_error_static"
+
+
+(** val errStr_json_to_manifest_set : coq_StringT **)
+
+val errStr_json_to_manifest_set = "errStr_json_to_manifest_set"
+
+(** val errStr_json_to_id_type : coq_StringT **)
+
+val errStr_json_to_id_type = "errStr_json_to_id_type"
+
+(** val errStr_json_to_manifest : coq_StringT **)
+
+val errStr_json_to_manifest = "errStr_json_to_manifest"
+
+(** val errStr_json_to_am_lib : coq_StringT **)
+
+val errStr_json_to_am_lib = "errStr_json_to_am_lib"
+
+(** val errStr_json_to_pair : coq_StringT **)
+
+val errStr_json_to_pair = "errStr_json_to_pair"
+

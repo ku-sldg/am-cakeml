@@ -2,6 +2,34 @@ datatype coq_ASP_Locator =
   Local_ASP coq_FS_Location
 | Remote_ASP coq_UUID
 
+(** val jsonifiable_ASP_Locator : coq_ASP_Locator coq_Jsonifiable **)
+
+val jsonifiable_ASP_Locator =
+  Build_Jsonifiable (fn v =>
+    case v of
+      Local_ASP loc =>
+      JSON_Object ((Coq_pair coq_JSON_Local_ASP
+        (let val Build_Jsonifiable to_JSON _ = jsonifiable_FS_Location in
+         to_JSON loc end)) :: [])
+    | Remote_ASP uuid =>
+      JSON_Object ((Coq_pair coq_JSON_Remote_ASP
+        (let val Build_Jsonifiable to_JSON _ = jsonifiable_uuid in
+         to_JSON uuid end)) :: [])) (fn js =>
+    case coq_JSON_get_JSON coq_JSON_Local_ASP js of
+      Coq_errC _ =>
+      (case coq_JSON_get_JSON coq_JSON_Remote_ASP js of
+         Coq_errC e => Coq_errC e
+       | Coq_resultC uuid =>
+         (case let val Build_Jsonifiable _ from_JSON = jsonifiable_uuid in
+               from_JSON uuid end of
+            Coq_errC e => Coq_errC e
+          | Coq_resultC uuid' => Coq_resultC (Remote_ASP uuid')))
+    | Coq_resultC loc =>
+      (case let val Build_Jsonifiable _ from_JSON = jsonifiable_FS_Location in
+            from_JSON loc end of
+         Coq_errC e => Coq_errC e
+       | Coq_resultC loc' => Coq_resultC (Local_ASP loc')))
+
 datatype coq_DispatcherErrors =
   Unavailable 
 | Runtime coq_StringT
@@ -35,7 +63,7 @@ val empty_Manifest =
 datatype coq_AM_Library =
   Build_AM_Library coq_UUID ((coq_ASP_ID, coq_ASP_Locator) coq_MapC)
    (((coq_Plc, coq_ASP_ID) prod, coq_ASP_Locator) coq_MapC)
-   ((coq_Plc, coq_UUID) coq_MapD) ((coq_Plc, coq_PublicKey) coq_MapD)
+   ((coq_Plc, coq_UUID) coq_MapC) ((coq_Plc, coq_PublicKey) coq_MapC)
 
 datatype coq_AM_Config =
   Coq_mkAmConfig coq_Manifest coq_UUID (coq_DispatcherErrors coq_ASPCallback)

@@ -84,6 +84,7 @@ get_files(copland_am_src
     stubs/Term_Defs_Admits.sml
     extracted/Anno_Term_Defs.cml
     extracted/JSON_Type.cml
+    extracted/JSON.cml
     stubs/JSON_Admits.sml
     stubs/Interface_Strings_Admits.sml
     extracted/Interface_Types.cml
@@ -95,6 +96,8 @@ get_files(copland_am_src
     stubs/Example_Phrases_Admits.sml
     extracted/Manifest_Set.cml
     extracted/Manifest.cml
+    stubs/Manifest_JSON_Admits_Stubs.sml
+    extracted/Manifest_JSON.cml
     extracted/EnvironmentM.cml
     extracted/Manifest_Union.cml
     extracted/Manifest_Generator_Helpers.cml
@@ -108,7 +111,7 @@ get_files(copland_am_src
     extracted/Cvm_St.cml
     extracted/AM_St.cml
     copland/json/ManifestJsonConfig.sml
-    util/ManifestUtils.sml
+    # util/ManifestUtils.sml
     stubs/Axioms_Io.sml
     extracted/Evidence_Bundlers.cml
     extracted/Cvm_Monad.cml
@@ -121,12 +124,13 @@ get_files(copland_am_src
     stubs/Example_Phrases_Demo_Admits.sml
     extracted/Example_Phrases.cml
     extracted/Example_Phrases_Demo.cml
-    stubs/IO_Stubs_extra.sml
+    # stubs/IO_Stubs_extra.sml
     extracted/AM_Json_Interfaces.cml
     extracted/AM_Helpers.cml
     extracted/Client_AM.cml
     extracted/Server_AM.cml
     stubs/ManGenConfig.sml
+    util/AM_CLI.sml
 )
 
 get_files(server_am_src ${util_src} ${posix_src} ${copland_am_src})

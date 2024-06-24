@@ -120,7 +120,7 @@ fun generate_Plc_dispatcher hID al am =
     let val Build_Manifest _ _ _ uuidPlcs _ _ _ = am in uuidPlcs end
   in
   let val shrunk_map =
-    minify_mapD coq_Eq_Class_ID_Type coq_Eq_Class_uuid local_plc_map (fn x =>
+    minify_mapD hID coq_Eq_Class_uuid local_plc_map (fn x =>
       case in_dec_set hID x abstract_plcs of
         Coq_left => True
       | Coq_right => False)
@@ -142,8 +142,7 @@ fun generate_PubKey_dispatcher hID al am =
     let val Build_Manifest _ _ _ _ pubKeyPlcs _ _ = am in pubKeyPlcs end
   in
   let val shrunk_map =
-    minify_mapD coq_Eq_Class_ID_Type coq_Eq_Class_public_key local_pubkey_map
-      (fn x =>
+    minify_mapD hID coq_Eq_Class_public_key local_pubkey_map (fn x =>
       case in_dec_set hID x abstract_plcs of
         Coq_left => True
       | Coq_right => False)

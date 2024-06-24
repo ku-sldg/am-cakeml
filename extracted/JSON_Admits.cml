@@ -9,6 +9,12 @@ val coq_JSON_to_stringT =
 val stringT_to_JSON =
   failwith "AXIOM TO BE REALIZED"
 
+(** val coq_JSON_get_JSON :
+    coq_StringT -> coq_JSON -> (coq_JSON, coq_StringT) coq_ResultT **)
+
+val coq_JSON_get_JSON =
+  failwith "AXIOM TO BE REALIZED"
+
 (** val coq_JSON_get_stringT :
     coq_StringT -> coq_JSON -> (coq_StringT, coq_StringT) coq_ResultT **)
 

@@ -1,5 +1,26 @@
 type 'a manifest_set = 'a list
 
+(** val manifest_set_to_JSON :
+    'a1 coq_Jsonifiable -> 'a1 manifest_set -> coq_JSON **)
+
+fun manifest_set_to_JSON h m =
+  JSON_Array (map (let val Build_Jsonifiable to_JSON _ = h in to_JSON end) m)
+
+(** val coq_JSON_to_manifest_set :
+    'a1 coq_Jsonifiable -> coq_JSON -> ('a1 manifest_set, coq_StringT)
+    coq_ResultT **)
+
+fun coq_JSON_to_manifest_set h js = case js of
+  JSON_Array m =>
+  result_map (let val Build_Jsonifiable _ from_JSON = h in from_JSON end) m
+| _ => Coq_errC errStr_json_to_manifest_set
+
+(** val jsonifiable_manifest_set :
+    'a1 coq_Jsonifiable -> 'a1 manifest_set coq_Jsonifiable **)
+
+fun jsonifiable_manifest_set h =
+  Build_Jsonifiable (manifest_set_to_JSON h) (coq_JSON_to_manifest_set h)
+
 (** val manifest_set_empty : 'a1 manifest_set **)
 
 val manifest_set_empty =

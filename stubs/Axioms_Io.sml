@@ -6,8 +6,6 @@ but not at the cost of proof validity.
 Duplicated functionality by (extracted/Axioms_Io.cml) *)
 
 fun cvm_events_core t p e = []
-(*
-  failwith "AXIOM TO BE REALIZED" *)
 
 (** val cvm_events : coq_Term -> coq_Plc -> coq_Evidence -> coq_Ev list **)
 
