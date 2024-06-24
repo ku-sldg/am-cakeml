@@ -102,16 +102,11 @@ get_files(copland_am_src
     extracted/Manifest_Union.cml
     extracted/Manifest_Generator_Helpers.cml
     extracted/Manifest_Generator.cml
-    extracted/Manifest_Generator_Facts.cml
-    extracted/ManCompSoundness_Helpers.cml
-    extracted/ManCompSoundness.cml
     extracted/Manifest_Generator_Union.cml
     stubs/IO_Stubs.sml
     extracted/Manifest_Compiler.cml
     extracted/Cvm_St.cml
     extracted/AM_St.cml
-    copland/json/ManifestJsonConfig.sml
-    # util/ManifestUtils.sml
     stubs/Axioms_Io.sml
     extracted/Evidence_Bundlers.cml
     extracted/Cvm_Monad.cml
@@ -124,7 +119,6 @@ get_files(copland_am_src
     stubs/Example_Phrases_Demo_Admits.sml
     extracted/Example_Phrases.cml
     extracted/Example_Phrases_Demo.cml
-    # stubs/IO_Stubs_extra.sml
     extracted/AM_Json_Interfaces.cml
     extracted/AM_Helpers.cml
     extracted/Client_AM.cml
