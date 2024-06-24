@@ -75,7 +75,6 @@ get_files(copland_am_src
     stubs/Maps_Helpers.sml
     stubs/AbstractedTypes.sml
     extracted/Term_Defs_Core.cml
-    extracted/Eqb_Evidence.cml
     stubs/Params_Admits_hardcoded.sml
     extracted/Term_Defs.cml
     copland/CoplandUtil.sml
@@ -120,8 +119,6 @@ get_files(copland_am_src
     extracted/Example_Phrases.cml
     extracted/Example_Phrases_Demo.cml
     extracted/AM_Json_Interfaces.cml
-    extracted/AM_Helpers.cml
-    extracted/Client_AM.cml
     extracted/Server_AM.cml
     util/AM_CLI.sml
 )
