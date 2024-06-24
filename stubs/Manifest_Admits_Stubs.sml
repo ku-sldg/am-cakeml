@@ -23,7 +23,7 @@ type coq_UUID = string (* AXIOM TO BE REALIZED *)
 (** val stringT_to_UUUID :
     coq_StringT -> (coq_UUID, coq_StringT) coq_ResultT **)
 
-val stringT_to_UUUID = (fn v => v)
+val stringT_to_UUUID = (fn v => Coq_resultC v)
 
 (** val jsonifiable_uuid : coq_UUID coq_Jsonifiable **)
 

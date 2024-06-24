@@ -83,16 +83,6 @@ val errStr_json_to_manifest_set =
 val errStr_json_to_id_type =
   failwith "AXIOM TO BE REALIZED"
 
-(** val errStr_json_to_manifest : coq_StringT **)
-
-val errStr_json_to_manifest =
-  failwith "AXIOM TO BE REALIZED"
-
-(** val errStr_json_to_am_lib : coq_StringT **)
-
-val errStr_json_to_am_lib =
-  failwith "AXIOM TO BE REALIZED"
-
 (** val errStr_json_to_pair : coq_StringT **)
 
 val errStr_json_to_pair =

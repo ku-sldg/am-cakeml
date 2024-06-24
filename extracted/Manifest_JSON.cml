@@ -37,8 +37,7 @@ fun coq_Manifest_to_JSON m =
 (** val coq_JSON_to_Manifest :
     coq_JSON -> (coq_Manifest, coq_StringT) coq_ResultT **)
 
-fun coq_JSON_to_Manifest js = case js of
-  JSON_Object _ =>
+fun coq_JSON_to_Manifest js =
   res_bind (coq_JSON_get_stringT coq_MAN_ABS_PLC js) (fn temp_ABS_PLC =>
     res_bind (coq_JSON_get_JSON coq_MAN_ASPS js) (fn temp_ASPS =>
       res_bind (coq_JSON_get_JSON coq_MAN_APPR_ASPS js) (fn temp_APPR_ASPS =>
@@ -89,7 +88,6 @@ fun coq_JSON_to_Manifest js = case js of
                               Coq_resultC (Build_Manifest aBS_PLC aSPS
                               aPPR_ASPS uUID_PLCS pUBKEY_PLCS tARGET_PLCS
                               pOLICY)))))))))))))))
-| _ => Coq_errC errStr_json_to_manifest
 
 (** val coq_Jsonifiable_Manifest : coq_Manifest coq_Jsonifiable **)
 
@@ -131,8 +129,7 @@ fun coq_AM_Lib_to_JSON am =
 (** val coq_JSON_to_AM_Lib :
     coq_JSON -> (coq_AM_Library, coq_StringT) coq_ResultT **)
 
-fun coq_JSON_to_AM_Lib js = case js of
-  JSON_Object _ =>
+fun coq_JSON_to_AM_Lib js =
   res_bind (coq_JSON_get_stringT coq_AM_CLONE_UUUID js)
     (fn temp_CLONE_UUUID =>
     res_bind (coq_JSON_get_JSON coq_AM_LIB_ASPS js) (fn temp_LIB_ASPS =>
@@ -173,7 +170,6 @@ fun coq_JSON_to_AM_Lib js = case js of
                        from_JSON temp_LIB_PUBKEYS end) (fn lIB_PUBKEYS =>
                       Coq_resultC (Build_AM_Library cLONE_UUUID lIB_ASPS
                       lIB_APPR_ASPS lIB_PLCS lIB_PUBKEYS)))))))))))
-| _ => Coq_errC errStr_json_to_am_lib
 
 (** val coq_Jsonifiable_AM_Library : coq_AM_Library coq_Jsonifiable **)
 

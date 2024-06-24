@@ -404,11 +404,6 @@ fun write_form_man_list_json_and_print_json_app (pathPrefix : string) (ets:(coq_
   handle Excn e => TextIOExtra.printLn e
 
 
-(* TODO: better error handling here -- i.e. reasonable error message if file not found... *)
-fun parse_private_key file =
-  BString.unshow (TextIOExtra.readFile file)
-
-fun argIndPresent (i:int) = (i <> ~1)
   
 
 (* Retrieves the manifest filename and private key (as strings)

@@ -30,15 +30,15 @@ fun handleIncoming listener ac =
          | Socket.InvalidFD => TextIOExtra.printLn_err "Invalid file descriptor"
 
 
-(* () -> () *)
-fun startServer () =
+(* coq_AM_Config -> unit *)
+fun startServer ac =
     let val queueLength = 5 (* TODO: Hardcoded queuelength *)
-        val uuid = ManifestUtils.get_myUUID()
+        val (Coq_mkAmConfig _ uuid _ _ _ _) = ac 
         val (ip, port) = decodeUUID uuid
         val _ = TextIOExtra.printLn ("Starting up Server")
         val _ = TextIOExtra.printLn ("On port: " ^ (Int.toString port) ^ "\nQueue Length: " ^ (Int.toString queueLength))
     in 
-     loop (handleIncoming (Socket.listen port queueLength) ac)
+     loop handleIncoming (Socket.listen port queueLength) ac
     end
     handle Socket.Err s => TextIO.print_err ("Socket failure on listener instantiation: " ^ s ^ "\n")
          | Crypto.Err s => TextIO.print_err ("Crypto error: " ^ s ^ "\n")
@@ -56,7 +56,7 @@ fun main () =
       val (Build_Manifest my_plc _ _ _ _ _ _) = man 
       val _ = print ("My Place (retrieved from Manifest): " ^ my_plc ^ "\n\n")
   in
-    startServer()
+    startServer ac
   end
   handle Exception e => TextIO.print_err e 
           | ManifestJsonConfig.Excn e => TextIO.print_err ("ManifestUtils Error: " ^ e)
