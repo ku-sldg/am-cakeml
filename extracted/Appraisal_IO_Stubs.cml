@@ -1,8 +1,3 @@
-(** val gen_nonce_bits : coq_BS **)
-
-val gen_nonce_bits =
-  failwith "AXIOM TO BE REALIZED"
-
 (** val decrypt_bs_to_rawev_prim :
     coq_BS -> coq_ASP_PARAMS -> coq_PublicKey -> (coq_RawEv,
     coq_DispatcherErrors) coq_ResultT **)

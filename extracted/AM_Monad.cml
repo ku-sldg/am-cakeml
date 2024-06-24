@@ -16,37 +16,8 @@ fun run_am_app_comp_init am_comp st =
 (** val get_AM_amConfig : coq_AM_Config coq_AM **)
 
 val get_AM_amConfig =
-  (bind get (fn st =>
-    ret (let val Coq_mkAM_St _ _ amConfig = st in amConfig end))) : coq_AM_Config coq_AM
-
-(** val put_amConfig : coq_AM_Config -> unit coq_AM **)
-
-fun put_amConfig ac =
-  bind get (fn oldSt =>
-    let val oldMap =
-      let val Coq_mkAM_St am_nonceMap _ _ = oldSt in am_nonceMap end
-    in
-    let val oldId =
-      let val Coq_mkAM_St _ am_nonceId _ = oldSt in am_nonceId end
-    in
-    put (Coq_mkAM_St oldMap oldId ac) end end)
-
-(** val am_newNonce : coq_BS -> nat coq_AM **)
-
-fun am_newNonce bs =
-  bind get (fn oldSt =>
-    let val oldMap =
-      let val Coq_mkAM_St am_nonceMap _ _ = oldSt in am_nonceMap end
-    in
-    let val oldId =
-      let val Coq_mkAM_St _ am_nonceId _ = oldSt in am_nonceId end
-    in
-    let val oldAMConfig =
-      let val Coq_mkAM_St _ _ amConfig = oldSt in amConfig end
-    in
-    let val newMap = map_set nat_EqClass oldMap oldId bs in
-    let val newId = add oldId (S O) in
-    bind (put (Coq_mkAM_St newMap newId oldAMConfig)) (fn _ => ret oldId) end end end end end)
+  bind get (fn st =>
+    ret (let val Coq_mkAM_St _ _ amConfig = st in amConfig end))
 
 (** val am_getNonce : nat -> coq_BS coq_AM **)
 

@@ -35,18 +35,6 @@ fun manset_add hA a s = case s of
                True => s
              | False => h :: (manset_add hA a t))
 
-(** val filter_manset :
-    ('a1 -> bool) -> 'a1 manifest_set -> 'a1 manifest_set **)
-
-val filter_manset =
-  filter
-
-(** val is_empty_manset : 'a1 manifest_set -> bool **)
-
-fun is_empty_manset s = case s of
-  [] => True
-| _ :: _ => False
-
 (** val in_dec_set : 'a1 coq_EqClass -> 'a1 -> 'a1 manifest_set -> sumbool **)
 
 fun in_dec_set hA a s =

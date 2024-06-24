@@ -9,11 +9,6 @@ val coq_Term_to_stringT =
 val stringT_to_Term =
   failwith "AXIOM TO BE REALIZED"
 
-(** val coq_Evidence_to_stringT : coq_Evidence -> coq_StringT **)
-
-val coq_Evidence_to_stringT =
-  failwith "AXIOM TO BE REALIZED"
-
 (** val stringT_to_Evidence :
     coq_StringT -> (coq_Evidence, coq_StringT) coq_ResultT **)
 

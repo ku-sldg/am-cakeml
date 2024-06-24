@@ -1,5 +1,0 @@
-(** val eq_plc_dec :
-    coq_ID_Type coq_EqClass -> coq_Plc -> coq_Plc -> sumbool **)
-
-val eq_plc_dec =
-  coq_EqClass_impl_DecEq

@@ -57,7 +57,7 @@ val store_args = []
 (** val appraise_inline_args : coq_Arg list **)
 (* NOTE: These functions seems worthless, 
 nothing is actually happening I feel like? *)
-val appraise_inline_args : coq_ASP_ARGS = 
+(* val appraise_inline_args : coq_ASP_ARGS = 
   let val appTerm = example_phrase_p2_appraise
       val appReq = (Coq_mkPAReq appTerm coq_P1 (Coq_nn O) [])
       val jsonAppReq = coq_ProtocolAppraiseRequest_to_JSON appReq
@@ -74,7 +74,7 @@ val check_ssl_sig_args : coq_ASP_ARGS =
       val jsonAppReq = coq_ProtocolAppraiseRequest_to_JSON appReq
       val strJsonAppReq = coq_JSON_to_stringT jsonAppReq in
         [Coq_pair "CHECK_SSL_SIG" (strJsonAppReq)]
-  end
+  end *)
 
 
 (* 

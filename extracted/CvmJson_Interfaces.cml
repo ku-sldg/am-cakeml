@@ -63,25 +63,6 @@ fun coq_JSON_to_ProtocolNegotiateResponse resp =
       res_bind (stringT_to_Term temp_term) (fn term => Coq_resultC
         (Coq_mkPNResp temp_success term))))
 
-(** val coq_ProtocolAppraiseRequest_to_JSON :
-    coq_ProtocolAppraiseRequest -> coq_JSON **)
-
-fun coq_ProtocolAppraiseRequest_to_JSON req =
-  JSON_Object ((Coq_pair coq_STR_TYPE (JSON_String
-    coq_STR_REQUEST)) :: ((Coq_pair coq_STR_ACTION (JSON_String
-    coq_STR_APPRAISE)) :: ((Coq_pair coq_STR_TERM (JSON_String
-    (coq_Term_to_stringT
-      (let val Coq_mkPAReq pareq_term _ _ _ = req in pareq_term end)))) :: ((Coq_pair
-    coq_STR_REQ_PLC (JSON_String
-    (coq_Plc_to_stringT
-      (let val Coq_mkPAReq _ pareq_plc _ _ = req in pareq_plc end)))) :: ((Coq_pair
-    coq_STR_EVIDENCE (JSON_String
-    (coq_Evidence_to_stringT
-      (let val Coq_mkPAReq _ _ pareq_evidence _ = req in pareq_evidence end)))) :: ((Coq_pair
-    coq_STR_EV (JSON_String
-    (coq_RawEv_to_stringT
-      (let val Coq_mkPAReq _ _ _ pareq_ev = req in pareq_ev end)))) :: []))))))
-
 (** val coq_JSON_to_ProtocolAppraiseRequest :
     coq_JSON -> (coq_ProtocolAppraiseRequest, coq_StringT) coq_ResultT **)
 

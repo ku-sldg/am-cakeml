@@ -28,14 +28,6 @@ fun forallb f l = case l of
                 True => forallb f l0
               | False => False)
 
-(** val filter : ('a1 -> bool) -> 'a1 list -> 'a1 list **)
-
-fun filter f l = case l of
-  [] => []
-| x :: l0 => (case f x of
-                True => x :: (filter f l0)
-              | False => filter f l0)
-
 (** val firstn : nat -> 'a1 list -> 'a1 list **)
 
 fun firstn n l =

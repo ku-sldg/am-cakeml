@@ -24,13 +24,3 @@ fun do_start_par_thread _ _ _ =
 
 fun do_wait_par_thread loc =
   ret (parallel_vm_thread loc)
-
-(** val is_local_appraisal : coq_AM_Library -> bool **)
-
-val is_local_appraisal =
-  failwith "AXIOM TO BE REALIZED"
-
-(** val pretty_print_manifest : coq_Manifest -> coq_StringT **)
-
-val pretty_print_manifest =
-  failwith "AXIOM TO BE REALIZED"
