@@ -1,89 +1,89 @@
 (** val errStr_amNonce : coq_StringT **)
 
-val errStr_amNonce =
+val errStr_amNonce : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val errStr_peel_bs_am : coq_StringT **)
 
-val errStr_peel_bs_am =
+val errStr_peel_bs_am : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val errStr_peel_n_am : coq_StringT **)
 
-val errStr_peel_n_am =
+val errStr_peel_n_am : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val errStr_disclosePolicy : coq_StringT **)
 
-val errStr_disclosePolicy =
+val errStr_disclosePolicy : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val errStr_dispatch_error : coq_StringT **)
 
-val errStr_dispatch_error =
+val errStr_dispatch_error : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val errStr_cvm_error : coq_StringT **)
 
-val errStr_cvm_error =
+val errStr_cvm_error : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val errStr_et_size : coq_StringT **)
 
-val errStr_et_size =
+val errStr_et_size : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val errStr_empty_raw_ev : coq_StringT **)
 
-val errStr_empty_raw_ev =
+val errStr_empty_raw_ev : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val errStr_raw_evidence_too_long : coq_StringT **)
 
-val errStr_raw_evidence_too_long =
+val errStr_raw_evidence_too_long : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val errStr_remote_am_failure : coq_StringT **)
 
-val errStr_remote_am_failure =
+val errStr_remote_am_failure : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val errStr_incorrect_resp_type : coq_StringT **)
 
-val errStr_incorrect_resp_type =
+val errStr_incorrect_resp_type : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val errStr_invalid_request_type : coq_StringT **)
 
-val errStr_invalid_request_type =
+val errStr_invalid_request_type : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val errStr_negotiation_not_implemented : coq_StringT **)
 
-val errStr_negotiation_not_implemented =
+val errStr_negotiation_not_implemented : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val errStr_run_cvm_at_error_dynamic : coq_StringT **)
 
-val errStr_run_cvm_at_error_dynamic =
+val errStr_run_cvm_at_error_dynamic : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val errStr_run_cvm_at_error_static : coq_StringT **)
 
-val errStr_run_cvm_at_error_static =
+val errStr_run_cvm_at_error_static : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val errStr_json_to_manifest_set : coq_StringT **)
 
-val errStr_json_to_manifest_set =
+val errStr_json_to_manifest_set : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val errStr_json_to_id_type : coq_StringT **)
 
-val errStr_json_to_id_type =
+val errStr_json_to_id_type : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val errStr_json_to_pair : coq_StringT **)
 
-val errStr_json_to_pair =
+val errStr_json_to_pair : coq_StringT =
   failwith "AXIOM TO BE REALIZED"

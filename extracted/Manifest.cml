@@ -4,15 +4,15 @@ datatype coq_ASP_Locator =
 
 (** val jsonifiable_ASP_Locator : coq_ASP_Locator coq_Jsonifiable **)
 
-val jsonifiable_ASP_Locator =
+val jsonifiable_ASP_Locator : coq_ASP_Locator coq_Jsonifiable =
   Build_Jsonifiable (fn v =>
     case v of
       Local_ASP loc =>
-      JSON_Object ((Coq_pair coq_JSON_Local_ASP
+      JSON_Object ((coq_JSON_Local_ASP,
         (let val Build_Jsonifiable to_JSON _ = jsonifiable_FS_Location in
          to_JSON loc end)) :: [])
     | Remote_ASP uuid =>
-      JSON_Object ((Coq_pair coq_JSON_Remote_ASP
+      JSON_Object ((coq_JSON_Remote_ASP,
         (let val Build_Jsonifiable to_JSON _ = jsonifiable_uuid in
          to_JSON uuid end)) :: [])) (fn js =>
     case coq_JSON_get_JSON coq_JSON_Local_ASP js of
@@ -42,27 +42,27 @@ type coq_PubKeyCallback =
 
 type coq_PlcCallback = coq_Plc -> (coq_UUID, coq_DispatcherErrors) coq_ResultT
 
-type coq_PolicyT = (coq_Plc, coq_ASP_ID) prod list
+type coq_PolicyT = (coq_Plc * coq_ASP_ID) list
 
 (** val empty_PolicyT : coq_PolicyT **)
 
-val empty_PolicyT =
+val empty_PolicyT : coq_PolicyT =
   []
 
 datatype coq_Manifest =
   Build_Manifest coq_Plc (coq_ASP_ID manifest_set)
-   ((coq_Plc, coq_ASP_ID) prod manifest_set) (coq_Plc manifest_set)
+   ((coq_Plc * coq_ASP_ID) manifest_set) (coq_Plc manifest_set)
    (coq_Plc manifest_set) (coq_Plc manifest_set) coq_PolicyT
 
 (** val empty_Manifest : coq_Manifest **)
 
-val empty_Manifest =
+val empty_Manifest : coq_Manifest =
   Build_Manifest empty_Manifest_Plc manifest_set_empty manifest_set_empty
     manifest_set_empty manifest_set_empty manifest_set_empty empty_PolicyT
 
 datatype coq_AM_Library =
   Build_AM_Library coq_UUID ((coq_ASP_ID, coq_ASP_Locator) coq_MapC)
-   (((coq_Plc, coq_ASP_ID) prod, coq_ASP_Locator) coq_MapC)
+   ((coq_Plc * coq_ASP_ID, coq_ASP_Locator) coq_MapC)
    ((coq_Plc, coq_UUID) coq_MapC) ((coq_Plc, coq_PublicKey) coq_MapC)
 
 datatype coq_AM_Config =

@@ -4,30 +4,30 @@ fun coq_Manifest_to_JSON m =
   let val Build_Manifest my_abstract_plc asps appraisal_asps uuidPlcs
     pubKeyPlcs targetPlcs policy = m
   in
-  JSON_Object ((Coq_pair coq_MAN_ABS_PLC
+  JSON_Object ((coq_MAN_ABS_PLC,
   (let val Build_Jsonifiable to_JSON _ = jsonifiable_ID_type in
-   to_JSON my_abstract_plc end)) :: ((Coq_pair coq_MAN_ASPS
+   to_JSON my_abstract_plc end)) :: ((coq_MAN_ASPS,
   (let val Build_Jsonifiable to_JSON _ =
      jsonifiable_manifest_set jsonifiable_ID_type
    in
-   to_JSON asps end)) :: ((Coq_pair coq_MAN_APPR_ASPS
+   to_JSON asps end)) :: ((coq_MAN_APPR_ASPS,
   (let val Build_Jsonifiable to_JSON _ =
      jsonifiable_manifest_set
        (jsonifiable_pair jsonifiable_ID_type jsonifiable_ID_type)
    in
-   to_JSON appraisal_asps end)) :: ((Coq_pair coq_MAN_UUUID_PLCS
+   to_JSON appraisal_asps end)) :: ((coq_MAN_UUUID_PLCS,
   (let val Build_Jsonifiable to_JSON _ =
      jsonifiable_manifest_set jsonifiable_ID_type
    in
-   to_JSON uuidPlcs end)) :: ((Coq_pair coq_MAN_PUBKEY_PLCS
+   to_JSON uuidPlcs end)) :: ((coq_MAN_PUBKEY_PLCS,
   (let val Build_Jsonifiable to_JSON _ =
      jsonifiable_manifest_set jsonifiable_ID_type
    in
-   to_JSON pubKeyPlcs end)) :: ((Coq_pair coq_MAN_TARGET_PLCS
+   to_JSON pubKeyPlcs end)) :: ((coq_MAN_TARGET_PLCS,
   (let val Build_Jsonifiable to_JSON _ =
      jsonifiable_manifest_set jsonifiable_ID_type
    in
-   to_JSON targetPlcs end)) :: ((Coq_pair coq_MAN_POLICY
+   to_JSON targetPlcs end)) :: ((coq_MAN_POLICY,
   (let val Build_Jsonifiable to_JSON _ =
      jsonifiable_manifest_set
        (jsonifiable_pair jsonifiable_ID_type jsonifiable_ID_type)
@@ -91,7 +91,7 @@ fun coq_JSON_to_Manifest js =
 
 (** val coq_Jsonifiable_Manifest : coq_Manifest coq_Jsonifiable **)
 
-val coq_Jsonifiable_Manifest =
+val coq_Jsonifiable_Manifest : coq_Manifest coq_Jsonifiable =
   Build_Jsonifiable coq_Manifest_to_JSON coq_JSON_to_Manifest
 
 (** val coq_AM_Lib_to_JSON : coq_AM_Library -> coq_JSON **)
@@ -100,26 +100,26 @@ fun coq_AM_Lib_to_JSON am =
   let val Build_AM_Library clone_uuid lib_asps lib_appr_asps lib_plcs
     lib_pubkeys = am
   in
-  JSON_Object ((Coq_pair coq_AM_CLONE_UUUID
+  JSON_Object ((coq_AM_CLONE_UUUID,
   (let val Build_Jsonifiable to_JSON _ = jsonifiable_uuid in
-   to_JSON clone_uuid end)) :: ((Coq_pair coq_AM_LIB_ASPS
+   to_JSON clone_uuid end)) :: ((coq_AM_LIB_ASPS,
   (let val Build_Jsonifiable to_JSON _ =
      jsonifiable_manifest_set
        (jsonifiable_pair jsonifiable_ID_type jsonifiable_ASP_Locator)
    in
-   to_JSON lib_asps end)) :: ((Coq_pair coq_AM_LIB_APPR_ASPS
+   to_JSON lib_asps end)) :: ((coq_AM_LIB_APPR_ASPS,
   (let val Build_Jsonifiable to_JSON _ =
      jsonifiable_manifest_set
        (jsonifiable_pair
          (jsonifiable_pair jsonifiable_ID_type jsonifiable_ID_type)
          jsonifiable_ASP_Locator)
    in
-   to_JSON lib_appr_asps end)) :: ((Coq_pair coq_AM_LIB_PLCS
+   to_JSON lib_appr_asps end)) :: ((coq_AM_LIB_PLCS,
   (let val Build_Jsonifiable to_JSON _ =
      jsonifiable_manifest_set
        (jsonifiable_pair jsonifiable_ID_type jsonifiable_uuid)
    in
-   to_JSON lib_plcs end)) :: ((Coq_pair coq_AM_LIB_PUBKEYS
+   to_JSON lib_plcs end)) :: ((coq_AM_LIB_PUBKEYS,
   (let val Build_Jsonifiable to_JSON _ =
      jsonifiable_manifest_set
        (jsonifiable_pair jsonifiable_ID_type jsonifiable_public_key)
@@ -173,5 +173,5 @@ fun coq_JSON_to_AM_Lib js =
 
 (** val coq_Jsonifiable_AM_Library : coq_AM_Library coq_Jsonifiable **)
 
-val coq_Jsonifiable_AM_Library =
+val coq_Jsonifiable_AM_Library : coq_AM_Library coq_Jsonifiable =
   Build_Jsonifiable coq_AM_Lib_to_JSON coq_JSON_to_AM_Lib

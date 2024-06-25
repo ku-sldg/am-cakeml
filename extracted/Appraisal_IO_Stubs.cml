@@ -2,10 +2,11 @@
     coq_BS -> coq_ASP_PARAMS -> coq_PublicKey -> (coq_RawEv,
     coq_DispatcherErrors) coq_ResultT **)
 
-val decrypt_bs_to_rawev_prim =
+val decrypt_bs_to_rawev_prim : (coq_BS -> coq_ASP_PARAMS -> coq_PublicKey ->
+                               (coq_RawEv, coq_DispatcherErrors) coq_ResultT) =
   failwith "AXIOM TO BE REALIZED"
 
 (** val checkNonce : coq_BS -> coq_BS -> coq_BS **)
 
-val checkNonce =
+val checkNonce : (coq_BS -> coq_BS -> coq_BS) =
   failwith "AXIOM TO BE REALIZED"

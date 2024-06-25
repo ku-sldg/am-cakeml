@@ -1,8 +1,8 @@
 (** val manifest_generator_plcTerm_list :
-    (coq_Term, coq_Plc) prod list -> coq_EnvironmentM list **)
+    (coq_Term * coq_Plc) list -> coq_EnvironmentM list **)
 
 fun manifest_generator_plcTerm_list ls =
-  map (fn pat => let val Coq_pair t p = pat in manifest_generator t p end) ls
+  map (fn pat => let val (t, p) = pat in manifest_generator t p end) ls
 
 (** val env_list_union : coq_EnvironmentM list -> coq_EnvironmentM **)
 
@@ -10,29 +10,28 @@ fun env_list_union ls =
   fold_right environment_union e_empty ls
 
 (** val mangen_plcTerm_list_union :
-    (coq_Term, coq_Plc) prod list -> coq_EnvironmentM **)
+    (coq_Term * coq_Plc) list -> coq_EnvironmentM **)
 
 fun mangen_plcTerm_list_union ls =
   env_list_union (manifest_generator_plcTerm_list ls)
 
 (** val manifest_generator_plcEvidence_list :
-    (coq_Evidence, coq_Plc) prod list -> coq_EnvironmentM list **)
+    (coq_Evidence * coq_Plc) list -> coq_EnvironmentM list **)
 
 fun manifest_generator_plcEvidence_list ls =
-  map (fn pat =>
-    let val Coq_pair et p = pat in manifest_generator_app et p end) ls
+  map (fn pat => let val (et, p) = pat in manifest_generator_app et p end) ls
 
 (** val mangen_plcEvidence_list_union :
-    (coq_Evidence, coq_Plc) prod list -> coq_EnvironmentM **)
+    (coq_Evidence * coq_Plc) list -> coq_EnvironmentM **)
 
 fun mangen_plcEvidence_list_union ls =
   env_list_union (manifest_generator_plcEvidence_list ls)
 
 (** val knowsof_myPlc_manifest_update_env' :
-    (coq_Plc, coq_Manifest) prod -> (coq_Plc, coq_Manifest) prod **)
+    (coq_Plc * coq_Manifest) -> coq_Plc * coq_Manifest **)
 
 fun knowsof_myPlc_manifest_update_env' p =
-  Coq_pair (fst p) (knowsof_myPlc_manifest_update (snd p))
+  ((fst p), (knowsof_myPlc_manifest_update (snd p)))
 
 (** val update_knowsOf_myPlc_env : coq_EnvironmentM -> coq_EnvironmentM **)
 
@@ -40,11 +39,10 @@ fun update_knowsOf_myPlc_env env =
   map knowsof_myPlc_manifest_update_env' env
 
 (** val update_pubkeys_env' :
-    coq_Plc manifest_set -> (coq_Plc, coq_Manifest) prod -> (coq_Plc,
-    coq_Manifest) prod **)
+    coq_Plc manifest_set -> (coq_Plc * coq_Manifest) -> coq_Plc * coq_Manifest **)
 
 fun update_pubkeys_env' pubs p =
-  Coq_pair (fst p) (pubkeys_manifest_update pubs (snd p))
+  ((fst p), (pubkeys_manifest_update pubs (snd p)))
 
 (** val update_pubkeys_env :
     coq_Plc manifest_set -> coq_EnvironmentM -> coq_EnvironmentM **)
@@ -53,7 +51,7 @@ fun update_pubkeys_env pubs env =
   map (update_pubkeys_env' pubs) env
 
 (** val end_to_end_mangen' :
-    (coq_Evidence, coq_Plc) prod list -> (coq_Term, coq_Plc) prod list ->
+    (coq_Evidence * coq_Plc) list -> (coq_Term * coq_Plc) list ->
     coq_EnvironmentM **)
 
 fun end_to_end_mangen' ls ts =
@@ -68,19 +66,19 @@ fun manset_union_list hA lss =
   fold_right (manset_union hA) [] lss
 
 (** val get_all_unique_places :
-    (coq_Term, coq_Plc) prod list -> (coq_Evidence, coq_Plc) prod list ->
-    coq_Plc manifest_set **)
+    (coq_Term * coq_Plc) list -> (coq_Evidence * coq_Plc) list -> coq_Plc
+    manifest_set **)
 
 fun get_all_unique_places ls ets =
   let val lss =
-    map (fn pat => let val Coq_pair t p = pat in places_manset p t end) ls
+    map (fn pat => let val (t, p) = pat in places_manset p t end) ls
   in
   let val ts_ps = manset_union_list coq_Eq_Class_ID_Type lss in
-  let val ets_ps = map (fn pat => let val Coq_pair _ p = pat in p end) ets in
+  let val ets_ps = map (fn pat => let val (_, p) = pat in p end) ets in
   manset_union coq_Eq_Class_ID_Type ts_ps ets_ps end end end
 
 (** val end_to_end_mangen :
-    (coq_Evidence, coq_Plc) prod list -> (coq_Term, coq_Plc) prod list ->
+    (coq_Evidence * coq_Plc) list -> (coq_Term * coq_Plc) list ->
     coq_EnvironmentM **)
 
 fun end_to_end_mangen ls ts =
@@ -88,7 +86,7 @@ fun end_to_end_mangen ls ts =
   update_pubkeys_env ps (update_knowsOf_myPlc_env (end_to_end_mangen' ls ts)) end
 
 (** val end_to_end_mangen_final :
-    (coq_Evidence, coq_Plc) prod list -> (coq_Term, coq_Plc) prod list ->
+    (coq_Evidence * coq_Plc) list -> (coq_Term * coq_Plc) list ->
     coq_Manifest list **)
 
 fun end_to_end_mangen_final ls ts =

@@ -1,12 +1,11 @@
-(** val in_dec : ('a1 -> 'a1 -> sumbool) -> 'a1 -> 'a1 list -> sumbool **)
+(** val in_dec : ('a1 -> 'a1 -> bool) -> 'a1 -> 'a1 list -> bool **)
 
 fun in_dec h a l = case l of
-  [] => Coq_right
+  [] => False
 | y :: l0 =>
-  let val s = h y a in
-  (case s of
-     Coq_left => Coq_left
-   | Coq_right => in_dec h a l0) end
+  let val s = h y a in (case s of
+                          True => True
+                        | False => in_dec h a l0) end
 
 (** val map : ('a1 -> 'a2) -> 'a1 list -> 'a2 list **)
 
@@ -24,9 +23,7 @@ fun fold_right f a0 l = case l of
 
 fun forallb f l = case l of
   [] => True
-| a :: l0 => (case f a of
-                True => forallb f l0
-              | False => False)
+| a :: l0 => (fn x => fn y => x andalso y) (f a) (forallb f l0)
 
 (** val firstn : nat -> 'a1 list -> 'a1 list **)
 

@@ -2,12 +2,12 @@ type coq_Plc = coq_ID_Type
 
 (** val coq_Plc_to_stringT : coq_Plc -> coq_StringT **)
 
-val coq_Plc_to_stringT =
+val coq_Plc_to_stringT : (coq_Plc -> coq_StringT) =
   coq_ID_Type_to_stringT
 
 (** val stringT_to_Plc : coq_StringT -> (coq_Plc, coq_StringT) coq_ResultT **)
 
-val stringT_to_Plc =
+val stringT_to_Plc : (coq_StringT -> (coq_Plc, coq_StringT) coq_ResultT) =
   stringT_to_ID_Type
 
 type coq_N_ID = nat
@@ -18,14 +18,14 @@ type coq_ASP_ID = coq_ID_Type
 
 (** val coq_ASP_ID_to_stringT : coq_ASP_ID -> coq_StringT **)
 
-val coq_ASP_ID_to_stringT =
+val coq_ASP_ID_to_stringT : (coq_ASP_ID -> coq_StringT) =
   coq_ID_Type_to_stringT
 
 type coq_TARG_ID = coq_ID_Type
 
 (** val coq_TARG_ID_to_stringT : coq_TARG_ID -> coq_StringT **)
 
-val coq_TARG_ID_to_stringT =
+val coq_TARG_ID_to_stringT : (coq_TARG_ID -> coq_StringT) =
   coq_ID_Type_to_stringT
 
 type coq_ASP_ARGS = (coq_StringT, coq_StringT) coq_MapC
@@ -58,7 +58,7 @@ datatype coq_ASP =
 | HSH 
 | ENC coq_Plc
 
-type coq_Split = (coq_SP, coq_SP) prod
+type coq_Split = coq_SP * coq_SP
 
 datatype coq_Term =
   Coq_asp coq_ASP

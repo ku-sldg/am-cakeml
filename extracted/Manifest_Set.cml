@@ -35,7 +35,7 @@ fun manset_add hA a s = case s of
                True => s
              | False => h :: (manset_add hA a t))
 
-(** val in_dec_set : 'a1 coq_EqClass -> 'a1 -> 'a1 manifest_set -> sumbool **)
+(** val in_dec_set : 'a1 coq_EqClass -> 'a1 -> 'a1 manifest_set -> bool **)
 
 fun in_dec_set hA a s =
   in_dec (coq_EqClass_impl_DecEq hA) a s

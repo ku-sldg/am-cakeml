@@ -3,12 +3,11 @@ datatype 'a coq_Jsonifiable =
    ((coq_JSON -> ('a, coq_StringT) coq_ResultT))
 
 (** val jsonifiable_pair :
-    'a1 coq_Jsonifiable -> 'a2 coq_Jsonifiable -> ('a1, 'a2) prod
-    coq_Jsonifiable **)
+    'a1 coq_Jsonifiable -> 'a2 coq_Jsonifiable -> ('a1 * 'a2) coq_Jsonifiable **)
 
 fun jsonifiable_pair h h0 =
   Build_Jsonifiable (fn pat =>
-    let val Coq_pair a b = pat in
+    let val (a, b) = pat in
     JSON_Array
     ((let val Build_Jsonifiable to_JSON _ = h in to_JSON a end) :: ((
                                                                     let val Build_Jsonifiable to_JSON
@@ -33,13 +32,13 @@ fun jsonifiable_pair h h0 =
                   (case let val Build_Jsonifiable _ from_JSON = h0 in
                         from_JSON b end of
                      Coq_errC e => Coq_errC e
-                   | Coq_resultC b' => Coq_resultC (Coq_pair a' b')))
+                   | Coq_resultC b' => Coq_resultC (a', b')))
              | _ :: _ => Coq_errC errStr_json_to_pair)))
     | _ => Coq_errC errStr_json_to_pair)
 
 (** val jsonifiable_ID_type : coq_ID_Type coq_Jsonifiable **)
 
-val jsonifiable_ID_type =
+val jsonifiable_ID_type : coq_ID_Type coq_Jsonifiable =
   Build_Jsonifiable (fn v => JSON_String (coq_ID_Type_to_stringT v)) (fn v =>
     case v of
       JSON_String s => stringT_to_ID_Type s

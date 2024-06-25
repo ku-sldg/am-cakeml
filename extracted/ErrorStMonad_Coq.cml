@@ -1,36 +1,36 @@
-type ('s, 'a, 'e) coq_Err = 's -> (('a, 'e) coq_ResultT, 's) prod
+type ('s, 'a, 'e) coq_Err = 's -> ('a, 'e) coq_ResultT * 's
 
 (** val ret : 'a2 -> ('a1, 'a2, 'a3) coq_Err **)
 
 fun ret a s =
-  Coq_pair (Coq_resultC a) s
+  ((Coq_resultC a), s)
 
 (** val bind :
     ('a1, 'a2, 'a4) coq_Err -> ('a2 -> ('a1, 'a3, 'a4) coq_Err) -> ('a1, 'a3,
     'a4) coq_Err **)
 
 fun bind m f s =
-  let val Coq_pair a s' = m s in
+  let val (a, s') = m s in
   (case a of
-     Coq_errC e => Coq_pair (Coq_errC e) s'
+     Coq_errC e => ((Coq_errC e), s')
    | Coq_resultC v => f v s') end
 
 (** val failm : 'a3 -> ('a1, 'a2, 'a3) coq_Err **)
 
 fun failm e s =
-  Coq_pair (Coq_errC e) s
+  ((Coq_errC e), s)
 
 (** val modify : ('a1 -> 'a1) -> ('a1, unit, 'a2) coq_Err **)
 
 fun modify f s =
-  Coq_pair (Coq_resultC ()) (f s)
+  ((Coq_resultC ()), (f s))
 
 (** val put : 'a1 -> ('a1, unit, 'a2) coq_Err **)
 
 fun put s _ =
-  Coq_pair (Coq_resultC ()) s
+  ((Coq_resultC ()), s)
 
 (** val get : ('a1, 'a1, 'a2) coq_Err **)
 
 fun get s =
-  Coq_pair (Coq_resultC s) s
+  ((Coq_resultC s), s)

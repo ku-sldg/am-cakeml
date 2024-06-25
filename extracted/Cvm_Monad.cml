@@ -10,18 +10,18 @@ fun put_ev e =
 
 (** val get_ev : coq_EvC coq_CVM **)
 
-val get_ev =
-  (bind get (fn st => ret (let val Coq_mk_st st_ev _ _ _ = st in st_ev end))) : coq_EvC coq_CVM
+val get_ev : coq_EvC coq_CVM =
+  bind get (fn st => ret (let val Coq_mk_st st_ev _ _ _ = st in st_ev end))
 
 (** val get_CVM_amConfig : coq_AM_Config coq_CVM **)
 
-val get_CVM_amConfig =
-  (bind get (fn st =>
-    ret (let val Coq_mk_st _ _ _ st_AM_config = st in st_AM_config end))) : coq_AM_Config coq_CVM
+val get_CVM_amConfig : coq_AM_Config coq_CVM =
+  bind get (fn st =>
+    ret (let val Coq_mk_st _ _ _ st_AM_config = st in st_AM_config end))
 
 (** val get_pl : coq_Plc coq_CVM **)
 
-val get_pl =
+val get_pl : coq_Plc coq_CVM =
   bind get_CVM_amConfig (fn ac =>
     ret
       (let val Build_Manifest my_abstract_plc _ _ _ _ _ _ =
@@ -31,14 +31,14 @@ val get_pl =
 
 (** val inc_id : coq_Event_ID coq_CVM **)
 
-val inc_id =
-  (bind get (fn st =>
+val inc_id : coq_Event_ID coq_CVM =
+  bind get (fn st =>
     let val tr' = let val Coq_mk_st _ st_trace _ _ = st in st_trace end in
     let val e' = let val Coq_mk_st st_ev _ _ _ = st in st_ev end in
     let val i = let val Coq_mk_st _ _ st_evid _ = st in st_evid end in
     let val ac = let val Coq_mk_st _ _ _ st_AM_config = st in st_AM_config end
     in
-    bind (put (Coq_mk_st e' tr' (add i (S O)) ac)) (fn _ => ret i) end end end end)) : coq_Event_ID coq_CVM
+    bind (put (Coq_mk_st e' tr' (add i (S O)) ac)) (fn _ => ret i) end end end end)
 
 (** val add_trace : coq_Ev list -> cvm_st -> cvm_st **)
 
@@ -52,7 +52,7 @@ fun add_tracem tr =
 
 (** val split_ev : unit coq_CVM **)
 
-val split_ev =
+val split_ev : unit coq_CVM =
   bind get_pl (fn p =>
     bind inc_id (fn i => add_tracem ((Coq_split i p) :: [])))
 
@@ -105,14 +105,14 @@ fun invoke_ASP fwd params =
 
 (** val copyEv : coq_EvC coq_CVM **)
 
-val copyEv =
+val copyEv : coq_EvC coq_CVM =
   bind get_pl (fn p =>
     bind inc_id (fn x =>
       bind (add_tracem ((Coq_copy x p) :: [])) (fn _ => get_ev)))
 
 (** val nullEv : coq_EvC coq_CVM **)
 
-val nullEv =
+val nullEv : coq_EvC coq_CVM =
   bind get_pl (fn p =>
     bind inc_id (fn x =>
       bind (add_tracem ((Coq_null x p) :: [])) (fn _ => ret mt_evc)))
@@ -167,7 +167,7 @@ fun tag_RPY p q e =
 
 (** val get_cvm_policy : coq_PolicyT coq_CVM **)
 
-val get_cvm_policy =
+val get_cvm_policy : coq_PolicyT coq_CVM =
   bind get_CVM_amConfig (fn ac =>
     ret
       (let val Build_Manifest _ _ _ _ _ _ policy =

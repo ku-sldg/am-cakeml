@@ -2,7 +2,7 @@
     coq_Core_Term -> cvm_st -> (cvm_st, coq_CVM_Error) coq_ResultT **)
 
 fun run_core_cvm t st =
-  let val Coq_pair res st' = build_cvm t st in
+  let val (res, st') = build_cvm t st in
   (case res of
      Coq_errC e => Coq_errC e
    | Coq_resultC _ => Coq_resultC st') end

@@ -9,6 +9,6 @@ datatype coq_AM_Error =
 (** val am_failm : coq_AM_Error -> (coq_AM_St, 'a1, coq_AM_Error) coq_Err **)
 
 fun am_failm e s =
-  Coq_pair (Coq_errC e) s
+  ((Coq_errC e), s)
 
 type 'a coq_AM = (coq_AM_St, 'a, coq_AM_Error) coq_Err

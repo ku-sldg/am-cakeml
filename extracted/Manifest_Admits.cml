@@ -1,18 +1,18 @@
 (** val coq_JSON_Local_ASP : coq_StringT **)
 
-val coq_JSON_Local_ASP =
+val coq_JSON_Local_ASP : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val coq_JSON_Remote_ASP : coq_StringT **)
 
-val coq_JSON_Remote_ASP =
+val coq_JSON_Remote_ASP : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 type coq_FS_Location (* AXIOM TO BE REALIZED *)
 
 (** val jsonifiable_FS_Location : coq_FS_Location coq_Jsonifiable **)
 
-val jsonifiable_FS_Location =
+val jsonifiable_FS_Location : coq_FS_Location coq_Jsonifiable =
   failwith "AXIOM TO BE REALIZED"
 
 type coq_UUID (* AXIOM TO BE REALIZED *)
@@ -20,32 +20,32 @@ type coq_UUID (* AXIOM TO BE REALIZED *)
 (** val stringT_to_UUUID :
     coq_StringT -> (coq_UUID, coq_StringT) coq_ResultT **)
 
-val stringT_to_UUUID =
+val stringT_to_UUUID : (coq_StringT -> (coq_UUID, coq_StringT) coq_ResultT) =
   failwith "AXIOM TO BE REALIZED"
 
 (** val jsonifiable_uuid : coq_UUID coq_Jsonifiable **)
 
-val jsonifiable_uuid =
+val jsonifiable_uuid : coq_UUID coq_Jsonifiable =
   failwith "AXIOM TO BE REALIZED"
 
 (** val coq_Eq_Class_uuid : coq_UUID coq_EqClass **)
 
-val coq_Eq_Class_uuid =
+val coq_Eq_Class_uuid : coq_UUID coq_EqClass =
   failwith "AXIOM TO BE REALIZED"
 
 type coq_PublicKey (* AXIOM TO BE REALIZED *)
 
 (** val jsonifiable_public_key : coq_PublicKey coq_Jsonifiable **)
 
-val jsonifiable_public_key =
+val jsonifiable_public_key : coq_PublicKey coq_Jsonifiable =
   failwith "AXIOM TO BE REALIZED"
 
 (** val coq_Eq_Class_public_key : coq_PublicKey coq_EqClass **)
 
-val coq_Eq_Class_public_key =
+val coq_Eq_Class_public_key : coq_PublicKey coq_EqClass =
   failwith "AXIOM TO BE REALIZED"
 
 (** val empty_Manifest_Plc : coq_Plc **)
 
-val empty_Manifest_Plc =
+val empty_Manifest_Plc : coq_Plc =
   failwith "AXIOM TO BE REALIZED"

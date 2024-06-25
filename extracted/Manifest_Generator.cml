@@ -135,8 +135,8 @@ fun app_aspid_manifest_update i p m =
     oldTargets oldPolicy = m
   in
   Build_Manifest oldPlc oldasps
-  (manset_add (pair_EqClass coq_Eq_Class_ID_Type coq_Eq_Class_ID_Type)
-    (Coq_pair i p) old_app_asps) oldKnowsOf oldContext oldTargets oldPolicy end
+  (manset_add (pair_EqClass coq_Eq_Class_ID_Type coq_Eq_Class_ID_Type) (i, p)
+    old_app_asps) oldKnowsOf oldContext oldTargets oldPolicy end
 
 (** val manifest_generator_app'' :
     coq_Evidence -> coq_Manifest -> coq_Manifest **)

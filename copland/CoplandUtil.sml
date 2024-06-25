@@ -13,11 +13,24 @@ fun targIdToString s = s
 fun coq_ASP_ARGS_to_string x = 
   Json.stringify (coq_MapC_to_Json x (fn x => x))
 
+fun natToInt n =
+    case n
+     of O => 0
+      | S n' => 1 + natToInt n'
+
+fun natFromInt i = if i < 0
+                   then O
+                   else if i = 0
+                        then O
+                        else S (natFromInt (i - 1))
+
+val natToString = Int.toString o natToInt
+
 (* aspParamsToString : coq_ASP_PARAMS -> string *)
 fun aspParamsToString ps =
     case ps of
         Coq_asp_paramsC aspid args tpl tid =>
-        concatWith " " ["(ASP_PARAMS", aspIdToString aspid,
+        String.concatWith " " ["(ASP_PARAMS", aspIdToString aspid,
                         coq_ASP_ARGS_to_string args,
                         plToString tpl, targIdToString tid, ")"]
 (* spToString : coq_SP -> string *)
@@ -41,13 +54,13 @@ fun aspToString asp = case asp of
     | CPY => "CPY"
     | SIG => "SIG"
     | HSH => "HSH"
-    | ENC q => concatWith " " ["(ENC", plToString q, ")"]
-    | ASPC sp fwd ps => concatWith " " ["(ASPC", spToString sp, fwdToString fwd,
+    | ENC q => String.concatWith " " ["(ENC", plToString q, ")"]
+    | ASPC sp fwd ps => String.concatWith " " ["(ASPC", spToString sp, fwdToString fwd,
                                         aspParamsToString ps, ")"]
 
 
 (* termToString :: coq_Term -> string *)
-fun termToString t = concatWith " "
+fun termToString t = String.concatWith " "
     let fun parens t = "(" ^ termToString t ^ ")"
         fun pairToString s1 s2 = "(" ^ s1 ^ ", " ^ s2 ^ ")"
      in case t of
@@ -69,7 +82,7 @@ fun termToString t = concatWith " "
 val nIdToString = natToString
                       
 (* evToString :: Evidence -> string *)                      
-fun evToString e = concatWith " "
+fun evToString e = String.concatWith " "
     let fun parens e = "(" ^ evToString e ^ ")"
      in case e of
             Coq_mt         => ["Mt"]
@@ -84,7 +97,7 @@ fun evToString e = concatWith " "
 fun rawEvToString e = listToString e BString.toString
 
 (* evidenceCToString :: coq_AppResultC -> string *)
-fun evidenceCToString e = concatWith " "
+fun evidenceCToString e = String.concatWith " "
     let fun parens e = "(" ^ evidenceCToString e ^ ")"
      in case e of
             Coq_mtc_app         => ["Mtc"]
@@ -105,7 +118,7 @@ fun evidenceCToString e = concatWith " "
 fun evCToString evc =
     case evc of
         Coq_evc rawEv et =>
-        concatWith " " ["(EvC", rawEvToString rawEv, evToString et, ")"]
+        String.concatWith " " ["(EvC", rawEvToString rawEv, evToString et, ")"]
 
 (* am_result_ToString :: coq_AM_Result -> string *)
 fun am_result_ToString e = 

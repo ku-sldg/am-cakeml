@@ -1,89 +1,89 @@
 (** val coq_STR_REQ_PLC : coq_StringT **)
 
-val coq_STR_REQ_PLC =
+val coq_STR_REQ_PLC : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val coq_STR_TERM : coq_StringT **)
 
-val coq_STR_TERM =
+val coq_STR_TERM : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val coq_STR_EV : coq_StringT **)
 
-val coq_STR_EV =
+val coq_STR_EV : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val coq_STR_SUCCESS : coq_StringT **)
 
-val coq_STR_SUCCESS =
+val coq_STR_SUCCESS : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val coq_STR_PAYLOAD : coq_StringT **)
 
-val coq_STR_PAYLOAD =
+val coq_STR_PAYLOAD : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val coq_STR_EVIDENCE : coq_StringT **)
 
-val coq_STR_EVIDENCE =
+val coq_STR_EVIDENCE : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val coq_STR_ACTION : coq_StringT **)
 
-val coq_STR_ACTION =
+val coq_STR_ACTION : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val coq_STR_TYPE : coq_StringT **)
 
-val coq_STR_TYPE =
+val coq_STR_TYPE : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val coq_STR_RUN : coq_StringT **)
 
-val coq_STR_RUN =
+val coq_STR_RUN : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val coq_STR_NEGOTIATE : coq_StringT **)
 
-val coq_STR_NEGOTIATE =
+val coq_STR_NEGOTIATE : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val coq_STR_APPRAISE : coq_StringT **)
 
-val coq_STR_APPRAISE =
+val coq_STR_APPRAISE : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val coq_STR_REQUEST : coq_StringT **)
 
-val coq_STR_REQUEST =
+val coq_STR_REQUEST : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val coq_STR_RESPONSE : coq_StringT **)
 
-val coq_STR_RESPONSE =
+val coq_STR_RESPONSE : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val coq_STR_ASP_RUN : coq_StringT **)
 
-val coq_STR_ASP_RUN =
+val coq_STR_ASP_RUN : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val coq_STR_ASP_ID : coq_StringT **)
 
-val coq_STR_ASP_ID =
+val coq_STR_ASP_ID : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val coq_STR_ASP_ARGS : coq_StringT **)
 
-val coq_STR_ASP_ARGS =
+val coq_STR_ASP_ARGS : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val coq_STR_TARG_PLC : coq_StringT **)
 
-val coq_STR_TARG_PLC =
+val coq_STR_TARG_PLC : coq_StringT =
   failwith "AXIOM TO BE REALIZED"
 
 (** val coq_STR_TARG : coq_StringT **)
 
-val coq_STR_TARG =
+val coq_STR_TARG : coq_StringT =
   failwith "AXIOM TO BE REALIZED"

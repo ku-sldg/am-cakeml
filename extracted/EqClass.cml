@@ -7,31 +7,28 @@ type 'a coq_EqClass =
 fun eqb eqClass =
   eqClass
 
-(** val coq_EqClass_impl_DecEq : 'a1 coq_EqClass -> 'a1 -> 'a1 -> sumbool **)
+(** val coq_EqClass_impl_DecEq : 'a1 coq_EqClass -> 'a1 -> 'a1 -> bool **)
 
 fun coq_EqClass_impl_DecEq h x y =
   let val b = h x y in (case b of
-                          True => Coq_left
-                        | False => Coq_right) end
+                          True => True
+                        | False => False) end
 
 (** val nat_EqClass : nat coq_EqClass **)
 
-val nat_EqClass =
+val nat_EqClass : nat coq_EqClass =
   Nat.eqb
 
 (** val eqbPair :
-    'a1 coq_EqClass -> 'a2 coq_EqClass -> ('a1, 'a2) prod -> ('a1, 'a2) prod
-    -> bool **)
+    'a1 coq_EqClass -> 'a2 coq_EqClass -> ('a1 * 'a2) -> ('a1 * 'a2) -> bool **)
 
 fun eqbPair h h' p1 p2 =
-  let val Coq_pair a1 b1 = p1 in
-  let val Coq_pair a2 b2 = p2 in
-  (case eqb h a1 a2 of
-     True => eqb h' b1 b2
-   | False => False) end end
+  let val (a1, b1) = p1 in
+  let val (a2, b2) = p2 in
+  (fn x => fn y => x andalso y) (eqb h a1 a2) (eqb h' b1 b2) end end
 
 (** val pair_EqClass :
-    'a1 coq_EqClass -> 'a2 coq_EqClass -> ('a1, 'a2) prod coq_EqClass **)
+    'a1 coq_EqClass -> 'a2 coq_EqClass -> ('a1 * 'a2) coq_EqClass **)
 
 val pair_EqClass =
   eqbPair

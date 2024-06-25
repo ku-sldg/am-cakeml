@@ -6,9 +6,9 @@ fun minify_mapC hA m f =
   case m of
     [] => []
   | p :: tl =>
-    let val Coq_pair k v = p in
+    let val (k, v) = p in
     (case f k of
-       True => (Coq_pair k v) :: (minify_mapC hA tl f)
+       True => (k, v) :: (minify_mapC hA tl f)
      | False => minify_mapC hA tl f) end
 
 (** val minify_mapD :
@@ -19,9 +19,9 @@ fun minify_mapD hA hB m f =
   case m of
     [] => []
   | p :: tl =>
-    let val Coq_pair k v = p in
+    let val (k, v) = p in
     (case f k of
-       True => (Coq_pair k v) :: (minify_mapD hA hB tl f)
+       True => (k, v) :: (minify_mapD hA hB tl f)
      | False => minify_mapD hA hB tl f) end
 
 (** val generate_ASP_dispatcher' :
@@ -39,8 +39,8 @@ fun generate_ASP_dispatcher' al am par rawEv =
   let val shrunk_map =
     minify_mapC coq_Eq_Class_ID_Type local_asps_map (fn x =>
       case in_dec_set coq_Eq_Class_ID_Type x abstract_asps of
-        Coq_left => True
-      | Coq_right => False)
+        True => True
+      | False => False)
   in
   (case map_get coq_Eq_Class_ID_Type shrunk_map aspid of
      Some loc =>
@@ -83,11 +83,11 @@ fun generate_appraisal_ASP_dispatcher' al am par rawEv =
       case in_dec_set
              (pair_EqClass coq_Eq_Class_ID_Type coq_Eq_Class_ID_Type) x
              abstract_asps of
-        Coq_left => True
-      | Coq_right => False)
+        True => True
+      | False => False)
   in
   (case map_get (pair_EqClass coq_Eq_Class_ID_Type coq_Eq_Class_ID_Type)
-          shrunk_map (Coq_pair targ_plc aspid) of
+          shrunk_map (targ_plc, aspid) of
      Some loc =>
      let val asp_req = Coq_mkASPRReq aspid args targ_plc targ rawEv in
      let val js_req = coq_ASPRunRequest_to_JSON asp_req in
@@ -122,8 +122,8 @@ fun generate_Plc_dispatcher hID al am =
   let val shrunk_map =
     minify_mapD hID coq_Eq_Class_uuid local_plc_map (fn x =>
       case in_dec_set hID x abstract_plcs of
-        Coq_left => True
-      | Coq_right => False)
+        True => True
+      | False => False)
   in
   (fn p =>
   case map_get hID shrunk_map p of
@@ -144,8 +144,8 @@ fun generate_PubKey_dispatcher hID al am =
   let val shrunk_map =
     minify_mapD hID coq_Eq_Class_public_key local_pubkey_map (fn x =>
       case in_dec_set hID x abstract_plcs of
-        Coq_left => True
-      | Coq_right => False)
+        True => True
+      | False => False)
   in
   (fn p =>
   case map_get hID shrunk_map p of

@@ -2,16 +2,17 @@ type coq_ID_Type (* AXIOM TO BE REALIZED *)
 
 (** val coq_ID_Type_to_stringT : coq_ID_Type -> coq_StringT **)
 
-val coq_ID_Type_to_stringT =
+val coq_ID_Type_to_stringT : (coq_ID_Type -> coq_StringT) =
   failwith "AXIOM TO BE REALIZED"
 
 (** val stringT_to_ID_Type :
     coq_StringT -> (coq_ID_Type, coq_StringT) coq_ResultT **)
 
-val stringT_to_ID_Type =
+val stringT_to_ID_Type : (coq_StringT -> (coq_ID_Type, coq_StringT)
+                         coq_ResultT) =
   failwith "AXIOM TO BE REALIZED"
 
 (** val coq_Eq_Class_ID_Type : coq_ID_Type coq_EqClass **)
 
-val coq_Eq_Class_ID_Type =
+val coq_Eq_Class_ID_Type : coq_ID_Type coq_EqClass =
   failwith "AXIOM TO BE REALIZED"

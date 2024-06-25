@@ -1,20 +1,20 @@
-(** val peel_bs_am : coq_RawEv -> (coq_BS, coq_RawEv) prod coq_AM **)
+(** val peel_bs_am : coq_RawEv -> (coq_BS * coq_RawEv) coq_AM **)
 
 fun peel_bs_am ls = case ls of
   [] => am_failm (Coq_am_error errStr_peel_bs_am)
-| bs :: ls' => ret (Coq_pair bs ls')
+| bs :: ls' => ret (bs, ls')
 
-(** val peel_n_am : nat -> coq_RawEv -> (coq_RawEv, coq_RawEv) prod coq_AM **)
+(** val peel_n_am : nat -> coq_RawEv -> (coq_RawEv * coq_RawEv) coq_AM **)
 
 fun peel_n_am n ls =
   case n of
-    O => ret (Coq_pair [] ls)
+    O => ret ([], ls)
   | S n' =>
     (case ls of
        [] => am_failm (Coq_am_error errStr_peel_n_am)
      | x :: ls' =>
        bind (peel_n_am n' ls') (fn v =>
-         let val Coq_pair ls1 ls2 = v in ret (Coq_pair (x :: ls1) ls2) end))
+         let val (ls1, ls2) = v in ret ((x :: ls1), ls2) end))
 
 (** val gen_appraise_AM :
     coq_Evidence -> coq_RawEv -> coq_AppResultC coq_AM **)
@@ -24,19 +24,19 @@ fun gen_appraise_AM et ls =
     Coq_mt => ret Coq_mtc_app
   | Coq_nn nid =>
     bind (peel_bs_am ls) (fn v =>
-      let val Coq_pair bs _ = v in
+      let val (bs, _) = v in
       bind (checkNonce' nid bs) (fn res => ret (Coq_nnc_app nid res)) end)
   | Coq_uu p fwd params et' =>
     (case fwd of
        ENCR =>
        bind (peel_bs_am ls) (fn v =>
-         let val Coq_pair bs _ = v in
+         let val (bs, _) = v in
          bind (decrypt_bs_to_rawev' bs params et') (fn decrypted_ls =>
            bind (gen_appraise_AM et' decrypted_ls) (fn rest =>
              ret (Coq_eec_app p params passed_bs rest))) end)
      | EXTD n =>
        bind (peel_n_am n ls) (fn v =>
-         let val Coq_pair rawEv ls' = v in
+         let val (rawEv, ls') = v in
          bind (check_asp_EXTD' params p rawEv ls') (fn v0 =>
            bind (gen_appraise_AM et' ls') (fn rest =>
              ret (Coq_ggc_app p params v0 rest))) end)

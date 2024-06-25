@@ -2,15 +2,15 @@
     coq_ProtocolRunRequest -> coq_JSON **)
 
 fun coq_ProtocolRunRequest_to_JSON req =
-  JSON_Object ((Coq_pair coq_STR_TYPE (JSON_String
-    coq_STR_REQUEST)) :: ((Coq_pair coq_STR_ACTION (JSON_String
-    coq_STR_RUN)) :: ((Coq_pair coq_STR_REQ_PLC (JSON_String
+  JSON_Object ((coq_STR_TYPE, (JSON_String
+    coq_STR_REQUEST)) :: ((coq_STR_ACTION, (JSON_String
+    coq_STR_RUN)) :: ((coq_STR_REQ_PLC, (JSON_String
     (coq_Plc_to_stringT
-      (let val Coq_mkPRReq _ prreq_req_plc _ = req in prreq_req_plc end)))) :: ((Coq_pair
-    coq_STR_TERM (JSON_String
+      (let val Coq_mkPRReq _ prreq_req_plc _ = req in prreq_req_plc end)))) :: ((coq_STR_TERM,
+    (JSON_String
     (coq_Term_to_stringT
-      (let val Coq_mkPRReq prreq_term _ _ = req in prreq_term end)))) :: ((Coq_pair
-    coq_STR_EV (JSON_String
+      (let val Coq_mkPRReq prreq_term _ _ = req in prreq_term end)))) :: ((coq_STR_EV,
+    (JSON_String
     (coq_RawEv_to_stringT
       (let val Coq_mkPRReq _ _ prreq_ev = req in prreq_ev end)))) :: [])))))
 
@@ -30,11 +30,11 @@ fun coq_JSON_to_ProtocolRunRequest req =
     coq_ProtocolRunResponse -> coq_JSON **)
 
 fun coq_ProtocolRunResponse_to_JSON resp =
-  JSON_Object ((Coq_pair coq_STR_TYPE (JSON_String
-    coq_STR_RESPONSE)) :: ((Coq_pair coq_STR_ACTION (JSON_String
-    coq_STR_RUN)) :: ((Coq_pair coq_STR_SUCCESS (JSON_Boolean
-    (let val Coq_mkPRResp prresp_success _ = resp in prresp_success end))) :: ((Coq_pair
-    coq_STR_PAYLOAD (JSON_String
+  JSON_Object ((coq_STR_TYPE, (JSON_String
+    coq_STR_RESPONSE)) :: ((coq_STR_ACTION, (JSON_String
+    coq_STR_RUN)) :: ((coq_STR_SUCCESS, (JSON_Boolean
+    (let val Coq_mkPRResp prresp_success _ = resp in prresp_success end))) :: ((coq_STR_PAYLOAD,
+    (JSON_String
     (coq_RawEv_to_stringT
       (let val Coq_mkPRResp _ prresp_ev = resp in prresp_ev end)))) :: []))))
 
@@ -82,11 +82,11 @@ fun coq_JSON_to_ProtocolAppraiseRequest req =
     coq_ProtocolAppraiseResponse -> coq_JSON **)
 
 fun coq_ProtocolAppraiseResponse_to_JSON resp =
-  JSON_Object ((Coq_pair coq_STR_TYPE (JSON_String
-    coq_STR_RESPONSE)) :: ((Coq_pair coq_STR_ACTION (JSON_String
-    coq_STR_APPRAISE)) :: ((Coq_pair coq_STR_SUCCESS (JSON_Boolean
-    (let val Coq_mkPAResp paresp_success _ = resp in paresp_success end))) :: ((Coq_pair
-    coq_STR_PAYLOAD (JSON_String
+  JSON_Object ((coq_STR_TYPE, (JSON_String
+    coq_STR_RESPONSE)) :: ((coq_STR_ACTION, (JSON_String
+    coq_STR_APPRAISE)) :: ((coq_STR_SUCCESS, (JSON_Boolean
+    (let val Coq_mkPAResp paresp_success _ = resp in paresp_success end))) :: ((coq_STR_PAYLOAD,
+    (JSON_String
     (coq_AppResultC_to_stringT
       (let val Coq_mkPAResp _ paresp_result = resp in paresp_result end)))) :: []))))
 
@@ -147,21 +147,21 @@ fun coq_JSON_to_AM_Protocol_Response resp =
 (** val coq_ASPRunRequest_to_JSON : coq_ASPRunRequest -> coq_JSON **)
 
 fun coq_ASPRunRequest_to_JSON req =
-  JSON_Object ((Coq_pair coq_STR_TYPE (JSON_String
-    coq_STR_REQUEST)) :: ((Coq_pair coq_STR_ACTION (JSON_String
-    coq_STR_ASP_RUN)) :: ((Coq_pair coq_STR_ASP_ID (JSON_String
+  JSON_Object ((coq_STR_TYPE, (JSON_String
+    coq_STR_REQUEST)) :: ((coq_STR_ACTION, (JSON_String
+    coq_STR_ASP_RUN)) :: ((coq_STR_ASP_ID, (JSON_String
     (coq_ASP_ID_to_stringT
       (let val Coq_mkASPRReq asprreq_asp_id _ _ _ _ = req in
-       asprreq_asp_id end)))) :: ((Coq_pair coq_STR_ASP_ARGS (JSON_String
+       asprreq_asp_id end)))) :: ((coq_STR_ASP_ARGS, (JSON_String
     (coq_ASP_ARGS_to_stringT
       (let val Coq_mkASPRReq _ asprreq_asp_args _ _ _ = req in
-       asprreq_asp_args end)))) :: ((Coq_pair coq_STR_TARG_PLC (JSON_String
+       asprreq_asp_args end)))) :: ((coq_STR_TARG_PLC, (JSON_String
     (coq_Plc_to_stringT
       (let val Coq_mkASPRReq _ _ asprreq_targ_plc _ _ = req in
-       asprreq_targ_plc end)))) :: ((Coq_pair coq_STR_TARG (JSON_String
+       asprreq_targ_plc end)))) :: ((coq_STR_TARG, (JSON_String
     (coq_TARG_ID_to_stringT
-      (let val Coq_mkASPRReq _ _ _ asprreq_targ _ = req in asprreq_targ end)))) :: ((Coq_pair
-    coq_STR_EV (JSON_String
+      (let val Coq_mkASPRReq _ _ _ asprreq_targ _ = req in asprreq_targ end)))) :: ((coq_STR_EV,
+    (JSON_String
     (coq_RawEv_to_stringT
       (let val Coq_mkASPRReq _ _ _ _ asprreq_rawev = req in asprreq_rawev end)))) :: [])))))))
 
@@ -177,5 +177,5 @@ fun coq_JSON_to_ASPRunResponse resp =
 (** val coq_ErrorResponseJSON : coq_StringT -> coq_JSON **)
 
 fun coq_ErrorResponseJSON msg =
-  JSON_Object ((Coq_pair coq_STR_SUCCESS (JSON_Boolean False)) :: ((Coq_pair
-    coq_STR_PAYLOAD (JSON_String msg)) :: []))
+  JSON_Object ((coq_STR_SUCCESS, (JSON_Boolean False)) :: ((coq_STR_PAYLOAD,
+    (JSON_String msg)) :: []))

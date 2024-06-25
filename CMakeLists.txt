@@ -29,7 +29,7 @@ endfunction()
 
 set(BASIS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/system/basis_ffi.c" CACHE PATH "Filepath of basis_ffi.c to use (associated with the compiler version).")
 
-get_files(util_src util/CoqDefaults.sml util/Extra.sml
+get_files(util_src util/Extra.sml
     util/ByteString.sml util/Misc.sml util/Parser.sml util/Json.sml
     util/BinaryParser.sml util/Http.sml)
 
@@ -69,6 +69,7 @@ get_files(copland_am_src
     extracted/ResultT.cml
     extracted/Specif.cml
     extracted/Datatypes.cml
+    extracted/Nat.cml
     extracted/EqClass.cml
     extracted/List.cml
     extracted/Maps.cml

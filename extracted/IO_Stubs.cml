@@ -1,17 +1,17 @@
 (** val make_JSON_Network_Request : coq_UUID -> coq_JSON -> coq_JSON **)
 
-val make_JSON_Network_Request =
+val make_JSON_Network_Request : (coq_UUID -> coq_JSON -> coq_JSON) =
   failwith "AXIOM TO BE REALIZED"
 
 (** val make_JSON_FS_Location_Request :
     coq_FS_Location -> coq_JSON -> coq_JSON **)
 
-val make_JSON_FS_Location_Request =
+val make_JSON_FS_Location_Request : (coq_FS_Location -> coq_JSON -> coq_JSON) =
   failwith "AXIOM TO BE REALIZED"
 
 (** val parallel_vm_thread : coq_Loc -> coq_EvC **)
 
-val parallel_vm_thread =
+val parallel_vm_thread : (coq_Loc -> coq_EvC) =
   failwith "AXIOM TO BE REALIZED"
 
 (** val do_start_par_thread :
