@@ -9,10 +9,10 @@ val priv2 = BString.unshow "308202260201003082011706092a864886f70d01030130820108
     coq_DispatcherErrors) coq_ResultT **)
 fun decrypt_bs_to_rawev_prim bs params pubkey = 
     let val recoveredtext : string = Crypto.decryptOneShot priv2 pubkey (*pub1*) (* priv1 pubkey *) bs (*priv2 pub1 bs *)
-        val res = case stringT_to_RawEv recoveredtext of
+        val res = case string_to_RawEv recoveredtext of
                       Coq_resultC r => r
                     | Coq_errC e => raise Exception e
-        val _ = print ("\nDecryption Succeeded: \n" ^ (coq_RawEv_to_stringT res) ^ "\n" ) in
+        val _ = print ("\nDecryption Succeeded: \n" ^ (coq_RawEv_to_string res) ^ "\n" ) in
         (Coq_resultC res)
     end
 

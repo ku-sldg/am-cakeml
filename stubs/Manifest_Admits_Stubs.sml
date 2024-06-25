@@ -1,10 +1,10 @@
 
 (* Used for locating something on the local filesystem *)
-(** val coq_JSON_Local_ASP : coq_StringT **)
+(** val coq_JSON_Local_ASP : string **)
 
 val coq_JSON_Local_ASP = "LOCAL_ASP"
 
-(** val coq_JSON_Remote_ASP : coq_StringT **)
+(** val coq_JSON_Remote_ASP : string **)
 
 val coq_JSON_Remote_ASP = "REMOTE_ASP"
 
@@ -20,10 +20,10 @@ val jsonifiable_FS_Location =
 
 type coq_UUID = string (* AXIOM TO BE REALIZED *)
 
-(** val stringT_to_UUUID :
-    coq_StringT -> (coq_UUID, coq_StringT) coq_ResultT **)
+(** val string_to_UUUID :
+    string -> (coq_UUID, string) coq_ResultT **)
 
-val stringT_to_UUUID = (fn v => Coq_resultC v)
+val string_to_UUUID = (fn v => Coq_resultC v)
 
 (** val jsonifiable_uuid : coq_UUID coq_Jsonifiable **)
 

@@ -22,11 +22,11 @@ fun make_JSON_Network_Request (u : coq_UUID) (js : coq_JSON) =
   (let val (ip, port) = decodeUUID u
       val fd = Socket.connect ip port
       val _ = print ("Connected to " ^ ip ^ ":" ^ (Int.toString port) ^ "\n")
-      val sendReq = Socket.output fd (coq_JSON_to_stringT js)
+      val sendReq = Socket.output fd (coq_JSON_to_string js)
       val resp = Socket.inputAll fd
   in
     (* TODO: I should really be managing with a resultC rather than alway JS response *)
-    case (stringT_to_JSON resp) of 
+    case (string_to_JSON resp) of 
       Coq_errC e => JSON_Object ((coq_STR_SUCCESS, (JSON_Boolean False)) :: [])
     | Coq_resultC js => js
   end) : coq_JSON
@@ -36,10 +36,10 @@ fun make_JSON_Network_Request (u : coq_UUID) (js : coq_JSON) =
 
 fun make_JSON_FS_Location_Request (loc : coq_FS_Location) (js : coq_JSON) =
   (let val _ = print ("Sending a request to the FS: " ^ loc ^ "\n")
-      val resp = c_popen_string (loc ^ " " ^ (coq_JSON_to_stringT js))
+      val resp = c_popen_string (loc ^ " " ^ (coq_JSON_to_string js))
       val _ = print ("Got back a response from the ASP: " ^ resp ^ "\n")
       val _ = print ("String Length is: " ^ Int.toString (String.size resp) ^ "\n")
-      val resp_js = stringT_to_JSON resp
+      val resp_js = string_to_JSON resp
   in
   (* TODO: I should really be managing with a resultC rather than alway JS response *)
     case resp_js of 
@@ -48,7 +48,7 @@ fun make_JSON_FS_Location_Request (loc : coq_FS_Location) (js : coq_JSON) =
           JSON_Object ((coq_STR_SUCCESS, (JSON_Boolean False)) :: [])
         end
     | Coq_resultC js => 
-        let val _ = print ("Response parsed as: " ^ (coq_JSON_to_stringT js) ^ "\n")
+        let val _ = print ("Response parsed as: " ^ (coq_JSON_to_string js) ^ "\n")
         in
           js
         end
