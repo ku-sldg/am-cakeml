@@ -20,10 +20,10 @@ val jsonifiable_FS_Location =
 
 type coq_UUID = string (* AXIOM TO BE REALIZED *)
 
-(** val string_to_UUUID :
+(** val string_to_uuid :
     string -> (coq_UUID, string) coq_ResultT **)
 
-val string_to_UUUID = (fn v => Coq_resultC v)
+val string_to_uuid = (fn v => Coq_resultC v)
 
 (** val jsonifiable_uuid : coq_UUID coq_Jsonifiable **)
 

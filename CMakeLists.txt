@@ -63,8 +63,7 @@ ${posix_src_cake})
 
 get_files(copland_am_src
     stubs/BS.sml
-    stubs/StringT.sml
-    stubs/ErrorStringConstants.sml
+    extracted/ErrorStringConstants.cml
     
     extracted/ResultT.cml
     extracted/Specif.cml
@@ -86,7 +85,7 @@ get_files(copland_am_src
     extracted/JSON_Type.cml
     extracted/JSON.cml
     stubs/JSON_Admits.sml
-    stubs/Interface_Strings_Admits.sml
+    extracted/Interface_Strings_Vars.cml
     extracted/Interface_Types.cml
     extracted/CvmJson_Interfaces.cml
     stubs/Manifest_Admits_Stubs.sml
@@ -96,7 +95,7 @@ get_files(copland_am_src
     stubs/Example_Phrases_Admits.sml
     extracted/Manifest_Set.cml
     extracted/Manifest.cml
-    stubs/Manifest_JSON_Admits_Stubs.sml
+    extracted/Manifest_JSON_Vars.cml
     extracted/Manifest_JSON.cml
     extracted/EnvironmentM.cml
     extracted/Manifest_Union.cml

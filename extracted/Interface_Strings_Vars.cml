@@ -1,0 +1,89 @@
+(** val coq_STR_REQ_PLC : string **)
+
+val coq_STR_REQ_PLC : string =
+  "REQ_PLC"
+
+(** val coq_STR_TERM : string **)
+
+val coq_STR_TERM : string =
+  "TERM"
+
+(** val coq_STR_EV : string **)
+
+val coq_STR_EV : string =
+  "EV"
+
+(** val coq_STR_SUCCESS : string **)
+
+val coq_STR_SUCCESS : string =
+  "SUCCESS"
+
+(** val coq_STR_PAYLOAD : string **)
+
+val coq_STR_PAYLOAD : string =
+  "PAYLOAD"
+
+(** val coq_STR_EVIDENCE : string **)
+
+val coq_STR_EVIDENCE : string =
+  "EVIDENCE"
+
+(** val coq_STR_ACTION : string **)
+
+val coq_STR_ACTION : string =
+  "ACTION"
+
+(** val coq_STR_TYPE : string **)
+
+val coq_STR_TYPE : string =
+  "TYPE"
+
+(** val coq_STR_RUN : string **)
+
+val coq_STR_RUN : string =
+  "RUN"
+
+(** val coq_STR_NEGOTIATE : string **)
+
+val coq_STR_NEGOTIATE : string =
+  "NEGOTIATE"
+
+(** val coq_STR_APPRAISE : string **)
+
+val coq_STR_APPRAISE : string =
+  "APPRAISE"
+
+(** val coq_STR_REQUEST : string **)
+
+val coq_STR_REQUEST : string =
+  "REQUEST"
+
+(** val coq_STR_RESPONSE : string **)
+
+val coq_STR_RESPONSE : string =
+  "RESPONSE"
+
+(** val coq_STR_ASP_RUN : string **)
+
+val coq_STR_ASP_RUN : string =
+  "ASP_RUN"
+
+(** val coq_STR_ASP_ID : string **)
+
+val coq_STR_ASP_ID : string =
+  "ASP_ID"
+
+(** val coq_STR_ASP_ARGS : string **)
+
+val coq_STR_ASP_ARGS : string =
+  "ASP_ARGS"
+
+(** val coq_STR_TARG_PLC : string **)
+
+val coq_STR_TARG_PLC : string =
+  "TARG_PLC"
+
+(** val coq_STR_TARG : string **)
+
+val coq_STR_TARG : string =
+  "TARG"

@@ -17,9 +17,9 @@ val jsonifiable_FS_Location : coq_FS_Location coq_Jsonifiable =
 
 type coq_UUID (* AXIOM TO BE REALIZED *)
 
-(** val string_to_UUUID : string -> (coq_UUID, string) coq_ResultT **)
+(** val string_to_uuid : string -> (coq_UUID, string) coq_ResultT **)
 
-val string_to_UUUID : (string -> (coq_UUID, string) coq_ResultT) =
+val string_to_uuid : (string -> (coq_UUID, string) coq_ResultT) =
   failwith "AXIOM TO BE REALIZED"
 
 (** val jsonifiable_uuid : coq_UUID coq_Jsonifiable **)

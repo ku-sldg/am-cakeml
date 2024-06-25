@@ -1,0 +1,59 @@
+(** val coq_MAN_ABS_PLC : string **)
+
+val coq_MAN_ABS_PLC : string =
+  "ABS_PLC"
+
+(** val coq_MAN_ASPS : string **)
+
+val coq_MAN_ASPS : string =
+  "ASPS"
+
+(** val coq_MAN_APPR_ASPS : string **)
+
+val coq_MAN_APPR_ASPS : string =
+  "APPR_ASPS"
+
+(** val coq_MAN_UUUID_PLCS : string **)
+
+val coq_MAN_UUUID_PLCS : string =
+  "UUID_PLCS"
+
+(** val coq_MAN_PUBKEY_PLCS : string **)
+
+val coq_MAN_PUBKEY_PLCS : string =
+  "PUBKEY_PLCS"
+
+(** val coq_MAN_TARGET_PLCS : string **)
+
+val coq_MAN_TARGET_PLCS : string =
+  "TARGET_PLCS"
+
+(** val coq_MAN_POLICY : string **)
+
+val coq_MAN_POLICY : string =
+  "POLICY"
+
+(** val coq_AM_CLONE_UUUID : string **)
+
+val coq_AM_CLONE_UUUID : string =
+  "CLONE_UUID"
+
+(** val coq_AM_LIB_ASPS : string **)
+
+val coq_AM_LIB_ASPS : string =
+  "LIB_ASPS"
+
+(** val coq_AM_LIB_APPR_ASPS : string **)
+
+val coq_AM_LIB_APPR_ASPS : string =
+  "LIB_APPR_ASPS"
+
+(** val coq_AM_LIB_PLCS : string **)
+
+val coq_AM_LIB_PLCS : string =
+  "LIB_PLCS"
+
+(** val coq_AM_LIB_PUBKEYS : string **)
+
+val coq_AM_LIB_PUBKEYS : string =
+  "LIB_PUBKEYS"

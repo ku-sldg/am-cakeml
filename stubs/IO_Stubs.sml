@@ -149,7 +149,7 @@ fun is_local_appraisal amLib =
 
 fun plc_aspid_pair_toString ((a,b): (coq_Plc * coq_ASP_ID)) = 
     "(" ^ (plToString a) ^ ", " ^ (aspIdToString b) ^ ")"
-      : coq_StringT
+      : string
 
 (** val pretty_print_manifest : coq_Manifest -> coq_StringT **)
 
