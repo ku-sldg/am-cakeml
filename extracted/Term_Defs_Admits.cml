@@ -1,45 +1,40 @@
-(** val coq_Term_to_stringT : coq_Term -> coq_StringT **)
+(** val coq_Term_to_string : coq_Term -> string **)
 
-val coq_Term_to_stringT : (coq_Term -> coq_StringT) =
+val coq_Term_to_string : (coq_Term -> string) =
   failwith "AXIOM TO BE REALIZED"
 
-(** val stringT_to_Term :
-    coq_StringT -> (coq_Term, coq_StringT) coq_ResultT **)
+(** val string_to_Term : string -> (coq_Term, string) coq_ResultT **)
 
-val stringT_to_Term : (coq_StringT -> (coq_Term, coq_StringT) coq_ResultT) =
+val string_to_Term : (string -> (coq_Term, string) coq_ResultT) =
   failwith "AXIOM TO BE REALIZED"
 
-(** val stringT_to_Evidence :
-    coq_StringT -> (coq_Evidence, coq_StringT) coq_ResultT **)
+(** val string_to_Evidence : string -> (coq_Evidence, string) coq_ResultT **)
 
-val stringT_to_Evidence : (coq_StringT -> (coq_Evidence, coq_StringT)
-                          coq_ResultT) =
+val string_to_Evidence : (string -> (coq_Evidence, string) coq_ResultT) =
   failwith "AXIOM TO BE REALIZED"
 
-(** val coq_AppResultC_to_stringT : coq_AppResultC -> coq_StringT **)
+(** val coq_AppResultC_to_string : coq_AppResultC -> string **)
 
-val coq_AppResultC_to_stringT : (coq_AppResultC -> coq_StringT) =
+val coq_AppResultC_to_string : (coq_AppResultC -> string) =
   failwith "AXIOM TO BE REALIZED"
 
-(** val stringT_to_AppResultC :
-    coq_StringT -> (coq_AppResultC, coq_StringT) coq_ResultT **)
+(** val string_to_AppResultC :
+    string -> (coq_AppResultC, string) coq_ResultT **)
 
-val stringT_to_AppResultC : (coq_StringT -> (coq_AppResultC, coq_StringT)
-                            coq_ResultT) =
+val string_to_AppResultC : (string -> (coq_AppResultC, string) coq_ResultT) =
   failwith "AXIOM TO BE REALIZED"
 
-(** val coq_RawEv_to_stringT : coq_RawEv -> coq_StringT **)
+(** val coq_RawEv_to_string : coq_RawEv -> string **)
 
-val coq_RawEv_to_stringT : (coq_RawEv -> coq_StringT) =
+val coq_RawEv_to_string : (coq_RawEv -> string) =
   failwith "AXIOM TO BE REALIZED"
 
-(** val stringT_to_RawEv :
-    coq_StringT -> (coq_RawEv, coq_StringT) coq_ResultT **)
+(** val string_to_RawEv : string -> (coq_RawEv, string) coq_ResultT **)
 
-val stringT_to_RawEv : (coq_StringT -> (coq_RawEv, coq_StringT) coq_ResultT) =
+val string_to_RawEv : (string -> (coq_RawEv, string) coq_ResultT) =
   failwith "AXIOM TO BE REALIZED"
 
-(** val coq_ASP_ARGS_to_stringT : coq_ASP_ARGS -> coq_StringT **)
+(** val coq_ASP_ARGS_to_string : coq_ASP_ARGS -> string **)
 
-val coq_ASP_ARGS_to_stringT : (coq_ASP_ARGS -> coq_StringT) =
+val coq_ASP_ARGS_to_string : (coq_ASP_ARGS -> string) =
   failwith "AXIOM TO BE REALIZED"

@@ -1,14 +1,14 @@
 type coq_Plc = coq_ID_Type
 
-(** val coq_Plc_to_stringT : coq_Plc -> coq_StringT **)
+(** val coq_Plc_to_string : coq_Plc -> string **)
 
-val coq_Plc_to_stringT : (coq_Plc -> coq_StringT) =
-  coq_ID_Type_to_stringT
+val coq_Plc_to_string : (coq_Plc -> string) =
+  coq_ID_Type_to_string
 
-(** val stringT_to_Plc : coq_StringT -> (coq_Plc, coq_StringT) coq_ResultT **)
+(** val string_to_Plc : string -> (coq_Plc, string) coq_ResultT **)
 
-val stringT_to_Plc : (coq_StringT -> (coq_Plc, coq_StringT) coq_ResultT) =
-  stringT_to_ID_Type
+val string_to_Plc : (string -> (coq_Plc, string) coq_ResultT) =
+  string_to_ID_Type
 
 type coq_N_ID = nat
 
@@ -16,19 +16,19 @@ type coq_Event_ID = nat
 
 type coq_ASP_ID = coq_ID_Type
 
-(** val coq_ASP_ID_to_stringT : coq_ASP_ID -> coq_StringT **)
+(** val coq_ASP_ID_to_string : coq_ASP_ID -> string **)
 
-val coq_ASP_ID_to_stringT : (coq_ASP_ID -> coq_StringT) =
-  coq_ID_Type_to_stringT
+val coq_ASP_ID_to_string : (coq_ASP_ID -> string) =
+  coq_ID_Type_to_string
 
 type coq_TARG_ID = coq_ID_Type
 
-(** val coq_TARG_ID_to_stringT : coq_TARG_ID -> coq_StringT **)
+(** val coq_TARG_ID_to_string : coq_TARG_ID -> string **)
 
-val coq_TARG_ID_to_stringT : (coq_TARG_ID -> coq_StringT) =
-  coq_ID_Type_to_stringT
+val coq_TARG_ID_to_string : (coq_TARG_ID -> string) =
+  coq_ID_Type_to_string
 
-type coq_ASP_ARGS = (coq_StringT, coq_StringT) coq_MapC
+type coq_ASP_ARGS = (string, string) coq_MapC
 
 datatype coq_ASP_PARAMS =
   Coq_asp_paramsC coq_ASP_ID coq_ASP_ARGS coq_Plc coq_TARG_ID

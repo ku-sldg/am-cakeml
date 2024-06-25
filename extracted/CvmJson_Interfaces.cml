@@ -5,25 +5,25 @@ fun coq_ProtocolRunRequest_to_JSON req =
   JSON_Object ((coq_STR_TYPE, (JSON_String
     coq_STR_REQUEST)) :: ((coq_STR_ACTION, (JSON_String
     coq_STR_RUN)) :: ((coq_STR_REQ_PLC, (JSON_String
-    (coq_Plc_to_stringT
+    (coq_Plc_to_string
       (let val Coq_mkPRReq _ prreq_req_plc _ = req in prreq_req_plc end)))) :: ((coq_STR_TERM,
     (JSON_String
-    (coq_Term_to_stringT
+    (coq_Term_to_string
       (let val Coq_mkPRReq prreq_term _ _ = req in prreq_term end)))) :: ((coq_STR_EV,
     (JSON_String
-    (coq_RawEv_to_stringT
+    (coq_RawEv_to_string
       (let val Coq_mkPRReq _ _ prreq_ev = req in prreq_ev end)))) :: [])))))
 
 (** val coq_JSON_to_ProtocolRunRequest :
-    coq_JSON -> (coq_ProtocolRunRequest, coq_StringT) coq_ResultT **)
+    coq_JSON -> (coq_ProtocolRunRequest, string) coq_ResultT **)
 
 fun coq_JSON_to_ProtocolRunRequest req =
-  res_bind (coq_JSON_get_stringT coq_STR_TERM req) (fn temp_term =>
-    res_bind (coq_JSON_get_stringT coq_STR_REQ_PLC req) (fn temp_req_plc =>
-      res_bind (coq_JSON_get_stringT coq_STR_EV req) (fn temp_ev =>
-        res_bind (stringT_to_Term temp_term) (fn term =>
-          res_bind (stringT_to_Plc temp_req_plc) (fn req_plc =>
-            res_bind (stringT_to_RawEv temp_ev) (fn ev => Coq_resultC
+  res_bind (coq_JSON_get_string coq_STR_TERM req) (fn temp_term =>
+    res_bind (coq_JSON_get_string coq_STR_REQ_PLC req) (fn temp_req_plc =>
+      res_bind (coq_JSON_get_string coq_STR_EV req) (fn temp_ev =>
+        res_bind (string_to_Term temp_term) (fn term =>
+          res_bind (string_to_Plc temp_req_plc) (fn req_plc =>
+            res_bind (string_to_RawEv temp_ev) (fn ev => Coq_resultC
               (Coq_mkPRReq term req_plc ev)))))))
 
 (** val coq_ProtocolRunResponse_to_JSON :
@@ -35,47 +35,47 @@ fun coq_ProtocolRunResponse_to_JSON resp =
     coq_STR_RUN)) :: ((coq_STR_SUCCESS, (JSON_Boolean
     (let val Coq_mkPRResp prresp_success _ = resp in prresp_success end))) :: ((coq_STR_PAYLOAD,
     (JSON_String
-    (coq_RawEv_to_stringT
+    (coq_RawEv_to_string
       (let val Coq_mkPRResp _ prresp_ev = resp in prresp_ev end)))) :: []))))
 
 (** val coq_JSON_to_ProtocolRunResponse :
-    coq_JSON -> (coq_ProtocolRunResponse, coq_StringT) coq_ResultT **)
+    coq_JSON -> (coq_ProtocolRunResponse, string) coq_ResultT **)
 
 fun coq_JSON_to_ProtocolRunResponse resp =
   res_bind (coq_JSON_get_bool coq_STR_SUCCESS resp) (fn temp_success =>
-    res_bind (coq_JSON_get_stringT coq_STR_PAYLOAD resp) (fn temp_ev =>
-      res_bind (stringT_to_RawEv temp_ev) (fn ev => Coq_resultC (Coq_mkPRResp
+    res_bind (coq_JSON_get_string coq_STR_PAYLOAD resp) (fn temp_ev =>
+      res_bind (string_to_RawEv temp_ev) (fn ev => Coq_resultC (Coq_mkPRResp
         temp_success ev))))
 
 (** val coq_JSON_to_ProtocolNegotiateRequest :
-    coq_JSON -> (coq_ProtocolNegotiateRequest, coq_StringT) coq_ResultT **)
+    coq_JSON -> (coq_ProtocolNegotiateRequest, string) coq_ResultT **)
 
 fun coq_JSON_to_ProtocolNegotiateRequest req =
-  res_bind (coq_JSON_get_stringT coq_STR_TERM req) (fn temp_term =>
-    res_bind (stringT_to_Term temp_term) (fn term => Coq_resultC term))
+  res_bind (coq_JSON_get_string coq_STR_TERM req) (fn temp_term =>
+    res_bind (string_to_Term temp_term) (fn term => Coq_resultC term))
 
 (** val coq_JSON_to_ProtocolNegotiateResponse :
-    coq_JSON -> (coq_ProtocolNegotiateResponse, coq_StringT) coq_ResultT **)
+    coq_JSON -> (coq_ProtocolNegotiateResponse, string) coq_ResultT **)
 
 fun coq_JSON_to_ProtocolNegotiateResponse resp =
   res_bind (coq_JSON_get_bool coq_STR_SUCCESS resp) (fn temp_success =>
-    res_bind (coq_JSON_get_stringT coq_STR_PAYLOAD resp) (fn temp_term =>
-      res_bind (stringT_to_Term temp_term) (fn term => Coq_resultC
+    res_bind (coq_JSON_get_string coq_STR_PAYLOAD resp) (fn temp_term =>
+      res_bind (string_to_Term temp_term) (fn term => Coq_resultC
         (Coq_mkPNResp temp_success term))))
 
 (** val coq_JSON_to_ProtocolAppraiseRequest :
-    coq_JSON -> (coq_ProtocolAppraiseRequest, coq_StringT) coq_ResultT **)
+    coq_JSON -> (coq_ProtocolAppraiseRequest, string) coq_ResultT **)
 
 fun coq_JSON_to_ProtocolAppraiseRequest req =
-  res_bind (coq_JSON_get_stringT coq_STR_TERM req) (fn temp_term =>
-    res_bind (coq_JSON_get_stringT coq_STR_REQ_PLC req) (fn temp_plc =>
-      res_bind (coq_JSON_get_stringT coq_STR_EVIDENCE req)
+  res_bind (coq_JSON_get_string coq_STR_TERM req) (fn temp_term =>
+    res_bind (coq_JSON_get_string coq_STR_REQ_PLC req) (fn temp_plc =>
+      res_bind (coq_JSON_get_string coq_STR_EVIDENCE req)
         (fn temp_evidence =>
-        res_bind (coq_JSON_get_stringT coq_STR_EV req) (fn temp_ev =>
-          res_bind (stringT_to_Term temp_term) (fn term =>
-            res_bind (stringT_to_Plc temp_plc) (fn plc =>
-              res_bind (stringT_to_Evidence temp_evidence) (fn evidence =>
-                res_bind (stringT_to_RawEv temp_ev) (fn ev => Coq_resultC
+        res_bind (coq_JSON_get_string coq_STR_EV req) (fn temp_ev =>
+          res_bind (string_to_Term temp_term) (fn term =>
+            res_bind (string_to_Plc temp_plc) (fn plc =>
+              res_bind (string_to_Evidence temp_evidence) (fn evidence =>
+                res_bind (string_to_RawEv temp_ev) (fn ev => Coq_resultC
                   (Coq_mkPAReq term plc evidence ev)))))))))
 
 (** val coq_ProtocolAppraiseResponse_to_JSON :
@@ -87,34 +87,34 @@ fun coq_ProtocolAppraiseResponse_to_JSON resp =
     coq_STR_APPRAISE)) :: ((coq_STR_SUCCESS, (JSON_Boolean
     (let val Coq_mkPAResp paresp_success _ = resp in paresp_success end))) :: ((coq_STR_PAYLOAD,
     (JSON_String
-    (coq_AppResultC_to_stringT
+    (coq_AppResultC_to_string
       (let val Coq_mkPAResp _ paresp_result = resp in paresp_result end)))) :: []))))
 
 (** val coq_JSON_to_ProtocolAppraiseResponse :
-    coq_JSON -> (coq_ProtocolAppraiseResponse, coq_StringT) coq_ResultT **)
+    coq_JSON -> (coq_ProtocolAppraiseResponse, string) coq_ResultT **)
 
 fun coq_JSON_to_ProtocolAppraiseResponse resp =
   res_bind (coq_JSON_get_bool coq_STR_SUCCESS resp) (fn temp_success =>
-    res_bind (coq_JSON_get_stringT coq_STR_PAYLOAD resp) (fn temp_result =>
-      res_bind (stringT_to_AppResultC temp_result) (fn result => Coq_resultC
+    res_bind (coq_JSON_get_string coq_STR_PAYLOAD resp) (fn temp_result =>
+      res_bind (string_to_AppResultC temp_result) (fn result => Coq_resultC
         (Coq_mkPAResp temp_success result))))
 
 (** val coq_JSON_to_AM_Protocol_Request :
-    coq_JSON -> (coq_AM_Protocol_Requests, coq_StringT) coq_ResultT **)
+    coq_JSON -> (coq_AM_Protocol_Requests, string) coq_ResultT **)
 
 fun coq_JSON_to_AM_Protocol_Request req =
-  res_bind (coq_JSON_get_stringT coq_STR_ACTION req) (fn temp_type =>
-    case eqb coq_EqClass_StringT temp_type coq_STR_RUN of
+  res_bind (coq_JSON_get_string coq_STR_ACTION req) (fn temp_type =>
+    case (fn x => fn y => x = y) temp_type coq_STR_RUN of
       True =>
       res_bind (coq_JSON_to_ProtocolRunRequest req) (fn temp_req =>
         Coq_resultC (Protocol_Run_Request temp_req))
     | False =>
-      (case eqb coq_EqClass_StringT temp_type coq_STR_APPRAISE of
+      (case (fn x => fn y => x = y) temp_type coq_STR_APPRAISE of
          True =>
          res_bind (coq_JSON_to_ProtocolAppraiseRequest req) (fn temp_req =>
            Coq_resultC (Protocol_Appraise_Request temp_req))
        | False =>
-         (case eqb coq_EqClass_StringT temp_type coq_STR_NEGOTIATE of
+         (case (fn x => fn y => x = y) temp_type coq_STR_NEGOTIATE of
             True =>
             res_bind (coq_JSON_to_ProtocolNegotiateRequest req)
               (fn temp_req => Coq_resultC (Protocol_Negotiate_Request
@@ -122,22 +122,22 @@ fun coq_JSON_to_AM_Protocol_Request req =
           | False => Coq_errC errStr_invalid_request_type)))
 
 (** val coq_JSON_to_AM_Protocol_Response :
-    coq_JSON -> (coq_AM_Protocol_Responses, coq_StringT) coq_ResultT **)
+    coq_JSON -> (coq_AM_Protocol_Responses, string) coq_ResultT **)
 
 fun coq_JSON_to_AM_Protocol_Response resp =
-  res_bind (coq_JSON_get_stringT coq_STR_ACTION resp) (fn temp_type =>
-    case eqb coq_EqClass_StringT temp_type coq_STR_RUN of
+  res_bind (coq_JSON_get_string coq_STR_ACTION resp) (fn temp_type =>
+    case (fn x => fn y => x = y) temp_type coq_STR_RUN of
       True =>
       res_bind (coq_JSON_to_ProtocolRunResponse resp) (fn temp_resp =>
         Coq_resultC (Protocol_Run_Response temp_resp))
     | False =>
-      (case eqb coq_EqClass_StringT temp_type coq_STR_APPRAISE of
+      (case (fn x => fn y => x = y) temp_type coq_STR_APPRAISE of
          True =>
          res_bind (coq_JSON_to_ProtocolAppraiseResponse resp)
            (fn temp_resp => Coq_resultC (Protocol_Appraise_Response
            temp_resp))
        | False =>
-         (case eqb coq_EqClass_StringT temp_type coq_STR_NEGOTIATE of
+         (case (fn x => fn y => x = y) temp_type coq_STR_NEGOTIATE of
             True =>
             res_bind (coq_JSON_to_ProtocolNegotiateResponse resp)
               (fn temp_resp => Coq_resultC (Protocol_Negotiate_Response
@@ -150,31 +150,31 @@ fun coq_ASPRunRequest_to_JSON req =
   JSON_Object ((coq_STR_TYPE, (JSON_String
     coq_STR_REQUEST)) :: ((coq_STR_ACTION, (JSON_String
     coq_STR_ASP_RUN)) :: ((coq_STR_ASP_ID, (JSON_String
-    (coq_ASP_ID_to_stringT
+    (coq_ASP_ID_to_string
       (let val Coq_mkASPRReq asprreq_asp_id _ _ _ _ = req in
        asprreq_asp_id end)))) :: ((coq_STR_ASP_ARGS, (JSON_String
-    (coq_ASP_ARGS_to_stringT
+    (coq_ASP_ARGS_to_string
       (let val Coq_mkASPRReq _ asprreq_asp_args _ _ _ = req in
        asprreq_asp_args end)))) :: ((coq_STR_TARG_PLC, (JSON_String
-    (coq_Plc_to_stringT
+    (coq_Plc_to_string
       (let val Coq_mkASPRReq _ _ asprreq_targ_plc _ _ = req in
        asprreq_targ_plc end)))) :: ((coq_STR_TARG, (JSON_String
-    (coq_TARG_ID_to_stringT
+    (coq_TARG_ID_to_string
       (let val Coq_mkASPRReq _ _ _ asprreq_targ _ = req in asprreq_targ end)))) :: ((coq_STR_EV,
     (JSON_String
-    (coq_RawEv_to_stringT
+    (coq_RawEv_to_string
       (let val Coq_mkASPRReq _ _ _ _ asprreq_rawev = req in asprreq_rawev end)))) :: [])))))))
 
 (** val coq_JSON_to_ASPRunResponse :
-    coq_JSON -> (coq_ASPRunResponse, coq_StringT) coq_ResultT **)
+    coq_JSON -> (coq_ASPRunResponse, string) coq_ResultT **)
 
 fun coq_JSON_to_ASPRunResponse resp =
   res_bind (coq_JSON_get_bool coq_STR_SUCCESS resp) (fn temp_success =>
-    res_bind (coq_JSON_get_stringT coq_STR_PAYLOAD resp) (fn temp_rawev =>
-      res_bind (stringT_to_RawEv temp_rawev) (fn rawev => Coq_resultC
+    res_bind (coq_JSON_get_string coq_STR_PAYLOAD resp) (fn temp_rawev =>
+      res_bind (string_to_RawEv temp_rawev) (fn rawev => Coq_resultC
         (Coq_mkASPRResp temp_success rawev))))
 
-(** val coq_ErrorResponseJSON : coq_StringT -> coq_JSON **)
+(** val coq_ErrorResponseJSON : string -> coq_JSON **)
 
 fun coq_ErrorResponseJSON msg =
   JSON_Object ((coq_STR_SUCCESS, (JSON_Boolean False)) :: ((coq_STR_PAYLOAD,

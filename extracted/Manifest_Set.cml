@@ -7,8 +7,7 @@ fun manifest_set_to_JSON h m =
   JSON_Array (map (let val Build_Jsonifiable to_JSON _ = h in to_JSON end) m)
 
 (** val coq_JSON_to_manifest_set :
-    'a1 coq_Jsonifiable -> coq_JSON -> ('a1 manifest_set, coq_StringT)
-    coq_ResultT **)
+    'a1 coq_Jsonifiable -> coq_JSON -> ('a1 manifest_set, string) coq_ResultT **)
 
 fun coq_JSON_to_manifest_set h js = case js of
   JSON_Array m =>

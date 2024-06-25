@@ -13,7 +13,7 @@ fun coq_JSON_to_CakeML_JSON js =
   | JSON_Null => Json.Null
 
 (* NOTE: We cannot do perfect conversions since coq json doesnt support numbers yet *)
-(** val coq_JSON_to_CakeML_JSON : coq_JSON -> (json, stringT) resultT **)
+(** val coq_JSON_to_CakeML_JSON : coq_JSON -> (json, string) resultT **)
 
 fun cakeML_JSON_to_coq_JSON js = 
   case js of
@@ -43,7 +43,7 @@ fun cakeML_JSON_to_coq_JSON js =
         | Coq_resultC h' => 
           case conv_list t of
             Coq_errC s => Coq_errC s
-          | Coq_resultC t' => Coq_resultC (h'::t')) : (coq_JSON list, coq_StringT) coq_ResultT
+          | Coq_resultC t' => Coq_resultC (h'::t')) : (coq_JSON list, string) coq_ResultT
   and
     conv_map js_asc_list =
       (case js_asc_list of
@@ -57,29 +57,29 @@ fun cakeML_JSON_to_coq_JSON js =
             Coq_errC s => Coq_errC s
           | Coq_resultC t' => 
             Coq_resultC ((k, v')::t')
-        end) : ((coq_StringT * coq_JSON) list, coq_StringT) coq_ResultT
+        end) : ((string * coq_JSON) list, string) coq_ResultT
 
 
 (* Now we can define the functions to convert between Coq JSON and CakeML JSON *)
 
-(** val coq_JSON_to_stringT : coq_JSON -> coq_StringT **)
+(** val coq_JSON_to_string : coq_JSON -> string **)
 
-val coq_JSON_to_stringT = 
+val coq_JSON_to_string = 
   fn cjs => Json.stringify (coq_JSON_to_CakeML_JSON cjs)
 
-(** val stringT_to_JSON :
-    coq_StringT -> (coq_JSON, coq_StringT) coq_ResultT **)
+(** val string_to_JSON :
+    string -> (coq_JSON, string) coq_ResultT **)
 
-val stringT_to_JSON =
-  fn (s : coq_StringT) => 
+val string_to_JSON =
+  fn (s : string) => 
     (case Json.parse s of
       Err s => Coq_errC s
-    | Ok j => cakeML_JSON_to_coq_JSON j) : (coq_JSON, coq_StringT) coq_ResultT
+    | Ok j => cakeML_JSON_to_coq_JSON j) : (coq_JSON, string) coq_ResultT
 
-(** val coq_JSON_get_stringT :
-    coq_StringT -> coq_JSON -> (coq_StringT, coq_StringT) coq_ResultT **)
+(** val coq_JSON_get_string :
+    string -> coq_JSON -> (string, string) coq_ResultT **)
 
-val coq_JSON_get_stringT = fn (s : coq_StringT) => fn (js : coq_JSON) =>
+val coq_JSON_get_string = fn (s : string) => fn (js : coq_JSON) =>
   (let val cakejs : Json.json = coq_JSON_to_CakeML_JSON js in
   (case (Json.lookup s cakejs) of
     None => Coq_errC ("Key '" ^ s ^ "' not found")
@@ -87,10 +87,10 @@ val coq_JSON_get_stringT = fn (s : coq_StringT) => fn (js : coq_JSON) =>
     case cakeML_JSON_to_coq_JSON js' of
       Coq_resultC (JSON_String s') => Coq_resultC s'
     | _ => Coq_errC "Not a string")
-  end) : (coq_StringT, coq_StringT) coq_ResultT
+  end) : (string, string) coq_ResultT
 
 (** val coq_JSON_get_bool :
-    coq_StringT -> coq_JSON -> (bool, coq_StringT) coq_ResultT **)
+    string -> coq_JSON -> (bool, string) coq_ResultT **)
 
 val coq_JSON_get_bool = fn s => fn js =>
   let val cakejs : Json.json = coq_JSON_to_CakeML_JSON js in
@@ -103,7 +103,7 @@ val coq_JSON_get_bool = fn s => fn js =>
   end
 
 (** val coq_JSON_get_JSON :
-    coq_StringT -> coq_JSON -> (coq_JSON, coq_StringT) coq_ResultT **)
+    string -> coq_JSON -> (coq_JSON, string) coq_ResultT **)
 val coq_JSON_get_JSON = fn s => fn js =>
   let val cakejs : Json.json = coq_JSON_to_CakeML_JSON js in
   (case (Json.lookup s cakejs) of

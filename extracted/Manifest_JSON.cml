@@ -35,10 +35,10 @@ fun coq_Manifest_to_JSON m =
    to_JSON policy end)) :: []))))))) end
 
 (** val coq_JSON_to_Manifest :
-    coq_JSON -> (coq_Manifest, coq_StringT) coq_ResultT **)
+    coq_JSON -> (coq_Manifest, string) coq_ResultT **)
 
 fun coq_JSON_to_Manifest js =
-  res_bind (coq_JSON_get_stringT coq_MAN_ABS_PLC js) (fn temp_ABS_PLC =>
+  res_bind (coq_JSON_get_string coq_MAN_ABS_PLC js) (fn temp_ABS_PLC =>
     res_bind (coq_JSON_get_JSON coq_MAN_ASPS js) (fn temp_ASPS =>
       res_bind (coq_JSON_get_JSON coq_MAN_APPR_ASPS js) (fn temp_APPR_ASPS =>
         res_bind (coq_JSON_get_JSON coq_MAN_UUUID_PLCS js)
@@ -49,7 +49,7 @@ fun coq_JSON_to_Manifest js =
               (fn temp_TARGET_PLCS =>
               res_bind (coq_JSON_get_JSON coq_MAN_POLICY js)
                 (fn temp_POLICY =>
-                res_bind (stringT_to_Plc temp_ABS_PLC) (fn aBS_PLC =>
+                res_bind (string_to_Plc temp_ABS_PLC) (fn aBS_PLC =>
                   res_bind
                     (let val Build_Jsonifiable _ from_JSON =
                        jsonifiable_manifest_set jsonifiable_ID_type
@@ -127,10 +127,10 @@ fun coq_AM_Lib_to_JSON am =
    to_JSON lib_pubkeys end)) :: []))))) end
 
 (** val coq_JSON_to_AM_Lib :
-    coq_JSON -> (coq_AM_Library, coq_StringT) coq_ResultT **)
+    coq_JSON -> (coq_AM_Library, string) coq_ResultT **)
 
 fun coq_JSON_to_AM_Lib js =
-  res_bind (coq_JSON_get_stringT coq_AM_CLONE_UUUID js)
+  res_bind (coq_JSON_get_string coq_AM_CLONE_UUUID js)
     (fn temp_CLONE_UUUID =>
     res_bind (coq_JSON_get_JSON coq_AM_LIB_ASPS js) (fn temp_LIB_ASPS =>
       res_bind (coq_JSON_get_JSON coq_AM_LIB_APPR_ASPS js)
@@ -138,7 +138,7 @@ fun coq_JSON_to_AM_Lib js =
         res_bind (coq_JSON_get_JSON coq_AM_LIB_PLCS js) (fn temp_LIB_PLCS =>
           res_bind (coq_JSON_get_JSON coq_AM_LIB_PUBKEYS js)
             (fn temp_LIB_PUBKEYS =>
-            res_bind (stringT_to_UUUID temp_CLONE_UUUID) (fn cLONE_UUUID =>
+            res_bind (string_to_UUUID temp_CLONE_UUUID) (fn cLONE_UUUID =>
               res_bind
                 (let val Build_Jsonifiable _ from_JSON =
                    jsonifiable_manifest_set

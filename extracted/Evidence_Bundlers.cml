@@ -1,6 +1,6 @@
 (** val extd_bundle :
     coq_RawEv -> coq_EvC -> coq_Plc -> nat -> coq_ASP_PARAMS -> (coq_EvC,
-    coq_StringT) coq_ResultT **)
+    string) coq_ResultT **)
 
 fun extd_bundle sig0 e p n ps =
   let val Coq_evc bits et = e in
@@ -9,8 +9,8 @@ fun extd_bundle sig0 e p n ps =
    | False => Coq_errC errStr_raw_evidence_too_long) end
 
 (** val comp_bundle :
-    coq_RawEv -> coq_EvC -> coq_Plc -> coq_ASP_PARAMS -> (coq_EvC,
-    coq_StringT) coq_ResultT **)
+    coq_RawEv -> coq_EvC -> coq_Plc -> coq_ASP_PARAMS -> (coq_EvC, string)
+    coq_ResultT **)
 
 fun comp_bundle hsh e p ps =
   let val Coq_evc _ et = e in
@@ -22,8 +22,8 @@ fun comp_bundle hsh e p ps =
       | _ :: _ => Coq_errC errStr_raw_evidence_too_long)) end
 
 (** val encr_bundle :
-    coq_RawEv -> coq_EvC -> coq_Plc -> coq_ASP_PARAMS -> (coq_EvC,
-    coq_StringT) coq_ResultT **)
+    coq_RawEv -> coq_EvC -> coq_Plc -> coq_ASP_PARAMS -> (coq_EvC, string)
+    coq_ResultT **)
 
 fun encr_bundle enc e p ps =
   let val Coq_evc _ et = e in

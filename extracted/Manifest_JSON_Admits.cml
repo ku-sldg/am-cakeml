@@ -1,59 +1,59 @@
-(** val coq_MAN_ABS_PLC : coq_StringT **)
+(** val coq_MAN_ABS_PLC : string **)
 
-val coq_MAN_ABS_PLC : coq_StringT =
+val coq_MAN_ABS_PLC : string =
   failwith "AXIOM TO BE REALIZED"
 
-(** val coq_MAN_ASPS : coq_StringT **)
+(** val coq_MAN_ASPS : string **)
 
-val coq_MAN_ASPS : coq_StringT =
+val coq_MAN_ASPS : string =
   failwith "AXIOM TO BE REALIZED"
 
-(** val coq_MAN_APPR_ASPS : coq_StringT **)
+(** val coq_MAN_APPR_ASPS : string **)
 
-val coq_MAN_APPR_ASPS : coq_StringT =
+val coq_MAN_APPR_ASPS : string =
   failwith "AXIOM TO BE REALIZED"
 
-(** val coq_MAN_UUUID_PLCS : coq_StringT **)
+(** val coq_MAN_UUUID_PLCS : string **)
 
-val coq_MAN_UUUID_PLCS : coq_StringT =
+val coq_MAN_UUUID_PLCS : string =
   failwith "AXIOM TO BE REALIZED"
 
-(** val coq_MAN_PUBKEY_PLCS : coq_StringT **)
+(** val coq_MAN_PUBKEY_PLCS : string **)
 
-val coq_MAN_PUBKEY_PLCS : coq_StringT =
+val coq_MAN_PUBKEY_PLCS : string =
   failwith "AXIOM TO BE REALIZED"
 
-(** val coq_MAN_TARGET_PLCS : coq_StringT **)
+(** val coq_MAN_TARGET_PLCS : string **)
 
-val coq_MAN_TARGET_PLCS : coq_StringT =
+val coq_MAN_TARGET_PLCS : string =
   failwith "AXIOM TO BE REALIZED"
 
-(** val coq_MAN_POLICY : coq_StringT **)
+(** val coq_MAN_POLICY : string **)
 
-val coq_MAN_POLICY : coq_StringT =
+val coq_MAN_POLICY : string =
   failwith "AXIOM TO BE REALIZED"
 
-(** val coq_AM_CLONE_UUUID : coq_StringT **)
+(** val coq_AM_CLONE_UUUID : string **)
 
-val coq_AM_CLONE_UUUID : coq_StringT =
+val coq_AM_CLONE_UUUID : string =
   failwith "AXIOM TO BE REALIZED"
 
-(** val coq_AM_LIB_ASPS : coq_StringT **)
+(** val coq_AM_LIB_ASPS : string **)
 
-val coq_AM_LIB_ASPS : coq_StringT =
+val coq_AM_LIB_ASPS : string =
   failwith "AXIOM TO BE REALIZED"
 
-(** val coq_AM_LIB_APPR_ASPS : coq_StringT **)
+(** val coq_AM_LIB_APPR_ASPS : string **)
 
-val coq_AM_LIB_APPR_ASPS : coq_StringT =
+val coq_AM_LIB_APPR_ASPS : string =
   failwith "AXIOM TO BE REALIZED"
 
-(** val coq_AM_LIB_PLCS : coq_StringT **)
+(** val coq_AM_LIB_PLCS : string **)
 
-val coq_AM_LIB_PLCS : coq_StringT =
+val coq_AM_LIB_PLCS : string =
   failwith "AXIOM TO BE REALIZED"
 
-(** val coq_AM_LIB_PUBKEYS : coq_StringT **)
+(** val coq_AM_LIB_PUBKEYS : string **)
 
-val coq_AM_LIB_PUBKEYS : coq_StringT =
+val coq_AM_LIB_PUBKEYS : string =
   failwith "AXIOM TO BE REALIZED"

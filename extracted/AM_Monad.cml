@@ -1,16 +1,16 @@
-(** val am_error_to_stringT : coq_AM_Error -> coq_StringT **)
+(** val am_error_to_string : coq_AM_Error -> string **)
 
-fun am_error_to_stringT err = case err of
+fun am_error_to_string err = case err of
   Coq_cvm_error _ => errStr_cvm_error
 | Coq_am_error s => s
 | Coq_am_dispatch_error _ => errStr_dispatch_error
 
 (** val run_am_app_comp_init :
-    'a1 coq_AM -> coq_AM_St -> ('a1, coq_StringT) coq_ResultT **)
+    'a1 coq_AM -> coq_AM_St -> ('a1, string) coq_ResultT **)
 
 fun run_am_app_comp_init am_comp st =
   case fst (am_comp st) of
-    Coq_errC e => Coq_errC (am_error_to_stringT e)
+    Coq_errC e => Coq_errC (am_error_to_string e)
   | Coq_resultC x => Coq_resultC x
 
 (** val get_AM_amConfig : coq_AM_Config coq_AM **)

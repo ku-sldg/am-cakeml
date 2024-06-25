@@ -1,31 +1,27 @@
-(** val coq_JSON_to_stringT : coq_JSON -> coq_StringT **)
+(** val coq_JSON_to_string : coq_JSON -> string **)
 
-val coq_JSON_to_stringT : (coq_JSON -> coq_StringT) =
+val coq_JSON_to_string : (coq_JSON -> string) =
   failwith "AXIOM TO BE REALIZED"
 
-(** val stringT_to_JSON :
-    coq_StringT -> (coq_JSON, coq_StringT) coq_ResultT **)
+(** val string_to_JSON : string -> (coq_JSON, string) coq_ResultT **)
 
-val stringT_to_JSON : (coq_StringT -> (coq_JSON, coq_StringT) coq_ResultT) =
+val string_to_JSON : (string -> (coq_JSON, string) coq_ResultT) =
   failwith "AXIOM TO BE REALIZED"
 
 (** val coq_JSON_get_JSON :
-    coq_StringT -> coq_JSON -> (coq_JSON, coq_StringT) coq_ResultT **)
+    string -> coq_JSON -> (coq_JSON, string) coq_ResultT **)
 
-val coq_JSON_get_JSON : (coq_StringT -> coq_JSON -> (coq_JSON, coq_StringT)
-                        coq_ResultT) =
+val coq_JSON_get_JSON : (string -> coq_JSON -> (coq_JSON, string) coq_ResultT) =
   failwith "AXIOM TO BE REALIZED"
 
-(** val coq_JSON_get_stringT :
-    coq_StringT -> coq_JSON -> (coq_StringT, coq_StringT) coq_ResultT **)
+(** val coq_JSON_get_string :
+    string -> coq_JSON -> (string, string) coq_ResultT **)
 
-val coq_JSON_get_stringT : (coq_StringT -> coq_JSON -> (coq_StringT,
-                           coq_StringT) coq_ResultT) =
+val coq_JSON_get_string : (string -> coq_JSON -> (string, string) coq_ResultT) =
   failwith "AXIOM TO BE REALIZED"
 
 (** val coq_JSON_get_bool :
-    coq_StringT -> coq_JSON -> (bool, coq_StringT) coq_ResultT **)
+    string -> coq_JSON -> (bool, string) coq_ResultT **)
 
-val coq_JSON_get_bool : (coq_StringT -> coq_JSON -> (bool, coq_StringT)
-                        coq_ResultT) =
+val coq_JSON_get_bool : (string -> coq_JSON -> (bool, string) coq_ResultT) =
   failwith "AXIOM TO BE REALIZED"

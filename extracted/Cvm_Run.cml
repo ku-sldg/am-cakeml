@@ -21,8 +21,7 @@ fun run_cvm_w_config t e ac =
   run_cvm t (Coq_mk_st (Coq_evc e Coq_mt) [] O ac)
 
 (** val run_cvm_rawEv :
-    coq_Term -> coq_RawEv -> coq_AM_Config -> (coq_RawEv, coq_StringT)
-    coq_ResultT **)
+    coq_Term -> coq_RawEv -> coq_AM_Config -> (coq_RawEv, string) coq_ResultT **)
 
 fun run_cvm_rawEv t e ac =
   case run_cvm_w_config t e ac of

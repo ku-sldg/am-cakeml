@@ -1,6 +1,6 @@
 (** val do_appraisal_session :
     coq_ProtocolAppraiseRequest -> coq_AM_Config -> coq_BS ->
-    (coq_ProtocolAppraiseResponse, coq_StringT) coq_ResultT **)
+    (coq_ProtocolAppraiseResponse, string) coq_ResultT **)
 
 fun do_appraisal_session appreq ac nonceVal =
   let val Coq_mkPAReq t p et ev = appreq in

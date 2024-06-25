@@ -32,7 +32,7 @@ val jsonifiable_ASP_Locator : coq_ASP_Locator coq_Jsonifiable =
 
 datatype coq_DispatcherErrors =
   Unavailable 
-| Runtime coq_StringT
+| Runtime string
 
 type 'errType coq_ASPCallback =
   coq_ASP_PARAMS -> coq_RawEv -> (coq_RawEv, 'errType) coq_ResultT
