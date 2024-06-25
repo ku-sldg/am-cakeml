@@ -67,10 +67,10 @@ fun termToString t = String.concatWith " "
           Coq_asp a => ["ASP", aspToString a]
         | Coq_att p t => ["Att", plToString p, parens t]
         | Coq_lseq t1 t2 => ["Lseq", parens t1, parens t2]
-        | Coq_bseq (Coq_pair s1 s2) t1 t2 =>
+        | Coq_bseq (s1, s2) t1 t2 =>
           ["Bseq", pairToString (spToString s1) (spToString s2),
            parens t1, parens t2]
-        | Coq_bpar (Coq_pair s1 s2) t1 t2 =>
+        | Coq_bpar (s1, s2) t1 t2 =>
           ["Bpar", pairToString (spToString s1) (spToString s2),
            parens t1, parens t2]
     end
@@ -94,7 +94,7 @@ fun evToString e = String.concatWith " "
     end
 
 (* rawEvToString :: coq_RawEv -> string *)
-fun rawEvToString e = listToString e BString.toString
+fun rawEvToString e = ListExtra.listToString e BString.toString
 
 (* evidenceCToString :: coq_AppResultC -> string *)
 fun evidenceCToString e = String.concatWith " "

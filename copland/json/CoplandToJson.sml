@@ -26,12 +26,7 @@ fun spPairToJson (sp1, sp2) =
     Json.fromList
         [Json.fromString  (spToString sp1), Json.fromString (spToString sp2)]
         
-(* spProdToJson : (coq_SP, coq_SP) prod -> json 
-   NOTE:  `prod` is the Coq pair type extracted naively to cakeml 
-*)
-fun spProdToJson sp =
-    case sp of
-        Coq_pair sp1 sp2 => spPairToJson (sp1,sp2)                            
+fun spProdToJson sp = spPairToJson sp
 
 (* nsMapToJson : am/CommTypes.nsMap -> json 
    type nsMap = ((coq_Plc, addr) map)
@@ -124,10 +119,10 @@ fun termToJson term = case term of
     | Coq_lseq t1 t2 =>
       constructorWithArgs "Lseq"
                           [termToJson t1, termToJson t2]
-    | Coq_bseq (Coq_pair sp1 sp2) t1 t2 =>
+    | Coq_bseq (sp1, sp2) t1 t2 =>
       constructorWithArgs "Bseq"
                           [spToJson sp1, spToJson sp2, termToJson t1, termToJson t2]
-    | Coq_bpar (Coq_pair sp1 sp2) t1 t2 =>
+    | Coq_bpar (sp1, sp2) t1 t2 =>
       constructorWithArgs "Bpar"
                           [spToJson sp1, spToJson sp2, termToJson t1, termToJson t2]
     |  _ =>

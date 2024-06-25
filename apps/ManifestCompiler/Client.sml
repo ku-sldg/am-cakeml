@@ -30,7 +30,7 @@ fun main () =
 
         val am_comp = am_client_gen_local main_phrase my_plc None formal_manifest am_library 
         val nonceval = BString.fromString "anonce" (* TODO: should this be hardcoded here? *)
-        val init_noncemap = (Coq_pair O nonceval) :: []
+        val init_noncemap = (O, nonceval) :: []
         val init_nonceid = S O
         val my_amst = Coq_mkAM_St init_noncemap init_nonceid ac
         val am_res = run_am_app_comp_init am_comp my_amst

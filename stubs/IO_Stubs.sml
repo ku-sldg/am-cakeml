@@ -27,7 +27,7 @@ fun make_JSON_Network_Request (u : coq_UUID) (js : coq_JSON) =
   in
     (* TODO: I should really be managing with a resultC rather than alway JS response *)
     case (stringT_to_JSON resp) of 
-      Coq_errC e => JSON_Object ((Coq_pair coq_STR_SUCCESS (JSON_Boolean False)) :: [])
+      Coq_errC e => JSON_Object ((coq_STR_SUCCESS, (JSON_Boolean False)) :: [])
     | Coq_resultC js => js
   end) : coq_JSON
 
@@ -45,7 +45,7 @@ fun make_JSON_FS_Location_Request (loc : coq_FS_Location) (js : coq_JSON) =
     case resp_js of 
       Coq_errC e => 
         let val _ = print "IN THE ERR SIDE" in
-          JSON_Object ((Coq_pair coq_STR_SUCCESS (JSON_Boolean False)) :: [])
+          JSON_Object ((coq_STR_SUCCESS, (JSON_Boolean False)) :: [])
         end
     | Coq_resultC js => 
         let val _ = print ("Response parsed as: " ^ (coq_JSON_to_stringT js) ^ "\n")
@@ -146,21 +146,9 @@ fun is_local_appraisal amLib =
 (** val lib_supports_manifest_bool :
     coq_AM_Library -> coq_Manifest -> bool **)
 
-(*
-fun lib_supports_manifest_bool amlib m = True
-*)
 
-
-(*
-
-datatype ('a, 'b) prod =
-  Coq_pair 'a 'b
-
-*)
-
-fun plc_aspid_pair_toString (pr:((coq_Plc, coq_ASP_ID) prod)) = 
-    case pr of 
-      Coq_pair a b => "(" ^ (plToString a) ^ ", " ^ (aspIdToString b) ^ ")"
+fun plc_aspid_pair_toString ((a,b): (coq_Plc * coq_ASP_ID)) = 
+    "(" ^ (plToString a) ^ ", " ^ (aspIdToString b) ^ ")"
       : coq_StringT
 
 (** val pretty_print_manifest : coq_Manifest -> coq_StringT **)
@@ -170,11 +158,11 @@ fun pretty_print_manifest (m:coq_Manifest) (* : coq_StringT *) =
   (case m of 
     Build_Manifest p asp_ls appraisal_ls uuid_ls pubkey_ls targ_ls pol => 
     (* )"\tmy_plc: " ^ (plToString p) ^ *)
-    "\n\tasps: " ^ (listToString asp_ls aspIdToString) ^
-    "\n\tappraisal_asps: " ^ (listToString appraisal_ls plc_aspid_pair_toString) ^
-    "\n\tuuidPlcs: " ^ (listToString uuid_ls plToString) ^
-    "\n\tpubkeyPlcs: " ^ (listToString pubkey_ls plToString) ^
-    "\n\ttargPlcs: " ^ (listToString targ_ls plToString) (* ^
+    "\n\tasps: " ^ (ListExtra.listToString asp_ls aspIdToString) ^
+    "\n\tappraisal_asps: " ^ (ListExtra.listToString appraisal_ls plc_aspid_pair_toString) ^
+    "\n\tuuidPlcs: " ^ (ListExtra.listToString uuid_ls plToString) ^
+    "\n\tpubkeyPlcs: " ^ (ListExtra.listToString pubkey_ls plToString) ^
+    "\n\ttargPlcs: " ^ (ListExtra.listToString targ_ls plToString) (* ^
     "\n\tpolicy: " ^ "True" *) 
     )
 
@@ -184,10 +172,10 @@ fun pretty_print_manifest_simple (m:coq_Manifest) (* : coq_StringT *) =
   (case m of 
     Build_Manifest p asp_ls appraisal_ls uuid_ls pubkey_ls targ_ls pol => 
     (* )"\tmy_plc: " ^ (plToString p) ^ *)
-    "\n\tasps: " ^ (listToString asp_ls aspIdToString) ^
-    "\n\tappraisal_asps: " ^ (listToString appraisal_ls plc_aspid_pair_toString) ^
-    "\n\tuuidPlcs: " ^ (listToString uuid_ls plToString) ^
-    "\n\tpubkeyPlcs: " ^ (listToString pubkey_ls plToString) ^
-    "\n\ttargPlcs: " ^ (listToString targ_ls plToString) (* ^
+    "\n\tasps: " ^ (ListExtra.listToString asp_ls aspIdToString) ^
+    "\n\tappraisal_asps: " ^ (ListExtra.listToString appraisal_ls plc_aspid_pair_toString) ^
+    "\n\tuuidPlcs: " ^ (ListExtra.listToString uuid_ls plToString) ^
+    "\n\tpubkeyPlcs: " ^ (ListExtra.listToString pubkey_ls plToString) ^
+    "\n\ttargPlcs: " ^ (ListExtra.listToString targ_ls plToString) (* ^
     "\n\tpolicy: " ^ "True" *) 
     )

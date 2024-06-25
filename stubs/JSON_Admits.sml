@@ -3,7 +3,7 @@
 fun coq_JSON_to_CakeML_JSON js =
   case js of
     JSON_Object m => 
-      Json.fromPairList (List.map (fn (Coq_pair k v) => (k, coq_JSON_to_CakeML_JSON v)) m)
+      Json.fromPairList (List.map (fn (k, v) => (k, coq_JSON_to_CakeML_JSON v)) m)
   | JSON_Array ls =>
       Json.fromList (List.map coq_JSON_to_CakeML_JSON ls)
   | JSON_String s =>
@@ -56,8 +56,8 @@ fun cakeML_JSON_to_coq_JSON js =
           case (conv_map t) of
             Coq_errC s => Coq_errC s
           | Coq_resultC t' => 
-            Coq_resultC ((Coq_pair k v')::t')
-        end) : ((coq_StringT, coq_JSON) prod list, coq_StringT) coq_ResultT
+            Coq_resultC ((k, v')::t')
+        end) : ((coq_StringT * coq_JSON) list, coq_StringT) coq_ResultT
 
 
 (* Now we can define the functions to convert between Coq JSON and CakeML JSON *)

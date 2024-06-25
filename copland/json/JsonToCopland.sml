@@ -199,12 +199,12 @@ fun jsonToTerm js = case (Json.toMap js) of
     and
     getBseq data = case data of
           [ sp1, sp2, term1, term2] =>
-            Coq_bseq (Coq_pair (jsonToSp sp1) (jsonToSp sp2)) (jsonToTerm term1) (jsonToTerm term2)
+            Coq_bseq ((jsonToSp sp1), (jsonToSp sp2)) (jsonToTerm term1) (jsonToTerm term2)
         | _ => raise  Json.Exn "getBseq" "unexpected argument list"
     and
     getBpar data = case data of
           [ sp1, sp2, term1, term2] =>
-            Coq_bpar (Coq_pair (jsonToSp sp1) (jsonToSp sp2)) (jsonToTerm term1) (jsonToTerm term2)
+            Coq_bpar ((jsonToSp sp1), (jsonToSp sp2)) (jsonToTerm term1) (jsonToTerm term2)
         | _ => raise  Json.Exn "getBpar" "unexpected argument list"
 
 
