@@ -14,8 +14,10 @@ fun nat_from_int_result i =
     if i < 0
     then Coq_errC ("Int " ^ Int.toString i ^ " is not a valid nat")
     else if i = 0
-          then O
-          else S (natFromInt (i - 1))
+          then Coq_resultC O
+          else case (nat_from_int_result (i - 1)) of
+                  Coq_errC s => Coq_errC s
+                | Coq_resultC n => Coq_resultC (S n)
 
 val natToString = Int.toString o natToInt
 

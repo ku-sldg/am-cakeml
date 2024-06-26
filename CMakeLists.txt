@@ -62,20 +62,23 @@ get_files(posix_src_tpm ${crypto_src_tpm}
 ${posix_src_cake})
 
 get_files(copland_am_src
-    stubs/BS.sml
     extracted/ErrorStringConstants.cml
+    extracted/Datatypes.cml
+    extracted/Nat.cml
     
     extracted/ResultT.cml
     extracted/Serializable.cml
     stubs/Serializable_Class_Admits.sml
+    stubs/BS.sml
     extracted/Specif.cml
-    extracted/Datatypes.cml
-    extracted/Nat.cml
     extracted/EqClass.cml
     extracted/List.cml
     extracted/Maps.cml
     stubs/Maps_Helpers.sml
     stubs/AbstractedTypes.sml
+    extracted/JSON_Type.cml
+    extracted/JSON.cml
+    stubs/JSON_Admits.sml
     extracted/Term_Defs_Core.cml
     stubs/Params_Admits_hardcoded.sml
     extracted/Term_Defs.cml
@@ -83,9 +86,6 @@ get_files(copland_am_src
     # copland/json/CoplandToJson.sml
     # copland/json/JsonToCopland.sml
     extracted/Anno_Term_Defs.cml
-    extracted/JSON_Type.cml
-    extracted/JSON.cml
-    stubs/JSON_Admits.sml
     extracted/Interface_Strings_Vars.cml
     extracted/Interface_Types.cml
     extracted/CvmJson_Interfaces.cml
