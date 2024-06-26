@@ -64,10 +64,7 @@ fun list_InJson_to_manifest_set h h0 l = case l of
 fun manifest_set_pairs_to_list_InJson h h0 m = case m of
   [] => []
 | h1 :: t =>
-  (InJSON_Object
-    (let val Build_Jsonifiable to_JSON _ = jsonifiable_serializable_pair h h0
-     in
-     to_JSON h1 end)) :: (manifest_set_pairs_to_list_InJson h h0 t)
+  (pair_to_JSON_Array h h0 h1) :: (manifest_set_pairs_to_list_InJson h h0 t)
 
 (** val list_InJson_to_manifest_set_pairs :
     'a1 coq_Serializable -> 'a2 coq_Serializable -> 'a1 coq_EqClass -> 'a2
@@ -77,18 +74,9 @@ fun manifest_set_pairs_to_list_InJson h h0 m = case m of
 fun list_InJson_to_manifest_set_pairs h h0 h1 h2 l = case l of
   [] => Coq_resultC []
 | h3 :: t =>
-  (case h3 of
-     InJSON_Object js =>
+  (case coq_InnerJSON_to_pair h h0 h3 of
+     Coq_errC e => Coq_errC e
+   | Coq_resultC h' =>
      (case list_InJson_to_manifest_set_pairs h h0 h1 h2 t of
         Coq_errC e => Coq_errC e
-      | Coq_resultC t' =>
-        (case let val Build_Jsonifiable _ from_JSON =
-                jsonifiable_serializable_pair h h0
-              in
-              from_JSON js end of
-           Coq_errC e => Coq_errC e
-         | Coq_resultC h' =>
-           Coq_resultC (manset_add (pair_EqClass h1 h2) h' t')))
-   | _ =>
-     Coq_errC
-       "Error: Invalid JSON type in manifest set from paris, only can handle json objects.")
+      | Coq_resultC t' => Coq_resultC (manset_add (pair_EqClass h1 h2) h' t')))
