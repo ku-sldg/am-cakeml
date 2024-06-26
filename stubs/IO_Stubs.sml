@@ -32,7 +32,7 @@ fun make_JSON_Network_Request (u : coq_UUID) (js : coq_JSON) =
 (** val make_JSON_FS_Location_Request :
     coq_FS_Location -> coq_JSON -> (coq_JSON, string) coq_ResultT **)
 
-val make_JSON_FS_Location_Request (loc : coq_FS_Location) (js : coq_JSON) = 
+fun make_JSON_FS_Location_Request (loc : coq_FS_Location) (js : coq_JSON) = 
   (let val _ = print ("Sending a request to the FS: " ^ loc ^ "\n")
       val resp = c_popen_string (loc ^ " " ^ (coq_JSON_to_string js))
       val _ = print ("Got back a response from the ASP: " ^ resp ^ "\n")
@@ -129,40 +129,3 @@ fun is_local_appraisal amLib =
   case amLib of 
     Build_AM_Library clone_uuid _ _ _ _ => clone_uuid = ""
 
-
-(** val lib_supports_manifest_bool :
-    coq_AM_Library -> coq_Manifest -> bool **)
-
-
-fun plc_aspid_pair_toString ((a,b): (coq_Plc * coq_ASP_ID)) = 
-    "(" ^ (plToString a) ^ ", " ^ (aspIdToString b) ^ ")"
-      : string
-
-(** val pretty_print_manifest : coq_Manifest -> coq_StringT **)
-
-fun pretty_print_manifest (m:coq_Manifest) (* : coq_StringT *) = 
-  "\nAM Library does NOT support Manifest.\nHere is a Manifest that captures the offending fields (omitted by the AM Library): \n\n" ^
-  (case m of 
-    Build_Manifest p asp_ls appraisal_ls uuid_ls pubkey_ls targ_ls pol => 
-    (* )"\tmy_plc: " ^ (plToString p) ^ *)
-    "\n\tasps: " ^ (ListExtra.listToString asp_ls aspIdToString) ^
-    "\n\tappraisal_asps: " ^ (ListExtra.listToString appraisal_ls plc_aspid_pair_toString) ^
-    "\n\tuuidPlcs: " ^ (ListExtra.listToString uuid_ls plToString) ^
-    "\n\tpubkeyPlcs: " ^ (ListExtra.listToString pubkey_ls plToString) ^
-    "\n\ttargPlcs: " ^ (ListExtra.listToString targ_ls plToString) (* ^
-    "\n\tpolicy: " ^ "True" *) 
-    )
-
-(** val pretty_print_manifest : coq_Manifest -> coq_StringT **)
-
-fun pretty_print_manifest_simple (m:coq_Manifest) (* : coq_StringT *) = 
-  (case m of 
-    Build_Manifest p asp_ls appraisal_ls uuid_ls pubkey_ls targ_ls pol => 
-    (* )"\tmy_plc: " ^ (plToString p) ^ *)
-    "\n\tasps: " ^ (ListExtra.listToString asp_ls aspIdToString) ^
-    "\n\tappraisal_asps: " ^ (ListExtra.listToString appraisal_ls plc_aspid_pair_toString) ^
-    "\n\tuuidPlcs: " ^ (ListExtra.listToString uuid_ls plToString) ^
-    "\n\tpubkeyPlcs: " ^ (ListExtra.listToString pubkey_ls plToString) ^
-    "\n\ttargPlcs: " ^ (ListExtra.listToString targ_ls plToString) (* ^
-    "\n\tpolicy: " ^ "True" *) 
-    )
