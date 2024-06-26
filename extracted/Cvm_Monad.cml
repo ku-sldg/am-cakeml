@@ -203,17 +203,20 @@ fun do_remote t pTo e ac =
      in
      let val remote_req = Coq_mkPRReq t my_plc (get_bits e) in
      let val js_req = coq_ProtocolRunRequest_to_JSON remote_req in
-     let val js_resp = make_JSON_Network_Request uuid js_req in
-     (case coq_JSON_to_AM_Protocol_Response js_resp of
+     let val resp_res = make_JSON_Network_Request uuid js_req in
+     (case resp_res of
         Coq_errC msg => Coq_errC (Runtime msg)
-      | Coq_resultC resp =>
-        (case resp of
-           Protocol_Run_Response prresp =>
-           let val Coq_mkPRResp success ev = prresp in
-           (case success of
-              True => Coq_resultC ev
-            | False => Coq_errC (Runtime errStr_remote_am_failure)) end
-         | _ => Coq_errC (Runtime errStr_incorrect_resp_type))) end end end end) end
+      | Coq_resultC js_resp =>
+        (case coq_JSON_to_AM_Protocol_Response js_resp of
+           Coq_errC msg => Coq_errC (Runtime msg)
+         | Coq_resultC resp =>
+           (case resp of
+              Protocol_Run_Response prresp =>
+              let val Coq_mkPRResp success ev = prresp in
+              (case success of
+                 True => Coq_resultC ev
+               | False => Coq_errC (Runtime errStr_remote_am_failure)) end
+            | _ => Coq_errC (Runtime errStr_incorrect_resp_type)))) end end end end) end
 
 (** val doRemote_session' :
     coq_Term -> coq_Plc -> coq_EvC -> coq_EvC coq_CVM **)
