@@ -14,6 +14,8 @@ function(get_real_file file real_name)
 
     elseif(EXISTS ${CMAKE_CURRENT_LIST_DIR}/${file})
         set(${real_name} "${CMAKE_CURRENT_LIST_DIR}/${file}" PARENT_SCOPE)
+    else()
+        message(FATAL_ERROR "File ${file} does not exist.")
     endif()
 endfunction()
 
@@ -62,60 +64,84 @@ get_files(posix_src_tpm ${crypto_src_tpm}
 ${posix_src_cake})
 
 get_files(copland_am_src
-    extracted/ErrorStringConstants.cml
+    # Require Extraction Files for Types
     extracted/Datatypes.cml
     extracted/Nat.cml
-    
+    extracted/Specif.cml
+    extracted/List.cml
+
+    # Random needed stuff (likely extraction bug related)
+    stubs/Preamble_Stuff.sml
+
+    # A more faithful extraction of the Coq code following _CoqProject
     extracted/ResultT.cml
     extracted/Serializable.cml
+
     stubs/Serializable_Class_Admits.sml
-    stubs/BS.sml
-    extracted/Specif.cml
+
     extracted/EqClass.cml
-    extracted/List.cml
-    extracted/Maps.cml
-    stubs/Maps_Helpers.sml
+
     stubs/AbstractedTypes.sml
+    stubs/BS.sml
+
+    extracted/ErrorStringConstants.cml
+    extracted/Maps.cml
     extracted/JSON_Type.cml
-    extracted/JSON.cml
+
     stubs/JSON_Admits.sml
+
+    extracted/JSON.cml
     extracted/Term_Defs_Core.cml
-    stubs/Params_Admits_hardcoded.sml
+
+    stubs/Params_Admits.sml
+
     extracted/Term_Defs.cml
-    extracted/Anno_Term_Defs.cml
     extracted/Interface_Strings_Vars.cml
     extracted/Interface_Types.cml
-    extracted/CvmJson_Interfaces.cml
-    stubs/Manifest_Admits_Stubs.sml
     extracted/ErrorStMonad_Coq.cml
-    stubs/Example_Phrases_Pre_Admits.sml
-    extracted/Example_Phrases_Pre.cml
+
+    stubs/Manifest_Admits.sml
     stubs/Example_Phrases_Admits.sml
+
     extracted/Manifest_Set.cml
     extracted/Manifest.cml
     extracted/Manifest_JSON_Vars.cml
     extracted/Manifest_JSON.cml
+    extracted/Cvm_St.cml
+
+    stubs/IO_Stubs.sml
+
+    extracted/Anno_Term_Defs.cml
+    extracted/CvmJson_Interfaces.cml
+    extracted/Manifest_Compiler.cml
     extracted/EnvironmentM.cml
     extracted/Manifest_Union.cml
-    extracted/Manifest_Generator_Helpers.cml
-    extracted/Manifest_Generator.cml
-    extracted/Manifest_Generator_Union.cml
-    stubs/IO_Stubs.sml
-    extracted/Manifest_Compiler.cml
-    extracted/Cvm_St.cml
-    extracted/AM_St.cml
+
+    stubs/Example_Phrases_Pre_Admits.sml
+
+    extracted/Example_Phrases_Pre.cml
+    extracted/Example_Phrases.cml
+
     stubs/Axioms_Io.sml
+
     extracted/Evidence_Bundlers.cml
     extracted/Cvm_Monad.cml
     extracted/Cvm_Impl.cml
     extracted/Cvm_Run.cml
+    extracted/Manifest_Generator_Helpers.cml
+    extracted/Manifest_Generator.cml
+    extracted/Manifest_Generator_Union.cml
+
+    stubs/Example_Phrases_Demo_Admits.sml
+
+    extracted/Example_Phrases_Demo.cml
+    extracted/AM_St.cml
+
     stubs/Appraisal_IO_Stubs.sml
+
     extracted/AM_Monad.cml
     extracted/Appraisal_Defs.cml
     extracted/Impl_appraisal.cml
-    stubs/Example_Phrases_Demo_Admits.sml
-    extracted/Example_Phrases.cml
-    extracted/Example_Phrases_Demo.cml
     extracted/AM_Json_Interfaces.cml
     extracted/Server_AM.cml
     util/AM_CLI.sml

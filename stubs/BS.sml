@@ -10,15 +10,5 @@ type bs = coq_BS
 val coq_Serializable_BS : coq_BS coq_Serializable =
   Build_Serializable (fn s => (BString.toString s)) (fn s => Coq_resultC (BString.fromString s))
 
-(* type coq_ID_Type = string 
-fun coq_Eq_Class_ID_Type x y = (x = y)
-val coq_ID_Type_ordering = String.compare
-*)
-
 val passed_bs = BString.fromString "PASSED"
 val failed_bs = BString.fromString "FAILED"
-
-structure Nat = struct
-  fun eqb x y = (x = y)
-
-end
