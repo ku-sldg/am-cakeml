@@ -19,8 +19,7 @@ fun decodeUUID (u : coq_UUID) =
 (** val make_JSON_Network_Request :
     coq_UUID -> coq_JSON -> (coq_JSON, string) coq_ResultT **)
 
-val make_JSON_Network_Request : (coq_UUID -> coq_JSON -> (coq_JSON, string)
-                                coq_ResultT) =
+fun make_JSON_Network_Request (u : coq_UUID) (js : coq_JSON) =
   (let val (ip, port) = decodeUUID u
       val fd = Socket.connect ip port
       val _ = print ("Connected to " ^ ip ^ ":" ^ (Int.toString port) ^ "\n")
@@ -33,8 +32,7 @@ val make_JSON_Network_Request : (coq_UUID -> coq_JSON -> (coq_JSON, string)
 (** val make_JSON_FS_Location_Request :
     coq_FS_Location -> coq_JSON -> (coq_JSON, string) coq_ResultT **)
 
-val make_JSON_FS_Location_Request : (coq_FS_Location -> coq_JSON ->
-                                    (coq_JSON, string) coq_ResultT) =
+val make_JSON_FS_Location_Request (loc : coq_FS_Location) (js : coq_JSON) = 
   (let val _ = print ("Sending a request to the FS: " ^ loc ^ "\n")
       val resp = c_popen_string (loc ^ " " ^ (coq_JSON_to_string js))
       val _ = print ("Got back a response from the ASP: " ^ resp ^ "\n")
