@@ -82,9 +82,6 @@ get_files(copland_am_src
     extracted/Term_Defs_Core.cml
     stubs/Params_Admits_hardcoded.sml
     extracted/Term_Defs.cml
-    # copland/CoplandUtil.sml
-    # copland/json/CoplandToJson.sml
-    # copland/json/JsonToCopland.sml
     extracted/Anno_Term_Defs.cml
     extracted/Interface_Strings_Vars.cml
     extracted/Interface_Types.cml
