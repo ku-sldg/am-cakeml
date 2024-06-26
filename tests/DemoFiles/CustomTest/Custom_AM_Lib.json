@@ -1,7 +1,7 @@
 {
   "CLONE_UUID": "192.168.0.1:5000",
   "LIB_ASPS": {},
-  "LIB_APPR_ASPS": {},
+  "LIB_APPR_ASPS": [],
   "LIB_PLCS": {},
   "LIB_PUBKEYS": {}
 }
