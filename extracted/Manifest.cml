@@ -1,3 +1,13 @@
+(** val coq_JSON_Local_ASP : string **)
+
+val coq_JSON_Local_ASP : string =
+  "Local_ASP"
+
+(** val coq_JSON_Remote_ASP : string **)
+
+val coq_JSON_Remote_ASP : string =
+  "Remote_ASP"
+
 datatype coq_ASP_Locator =
   Local_ASP coq_FS_Location
 | Remote_ASP coq_UUID
@@ -8,25 +18,30 @@ val jsonifiable_ASP_Locator : coq_ASP_Locator coq_Jsonifiable =
   Build_Jsonifiable (fn v =>
     case v of
       Local_ASP loc =>
-      JSON_Object ((coq_JSON_Local_ASP,
-        (let val Build_Jsonifiable to_JSON _ = jsonifiable_FS_Location in
-         to_JSON loc end)) :: [])
+      JSON_Object ((coq_JSON_Local_ASP, (InJSON_String
+        (let val Build_Serializable to_string _ = coq_Serializable_FS_Location
+         in
+         to_string loc end))) :: [])
     | Remote_ASP uuid =>
-      JSON_Object ((coq_JSON_Remote_ASP,
-        (let val Build_Jsonifiable to_JSON _ = jsonifiable_uuid in
-         to_JSON uuid end)) :: [])) (fn js =>
-    case coq_JSON_get_JSON coq_JSON_Local_ASP js of
+      JSON_Object ((coq_JSON_Remote_ASP, (InJSON_String
+        (let val Build_Serializable to_string _ = coq_Serializable_UUUID in
+         to_string uuid end))) :: [])) (fn js =>
+    case coq_JSON_get_string coq_JSON_Local_ASP js of
       Coq_errC _ =>
-      (case coq_JSON_get_JSON coq_JSON_Remote_ASP js of
+      (case coq_JSON_get_string coq_JSON_Remote_ASP js of
          Coq_errC e => Coq_errC e
        | Coq_resultC uuid =>
-         (case let val Build_Jsonifiable _ from_JSON = jsonifiable_uuid in
-               from_JSON uuid end of
+         (case let val Build_Serializable _ from_string =
+                 coq_Serializable_UUUID
+               in
+               from_string uuid end of
             Coq_errC e => Coq_errC e
           | Coq_resultC uuid' => Coq_resultC (Remote_ASP uuid')))
     | Coq_resultC loc =>
-      (case let val Build_Jsonifiable _ from_JSON = jsonifiable_FS_Location in
-            from_JSON loc end of
+      (case let val Build_Serializable _ from_string =
+              coq_Serializable_FS_Location
+            in
+            from_string loc end of
          Coq_errC e => Coq_errC e
        | Coq_resultC loc' => Coq_resultC (Local_ASP loc')))
 

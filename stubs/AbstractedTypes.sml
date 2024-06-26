@@ -1,14 +1,9 @@
 
 type coq_ID_Type = string
-(* AXIOM TO BE REALIZED *)
-(** val coq_ID_Type_to_string : coq_ID_Type -> string **)
 
-val coq_ID_Type_to_string = fn x => x
-
-(** val string_to_ID_Type :
-    string -> (coq_ID_Type, string) coq_ResultT **)
-
-val string_to_ID_Type = fn x => Coq_resultC x
+(** val coq_Serializable_ID_Type : coq_ID_Type coq_Serializable **)
+val coq_Serializable_ID_Type : coq_ID_Type coq_Serializable =
+  Build_Serializable (fn s => s) (fn s => Coq_resultC s)
 
 (** val coq_Eq_Class_ID_Type : coq_ID_Type coq_EqClass **)
 

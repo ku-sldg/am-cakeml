@@ -13,19 +13,6 @@ fun targIdToString s = s
 fun coq_ASP_ARGS_to_string x = 
   Json.stringify (coq_MapC_to_Json x (fn x => x))
 
-fun natToInt n =
-    case n
-     of O => 0
-      | S n' => 1 + natToInt n'
-
-fun natFromInt i = if i < 0
-                   then O
-                   else if i = 0
-                        then O
-                        else S (natFromInt (i - 1))
-
-val natToString = Int.toString o natToInt
-
 (* aspParamsToString : coq_ASP_PARAMS -> string *)
 fun aspParamsToString ps =
     case ps of

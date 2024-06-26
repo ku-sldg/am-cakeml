@@ -73,17 +73,42 @@ val errStr_run_cvm_at_error_dynamic : string =
 val errStr_run_cvm_at_error_static : string =
   "errStr_run_cvm_at_error_static"
 
-(** val errStr_json_to_manifest_set : string **)
+(** val errStr_json_to_map : string **)
 
-val errStr_json_to_manifest_set : string =
-  "errStr_json_to_manifest_set"
-
-(** val errStr_json_to_id_type : string **)
-
-val errStr_json_to_id_type : string =
-  "errStr_json_to_id_type"
+val errStr_json_to_map : string =
+  "errStr_json_to_map"
 
 (** val errStr_json_to_pair : string **)
 
 val errStr_json_to_pair : string =
   "errStr_json_to_pair"
+
+(** val errStr_json_get_array_key_not_found : string **)
+
+val errStr_json_get_array_key_not_found : string =
+  "errStr_json_get_array_key_not_found"
+
+(** val errStr_json_get_array_not_an_array : string **)
+
+val errStr_json_get_array_not_an_array : string =
+  "errStr_json_get_array_not_an_array"
+
+(** val errStr_json_get_string_key_not_found : string **)
+
+val errStr_json_get_string_key_not_found : string =
+  "errStr_json_get_string_key_not_found"
+
+(** val errStr_json_get_string_not_a_string : string **)
+
+val errStr_json_get_string_not_a_string : string =
+  "errStr_json_get_string_not_a_string"
+
+(** val errStr_json_get_bool_key_not_found : string **)
+
+val errStr_json_get_bool_key_not_found : string =
+  "errStr_json_get_bool_key_not_found"
+
+(** val errStr_json_get_bool_not_a_bool : string **)
+
+val errStr_json_get_bool_not_a_bool : string =
+  "errStr_json_get_bool_not_a_bool"

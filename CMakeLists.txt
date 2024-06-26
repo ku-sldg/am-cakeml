@@ -66,6 +66,8 @@ get_files(copland_am_src
     extracted/ErrorStringConstants.cml
     
     extracted/ResultT.cml
+    extracted/Serializable.cml
+    stubs/Serializable_Class_Admits.sml
     extracted/Specif.cml
     extracted/Datatypes.cml
     extracted/Nat.cml
@@ -77,10 +79,9 @@ get_files(copland_am_src
     extracted/Term_Defs_Core.cml
     stubs/Params_Admits_hardcoded.sml
     extracted/Term_Defs.cml
-    copland/CoplandUtil.sml
-    copland/json/CoplandToJson.sml
-    copland/json/JsonToCopland.sml
-    stubs/Term_Defs_Admits.sml
+    # copland/CoplandUtil.sml
+    # copland/json/CoplandToJson.sml
+    # copland/json/JsonToCopland.sml
     extracted/Anno_Term_Defs.cml
     extracted/JSON_Type.cml
     extracted/JSON.cml
