@@ -159,12 +159,6 @@ get_files(posix_c_files_base
 )
 
 
-get_files(posix_c_files_noasps
-    ${BASIS_FILE}
-    system/crypto/openssl/crypto_ffi.c
-    ${posix_c_files_base}
-)
-
 get_files(posix_c_files
     ${BASIS_FILE}
     system/crypto/openssl/crypto_ffi.c
