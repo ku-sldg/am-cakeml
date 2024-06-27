@@ -1,3 +1,24 @@
 {
-  "Term_Plc_list": []
+  "Term_Plc_list": [
+    [
+      {
+        "TERM_CONSTRUCTOR": "asp",
+        "TERM_BODY": {
+          "ASP_CONSTRUCTOR": "ASPC",
+          "ASP_SP": "ALL",
+          "ASP_FWD": {
+            "FWD_CONSTRUCTOR": "EXTD",
+            "EXTD_N": "1"
+          },
+          "ASP_PARAMS": {
+            "ASP_ID": "ssl_sig_aspid",
+            "ASP_ARGS": {},
+            "ASP_PLC": "P1",
+            "ASP_TARG_ID": "sys"
+          }
+        }
+      },
+      "P1"
+    ]
+  ]
 }
