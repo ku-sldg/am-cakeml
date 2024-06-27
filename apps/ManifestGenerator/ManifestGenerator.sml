@@ -46,20 +46,20 @@ structure ManGen_CLI_Utils = struct
     *)
   fun retrieve_CLI_args () =
       (let val name = CommandLine.name()
-          val usage = ("Usage: " ^ name ^ "-t <terms_file>.json -e <evidences_file>.json -o <output_directory>\n")
+          val usage = ("Usage: " ^ name ^ " -t <terms_file>.json -e <evidences_file>.json -o <output_directory>\n")
       in
         case (CommandLine.arguments()) of
           argList =>
             let val termFileInd   = ListExtra.find_index argList "-t"
                 val evidFileInd   = ListExtra.find_index argList "-e"
-                val outDirInd     = ListExtra.find_index argList "-e"
+                val outDirInd     = ListExtra.find_index argList "-o"
 
                 val termFileBool  = (termFileInd <> ~1)
                 val evidFileBool  = (evidFileInd <> ~1)
                 val outDirBool    = (outDirInd <> ~1)
             in
               if ((not termFileBool) orelse (not evidFileBool) orelse (not outDirBool))
-              then (raise (Exception ("Manifest Generator Argument Error: " ^ usage)))
+              then (raise (Exception ("Manifest Generator Argument Error: \n" ^ usage)))
               else
                 let val termFile  = List.nth argList (termFileInd + 1) 
                     val evidFile  = List.nth argList (evidFileInd + 1) 

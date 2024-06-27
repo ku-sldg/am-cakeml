@@ -4,6 +4,7 @@
 #include <assert.h>
 
 #define SUCCESS 0x00
+#define BUFFER_OVERFLOW 0xe0
 #define FAILED_TO_READ_FILE 0xed
 #define FAILED_TO_REALLOC_BUFFER 0xee
 #define FAILED_TO_ALLOCATE_BUFFER 0xef
@@ -52,12 +53,23 @@ uint8_t read_until_eof(FILE *file, size_t INITIAL_BUFFER_SIZE, char **buffer, si
   }
 
   size_t bytes_read;
-  while ((bytes_read = fread(*buffer + *total_read, 1, buffer_size - *total_read - 1, file)) > 0)
+  while ((bytes_read = fread(
+              *buffer + *total_read,         // Start writing at the start of the buffer + any offset for what we've already read
+              1,                             // Read 1 byte at a time
+              buffer_size - *total_read - 1, // Read all the way to the end of the buffer - the items already read - 1 for null terminator
+              file)) > 0)
   {
     *total_read += bytes_read;
 
     // Check if we need to resize the buffer
-    if (*total_read >= buffer_size - 1)
+    if (*total_read > buffer_size)
+    {
+      // This should never happen, but just in case
+      perror("read_until_eof: Buffer overflow");
+      free(buffer);
+      return BUFFER_OVERFLOW;
+    }
+    else if (*total_read == (buffer_size - 1))
     {
       buffer_size *= 2;
       // Resize and reallocate (safely moves the ptrs)
