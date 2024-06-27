@@ -255,7 +255,7 @@ foreach(appdir ${appdirs})
     endif()
 endforeach()
 
-get_real_file("./build/CMakeLists.txt" temp)
+# get_real_file("./build/CMakeLists.txt" temp)
 if (EXISTS ${temp})
   add_subdirectory("build")
 endif()

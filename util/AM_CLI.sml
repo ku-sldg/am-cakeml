@@ -45,6 +45,7 @@ structure AM_CLI_Utils = struct
   (* TODO: better error handling here -- i.e. reasonable error message if file not found... *)
   fun parse_private_key file =
     Coq_resultC (BString.unshow (TextIOExtra.readFile file))
+    handle Word8Extra.InvalidHex => Coq_errC "BString Unshow Error in parsing private key"
   
   fun argIndPresent (i:int) = (i <> ~1)
 
