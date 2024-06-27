@@ -101,7 +101,6 @@ get_files(copland_am_src
     extracted/ErrorStMonad_Coq.cml
 
     stubs/Manifest_Admits.sml
-    stubs/Example_Phrases_Admits.sml
 
     extracted/Manifest_Set.cml
     extracted/Manifest.cml
@@ -117,11 +116,6 @@ get_files(copland_am_src
     extracted/EnvironmentM.cml
     extracted/Manifest_Union.cml
 
-    stubs/Example_Phrases_Pre_Admits.sml
-
-    extracted/Example_Phrases_Pre.cml
-    extracted/Example_Phrases.cml
-
     stubs/Axioms_Io.sml
 
     extracted/Evidence_Bundlers.cml
@@ -131,10 +125,6 @@ get_files(copland_am_src
     extracted/Manifest_Generator_Helpers.cml
     extracted/Manifest_Generator.cml
     extracted/Manifest_Generator_Union.cml
-
-    stubs/Example_Phrases_Demo_Admits.sml
-
-    extracted/Example_Phrases_Demo.cml
     extracted/AM_St.cml
 
     stubs/Appraisal_IO_Stubs.sml
