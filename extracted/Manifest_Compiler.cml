@@ -46,11 +46,7 @@ fun generate_ASP_dispatcher' al am par rawEv =
      Some loc =>
      let val asp_req = Coq_mkASPRReq aspid args targ_plc targ rawEv in
      let val js_req = coq_ASPRunRequest_to_JSON asp_req in
-     let val resp_res =
-       case loc of
-         Local_ASP fsLoc => make_JSON_FS_Location_Request fsLoc js_req
-       | Remote_ASP uuid => make_JSON_Network_Request uuid js_req
-     in
+     let val resp_res = make_JSON_FS_Location_Request loc js_req in
      (case resp_res of
         Coq_errC msg => Coq_errC (Runtime msg)
       | Coq_resultC js_resp =>
@@ -95,11 +91,7 @@ fun generate_appraisal_ASP_dispatcher' al am par rawEv =
      Some loc =>
      let val asp_req = Coq_mkASPRReq aspid args targ_plc targ rawEv in
      let val js_req = coq_ASPRunRequest_to_JSON asp_req in
-     let val resp_res =
-       case loc of
-         Local_ASP fsLoc => make_JSON_FS_Location_Request fsLoc js_req
-       | Remote_ASP uuid => make_JSON_Network_Request uuid js_req
-     in
+     let val resp_res = make_JSON_FS_Location_Request loc js_req in
      (case resp_res of
         Coq_errC msg => Coq_errC (Runtime msg)
       | Coq_resultC js_resp =>

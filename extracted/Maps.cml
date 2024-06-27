@@ -39,30 +39,4 @@ fun map_map hA f m = case m of
   [] => []
 | p :: m' => let val (k, v) = p in (k, (f v)) :: (map_map hA f m') end
 
-(** val id_map_to_string_map :
-    coq_ID_Type coq_Serializable -> (coq_ID_Type, 'a1) coq_MapC -> (string,
-    'a1) coq_MapC **)
-
-fun id_map_to_string_map h m = case m of
-  [] => []
-| p :: m' =>
-  let val (k, v) = p in
-  ((let val Build_Serializable to_string _ = h in to_string k end),
-  v) :: (id_map_to_string_map h m') end
-
-(** val string_map_to_id_map :
-    coq_ID_Type coq_Serializable -> (string, 'a1) coq_MapC -> ((coq_ID_Type,
-    'a1) coq_MapC, string) coq_ResultT **)
-
-fun string_map_to_id_map h m = case m of
-  [] => Coq_resultC []
-| p :: m' =>
-  let val (k, v) = p in
-  (case let val Build_Serializable _ from_string = h in from_string k end of
-     Coq_errC e => Coq_errC e
-   | Coq_resultC k' =>
-     (case string_map_to_id_map h m' of
-        Coq_errC e => Coq_errC e
-      | Coq_resultC m'' => Coq_resultC ((k', v) :: m''))) end
-
 type ('a, 'b) coq_MapD = ('a * 'b) list

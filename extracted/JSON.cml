@@ -90,14 +90,6 @@ fun coq_InnerJSON_to_pair h h0 js = case js of
       | _ => Coq_errC errStr_json_to_pair))
 | _ => Coq_errC errStr_json_to_pair
 
-(** val string_map_to_JSON :
-    'a1 coq_Jsonifiable -> (string, 'a1) coq_MapC -> coq_JSON **)
-
-fun string_map_to_JSON h m =
-  JSON_Object
-    (map_map str_eq_class (fn x => InJSON_Object
-      (let val Build_Jsonifiable to_JSON _ = h in to_JSON x end)) m)
-
 (** val string_string_map_to_JSON :
     'a1 coq_Serializable -> (string, 'a1) coq_MapC -> coq_JSON **)
 
@@ -105,21 +97,6 @@ fun string_string_map_to_JSON h m =
   JSON_Object
     (map_map str_eq_class (fn x => InJSON_String
       (let val Build_Serializable to_string _ = h in to_string x end)) m)
-
-(** val coq_JSON_to_string_map :
-    'a1 coq_Jsonifiable -> coq_JSON -> ((string, 'a1) coq_MapC, string)
-    coq_ResultT **)
-
-fun coq_JSON_to_string_map h js = case js of
-  JSON_Object m =>
-  result_map (fn pat =>
-    let val (k, v) = pat in
-    (case v of
-       InJSON_Object v' =>
-       (case let val Build_Jsonifiable _ from_JSON = h in from_JSON v' end of
-          Coq_errC e => Coq_errC e
-        | Coq_resultC v'0 => Coq_resultC (k, v'0))
-     | _ => Coq_errC errStr_json_to_map) end) m
 
 (** val coq_JSON_to_string_string_map :
     'a1 coq_Serializable -> coq_JSON -> ((string, 'a1) coq_MapC, string)
@@ -136,17 +113,6 @@ fun coq_JSON_to_string_string_map h js = case js of
           Coq_errC e => Coq_errC e
         | Coq_resultC v'0 => Coq_resultC (k, v'0))
      | _ => Coq_errC errStr_json_to_map) end) m
-
-(** val jsonifiable_id_map :
-    'a1 coq_Jsonifiable -> (coq_ID_Type, 'a1) coq_MapC coq_Jsonifiable **)
-
-fun jsonifiable_id_map h =
-  Build_Jsonifiable (fn m =>
-    string_map_to_JSON h (id_map_to_string_map coq_Serializable_ID_Type m))
-    (fn js =>
-    case coq_JSON_to_string_map h js of
-      Coq_errC e => Coq_errC e
-    | Coq_resultC m => string_map_to_id_map coq_Serializable_ID_Type m)
 
 (** val id_B_map_to_string_map :
     coq_ID_Type coq_Serializable -> 'a1 coq_Serializable -> (coq_ID_Type,
@@ -197,21 +163,6 @@ fun map_flatten h h0 m = case m of
   [] => []
 | p :: m' => p :: (map_flatten h h0 m')
 
-(** val map_pair_to_InnerJSON :
-    'a1 coq_Serializable -> 'a1 coq_EqClass -> 'a2 coq_EqClass -> 'a2
-    coq_Serializable -> 'a3 coq_Jsonifiable -> ('a1 * 'a2, 'a3) coq_MapC ->
-    coq_InnerJSON list **)
-
-fun map_pair_to_InnerJSON h h0 h1 h2 h3 m =
-  map (fn pat =>
-    let val (y, v) = pat in
-    let val (k1, k2) = y in
-    InJSON_Array ((InJSON_String
-    (let val Build_Serializable to_string _ = h in to_string k1 end)) :: ((InJSON_String
-    (let val Build_Serializable to_string _ = h2 in to_string k2 end)) :: ((InJSON_Object
-    (let val Build_Jsonifiable to_JSON _ = h3 in to_JSON v end)) :: []))) end end)
-    (map_flatten h0 h1 m)
-
 (** val result_map_pairs :
     'a1 coq_EqClass -> 'a2 coq_EqClass -> (coq_InnerJSON ->
     (('a1 * 'a2) * 'a3, string) coq_ResultT) -> coq_InnerJSON list ->
@@ -227,12 +178,27 @@ fun result_map_pairs h h0 f l = case l of
         Coq_errC e => Coq_errC e
       | Coq_resultC m' => Coq_resultC (p :: m')))
 
-(** val coq_InnerJson_to_map_pair :
+(** val map_pair_to_InnerJSON_string :
     'a1 coq_Serializable -> 'a1 coq_EqClass -> 'a2 coq_EqClass -> 'a2
-    coq_Serializable -> 'a3 coq_Jsonifiable -> coq_InnerJSON list ->
+    coq_Serializable -> 'a3 coq_Serializable -> ('a1 * 'a2, 'a3) coq_MapC ->
+    coq_InnerJSON list **)
+
+fun map_pair_to_InnerJSON_string h h0 h1 h2 h3 m =
+  map (fn pat =>
+    let val (y, v) = pat in
+    let val (k1, k2) = y in
+    InJSON_Array ((InJSON_String
+    (let val Build_Serializable to_string _ = h in to_string k1 end)) :: ((InJSON_String
+    (let val Build_Serializable to_string _ = h2 in to_string k2 end)) :: ((InJSON_String
+    (let val Build_Serializable to_string _ = h3 in to_string v end)) :: []))) end end)
+    (map_flatten h0 h1 m)
+
+(** val coq_InnerJson_string_to_map_pair :
+    'a1 coq_Serializable -> 'a1 coq_EqClass -> 'a2 coq_EqClass -> 'a2
+    coq_Serializable -> 'a3 coq_Serializable -> coq_InnerJSON list ->
     (('a1 * 'a2, 'a3) coq_MapC, string) coq_ResultT **)
 
-fun coq_InnerJson_to_map_pair h h0 h1 h2 h3 js =
+fun coq_InnerJson_string_to_map_pair h h0 h1 h2 h3 js =
   result_map_pairs h0 h1 (fn js' =>
     case js' of
       InJSON_Array l =>
@@ -250,7 +216,7 @@ fun coq_InnerJson_to_map_pair h h0 h1 h2 h3 js =
                      [] => Coq_errC errStr_json_to_map
                    | i1 :: l2 =>
                      (case i1 of
-                        InJSON_Object v =>
+                        InJSON_String v =>
                         (case l2 of
                            [] =>
                            (case let val Build_Serializable _ from_string = h
@@ -264,10 +230,10 @@ fun coq_InnerJson_to_map_pair h h0 h1 h2 h3 js =
                                     from_string k2 end of
                                  Coq_errC _ => Coq_errC errStr_json_to_map
                                | Coq_resultC k4 =>
-                                 (case let val Build_Jsonifiable _
-                                         from_JSON = h3
+                                 (case let val Build_Serializable _
+                                         from_string = h3
                                        in
-                                       from_JSON v end of
+                                       from_string v end of
                                     Coq_errC _ => Coq_errC errStr_json_to_map
                                   | Coq_resultC v0 =>
                                     Coq_resultC ((k3, k4), v0))))

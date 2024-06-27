@@ -1,7 +1,24 @@
 {
   "CLONE_UUID": "192.168.0.1:5000",
-  "LIB_ASPS": {},
-  "LIB_APPR_ASPS": [],
-  "LIB_PLCS": {},
+  "LIB_ASPS": {
+    "ssl_sig_aspid": "~/repos/asp-libs/attestation_asps/test_asp.out"
+  },
+  "LIB_APPR_ASPS": [
+    [
+      "P1",
+      "ssl_sig_aspid",
+      "~/repos/asp-libs/attestation_asps/test_asp.out"
+    ],
+    [
+      "P2",
+      "ssl_sig_aspid",
+      "~/repos/asp-libs/attestation_asps/test_asp.out"
+    ]
+  ],
+  "LIB_PLCS": {
+    "P1": "192.168.0.1:5001",
+    "P2": "192.168.0.1:5002",
+    "P3": "192.168.0.1:5003"
+  },
   "LIB_PUBKEYS": {}
 }

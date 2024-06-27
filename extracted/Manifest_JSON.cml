@@ -86,12 +86,13 @@ fun coq_AM_Lib_to_JSON am =
   (let val Build_Serializable to_string _ = coq_Serializable_UUUID in
    to_string clone_uuid end))) :: ((coq_AM_LIB_ASPS, (InJSON_Object
   (let val Build_Jsonifiable to_JSON _ =
-     jsonifiable_id_map jsonifiable_ASP_Locator
+     jsonifiable_id_map_serializables coq_Serializable_FS_Location
    in
    to_JSON lib_asps end))) :: ((coq_AM_LIB_APPR_ASPS, (InJSON_Array
-  (map_pair_to_InnerJSON coq_Serializable_TARG_ID coq_Eq_Class_ID_Type
-    coq_Eq_Class_ID_Type coq_Serializable_TARG_ID jsonifiable_ASP_Locator
-    lib_appr_asps))) :: ((coq_AM_LIB_PLCS, (InJSON_Object
+  (map_pair_to_InnerJSON_string coq_Serializable_TARG_ID coq_Eq_Class_ID_Type
+    coq_Eq_Class_ID_Type coq_Serializable_TARG_ID
+    coq_Serializable_FS_Location lib_appr_asps))) :: ((coq_AM_LIB_PLCS,
+  (InJSON_Object
   (let val Build_Jsonifiable to_JSON _ =
      jsonifiable_id_map_serializables coq_Serializable_UUUID
    in
@@ -121,13 +122,14 @@ fun coq_JSON_to_AM_Lib js =
                from_string temp_CLONE_UUUID end) (fn cLONE_UUUID =>
               res_bind
                 (let val Build_Jsonifiable _ from_JSON =
-                   jsonifiable_id_map jsonifiable_ASP_Locator
+                   jsonifiable_id_map_serializables
+                     coq_Serializable_FS_Location
                  in
                  from_JSON temp_LIB_ASPS end) (fn lIB_ASPS =>
                 res_bind
-                  (coq_InnerJson_to_map_pair coq_Serializable_TARG_ID
+                  (coq_InnerJson_string_to_map_pair coq_Serializable_TARG_ID
                     coq_Eq_Class_ID_Type coq_Eq_Class_ID_Type
-                    coq_Serializable_TARG_ID jsonifiable_ASP_Locator
+                    coq_Serializable_TARG_ID coq_Serializable_FS_Location
                     temp_LIB_APPR_ASPS) (fn lIB_APPR_ASPS =>
                   res_bind
                     (let val Build_Jsonifiable _ from_JSON =
