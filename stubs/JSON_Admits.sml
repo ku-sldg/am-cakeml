@@ -18,9 +18,8 @@ fun coq_JSON_to_CakeML_JSON (js : coq_JSON) =
 
 fun cakeML_JSON_to_coq_JSON js = 
   case js of
-    Json.Object map => 
-      let val ascList : (string * Json.json) list = Map.toAscList map
-          fun aux (k : string) (v : Json.json) = 
+    Json.Object ascList => 
+      let fun aux (k : string) (v : Json.json) = 
             (case cakeML_JSON_to_coq_InnerJSON v of
               Coq_errC s => Coq_errC s
             | Coq_resultC v' => Coq_resultC (k, v')) : ((string * coq_InnerJSON), string) coq_ResultT
