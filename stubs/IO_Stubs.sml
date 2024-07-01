@@ -21,6 +21,7 @@ fun decodeUUID (u : coq_UUID) =
 
 fun make_JSON_Network_Request (u : coq_UUID) (js : coq_JSON) =
   (let val (ip, port) = decodeUUID u
+      val _ = print ("Decoded UUID to: " ^ ip ^ ":" ^ (Int.toString port) ^ "\n")
       val fd = Socket.connect ip port
       val _ = print ("Connected to " ^ ip ^ ":" ^ (Int.toString port) ^ "\n")
       val sendReq = Socket.output fd (coq_JSON_to_string js)

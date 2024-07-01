@@ -1,1 +1,19 @@
-{"ABS_PLC":"P1","APPR_ASPS":[],"ASPS":["ssl_sig_aspid"],"POLICY":[],"PUBKEY_PLCS":["P1","P0"],"TARGET_PLCS":["P1"],"UUID_PLCS":["P1"]}
+{
+  "ABS_PLC": "P1",
+  "APPR_ASPS": [],
+  "ASPS": [
+    "ssl_sig_aspid"
+  ],
+  "POLICY": [],
+  "PUBKEY_PLCS": [
+    "P1",
+    "P0"
+  ],
+  "TARGET_PLCS": [
+    "P1"
+  ],
+  "UUID_PLCS": [
+    "P0",
+    "P1"
+  ]
+}
