@@ -8,10 +8,10 @@ val coq_STR_REQ_PLC : string =
 val coq_STR_TERM : string =
   "TERM"
 
-(** val coq_STR_EV : string **)
+(** val coq_STR_RAWEV : string **)
 
-val coq_STR_EV : string =
-  "EV"
+val coq_STR_RAWEV : string =
+  "RAWEV"
 
 (** val coq_STR_SUCCESS : string **)
 

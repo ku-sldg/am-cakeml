@@ -40,8 +40,17 @@ type coq_ASP_ARGS = (string, string) coq_MapC
 (** val coq_Jsonifiable_ASP_ARGS : coq_ASP_ARGS coq_Jsonifiable **)
 
 val coq_Jsonifiable_ASP_ARGS : coq_ASP_ARGS coq_Jsonifiable =
-  Build_Jsonifiable (string_string_map_to_JSON coq_Serializable_string)
-    (coq_JSON_to_string_string_map coq_Serializable_string)
+  Build_Jsonifiable
+    (let val Build_Jsonifiable to_JSON _ =
+       jsonifiable_map_serial_serial coq_Serializable_TARG_ID
+         coq_Eq_Class_ID_Type coq_Serializable_TARG_ID
+     in
+     to_JSON end)
+    (let val Build_Jsonifiable _ from_JSON =
+       jsonifiable_map_serial_serial coq_Serializable_TARG_ID
+         coq_Eq_Class_ID_Type coq_Serializable_TARG_ID
+     in
+     from_JSON end)
 
 datatype coq_ASP_PARAMS =
   Coq_asp_paramsC coq_ASP_ID coq_ASP_ARGS coq_Plc coq_TARG_ID
