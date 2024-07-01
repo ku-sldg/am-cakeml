@@ -80,8 +80,8 @@ get_files(copland_am_src
     stubs/Serializable_Class_Admits.sml
 
     extracted/EqClass.cml
+    extracted/ID_Type.cml
 
-    stubs/AbstractedTypes.sml
     stubs/BS.sml
 
     extracted/ErrorStringConstants.cml

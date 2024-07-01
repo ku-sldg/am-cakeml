@@ -31,12 +31,4 @@ fun map_vals h m = case m of
   [] => []
 | p :: m' => let val (_, v) = p in v :: (map_vals h m') end
 
-(** val map_map :
-    'a1 coq_EqClass -> ('a2 -> 'a3) -> ('a1, 'a2) coq_MapC -> ('a1, 'a3)
-    coq_MapC **)
-
-fun map_map hA f m = case m of
-  [] => []
-| p :: m' => let val (k, v) = p in (k, (f v)) :: (map_map hA f m') end
-
 type ('a, 'b) coq_MapD = ('a * 'b) list
