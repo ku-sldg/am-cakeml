@@ -11,6 +11,11 @@ When things go wrong, handle_AM_request returns a raw error message string.
 fun respondToMsg client nonce ac = 
   let val inString  = Socket.inputAll client 
       val _ = print ("\n\nReceived request string: \n" ^ inString ^ "\n")
+      val jsonTest = case string_to_JSON inString of
+              Coq_errC msg => raise (Exception ("Error in JSON conversion " ^ msg))
+            | Coq_resultC js => coq_JSON_to_string js
+      val _ = print "TEsting json conversion\n"
+      val _ = print ("jsonTest: " ^ jsonTest ^ "\n")
       val outString = handle_AM_request inString ac nonce
       val _ = print ("\n\nSending response string: \n" ^ outString) 
   in 
@@ -19,8 +24,10 @@ fun respondToMsg client nonce ac =
   handle Json.Exn s1 s2 =>
           (TextIO.print_err ("JSON error" ^ s1 ^ ": " ^ s2 ^ "\n"); ())
             
-fun handleIncoming listener ac =
-    let val client = Socket.accept listener
+fun handleIncoming (listener_and_ac) =
+    let val (listener, ac) = listener_and_ac
+        val client = Socket.accept listener
+        val _ = TextIOExtra.printLn "Accepted connection\n"
         val nonceval = BString.fromString "anonce" (* TODO: should this be hardcoded here? *)
     in 
       (respondToMsg client nonceval ac);
@@ -38,7 +45,7 @@ fun startServer ac =
         val _ = TextIOExtra.printLn ("Starting up Server")
         val _ = TextIOExtra.printLn ("On port: " ^ (Int.toString port) ^ "\nQueue Length: " ^ (Int.toString queueLength))
     in 
-     loop handleIncoming (Socket.listen port queueLength) ac
+     loop handleIncoming ((Socket.listen port queueLength), ac)
     end
     handle Socket.Err s => TextIO.print_err ("Socket failure on listener instantiation: " ^ s ^ "\n")
          | Crypto.Err s => TextIO.print_err ("Crypto error: " ^ s ^ "\n")
