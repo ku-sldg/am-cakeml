@@ -52,6 +52,8 @@ trap kill_background_processes EXIT
 
 TESTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+echo "Test Dir Set to: $TESTS_DIR"
+
 # Common Variables
 TERM_GEN=./apps/TermToJson/TermToJson
 MAN_GEN=./apps/ManifestGenerator/ManifestGenerator
