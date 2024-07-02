@@ -30,6 +30,26 @@ if [[ "$TERM_TYPE" == "layered_bg" ]]; then
   exit 0
 fi
 
+PIDS=()
+
+# Function to kill all background processes
+kill_background_processes() {
+    echo -e "\nKilling background processes...\n"
+    kill ${PIDS[@]} || true
+    # for pid in ${PIDS[@]}; do
+    #   echo "Killing process with PID: $pid"
+    #   if kill $pid; then
+    #       echo "Killed process with PID: $pid"
+    #   else
+    #       echo "Failed to kill process with PID: $pid"
+    #   fi
+    # done
+}
+
+# Trap to ensure background processes are killed on script exit
+trap kill_background_processes EXIT
+
+
 TESTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Common Variables
@@ -71,26 +91,20 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   # First, generate the manifests
   $MAN_GEN -t $GENERATED/TermPairList.json -e $DEMO_FILES/Evid_List.json -o $GENERATED
 
-  # Setup tmux windows
-  tmux new-session -d -s ServerProcess 'bash -i'
+  PIDS=()
   
   # Generate an AM for each manifest
-  I=0
   for MANIFEST in $GENERATED/Manifest_*.json; do
-    # Make window for it
-    tmux split-window -v 'bash -i'
-    tmux select-layout even-horizontal
-    # Start the AM
-    tmux send-keys -t $I "( $AM_EXEC -m $MANIFEST -l $TEST_AM_LIB -k $TEST_PRIVKEY )" Enter
-    # Increment I
-    I=$((I+1))
+    # Start the AM in the background and store its PID
+    $AM_EXEC -m $MANIFEST -l $TEST_AM_LIB -k $TEST_PRIVKEY &
+    PIDS+=($!)
   done
   
   # Now send the request, on the very last window
-  tmux send-keys -t $I "sleep 1 && $TESTS_DIR/send_term_req.sh -h localhost -p 5000 -f $TERM_FILE" Enter
-
-  tmux attach-session -d -t ServerProcess
-
+  sleep 1 
+  $TESTS_DIR/send_term_req.sh -h localhost -p 5000 -f $TERM_FILE > $GENERATED/output.out
+  # We need this to be the last line so that the exit code is whether or not we found success
+  grep "\"SUCCESS\":true" $GENERATED/output.out
 else
   echo "You are not in the 'am-cakeml/tests' directory"
 fi
