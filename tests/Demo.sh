@@ -56,6 +56,7 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   repoRoot=$(dirname "$PWD")
   # Move to build folder
   mkdir -p $repoRoot/build
+  cmake ..
   cd $repoRoot/build
 
   # Make targets
