@@ -37,7 +37,6 @@ fun make_JSON_FS_Location_Request (loc : coq_FS_Location) (js : coq_JSON) =
   (let val _ = print ("Sending a request to the FS: " ^ loc ^ "\n")
       val resp = c_popen_string (loc ^ " " ^ (coq_JSON_to_string js))
       val _ = print ("Got back a response from the ASP: " ^ resp ^ "\n")
-      val _ = print ("String Length is: " ^ Int.toString (String.size resp) ^ "\n")
   in
     string_to_JSON resp
   end) : (coq_JSON, string) coq_ResultT

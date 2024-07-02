@@ -134,7 +134,6 @@ void ffipopen_string(const char *commandIn, const long clen, uint8_t *a, const l
     return;
   }
 
-  printf("ffipopen_string: Running command: %s\n", commandIn);
   // Open a pipe to the command
   FILE *fp = popen((char *)commandIn, "r");
   if (fp == NULL)
@@ -143,7 +142,6 @@ void ffipopen_string(const char *commandIn, const long clen, uint8_t *a, const l
     a[RESPONSE_CODE_START] = FILE_READ_ERROR;
     return;
   }
-  printf("ffipopen_string: managed to open file\n");
 
   // Read the output running the command into a buffer
   char *buffer = NULL;
