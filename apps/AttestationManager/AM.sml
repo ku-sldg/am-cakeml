@@ -40,7 +40,11 @@ fun handleIncoming (listener_and_ac) =
 (* coq_AM_Config -> unit *)
 fun startServer ac =
     let val queueLength = 5 (* TODO: Hardcoded queuelength *)
-        val (Coq_mkAmConfig _ uuid _ _ _ _) = ac 
+        val (Coq_mkAmConfig man _ _ _ uuidCb _) = ac 
+        val (Build_Manifest my_plc _ _ _ _ _ _) = man 
+        val uuid = case uuidCb my_plc of
+                      Coq_resultC u => u
+                    | Coq_errC s => raise Exception ("UUID lookup error: Could not find own UUID in AM Config")
         val (ip, port) = decodeUUID uuid
         val _ = TextIOExtra.printLn ("Starting up Server")
         val _ = TextIOExtra.printLn ("On port: " ^ (Int.toString port) ^ "\nQueue Length: " ^ (Int.toString queueLength))
@@ -59,7 +63,7 @@ fun main () =
   let val (manifest, am_lib, priv_key) = AM_CLI_Utils.retrieve_CLI_args ()
       val ac = manifest_compiler manifest am_lib
       (* Retrieving implicit self place from manifest here *)
-      val (Coq_mkAmConfig man uuid _ _ _ _) = ac 
+      val (Coq_mkAmConfig man _ _ _ _ _) = ac 
       val (Build_Manifest my_plc _ _ _ _ _ _) = man 
       val _ = print ("My Place (retrieved from Manifest): " ^ my_plc ^ "\n\n")
   in
