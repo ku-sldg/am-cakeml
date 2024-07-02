@@ -5,6 +5,7 @@
 
 #define SUCCESS 0x00
 #define BUFFER_OVERFLOW 0xe0
+#define PATH_ERROR 0xe1
 #define FAILED_TO_READ_FILE 0xed
 #define FAILED_TO_REALLOC_BUFFER 0xee
 #define FAILED_TO_ALLOCATE_BUFFER 0xef
@@ -116,7 +117,7 @@ uint8_t read_until_eof(FILE *file, size_t INITIAL_BUFFER_SIZE, char **buffer, si
  * Return of 0xfe = Failed to read from file properly
  * Return of 0xff = Failed to open file
  */
-void ffipopen_string(const uint8_t *c, const long clen, uint8_t *a, const long alen)
+void ffipopen_string(const char *commandIn, const long clen, uint8_t *a, const long alen)
 {
   const uint8_t RESPONSE_CODE_START = 0;
   const uint8_t RESPONSE_CODE_LENGTH = 1;
@@ -124,19 +125,39 @@ void ffipopen_string(const uint8_t *c, const long clen, uint8_t *a, const long a
   const uint8_t OUTPUT_LENGTH_LENGTH = 4;
   const uint8_t HEADER_LENGTH = RESPONSE_CODE_LENGTH + OUTPUT_LENGTH_LENGTH;
 
-  FILE *fp = popen((char *)c, "r");
+  // Try to expand the ~ to the full home directory path
+  long newComLength;
+  if (commandIn[0] != '/')
+  {
+    perror("ffipopen_string: Found ~ in path, this is not allowed and only absolute paths are going to robustly work.\n");
+    a[RESPONSE_CODE_START] = PATH_ERROR;
+    return;
+  }
+
+  printf("ffipopen_string: Running command: %s\n", commandIn);
+  // Open a pipe to the command
+  FILE *fp = popen((char *)commandIn, "r");
   if (fp == NULL)
   {
     // Error handling
     a[RESPONSE_CODE_START] = FILE_READ_ERROR;
     return;
   }
+  printf("ffipopen_string: managed to open file\n");
 
   // Read the output running the command into a buffer
   char *buffer = NULL;
   size_t output_length = 0;
   uint8_t out_code = read_until_eof(fp, alen - HEADER_LENGTH, &buffer, &output_length);
-  fclose(fp);
+  int ret = pclose(fp);
+  if (ret != 0)
+  {
+    perror("ffipopen_string: Failed to close file");
+    // Error handling
+    a[RESPONSE_CODE_START] = FILE_CLOSE_ERROR;
+    return;
+  }
+  // fclose(fp);
   // Cast the output length to a 32-bit integer, with error if too large
   if (output_length > UINT32_MAX)
   {
