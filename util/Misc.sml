@@ -91,6 +91,23 @@ structure FFI = struct
     val failure = Word8.fromInt 1
     val bufferTooSmall = Word8.fromInt 2
 
+    val resp_code_SUCCESS = Word8.fromInt 0
+
+    val resp_code_FAILED_TO_READ_FILE = Word8.fromInt 237
+    val resp_code_FAILED_TO_REALLOC_BUFFER = Word8.fromInt 238
+    val resp_code_FAILED_TO_ALLOCATE_BUFFER = Word8.fromInt 239
+    val resp_code_INSUFFICIENT_OUTPUT = Word8.fromInt 240
+    val resp_code_NEED_MORE_THAN_32_BITS_FOR_LENGTH = Word8.fromInt 241
+
+    val resp_code_FILE_READ_ERROR = Word8.fromInt 254
+    val resp_code_FILE_CLOSE_ERROR = Word8.fromInt 255
+
+    val resp_CODE_START : int = 0
+    val resp_CODE_LEN : int = 1
+    val output_LEN_START : int = 1
+    val output_LEN_LEN : int = 4
+    val header_END = 5
+
     (* ffi -> int -> bstring -> bstring *)
     fun call ffi len input = 
         let val out = Word8ArrayExtra.nulls len 
@@ -107,6 +124,42 @@ structure FFI = struct
                 None
         end
 
+    (* This is a call for a FFI function that abides by the standard
+    that is utilized in the sys_ffi popen_string code.
+    Basically it allows for a variable length output buffer where if
+    it fails the first time due to insufficient space, it will
+    call it again with a sufficient amount (because the FFI function
+    will return how much space it needs)
+    *)
+    (* ffi -> int -> bstring -> bstring *)
+    fun callVariableResp ffi defaultLen input = 
+      let fun callVarResp_aux len = 
+            let val result = call ffi len input
+                val resp_code = (BString.substring result resp_CODE_START resp_CODE_LEN)
+                val output_len_str = (BString.substring result output_LEN_START output_LEN_LEN)
+                val output_len = BString.toInt BString.LittleEndian output_len_str
+            in 
+              case resp_code of
+                resp_code_SUCCESS => 
+                  BString.substring result header_END output_len
+              | resp_code_FAILED_TO_READ_FILE => 
+                  raise (Exception "FAILED_TO_READ_FILE")
+              | resp_code_FAILED_TO_REALLOC_BUFFER => 
+                  raise (Exception "FAILED_TO_REALLOC_BUFFER")
+              | resp_code_FAILED_TO_ALLOCATE_BUFFER => 
+                  raise (Exception "FAILED_TO_ALLOCATE_BUFFER")
+              | resp_code_INSUFFICIENT_OUTPUT => 
+                  callVarResp_aux (2 * output_len)
+              | resp_code_FILE_READ_ERROR => 
+                  raise (Exception "FILE_READ_ERROR")
+              | resp_code_FILE_CLOSE_ERROR => 
+                  raise (Exception "FILE_CLOSE_ERROR")
+              | _ => raise (Exception ("Unknown Response Code returned to FFI callVariableResp during: \"" ^ (BString.toString input) ^ "\"\n"))
+            end
+      in 
+        callVarResp_aux defaultLen
+      end
+    
     (* ffi -> int -> bstring -> bstring option *)
     fun callOptFlex ffi defaultLen input = 
         let fun callOptFlex_aux len = 

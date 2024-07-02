@@ -135,22 +135,22 @@ fun app_aspid_manifest_update i p m =
     oldTargets oldPolicy = m
   in
   Build_Manifest oldPlc oldasps
-  (manset_add (pair_EqClass coq_Eq_Class_ID_Type coq_Eq_Class_ID_Type)
-    (Coq_pair i p) old_app_asps) oldKnowsOf oldContext oldTargets oldPolicy end
+  (manset_add (pair_EqClass coq_Eq_Class_ID_Type coq_Eq_Class_ID_Type) (i, p)
+    old_app_asps) oldKnowsOf oldContext oldTargets oldPolicy end
 
 (** val manifest_generator_app'' :
     coq_Evidence -> coq_Manifest -> coq_Manifest **)
 
 fun manifest_generator_app'' et m =
   case et of
-    Coq_uu p fwd ps e' =>
+    Coq_uu _ fwd ps e' =>
     (case fwd of
        ENCR =>
        let val Coq_asp_paramsC _ _ p' _ = ps in
        manifest_generator_app'' e' (pubkey_manifest_update p' m) end
-     | EXTD =>
-       let val Coq_asp_paramsC a _ _ _ = ps in
-       manifest_generator_app'' e' (app_aspid_manifest_update p a m) end
+     | EXTD _ =>
+       let val Coq_asp_paramsC a _ targ _ = ps in
+       manifest_generator_app'' e' (app_aspid_manifest_update targ a m) end
      | KEEP => manifest_generator_app'' e' m
      | _ => m)
   | Coq_ss e1 e2 =>

@@ -1,29 +1,114 @@
-(** val errStr_amNonce : coq_StringT **)
+(** val errStr_amNonce : string **)
 
-val errStr_amNonce : coq_StringT =
-  failwith "AXIOM TO BE REALIZED"
+val errStr_amNonce : string =
+  "errStr_amNonce"
 
-(** val errStr_peel_bs_am : coq_StringT **)
+(** val errStr_peel_bs_am : string **)
 
-val errStr_peel_bs_am : coq_StringT =
-  failwith "AXIOM TO BE REALIZED"
+val errStr_peel_bs_am : string =
+  "errStr_peel_bs_am"
 
-(** val errStr_requester_bound : coq_StringT **)
+(** val errStr_peel_n_am : string **)
 
-val errStr_requester_bound : coq_StringT =
-  failwith "AXIOM TO BE REALIZED"
+val errStr_peel_n_am : string =
+  "errStr_peel_n_am"
 
-(** val errStr_disclosePolicy : coq_StringT **)
+(** val errStr_disclosePolicy : string **)
 
-val errStr_disclosePolicy : coq_StringT =
-  failwith "AXIOM TO BE REALIZED"
+val errStr_disclosePolicy : string =
+  "errStr_disclosePolicy"
 
-(** val errStr_app_auth_tok : coq_StringT **)
+(** val errStr_dispatch_error : string **)
 
-val errStr_app_auth_tok : coq_StringT =
-  failwith "AXIOM TO BE REALIZED"
+val errStr_dispatch_error : string =
+  "errStr_dispatch_error"
 
-(** val errStr_et_size : coq_StringT **)
+(** val errStr_cvm_error : string **)
 
-val errStr_et_size : coq_StringT =
-  failwith "AXIOM TO BE REALIZED"
+val errStr_cvm_error : string =
+  "errStr_cvm_error"
+
+(** val errStr_et_size : string **)
+
+val errStr_et_size : string =
+  "errStr_et_size"
+
+(** val errStr_empty_raw_ev : string **)
+
+val errStr_empty_raw_ev : string =
+  "errStr_empty_raw_ev"
+
+(** val errStr_raw_evidence_too_long : string **)
+
+val errStr_raw_evidence_too_long : string =
+  "errStr_raw_evidence_too_long"
+
+(** val errStr_remote_am_failure : string **)
+
+val errStr_remote_am_failure : string =
+  "errStr_remote_am_failure"
+
+(** val errStr_incorrect_resp_type : string **)
+
+val errStr_incorrect_resp_type : string =
+  "errStr_incorrect_resp_type"
+
+(** val errStr_invalid_request_type : string **)
+
+val errStr_invalid_request_type : string =
+  "errStr_invalid_request_type"
+
+(** val errStr_negotiation_not_implemented : string **)
+
+val errStr_negotiation_not_implemented : string =
+  "errStr_negotiation_not_implemented"
+
+(** val errStr_run_cvm_at_error_dynamic : string **)
+
+val errStr_run_cvm_at_error_dynamic : string =
+  "errStr_run_cvm_at_error_dynamic"
+
+(** val errStr_run_cvm_at_error_static : string **)
+
+val errStr_run_cvm_at_error_static : string =
+  "errStr_run_cvm_at_error_static"
+
+(** val errStr_json_to_map : string **)
+
+val errStr_json_to_map : string =
+  "errStr_json_to_map"
+
+(** val errStr_json_to_pair : string **)
+
+val errStr_json_to_pair : string =
+  "errStr_json_to_pair"
+
+(** val errStr_json_get_array_key_not_found : string **)
+
+val errStr_json_get_array_key_not_found : string =
+  "errStr_json_get_array_key_not_found"
+
+(** val errStr_json_get_array_not_an_array : string **)
+
+val errStr_json_get_array_not_an_array : string =
+  "errStr_json_get_array_not_an_array"
+
+(** val errStr_json_get_string_key_not_found : string **)
+
+val errStr_json_get_string_key_not_found : string =
+  "errStr_json_get_string_key_not_found"
+
+(** val errStr_json_get_string_not_a_string : string **)
+
+val errStr_json_get_string_not_a_string : string =
+  "errStr_json_get_string_not_a_string"
+
+(** val errStr_json_get_bool_key_not_found : string **)
+
+val errStr_json_get_bool_key_not_found : string =
+  "errStr_json_get_bool_key_not_found"
+
+(** val errStr_json_get_bool_not_a_bool : string **)
+
+val errStr_json_get_bool_not_a_bool : string =
+  "errStr_json_get_bool_not_a_bool"

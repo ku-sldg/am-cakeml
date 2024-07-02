@@ -14,6 +14,8 @@ function(get_real_file file real_name)
 
     elseif(EXISTS ${CMAKE_CURRENT_LIST_DIR}/${file})
         set(${real_name} "${CMAKE_CURRENT_LIST_DIR}/${file}" PARENT_SCOPE)
+    else()
+        message(FATAL_ERROR "File ${file} does not exist.")
     endif()
 endfunction()
 
@@ -29,7 +31,7 @@ endfunction()
 
 set(BASIS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/system/basis_ffi.c" CACHE PATH "Filepath of basis_ffi.c to use (associated with the compiler version).")
 
-get_files(util_src util/CoqDefaults.sml util/Extra.sml
+get_files(util_src util/Extra.sml
     util/ByteString.sml util/Misc.sml util/Parser.sml util/Json.sml
     util/BinaryParser.sml util/Http.sml)
 
@@ -61,87 +63,83 @@ ${posix_src_cake})
 get_files(posix_src_tpm ${crypto_src_tpm}
 ${posix_src_cake})
 
-# Includes the CMakeLists for the specific asps types (modularity)
-include(./stubs/appraisal_asps/CMakeLists.txt)
-include(./stubs/attestation_asps/CMakeLists.txt)
-
-get_files(cop_src_pre_aspStubs
-    stubs/BS.sml
-    stubs/StringT.sml
-    stubs/ErrorStringConstants.sml
-    extracted/Specif.cml
+get_files(copland_am_src
+    # Require Extraction Files for Types
     extracted/Datatypes.cml
-    extracted/EqClass.cml
+    extracted/Nat.cml
+    extracted/Specif.cml
     extracted/List.cml
-    stubs/AbstractedTypes.sml
-    extracted/Term_Defs_Core.cml
-    extracted/Eqb_Evidence.cml
-    stubs/Params_Admits_hardcoded.sml
-    extracted/Term_Defs.cml
-    extracted/Anno_Term_Defs.cml
-    copland/CoplandUtil.sml
-    copland/json/CoplandToJson.sml
-    copland/json/JsonToCopland.sml
-    stubs/CvmJson_Admits.sml
+
+    # Random needed stuff (likely extraction bug related)
+    stubs/Preamble_Stuff.sml
+
+    # A more faithful extraction of the Coq code following _CoqProject
+    extracted/ResultT.cml
+    extracted/Serializable.cml
+
+    stubs/Serializable_Class_Admits.sml
+
+    extracted/EqClass.cml
+    extracted/ID_Type.cml
+
+    stubs/BS.sml
+
+    extracted/ErrorStringConstants.cml
     extracted/Maps.cml
-    stubs/Maps.sml
-    stubs/Manifest_Admits_Stubs.sml
+    extracted/JSON_Type.cml
+
+    stubs/JSON_Admits.sml
+
+    extracted/JSON.cml
+    extracted/Term_Defs_Core.cml
+
+    stubs/Params_Admits.sml
+
+    extracted/Term_Defs.cml
+    extracted/Interface_Strings_Vars.cml
+    extracted/Interface_Types.cml
     extracted/ErrorStMonad_Coq.cml
-    stubs/Example_Phrases_Pre_Admits.sml
-    extracted/Example_Phrases_Pre.cml
-    stubs/Example_Phrases_Admits.sml
+
+    stubs/Manifest_Admits.sml
+
     extracted/Manifest_Set.cml
     extracted/Manifest.cml
+    extracted/Manifest_JSON_Vars.cml
+    extracted/Manifest_JSON.cml
+    extracted/Cvm_St.cml
+
+    stubs/IO_Stubs.sml
+
+    extracted/Anno_Term_Defs.cml
+    extracted/CvmJson_Interfaces.cml
+    extracted/Manifest_Compiler.cml
     extracted/EnvironmentM.cml
     extracted/Manifest_Union.cml
-    extracted/Manifest_Generator_Helpers.cml
-    extracted/Manifest_Generator.cml
-    extracted/Manifest_Generator_Facts.cml
-    extracted/ManCompSoundness_Helpers.cml
-    extracted/ManCompSoundness.cml
-    extracted/Manifest_Generator_Union.cml
-    extracted/Manifest_Compiler.cml
-    extracted/Cvm_St.cml
-    extracted/AM_St.cml
-    copland/json/ManifestJsonConfig.sml
-    util/ManifestUtils.sml
-    am/CoplandCommUtil.sml
-    stubs/IO_Stubs.sml
+
     stubs/Axioms_Io.sml
+
     extracted/Evidence_Bundlers.cml
     extracted/Cvm_Monad.cml
     extracted/Cvm_Impl.cml
     extracted/Cvm_Run.cml
+    extracted/Manifest_Generator_Helpers.cml
+    extracted/Manifest_Generator.cml
+    extracted/Manifest_Generator_Union.cml
+    extracted/AM_St.cml
+
     stubs/Appraisal_IO_Stubs.sml
+
     extracted/AM_Monad.cml
     extracted/Appraisal_Defs.cml
     extracted/Impl_appraisal.cml
-    stubs/Example_Phrases_Demo_Admits.sml
-    extracted/Example_Phrases.cml
-    extracted/Example_Phrases_Demo.cml
-    stubs/IO_Stubs_extra.sml
-    am/CommTypes.sml
-    extracted/AM_Helpers.cml
-    extracted/Client_AM.cml
+    extracted/AM_Json_Interfaces.cml
     extracted/Server_AM.cml
-    stubs/ManGenConfig.sml
+    util/AM_CLI.sml
 )
 
-get_files(cop_src
-    ${cop_src_pre_aspStubs}
-    ${attestation_asps}
-    ${appraisal_asps}
-)
-
-get_files(cop_src_noasps
-    ${cop_src_pre_aspStubs}
-)
-
-get_files(server_am_src_noasps ${util_src} ${posix_src} ${cop_src_noasps})
-
-get_files(server_am_src ${util_src} ${posix_src} ${cop_src})
-get_files(server_am_src_hacl ${util_src} ${posix_src_hacl} ${cop_src})
-get_files(server_am_src_tpm ${util_src} ${posix_src_tpm} ${cop_src})
+get_files(server_am_src ${util_src} ${posix_src} ${copland_am_src})
+get_files(server_am_src_hacl ${util_src} ${posix_src_hacl} ${copland_am_src})
+get_files(server_am_src_tpm ${util_src} ${posix_src_tpm} ${copland_am_src})
 
 get_files(posix_c_files_base
     system/posix/sockets/socket_ffi.c
@@ -150,12 +148,6 @@ get_files(posix_c_files_base
     system/posix/sys/sys_ffi.c
 )
 
-
-get_files(posix_c_files_noasps
-    ${BASIS_FILE}
-    system/crypto/openssl/crypto_ffi.c
-    ${posix_c_files_base}
-)
 
 get_files(posix_c_files
     ${BASIS_FILE}
@@ -207,17 +199,6 @@ add_subdirectory(system/crypto/evercrypt)
 add_subdirectory(system/crypto/openssl)
 add_subdirectory(system/crypto/tpm)
 
-function(build_posix_am_noasps name)
-    build_cake("${name}.cake" SOURCES "${ARGN}")
-    add_executable(${name} ${posix_c_files_noasps})
-    if(${STATIC_LINKING})
-        set(link_flags "-static-libgcc -static -lcrypto")
-    else()
-        set(link_flags "-lcrypto")
-    endif()
-    target_link_libraries(${name} "${name}.cake" ${link_flags})
-endfunction()
-
 function(build_posix_am name)
     build_cake("${name}.cake" SOURCES "${ARGN}")
     add_executable(${name} ${posix_c_files})
@@ -258,7 +239,7 @@ foreach(appdir ${appdirs})
     endif()
 endforeach()
 
-get_real_file("./build/CMakeLists.txt" temp)
+# get_real_file("./build/CMakeLists.txt" temp)
 if (EXISTS ${temp})
   add_subdirectory("build")
 endif()

@@ -1,0 +1,1 @@
+{"appMap":[["P2","cert_aspid"],["P2","appraise_aspid"],["P1","attest_aspid"]],"asps":["ssl_sig_aspid"],"plc":"P0","policy":[],"pubKeyPlcs":["P3","P0","P1","P2"],"targetPlcs":["default_place"],"uuidPlcs":["P1","P0"]}

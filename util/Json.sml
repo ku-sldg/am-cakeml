@@ -7,7 +7,7 @@ struct
         | Bool bool
         | String string
         | Array (json list)
-        | Object ((string, json) map)
+        | Object ((string * json) list)
     local
         (* trueParser: (json, char) parser
          * Parses the JSON boolean literal `true`.
@@ -247,7 +247,7 @@ struct
          *)
         and objParser stream =
             Parser.map
-                (fn strJsons => Object (Map.fromList String.compare strJsons))
+                (fn strJsons => Object strJsons)
                 (Parser.between
                     (Parser.seq (Parser.char #"{") Parser.spaces)
                     (Parser.char #"}")
@@ -317,7 +317,7 @@ struct
                             (fn (str, json) =>
                                 String.concat ["\"", escapeString str,
                                                 "\":", stringify json])
-                            (Map.toAscList strJsons)
+                            strJsons
                     val body = String.concatWith "," fields
                 in
                     String.concat ["{", body, "}"]
@@ -347,14 +347,10 @@ struct
      * Converts a list of JSON values
      *)
     fun fromList xs = Array xs
-    (* fromMap: (string, json) map -> json
-     * Converts a string to json mapping into a JSON value.
-     *)
-    fun fromMap xm = Object xm
     (* fromPairList: (string * json) list -> json
      * Converts a list of pairs of strings and json values into a JSON value.
      *)
-    fun fromPairList xys = Object (Map.fromList String.compare xys)
+    fun fromPairList xys = Object xys
     (* isNull: json -> bool
      * Determines whether the JSON value is a null.
      *)
@@ -397,25 +393,36 @@ struct
         case xJson of
           Array xJsons => Some xJsons
         | _ => None
-    (* toMap: json -> ((string, json) map) option
-     * Tries to convert a JSON to a mapping from strings to JSON values
+    (* toPairList: json -> ((string * json) list) option
+     * Tries to convert a JSON to a list of pairs of strings and JSON values.
      *)
-    fun toMap xJson =
+    fun toPairList xJson =
         case xJson of
           Object xJsonm => Some xJsonm
         | _ => None
+
+
+
     (* lookup: string -> json -> json option
      * `lookup str json`
      * Tries to lookup the key `str` in the JSON value `json`.
      *)
     fun lookup key xJson =
+      let fun lookup_aux key jsons = case jsons of
+                                      [] => None
+                                    | (k, v) :: t =>
+                                            if (key = k)
+                                            then Some v
+                                            else lookup_aux key t
+      in
         case xJson of
-          Object xJsonm => Map.lookup xJsonm key
+          Object xJsonm => lookup_aux key xJsonm
         | _ => None
+      end
     
     fun insert xJson key value =
         case xJson of
-          Object xJsonm => Some (Object (Map.insert xJsonm key value))
+          Object xJsonm => Some (Object ((key, value) :: xJsonm))
         | _ => None
     exception Exn string string
 end

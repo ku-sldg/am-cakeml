@@ -12,7 +12,27 @@ if [ -n "${COPLAND_AVM_DIR}" ]; then
 
   cp ${COPLAND_AVM_DIR}/*.cml ${CML_DIR}
 
-  rm ${CML_DIR}/Extraction_Cvm_Cake.cml
+  search_string="If this appears, you're using Ascii internals. Please don't"
+
+  grep -rn "$search_string" "$CML_DIR" --color=auto
+
+  # Check the exit status of grep
+  if [ $? -eq 0 ]; then
+      echo "The string '$search_string' was found in one or more files."
+      echo "This means that some of the Coq code is using Ascii internals."
+  fi
+  
+  search_string2="If this appears, you're using String internals. Please don't"
+
+  grep -rn "$search_string2" "$CML_DIR" --color=auto
+
+  # Check the exit status of grep
+  if [ $? -eq 0 ]; then
+      echo "The string '$search_string2' was found in one or more files."
+      echo "This means that some of the Coq code is using String internals."
+  fi
+
+  # rm ${CML_DIR}/Extraction_Cvm_Cake.cml
 
   # This is a temporary hack to add explicit type annotations to monadic helpers
   #cp ${CML_DIR}/../stubs/Cvm_Monad_Annotated.sml ${CML_DIR}/Cvm_Monad.cml

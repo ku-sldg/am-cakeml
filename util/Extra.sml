@@ -3,6 +3,16 @@
 (* Extensions to structures in the standard library *)
 exception Exception string
 structure ListExtra = struct
+
+    fun listToString l f = 
+      String.concat [ "[", listToStringInner l f, "]" ]
+    and listToStringInner l f =
+      case l of 
+          [] => ""
+        | x::[] => f x
+        | x::xs => String.concat [(f x), ", ", (listToStringInner xs f)]
+
+
     (* int -> 'a -> 'a list *)
     fun replicate len a = List.genlist (const a) len
 

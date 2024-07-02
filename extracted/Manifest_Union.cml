@@ -25,7 +25,7 @@ fun environment_union'' p m1 e2 =
   | None => map_set coq_Eq_Class_ID_Type e2 p m1
 
 (** val env_union_helper :
-    (coq_Plc, coq_Manifest) prod -> coq_EnvironmentM -> coq_EnvironmentM **)
+    (coq_Plc * coq_Manifest) -> coq_EnvironmentM -> coq_EnvironmentM **)
 
 fun env_union_helper e1_pr e2 =
   environment_union'' (fst e1_pr) (snd e1_pr) e2

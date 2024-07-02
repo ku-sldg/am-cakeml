@@ -1,0 +1,34 @@
+datatype coq_ProtocolRunRequest =
+  Coq_mkPRReq coq_Term coq_Plc coq_RawEv
+
+datatype coq_ProtocolRunResponse =
+  Coq_mkPRResp bool coq_RawEv
+
+type coq_ProtocolNegotiateRequest =
+  coq_Term
+  (* singleton inductive, whose constructor was mkPNReq *)
+
+datatype coq_ProtocolNegotiateResponse =
+  Coq_mkPNResp bool coq_Term
+
+datatype coq_ProtocolAppraiseRequest =
+  Coq_mkPAReq coq_Term coq_Plc coq_Evidence coq_RawEv
+
+datatype coq_ProtocolAppraiseResponse =
+  Coq_mkPAResp bool coq_AppResultC
+
+datatype coq_ASPRunRequest =
+  Coq_mkASPRReq coq_ASP_ID coq_ASP_ARGS coq_Plc coq_TARG_ID coq_RawEv
+
+datatype coq_ASPRunResponse =
+  Coq_mkASPRResp bool coq_RawEv
+
+datatype coq_AM_Protocol_Requests =
+  Protocol_Run_Request coq_ProtocolRunRequest
+| Protocol_Negotiate_Request coq_ProtocolNegotiateRequest
+| Protocol_Appraise_Request coq_ProtocolAppraiseRequest
+
+datatype coq_AM_Protocol_Responses =
+  Protocol_Run_Response coq_ProtocolRunResponse
+| Protocol_Negotiate_Response coq_ProtocolNegotiateResponse
+| Protocol_Appraise_Response coq_ProtocolAppraiseResponse

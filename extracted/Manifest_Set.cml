@@ -14,19 +14,7 @@ fun manset_add hA a s = case s of
                True => s
              | False => h :: (manset_add hA a t))
 
-(** val filter_manset :
-    ('a1 -> bool) -> 'a1 manifest_set -> 'a1 manifest_set **)
-
-val filter_manset =
-  filter
-
-(** val is_empty_manset : 'a1 manifest_set -> bool **)
-
-fun is_empty_manset s = case s of
-  [] => True
-| _ :: _ => False
-
-(** val in_dec_set : 'a1 coq_EqClass -> 'a1 -> 'a1 manifest_set -> sumbool **)
+(** val in_dec_set : 'a1 coq_EqClass -> 'a1 -> 'a1 manifest_set -> bool **)
 
 fun in_dec_set hA a s =
   in_dec (coq_EqClass_impl_DecEq hA) a s
@@ -38,3 +26,57 @@ fun in_dec_set hA a s =
 fun manset_union hA a b = case b of
   [] => a
 | h :: t => manset_union hA (manset_add hA h a) t
+
+(** val manifest_set_to_list_InJson :
+    'a1 coq_Serializable -> 'a1 manifest_set -> coq_InnerJSON list **)
+
+fun manifest_set_to_list_InJson h m = case m of
+  [] => []
+| h0 :: t =>
+  (InJSON_String
+    (let val Build_Serializable to_string _ = h in to_string h0 end)) :: 
+    (manifest_set_to_list_InJson h t)
+
+(** val list_InJson_to_manifest_set :
+    'a1 coq_Serializable -> 'a1 coq_EqClass -> coq_InnerJSON list -> ('a1
+    manifest_set, string) coq_ResultT **)
+
+fun list_InJson_to_manifest_set h h0 l = case l of
+  [] => Coq_resultC []
+| h1 :: t =>
+  (case h1 of
+     InJSON_String s =>
+     (case list_InJson_to_manifest_set h h0 t of
+        Coq_errC e => Coq_errC e
+      | Coq_resultC t' =>
+        (case let val Build_Serializable _ from_string = h in
+              from_string s end of
+           Coq_errC e => Coq_errC e
+         | Coq_resultC h' => Coq_resultC (manset_add h0 h' t')))
+   | _ =>
+     Coq_errC
+       "Error: Invalid JSON type in manifest set, only can handle strings.")
+
+(** val manifest_set_pairs_to_list_InJson :
+    'a1 coq_Serializable -> 'a2 coq_Serializable -> ('a1 * 'a2) manifest_set
+    -> coq_InnerJSON list **)
+
+fun manifest_set_pairs_to_list_InJson h h0 m = case m of
+  [] => []
+| h1 :: t =>
+  (pair_to_JSON_Array h h0 h1) :: (manifest_set_pairs_to_list_InJson h h0 t)
+
+(** val list_InJson_to_manifest_set_pairs :
+    'a1 coq_Serializable -> 'a2 coq_Serializable -> 'a1 coq_EqClass -> 'a2
+    coq_EqClass -> coq_InnerJSON list -> (('a1 * 'a2) manifest_set, string)
+    coq_ResultT **)
+
+fun list_InJson_to_manifest_set_pairs h h0 h1 h2 l = case l of
+  [] => Coq_resultC []
+| h3 :: t =>
+  (case coq_InnerJSON_to_pair h h0 h3 of
+     Coq_errC e => Coq_errC e
+   | Coq_resultC h' =>
+     (case list_InJson_to_manifest_set_pairs h h0 h1 h2 t of
+        Coq_errC e => Coq_errC e
+      | Coq_resultC t' => Coq_resultC (manset_add (pair_EqClass h1 h2) h' t')))

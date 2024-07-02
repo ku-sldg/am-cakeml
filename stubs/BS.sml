@@ -5,15 +5,10 @@ We would like aliases in one place if possible *)
 type coq_BS = BString.bstring
 type bs = coq_BS
 
-(* type coq_ID_Type = string 
-fun coq_Eq_Class_ID_Type x y = (x = y)
-val coq_ID_Type_ordering = String.compare
-*)
+(** val coq_Serializable_BS : coq_BS coq_Serializable **)
+
+val coq_Serializable_BS : coq_BS coq_Serializable =
+  Build_Serializable (fn s => (BString.toString s)) (fn s => Coq_resultC (BString.fromString s))
 
 val passed_bs = BString.fromString "PASSED"
 val failed_bs = BString.fromString "FAILED"
-
-structure Nat = struct
-  fun eqb x y = (x = y)
-
-end
