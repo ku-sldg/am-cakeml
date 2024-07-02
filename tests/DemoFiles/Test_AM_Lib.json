@@ -1,0 +1,32 @@
+{
+  "CLONE_UUID": "localhost:5100",
+  "LIB_ASPS": {
+    "ssl_sig_aspid": "/home/w732t351/repos/asp-libs/attestation_asps/test_asp.out",
+    "kim_aspid": "/home/w732t351/repos/asp-libs/attestation_asps/test_asp.out",
+    "attest_id": "/home/w732t351/repos/asp-libs/attestation_asps/test_asp.out",
+    "appraise_id": "/home/w732t351/repos/asp-libs/attestation_asps/test_asp.out",
+    "certificate_id": "/home/w732t351/repos/asp-libs/attestation_asps/test_asp.out"
+  },
+  "LIB_APPR_ASPS": [
+    [
+      "P1",
+      "ssl_sig_aspid",
+      "/home/w732t351/repos/asp-libs/attestation_asps/test_asp.out"
+    ],
+    [
+      "P2",
+      "ssl_sig_aspid",
+      "/home/w732t351/repos/asp-libs/attestation_asps/test_asp.out"
+    ]
+  ],
+  "LIB_PLCS": {
+    "P0": "localhost:5000",
+    "P1": "localhost:5001",
+    "P2": "localhost:5002",
+    "P3": "localhost:5003",
+    "P4": "localhost:5004",
+    "P5": "localhost:5005",
+    "P6": "localhost:5006"
+  },
+  "LIB_PUBKEYS": {}
+}

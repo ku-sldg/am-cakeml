@@ -1,20 +1,20 @@
 #!/bin/bash
 
+TESTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+GENERATED=$TESTS_DIR/DemoFiles/Generated
+TOP_PLC="P0"
+TERM_PAIR_FILE=$GENERATED/TermPairList.json
+
 # Function to display usage instructions
 usage() {
-  echo "Usage: $0 -h <host> -p <port> -f <json_term_file>"
+  echo "Usage: $0 -f <json_term_file>"
   exit 1
 }
 
 # Parse command-line arguments
-while getopts "h:p:f:" opt; do
+while getopts "f:" opt; do
   case ${opt} in
-    h )
-      HOST=$OPTARG
-      ;;
-    p )
-      PORT=$OPTARG
-      ;;
     f )
       JSON_TERM_FILE=$OPTARG
       ;;
@@ -25,7 +25,7 @@ while getopts "h:p:f:" opt; do
 done
 
 # Check if all required arguments are provided
-if [[ -z "$HOST" || -z "$PORT" || -z "$JSON_TERM_FILE" ]]; then
+if [[ -z "$JSON_TERM_FILE" ]]; then
   usage
 fi
 
@@ -39,4 +39,7 @@ fi
 JSON_TERM_DATA=$(cat "$JSON_TERM_FILE")
 
 # Send JSON data to the specified host and port
-echo -e "{ \"TYPE\": \"REQUEST\", \"ACTION\": \"RUN\", \"REQ_PLC\": \"TOP_PLC\", \"TERM\": $JSON_TERM_DATA, \"RAWEV\": { \"RawEv\": [] } }" | nc $HOST $PORT
+TERM_FILE_JSON="{ \"Term_Plc_list\": [ [$JSON_TERM_DATA, \"$TOP_PLC\" ] ] }" 
+
+# Write to generated temporarily
+echo $TERM_FILE_JSON > $TERM_PAIR_FILE

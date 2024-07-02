@@ -12,35 +12,28 @@ fun write_term_to_file (term : coq_Term) (filename : string) =
 fun main () =
   case (CommandLine.arguments()) of
     argList =>
-    let val termInd   = ListExtra.find_index argList "-t"
-        val outDirInd = ListExtra.find_index argList "-o"
+    let val termInd     = ListExtra.find_index argList "-t"
+        val outFileInd  = ListExtra.find_index argList "-o"
 
-        val termBool  = (termInd <> ~1)
-        val outDirBool    = (outDirInd <> ~1)
+        val termBool    = (termInd <> ~1)
+        val outFileBool = (outFileInd <> ~1)
         
         val name = CommandLine.name()
-        val usage = ("Usage: " ^ name ^ " -t [cert|bg|parmut|layered_bg] -o <output_directory>\n")
+        val usage = ("Usage: " ^ name ^ " -t [cert|bg|parmut|layered_bg] -o <output_file>\n")
     in
-      if ((not termBool) orelse (not outDirBool))
+      if ((not termBool) orelse (not outFileBool))
       then (raise (Exception ("TermToJson Argument Error: \n" ^ usage)))
       else
         let val termName  = List.nth argList (termInd + 1) 
-            val outDir    = List.nth argList (outDirInd + 1)
+            val outFile   = List.nth argList (outFileInd + 1)
+            val outTerm   = case termName of
+                              "cert"        => certificate_style
+                            | "bg"          => background_check
+                            | "parmut"      => parallel_mutual_1
+                            | "layered_bg"  => layered_background_check
+                            | _ => raise (Exception ("TermToJson Argument Error: \n" ^ usage))
         in
-          case termName of
-            "cert"        => write_term_to_file 
-                              certificate_style 
-                              (outDir ^ "/CertificateStyleTerm.json")
-          | "bg"          => write_term_to_file 
-                              background_check
-                              (outDir ^ "/BackgroundStyleTerm.json")
-          | "parmut"      => write_term_to_file 
-                              parallel_mutual_1
-                              (outDir ^ "/ParalleMutualTerm.json")
-          | "layered_bg"  => write_term_to_file 
-                              layered_background_check
-                              (outDir ^ "/LayeredBackgroundTerm.json")
-          | _ => raise (Exception ("TermToJson Argument Error: \n" ^ usage))
+          write_term_to_file outTerm outFile
         end
     end
     handle Exception e => TextIO.print_err e 
