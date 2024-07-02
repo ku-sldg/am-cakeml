@@ -25,7 +25,7 @@ jobs:
         id: cake-cache-restore
         uses: actions/cache/restore@v4
         with:
-          path: ~/cake-x64-64
+          path: $HOME/cake-x64-64
           key: ${{ runner.OS }}-CAKE-${{ env.CAKE_VERSION }}
 
       - name: Build Cake
@@ -33,7 +33,7 @@ jobs:
           cd $HOME
           wget https://github.com/CakeML/cakeml/releases/download/${{ env.CAKE_VERSION }}/cake-x64-64.tar.gz
           tar -xvf cake-x64-64.tar.gz
-          cd cake-x64-64
+          cd $HOME/cake-x64-64
           make cake
       
       - name: Cake Cache Save
@@ -41,7 +41,7 @@ jobs:
         if: steps.cake-cache-restore.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
-          path: ~/cake
+          path: $HOME/cake
           key: ${{ runner.OS }}-CAKE-${{ env.CAKE_VERSION }}
 
       - name: Install Cake
