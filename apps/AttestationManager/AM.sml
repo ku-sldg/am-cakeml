@@ -11,11 +11,11 @@ When things go wrong, handle_AM_request returns a raw error message string.
 fun respondToMsg client nonce ac = 
   let val inString  = Socket.inputAll client 
       val _ = print ("\n\nReceived request string: \n" ^ inString ^ "\n")
-      val jsonTest = case string_to_JSON inString of
+      (* val jsonTest = case string_to_JSON inString of
               Coq_errC msg => raise (Exception ("Error in JSON conversion " ^ msg))
             | Coq_resultC js => coq_JSON_to_string js
       val _ = print "TEsting json conversion\n"
-      val _ = print ("jsonTest: " ^ jsonTest ^ "\n")
+      val _ = print ("jsonTest: " ^ jsonTest ^ "\n") *)
       val outString = handle_AM_request inString ac nonce
       val _ = print ("\n\nSending response string: \n" ^ outString) 
   in 
