@@ -55,6 +55,7 @@ mkdir -p $GENERATED
 if [[ "$PWD" == */am-cakeml/tests ]]; then
   repoRoot=$(dirname "$PWD")
   # Move to build folder
+  mkdir -p $repoRoot/build
   cd $repoRoot/build
 
   # Make targets
