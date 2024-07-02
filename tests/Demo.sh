@@ -56,8 +56,8 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   repoRoot=$(dirname "$PWD")
   # Move to build folder
   mkdir -p $repoRoot/build
-  cmake ..
   cd $repoRoot/build
+  cmake ..
 
   # Make targets
   make term_to_json
