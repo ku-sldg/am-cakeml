@@ -3,11 +3,6 @@
 
 type coq_FS_Location = string
 
-(** val coq_Serializable_FS_Location : coq_FS_Location coq_Serializable **)
-
-val coq_Serializable_FS_Location : coq_FS_Location coq_Serializable =
-  Build_Serializable (fn v => v) (fn v => Coq_resultC v)
-
 type coq_UUID = string (* AXIOM TO BE REALIZED *)
 
 (** val coq_Serializable_UUUID : coq_UUID coq_Serializable **)

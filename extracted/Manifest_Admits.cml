@@ -1,10 +1,5 @@
 type coq_FS_Location (* AXIOM TO BE REALIZED *)
 
-(** val coq_Serializable_FS_Location : coq_FS_Location coq_Serializable **)
-
-val coq_Serializable_FS_Location : coq_FS_Location coq_Serializable =
-  failwith "AXIOM TO BE REALIZED"
-
 type coq_UUID (* AXIOM TO BE REALIZED *)
 
 (** val coq_Serializable_UUUID : coq_UUID coq_Serializable **)

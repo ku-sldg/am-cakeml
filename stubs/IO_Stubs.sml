@@ -31,10 +31,11 @@ fun make_JSON_Network_Request (u : coq_UUID) (js : coq_JSON) =
   end) : (coq_JSON, string) coq_ResultT 
 
 (** val make_JSON_FS_Location_Request :
-    coq_FS_Location -> coq_JSON -> (coq_JSON, string) coq_ResultT **)
-
-fun make_JSON_FS_Location_Request (loc : coq_FS_Location) (js : coq_JSON) = 
-  (let val _ = print ("Sending a request to the FS: " ^ loc ^ "\n")
+    coq_FS_Location -> coq_ASP_ID -> coq_JSON -> (coq_JSON, string)
+    coq_ResultT **)
+fun make_JSON_FS_Location_Request (aspBin : coq_FS_Location) (aspId : coq_ASP_ID) (js : coq_JSON) = 
+  (let val loc = aspBin ^ "/" ^ aspId
+      val _ = print ("Sending a request to the FS: " ^ loc ^ "\n")
       val resp = c_popen_string (loc ^ " " ^ (coq_JSON_to_string js))
       val _ = print ("Got back a response from the ASP: " ^ resp ^ "\n")
   in
@@ -127,5 +128,5 @@ fun appraise_auth_tok appres = True
 fun is_local_appraisal amLib =
   (* Basically if we dont have a clone its local *)
   case amLib of 
-    Build_AM_Library clone_uuid _ _ _ _ => clone_uuid = ""
+    Build_AM_Library clone_uuid _ _ => clone_uuid = ""
 

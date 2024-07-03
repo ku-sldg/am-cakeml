@@ -59,8 +59,8 @@ fun startServer ac =
 
 (* () -> () *)
 fun main () =
-  let val (manifest, am_lib, priv_key) = AM_CLI_Utils.retrieve_CLI_args ()
-      val ac = manifest_compiler manifest am_lib
+  let val (manifest, am_lib, aspBin, priv_key) = AM_CLI_Utils.retrieve_CLI_args ()
+      val ac = manifest_compiler manifest am_lib aspBin
       (* Retrieving implicit self place from manifest here *)
       val (Coq_mkAmConfig man _ _ _ _ _) = ac 
       val (Build_Manifest my_plc _ _ _ _ _ _) = man 

@@ -2,7 +2,7 @@
 (* TODO: dependencies *)
 structure AM_CLI_Utils = struct
   type priv_key_t = string
-  type am_args_t = (coq_Manifest * coq_AM_Library * priv_key_t)
+  type am_args_t = (coq_Manifest * coq_AM_Library * coq_FS_Location * priv_key_t)
 
   (* Parse a JSON file into a JSON object *)
   (* : string -> (coq_Manifest, string) coq_ResultT *)
@@ -55,16 +55,18 @@ structure AM_CLI_Utils = struct
   *)
   fun retrieve_CLI_args _ =
     let val name = CommandLine.name ()
-        val usage = ("Usage: " ^ name ^ " -m <ManifestFile>.json -l <AmLibFile>.json (-k <privateKeyFile>)\n\ne.g.\t" ^ name ^ " -m formMan.json -l amLib.json -k ~/.ssh/id_ed25519\n\n")
+        val usage = ("Usage: " ^ name ^ " -m <ManifestFile>.json -l <AmLibFile>.json -b <asp_bin_location> (-k <privateKeyFile>)\n\ne.g.\t" ^ name ^ " -m formMan.json -l amLib.json -b /opt/asps -k ~/.ssh/id_ed25519\n\n")
         val argList = CommandLine.arguments ()
         val manInd        = ListExtra.find_index argList "-m"
         val amLibInd      = ListExtra.find_index argList "-l"
+        val aspBinInd     = ListExtra.find_index argList "-b"
         val keyInd        = ListExtra.find_index argList "-k"
         val manIndBool    = argIndPresent manInd 
         val amLibIndBool  = argIndPresent amLibInd
+        val aspBinBool    = argIndPresent aspBinInd
         val keyIndBool    = argIndPresent keyInd
     in 
-      if ((manIndBool = False) orelse (amLibIndBool = False))
+      if ((manIndBool = False) orelse (amLibIndBool = False) orelse (aspBinBool = False))
       then raise (Exception ("Invalid Arguments\n" ^ usage))
       else (
         if (keyIndBool = False)
@@ -73,6 +75,7 @@ structure AM_CLI_Utils = struct
         else (
           let val manFileName   = List.nth argList (manInd + 1)
               val amLibFileName = List.nth argList (amLibInd + 1)
+              val aspBinLoc     = List.nth argList (aspBinInd + 1)
               val privKeyFile   = List.nth argList (keyInd + 1)
           in
             (case (parse_manifest_from_file manFileName) of
@@ -83,7 +86,7 @@ structure AM_CLI_Utils = struct
               | Coq_resultC am_lib =>
                 (case (parse_private_key privKeyFile) of
                   Coq_errC e => raise (Exception ("Could not parse private key file: " ^ e ^ "\n"))
-                | Coq_resultC priv_key => (manifest, am_lib, priv_key)
+                | Coq_resultC priv_key => (manifest, am_lib, aspBinLoc, priv_key)
                 )
               )
             )

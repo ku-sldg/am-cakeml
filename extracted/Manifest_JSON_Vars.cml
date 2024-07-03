@@ -38,16 +38,6 @@ val coq_MAN_POLICY : string =
 val coq_AM_CLONE_UUUID : string =
   "CLONE_UUID"
 
-(** val coq_AM_LIB_ASPS : string **)
-
-val coq_AM_LIB_ASPS : string =
-  "LIB_ASPS"
-
-(** val coq_AM_LIB_APPR_ASPS : string **)
-
-val coq_AM_LIB_APPR_ASPS : string =
-  "LIB_APPR_ASPS"
-
 (** val coq_AM_LIB_PLCS : string **)
 
 val coq_AM_LIB_PLCS : string =
