@@ -33,9 +33,17 @@ fi
 TESTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Common Variables
-TERM_GEN=./apps/TermToJson/TermToJson
-MAN_GEN=./apps/ManifestGenerator/ManifestGenerator
-AM_EXEC=./apps/AttestationManager/AttestationManager
+IP=localhost
+PORT=5000
+TERM_GEN=./apps/TermToJson/term_to_json
+MAN_GEN=./apps/ManifestGenerator/manifest_generator
+AM_EXEC=./apps/AttestationManager/attestation_manager
+
+if [ -z ${ASP_BIN+x} ]; then
+  echo "Variable 'ASP_BIN' is not set" 
+  echo "Run: 'export ASP_BIN=<path-to-asps>'"
+  exit 1
+fi
 
 # General Path Vars
 DEMO_FILES=$TESTS_DIR/DemoFiles
@@ -83,13 +91,13 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
     tmux split-window -v 'bash -i'
     tmux select-layout even-horizontal
     # Start the AM
-    tmux send-keys -t $I "( $AM_EXEC -m $MANIFEST -l $TEST_AM_LIB -k $TEST_PRIVKEY )" Enter
+    tmux send-keys -t $I "( $AM_EXEC -m $MANIFEST -l $TEST_AM_LIB -b $ASP_BIN -k $TEST_PRIVKEY )" Enter
     # Increment I
     I=$((I+1))
   done
   
   # Now send the request, on the very last window
-  tmux send-keys -t $I "sleep 1 && $TESTS_DIR/send_term_req.sh -h localhost -p 5000 -f $TERM_FILE" Enter
+  tmux send-keys -t $I "sleep 1 && $TESTS_DIR/send_term_req.sh -h $IP -p $PORT -f $TERM_FILE" Enter
 
   tmux attach-session -d -t ServerProcess
 

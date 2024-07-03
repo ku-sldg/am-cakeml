@@ -53,9 +53,17 @@ trap kill_background_processes EXIT
 TESTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Common Variables
-TERM_GEN=./apps/TermToJson/TermToJson
-MAN_GEN=./apps/ManifestGenerator/ManifestGenerator
-AM_EXEC=./apps/AttestationManager/AttestationManager
+IP=localhost
+PORT=5000
+TERM_GEN=./apps/TermToJson/term_to_json
+MAN_GEN=./apps/ManifestGenerator/manifest_generator
+AM_EXEC=./apps/AttestationManager/attestation_manager
+
+if [ -z ${ASP_BIN+x} ]; then
+  echo "Variable 'ASP_BIN' is not set" 
+  echo "Run: 'export ASP_BIN=<path-to-asps>'"
+  exit 1
+fi
 
 # General Path Vars
 DEMO_FILES=$TESTS_DIR/DemoFiles
@@ -98,13 +106,13 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   # Generate an AM for each manifest
   for MANIFEST in $GENERATED/Manifest_*.json; do
     # Start the AM in the background and store its PID
-    $AM_EXEC -m $MANIFEST -l $TEST_AM_LIB -k $TEST_PRIVKEY &
+    $AM_EXEC -m $MANIFEST -l $TEST_AM_LIB -b $ASP_BIN -k $TEST_PRIVKEY &
     PIDS+=($!)
   done
   
   # Now send the request, on the very last window
   sleep 1 
-  $TESTS_DIR/send_term_req.sh -h localhost -p 5000 -f $TERM_FILE > $GENERATED/output.out
+  $TESTS_DIR/send_term_req.sh -h $IP -p $PORT -f $TERM_FILE > $GENERATED/output.out
   # We need this to be the last line so that the exit code is whether or not we found success
   grep "\"SUCCESS\":true" $GENERATED/output.out
 else
