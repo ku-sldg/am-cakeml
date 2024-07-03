@@ -8,12 +8,13 @@ val priv2 = BString.unshow "308202260201003082011706092a864886f70d01030130820108
     coq_BS -> coq_ASP_PARAMS -> coq_PublicKey -> (coq_RawEv,
     coq_DispatcherErrors) coq_ResultT **)
 fun decrypt_bs_to_rawev_prim bs params pubkey = 
-    let val recoveredtext : string = Crypto.decryptOneShot priv2 pubkey (*pub1*) (* priv1 pubkey *) bs (*priv2 pub1 bs *)
+    Coq_errC (Runtime "decrypt_bs_to_rawev_prim: Decryption is not yet implemented in appraisal")
+    (* let val recoveredtext : string = Crypto.decryptOneShot priv2 pubkey (*pub1*) (* priv1 pubkey *) bs (*priv2 pub1 bs *)
         val res = [BString.fromString recoveredtext]
     in
         (* val _ = print ("\nDecryption Succeeded: \n" ^ (coq_RawEv_to_string res) ^ "\n" ) in *)
         (Coq_resultC res)
-    end
+    end *)
 
 
 (** fun checkNonce : coq_BS -> coq_BS -> coq_BS **)

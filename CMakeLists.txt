@@ -35,34 +35,6 @@ get_files(util_src util/Extra.sml
     util/ByteString.sml util/Misc.sml util/Parser.sml util/Json.sml
     util/BinaryParser.sml util/Http.sml)
 
-get_files(crypto_src 
-system/crypto/openssl/CryptoFFI.sml
-system/crypto/openssl/Random.sml)
-
-get_files(crypto_src_hacl 
-system/crypto/evercrypt/CryptoFFI.sml
-system/crypto/evercrypt/Random.sml)
-
-get_files(crypto_src_tpm 
-system/crypto/tpm/CryptoFFI.sml
-system/crypto/tpm/Random.sml)
-
-
-get_files (posix_src_cake 
-system/posix/sockets/SocketFFI.sml
-system/posix/time/TimeFFI.sml 
-system/posix/meas/MeasFFI.sml 
-system/posix/sys/SysFFI.sml)
-
-get_files(posix_src ${crypto_src} 
-${posix_src_cake})
-
-get_files(posix_src_hacl ${crypto_src_hacl}
-${posix_src_cake})
-
-get_files(posix_src_tpm ${crypto_src_tpm}
-${posix_src_cake})
-
 get_files(copland_am_src
     # Require Extraction Files for Types
     extracted/Datatypes.cml
@@ -137,33 +109,21 @@ get_files(copland_am_src
     util/AM_CLI.sml
 )
 
-get_files(server_am_src ${util_src} ${posix_src} ${copland_am_src})
-get_files(server_am_src_hacl ${util_src} ${posix_src_hacl} ${copland_am_src})
-get_files(server_am_src_tpm ${util_src} ${posix_src_tpm} ${copland_am_src})
+get_files (posix_src_cake 
+    system/posix/sockets/SocketFFI.sml
+    system/posix/time/TimeFFI.sml 
+    system/posix/sys/SysFFI.sml
+)
 
-get_files(posix_c_files_base
+get_files(posix_src_c
+    ${BASIS_FILE}
     system/posix/sockets/socket_ffi.c
     system/posix/time/time_ffi.c
-    system/posix/meas/meas_ffi.c
     system/posix/sys/sys_ffi.c
 )
 
+get_files(server_am_src ${util_src} ${posix_src_cake} ${copland_am_src})
 
-get_files(posix_c_files
-    ${BASIS_FILE}
-    system/crypto/openssl/crypto_ffi.c
-    ${posix_c_files_base}
-)
-get_files(posix_c_files_hacl
-    ${BASIS_FILE}
-    system/crypto/evercrypt/crypto_ffi.c
-    ${posix_c_files_base}
-)
-get_files(posix_c_files_tpm
-    ${BASIS_FILE}
-    system/crypto/tpm/crypto_ffi.c
-    ${posix_c_files_base}
-)
 
 # OS Config
 if(${APPLE})
@@ -195,35 +155,9 @@ mark_as_advanced(CLEAR
     CMAKE_C_FLAGS_RELEASE CMAKE_EXE_LINKER_FLAGS CMAKE_VERBOSE_MAKEFILE
 )
 
-add_subdirectory(system/crypto/evercrypt)
-add_subdirectory(system/crypto/openssl)
-add_subdirectory(system/crypto/tpm)
-
 function(build_posix_am name)
     build_cake("${name}.cake" SOURCES "${ARGN}")
-    add_executable(${name} ${posix_c_files})
-    if(${STATIC_LINKING})
-        set(link_flags "-static-libgcc -static -lcrypto")
-    else()
-        set(link_flags "-lcrypto")
-    endif()
-    target_link_libraries(${name} "${name}.cake" ${link_flags})
-endfunction()
-
-function(build_posix_am_hacl name)
-    build_cake("${name}.cake" SOURCES "${ARGN}")
-    add_executable(${name} ${posix_c_files_hacl})
-    add_hacl(${name})
-    if(${STATIC_LINKING})
-        set(link_flags "-static-libgcc -static")
-    endif()
-    target_link_libraries(${name} "${name}.cake" ${link_flags})
-endfunction()
-
-function(build_posix_am_tpm name)
-    build_cake("${name}.cake" SOURCES "${ARGN}")
-    add_executable(${name} ${posix_c_files_tpm})
-    add_tpm(${name})
+    add_executable(${name} ${posix_src_c})
     if(${STATIC_LINKING})
         set(link_flags "-static-libgcc -static -lcrypto")
     else()
