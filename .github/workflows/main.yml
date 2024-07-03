@@ -21,7 +21,7 @@ jobs:
       CAKE_VERSION: "v2419"
       ASP_LIB_REPO_PATH: "ku-sldg/asp-libs"
       ASP_LIB_BRANCH: "main"
-      ASP_LIBS_PATH: $HOME/asp-libs
+      ASP_LIBS_PATH: ~/asp-libs
 
     steps:
 ############### Setup and Caching for CakeML
@@ -29,15 +29,15 @@ jobs:
         id: cake-cache-restore
         uses: actions/cache/restore@v4
         with:
-          path: $HOME/cake-x64-64
+          path: ~/cake-x64-64
           key: ${{ runner.OS }}-CAKE-${{ env.CAKE_VERSION }}
 
       - name: Build Cake
         run: |
-          cd $HOME
+          cd ~
           wget https://github.com/CakeML/cakeml/releases/download/${{ env.CAKE_VERSION }}/cake-x64-64.tar.gz
           tar -xvf cake-x64-64.tar.gz
-          cd $HOME/cake-x64-64
+          cd ~/cake-x64-64
           make cake
       
       - name: Cake Cache Save
@@ -45,7 +45,7 @@ jobs:
         if: steps.cake-cache-restore.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
-          path: $HOME/cake
+          path: ~/cake
           key: ${{ runner.OS }}-CAKE-${{ env.CAKE_VERSION }}
 ############### 
 
@@ -68,7 +68,7 @@ jobs:
         if: steps.asp-lib-cache-restore.outputs.cache-hit != 'true'
         run: |
           rm -rf ${{ env.ASP_LIBS_PATH }}
-          cd $HOME
+          cd ~
           git clone https://github.com/$ASP_LIB_REPO_PATH.git
           cd ${{ env.ASP_LIBS_PATH }}
           git switch $ASP_LIB_BRANCH
@@ -85,7 +85,7 @@ jobs:
 ############### Install Cake
       - name: Install Cake
         run:
-          sudo ln -s $HOME/cake-x64-64/cake /usr/bin
+          sudo ln -s ~/cake-x64-64/cake /usr/bin
 
 ############### Final Testing Checkout and Build am-cakeml
       - name: Checkout code
