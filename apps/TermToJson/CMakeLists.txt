@@ -5,6 +5,4 @@ get_files(termToJson_src
   ../../extracted/Flexible_Mechanisms_Vars.cml 
   ../../extracted/Flexible_Mechanisms.cml 
   TermToJson.sml)
-build_posix_am("TermToJson" ${termToJson_src})
-
-add_custom_target(term_to_json DEPENDS TermToJson)
+build_posix_am("term_to_json" ${termToJson_src})
