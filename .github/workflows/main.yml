@@ -45,9 +45,14 @@ jobs:
         if: steps.cake-cache-restore.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
-          path: ~/cake
+          path: ~/cake-x64-64
           key: ${{ runner.OS }}-CAKE-${{ env.CAKE_VERSION }}
 ############### 
+
+############### Install Cake
+      - name: Install Cake
+        run:
+          sudo ln -s ~/cake-x64-64/cake /usr/bin
 
 ############### Setup and Caching for ASP_Libs
       - name: Get latest commit hash of Asp libs repo
@@ -81,11 +86,6 @@ jobs:
         with:
           path: ${{ env.ASP_LIBS_PATH }}
           key: ${{ runner.OS }}-ASP-LIBS-${{ env.COMMIT_HASH }}
-
-############### Install Cake
-      - name: Install Cake
-        run:
-          sudo ln -s ~/cake-x64-64/cake /usr/bin
 
 ############### Final Testing Checkout and Build am-cakeml
       - name: Checkout code
