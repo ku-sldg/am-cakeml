@@ -1,6 +1,5 @@
 ## Contents ##
 
-- [`case/`](case/)&mdash;attestation managers for the case project, ground
-  station and UAV.
-- [`serverClient/`](serverClient/)&mdash;an example attestation client/server.
-- [`tests/`](tests/)&mdash;some tests for the Copland interpreter.
+- [`AttestationManager/`](./AttestationManager/) Attestation Manager executable
+- [`ManifestGenerator/`](./ManifestGenerator/) Manifest Generator executable
+- [`TermToJson/`](./TermToJson/) Executable to transform Coq -> CakeML extracted Terms into a JSON file
