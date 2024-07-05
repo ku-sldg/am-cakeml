@@ -17,7 +17,7 @@ fun coq_EqClass_impl_DecEq h x y =
 (** val str_eq_class : string coq_EqClass **)
 
 val str_eq_class : string coq_EqClass =
-  (fn x => fn y => x = y)
+  (op=)
 
 (** val nat_EqClass : nat coq_EqClass **)
 

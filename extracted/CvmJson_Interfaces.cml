@@ -137,17 +137,17 @@ fun coq_JSON_to_ProtocolAppraiseResponse resp =
 
 fun coq_JSON_to_AM_Protocol_Request req =
   res_bind (coq_JSON_get_string coq_STR_ACTION req) (fn temp_type =>
-    case (fn x => fn y => x = y) temp_type coq_STR_RUN of
+    case (op=) temp_type coq_STR_RUN of
       True =>
       res_bind (coq_JSON_to_ProtocolRunRequest req) (fn temp_req =>
         Coq_resultC (Protocol_Run_Request temp_req))
     | False =>
-      (case (fn x => fn y => x = y) temp_type coq_STR_APPRAISE of
+      (case (op=) temp_type coq_STR_APPRAISE of
          True =>
          res_bind (coq_JSON_to_ProtocolAppraiseRequest req) (fn temp_req =>
            Coq_resultC (Protocol_Appraise_Request temp_req))
        | False =>
-         (case (fn x => fn y => x = y) temp_type coq_STR_NEGOTIATE of
+         (case (op=) temp_type coq_STR_NEGOTIATE of
             True =>
             res_bind (coq_JSON_to_ProtocolNegotiateRequest req)
               (fn temp_req => Coq_resultC (Protocol_Negotiate_Request
@@ -159,18 +159,18 @@ fun coq_JSON_to_AM_Protocol_Request req =
 
 fun coq_JSON_to_AM_Protocol_Response resp =
   res_bind (coq_JSON_get_string coq_STR_ACTION resp) (fn temp_type =>
-    case (fn x => fn y => x = y) temp_type coq_STR_RUN of
+    case (op=) temp_type coq_STR_RUN of
       True =>
       res_bind (coq_JSON_to_ProtocolRunResponse resp) (fn temp_resp =>
         Coq_resultC (Protocol_Run_Response temp_resp))
     | False =>
-      (case (fn x => fn y => x = y) temp_type coq_STR_APPRAISE of
+      (case (op=) temp_type coq_STR_APPRAISE of
          True =>
          res_bind (coq_JSON_to_ProtocolAppraiseResponse resp)
            (fn temp_resp => Coq_resultC (Protocol_Appraise_Response
            temp_resp))
        | False =>
-         (case (fn x => fn y => x = y) temp_type coq_STR_NEGOTIATE of
+         (case (op=) temp_type coq_STR_NEGOTIATE of
             True =>
             res_bind (coq_JSON_to_ProtocolNegotiateResponse resp)
               (fn temp_resp => Coq_resultC (Protocol_Negotiate_Response

@@ -136,19 +136,19 @@ val coq_Jsonifiable_FWD : coq_FWD coq_Jsonifiable =
     case coq_JSON_get_string "FWD_CONSTRUCTOR" js of
       Coq_errC e => Coq_errC e
     | Coq_resultC cons_name =>
-      (case (fn x => fn y => x = y) cons_name "COMP" of
+      (case (op=) cons_name "COMP" of
          True => Coq_resultC COMP
        | False =>
-         (case (fn x => fn y => x = y) cons_name "ENCR" of
+         (case (op=) cons_name "ENCR" of
             True => Coq_resultC ENCR
           | False =>
-            (case (fn x => fn y => x = y) cons_name "KILL" of
+            (case (op=) cons_name "KILL" of
                True => Coq_resultC KILL
              | False =>
-               (case (fn x => fn y => x = y) cons_name "KEEP" of
+               (case (op=) cons_name "KEEP" of
                   True => Coq_resultC KEEP
                 | False =>
-                  (case (fn x => fn y => x = y) cons_name "EXTD" of
+                  (case (op=) cons_name "EXTD" of
                      True =>
                      (case coq_JSON_get_string "EXTD_N" js of
                         Coq_errC _ => Coq_errC "Parsing EXTD not successful"
@@ -199,10 +199,10 @@ fun coq_Evidence_from_JSON js =
   case coq_JSON_get_string "EVIDENCE_CONSTRUCTOR" js of
     Coq_errC e => Coq_errC e
   | Coq_resultC cons_name =>
-    (case (fn x => fn y => x = y) cons_name "mt" of
+    (case (op=) cons_name "mt" of
        True => Coq_resultC Coq_mt
      | False =>
-       (case (fn x => fn y => x = y) cons_name "nn" of
+       (case (op=) cons_name "nn" of
           True =>
           (case coq_JSON_get_string "N_ID" js of
              Coq_errC _ => Coq_errC "Parsing nn not successful"
@@ -214,7 +214,7 @@ fun coq_Evidence_from_JSON js =
                 Coq_errC e => Coq_errC e
               | Coq_resultC n => Coq_resultC (Coq_nn n)))
         | False =>
-          (case (fn x => fn y => x = y) cons_name "uu" of
+          (case (op=) cons_name "uu" of
              True =>
              let val JSON_Object m = js in
              (case m of
@@ -291,7 +291,7 @@ fun coq_Evidence_from_JSON js =
                           | _ => Coq_errC "Parsing uu not successful") end)
                     | _ => Coq_errC "Parsing uu not successful") end)) end
            | False =>
-             (case (fn x => fn y => x = y) cons_name "ss" of
+             (case (op=) cons_name "ss" of
                 True =>
                 let val JSON_Object m = js in
                 (case m of
@@ -341,10 +341,10 @@ val coq_Serializable_SP : coq_SP coq_Serializable =
   Build_Serializable (fn sp => case sp of
                                  ALL => "ALL"
                                | NONE => "NONE") (fn s =>
-    case (fn x => fn y => x = y) s "ALL" of
+    case (op=) s "ALL" of
       True => Coq_resultC ALL
     | False =>
-      (case (fn x => fn y => x = y) s "NONE" of
+      (case (op=) s "NONE" of
          True => Coq_resultC NONE
        | False => Coq_errC "Invalid SP string"))
 
@@ -382,13 +382,13 @@ val coq_Jsonifiable_ASP : coq_ASP coq_Jsonifiable =
     case coq_JSON_get_string "ASP_CONSTRUCTOR" js of
       Coq_errC _ => Coq_errC "Invalid JSON ASP Constructor Name"
     | Coq_resultC cons_name =>
-      (case (fn x => fn y => x = y) cons_name "NULL" of
+      (case (op=) cons_name "NULL" of
          True => Coq_resultC NULL
        | False =>
-         (case (fn x => fn y => x = y) cons_name "CPY" of
+         (case (op=) cons_name "CPY" of
             True => Coq_resultC CPY
           | False =>
-            (case (fn x => fn y => x = y) cons_name "ASPC" of
+            (case (op=) cons_name "ASPC" of
                True =>
                (case coq_JSON_get_string "ASP_SP" js of
                   Coq_errC _ => Coq_errC "Parsing ASPC not successful"
@@ -422,13 +422,13 @@ val coq_Jsonifiable_ASP : coq_ASP coq_Jsonifiable =
                                | Coq_resultC ps0 =>
                                  Coq_resultC (ASPC sp0 fwd0 ps0)))))))
              | False =>
-               (case (fn x => fn y => x = y) cons_name "SIG" of
+               (case (op=) cons_name "SIG" of
                   True => Coq_resultC SIG
                 | False =>
-                  (case (fn x => fn y => x = y) cons_name "HSH" of
+                  (case (op=) cons_name "HSH" of
                      True => Coq_resultC HSH
                    | False =>
-                     (case (fn x => fn y => x = y) cons_name "ENC" of
+                     (case (op=) cons_name "ENC" of
                         True =>
                         (case coq_JSON_get_string "ENC_PLC" js of
                            Coq_errC _ => Coq_errC "Parsing ENC not successful"
@@ -519,7 +519,7 @@ fun coq_Term_from_JSON js =
   case coq_JSON_get_string "TERM_CONSTRUCTOR" js of
     Coq_errC e => Coq_errC e
   | Coq_resultC cons_name =>
-    (case (fn x => fn y => x = y) cons_name "asp" of
+    (case (op=) cons_name "asp" of
        True =>
        (case coq_JSON_get_Object "TERM_BODY" js of
           Coq_errC e => Coq_errC e
@@ -529,7 +529,7 @@ fun coq_Term_from_JSON js =
              Coq_errC e => Coq_errC e
            | Coq_resultC a => Coq_resultC (Coq_asp a)))
      | False =>
-       (case (fn x => fn y => x = y) cons_name "att" of
+       (case (op=) cons_name "att" of
           True =>
           let val JSON_Object m = js in
           (case m of
@@ -593,7 +593,7 @@ fun coq_Term_from_JSON js =
                    Coq_errC
                      "Invalid att JSON: REMEMBER IT MUST BE IN A SPECIFIC FORMAT AND ORDER") end)) end
         | False =>
-          (case (fn x => fn y => x = y) cons_name "lseq" of
+          (case (op=) cons_name "lseq" of
              True =>
              let val JSON_Object m = js in
              (case m of
@@ -654,7 +654,7 @@ fun coq_Term_from_JSON js =
                       Coq_errC
                         "Invalid lseq JSON: REMEMBER IT MUST BE IN A SPECIFIC FORMAT AND ORDER") end)) end
            | False =>
-             (case (fn x => fn y => x = y) cons_name "bseq" of
+             (case (op=) cons_name "bseq" of
                 True =>
                 let val JSON_Object m = js in
                 (case m of
@@ -737,7 +737,7 @@ fun coq_Term_from_JSON js =
                          Coq_errC
                            "Invalid bseq JSON: REMEMBER IT MUST BE IN A SPECIFIC FORMAT AND ORDER") end)) end
               | False =>
-                (case (fn x => fn y => x = y) cons_name "bpar" of
+                (case (op=) cons_name "bpar" of
                    True =>
                    let val JSON_Object m = js in
                    (case m of
@@ -925,10 +925,10 @@ fun coq_AppResultC_from_JSON js =
   case coq_JSON_get_string "AppResultC_CONSTRUCTOR" js of
     Coq_errC _ => Coq_errC "Invalid AppResultC JSON"
   | Coq_resultC cons_name =>
-    (case (fn x => fn y => x = y) cons_name "mt_app" of
+    (case (op=) cons_name "mt_app" of
        True => Coq_resultC Coq_mtc_app
      | False =>
-       (case (fn x => fn y => x = y) cons_name "nnc_app" of
+       (case (op=) cons_name "nnc_app" of
           True =>
           let val JSON_Object m = js in
           (case m of
@@ -968,7 +968,7 @@ fun coq_AppResultC_from_JSON js =
                        | _ => Coq_errC "Parsing nnc_app not successful") end)
                  | _ => Coq_errC "Parsing nnc_app not successful") end)) end
         | False =>
-          (case (fn x => fn y => x = y) cons_name "ggc_app" of
+          (case (op=) cons_name "ggc_app" of
              True =>
              let val JSON_Object m = js in
              (case m of
@@ -1048,7 +1048,7 @@ fun coq_AppResultC_from_JSON js =
                           | _ => Coq_errC "Parsing ggc_app not successful") end)
                     | _ => Coq_errC "Parsing ggc_app not successful") end)) end
            | False =>
-             (case (fn x => fn y => x = y) cons_name "hhc_app" of
+             (case (op=) cons_name "hhc_app" of
                 True =>
                 let val JSON_Object m = js in
                 (case m of
@@ -1130,7 +1130,7 @@ fun coq_AppResultC_from_JSON js =
                              | _ => Coq_errC "Parsing hhc_app not successful") end)
                        | _ => Coq_errC "Parsing hhc_app not successful") end)) end
               | False =>
-                (case (fn x => fn y => x = y) cons_name "eec_app" of
+                (case (op=) cons_name "eec_app" of
                    True =>
                    let val JSON_Object m = js in
                    (case m of
@@ -1215,7 +1215,7 @@ fun coq_AppResultC_from_JSON js =
                                   Coq_errC "Parsing eec_app not successful") end)
                           | _ => Coq_errC "Parsing eec_app not successful") end)) end
                  | False =>
-                   (case (fn x => fn y => x = y) cons_name "ssc_app" of
+                   (case (op=) cons_name "ssc_app" of
                       True =>
                       let val JSON_Object m = js in
                       (case m of
