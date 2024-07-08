@@ -1,0 +1,21 @@
+datatype ('a, 'e) coq_ResultT =
+  Coq_errC 'e
+| Coq_resultC 'a
+
+(** val res_bind :
+    ('a1, 'a3) coq_ResultT -> ('a1 -> ('a2, 'a3) coq_ResultT) -> ('a2, 'a3)
+    coq_ResultT **)
+
+fun res_bind m f =
+  case m of
+    Coq_errC e => Coq_errC e
+  | Coq_resultC v => f v
+
+(** val result_map :
+    ('a1 -> ('a2, 'a3) coq_ResultT) -> 'a1 list -> ('a2 list, 'a3) coq_ResultT **)
+
+fun result_map f l = case l of
+  [] => Coq_resultC []
+| h :: t =>
+  res_bind (f h) (fn v =>
+    res_bind (result_map f t) (fn vs => Coq_resultC (v :: vs)))

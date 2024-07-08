@@ -1,0 +1,98 @@
+name: Build and Test
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  schedule:
+    - cron: '0 0 * * 0' # Running at midnight every Sunday (to preserve caches mostly)
+
+jobs:
+  build-and-test:
+    strategy:
+      fail-fast: false
+      
+    runs-on: ubuntu-latest
+
+    env:
+      CAKE_VERSION: "v2419"
+      ASP_LIB_REPO_PATH: "ku-sldg/asp-libs"
+      ASP_LIB_BRANCH: "main"
+      ASP_LIBS_PATH: ~/asp-libs
+
+    steps:
+############### Setup and Caching for CakeML
+      - name: Restore Cake Cache
+        id: cake-cache-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/cake-x64-64
+          key: ${{ runner.OS }}-CAKE-${{ env.CAKE_VERSION }}
+
+      - name: Build Cake
+        run: |
+          cd ~
+          wget https://github.com/CakeML/cakeml/releases/download/${{ env.CAKE_VERSION }}/cake-x64-64.tar.gz
+          tar -xvf cake-x64-64.tar.gz
+          cd ~/cake-x64-64
+          make cake
+      
+      - name: Cake Cache Save
+        id: cake-cache-install
+        if: steps.cake-cache-restore.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ~/cake-x64-64
+          key: ${{ runner.OS }}-CAKE-${{ env.CAKE_VERSION }}
+############### 
+
+############### Install Cake
+      - name: Install Cake
+        run:
+          sudo ln -s ~/cake-x64-64/cake /usr/bin
+
+############### Setup and Caching for ASP_Libs
+      - name: Get latest commit hash of Asp libs repo
+        id: get_commit_hash
+        run: |
+          response=$(curl -s "https://api.github.com/repos/$ASP_LIB_REPO_PATH/commits/$ASP_LIB_BRANCH")
+          commit_hash=$(echo "$response" | jq -r '.sha')
+          echo "COMMIT_HASH=$commit_hash" >> $GITHUB_ENV      
+
+      - name: Restore ASP Lib Cache
+        id: asp-lib-cache-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ env.ASP_LIBS_PATH }}
+          key: ${{ runner.OS }}-ASP-LIBS-${{ env.COMMIT_HASH }}
+      
+      - name: Checkout and build ASP Libs
+        if: steps.asp-lib-cache-restore.outputs.cache-hit != 'true'
+        run: |
+          rm -rf ${{ env.ASP_LIBS_PATH }}
+          cd ~
+          git clone https://github.com/$ASP_LIB_REPO_PATH.git
+          cd ${{ env.ASP_LIBS_PATH }}
+          git switch $ASP_LIB_BRANCH
+          make
+      
+      - name: ASP Lib Cache Save
+        id: asp-lib-cache-install
+        if: steps.asp-lib-cache-restore.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.ASP_LIBS_PATH }}
+          key: ${{ runner.OS }}-ASP-LIBS-${{ env.COMMIT_HASH }}
+
+############### Final Testing Checkout and Build am-cakeml
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Test Build
+        run: |
+          cd ${{ github.workspace }}/tests
+          export ASP_BIN=${{ env.ASP_LIBS_PATH }}/bin
+          make ci

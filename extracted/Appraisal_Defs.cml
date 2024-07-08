@@ -12,7 +12,7 @@ fun check_et_size et ls =
 
 fun decrypt_bs_to_rawev bs params ac =
   let val Coq_asp_paramsC _ _ p _ = params in
-  (case let val Coq_mkAmConfig _ _ _ _ _ pubKeyCb _ = ac in pubKeyCb p end of
+  (case let val Coq_mkAmConfig _ _ _ _ _ pubKeyCb = ac in pubKeyCb p end of
      Coq_errC e => Coq_errC e
    | Coq_resultC pubkey => decrypt_bs_to_rawev_prim bs params pubkey) end
 
@@ -35,18 +35,17 @@ fun checkNonce' nid nonceCandidate =
     ret (checkNonce nonceGolden nonceCandidate))
 
 (** val check_asp_EXTD :
-    coq_ASP_PARAMS -> coq_Plc -> coq_BS -> coq_RawEv -> coq_AM_Config ->
-    (coq_BS, coq_DispatcherErrors) coq_ResultT **)
+    coq_ASP_PARAMS -> coq_RawEv -> coq_AM_Config -> (coq_RawEv,
+    coq_DispatcherErrors) coq_ResultT **)
 
-fun check_asp_EXTD params p sig0 ls ac =
-  let val Coq_mkAmConfig _ _ _ app_aspCb _ _ _ = ac in
-  app_aspCb params p sig0 ls end
+fun check_asp_EXTD params ls ac =
+  let val Coq_mkAmConfig _ _ _ app_aspCb _ _ = ac in app_aspCb params ls end
 
 (** val check_asp_EXTD' :
-    coq_ASP_PARAMS -> coq_Plc -> coq_BS -> coq_RawEv -> coq_BS coq_AM **)
+    coq_ASP_PARAMS -> coq_Plc -> coq_RawEv -> coq_RawEv -> coq_RawEv coq_AM **)
 
-fun check_asp_EXTD' params p sig0 ls =
+fun check_asp_EXTD' params _ sig0 ls =
   bind get_AM_amConfig (fn ac =>
-    case check_asp_EXTD params p sig0 ls ac of
+    case check_asp_EXTD params (app sig0 ls) ac of
       Coq_errC e => am_failm (Coq_am_dispatch_error e)
     | Coq_resultC r => ret r)

@@ -1,0 +1,7 @@
+datatype coq_JSON =
+  JSON_Object ((string, coq_InnerJSON) coq_MapC)
+and coq_InnerJSON =
+  InJSON_Object coq_JSON
+| InJSON_Array (coq_InnerJSON list)
+| InJSON_String string
+| InJSON_Boolean bool

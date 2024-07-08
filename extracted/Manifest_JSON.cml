@@ -1,0 +1,127 @@
+(** val coq_Manifest_to_JSON : coq_Manifest -> coq_JSON **)
+
+fun coq_Manifest_to_JSON m =
+  let val Build_Manifest my_abstract_plc asps appraisal_asps uuidPlcs
+    pubKeyPlcs targetPlcs policy = m
+  in
+  JSON_Object ((coq_MAN_ABS_PLC, (InJSON_String
+  (let val Build_Serializable to_string _ = coq_Serializable_TARG_ID in
+   to_string my_abstract_plc end))) :: ((coq_MAN_ASPS, (InJSON_Array
+  (manifest_set_to_list_InJson coq_Serializable_TARG_ID asps))) :: ((coq_MAN_APPR_ASPS,
+  (InJSON_Array
+  (manifest_set_pairs_to_list_InJson coq_Serializable_TARG_ID
+    coq_Serializable_TARG_ID appraisal_asps))) :: ((coq_MAN_UUUID_PLCS,
+  (InJSON_Array
+  (manifest_set_to_list_InJson coq_Serializable_TARG_ID uuidPlcs))) :: ((coq_MAN_PUBKEY_PLCS,
+  (InJSON_Array
+  (manifest_set_to_list_InJson coq_Serializable_TARG_ID pubKeyPlcs))) :: ((coq_MAN_TARGET_PLCS,
+  (InJSON_Array
+  (manifest_set_to_list_InJson coq_Serializable_TARG_ID targetPlcs))) :: ((coq_MAN_POLICY,
+  (InJSON_Array
+  (manifest_set_pairs_to_list_InJson coq_Serializable_TARG_ID
+    coq_Serializable_TARG_ID policy))) :: []))))))) end
+
+(** val coq_JSON_to_Manifest :
+    coq_JSON -> (coq_Manifest, string) coq_ResultT **)
+
+fun coq_JSON_to_Manifest js =
+  res_bind (coq_JSON_get_string coq_MAN_ABS_PLC js) (fn temp_ABS_PLC =>
+    res_bind (coq_JSON_get_Array coq_MAN_ASPS js) (fn temp_ASPS =>
+      res_bind (coq_JSON_get_Array coq_MAN_APPR_ASPS js)
+        (fn temp_APPR_ASPS =>
+        res_bind (coq_JSON_get_Array coq_MAN_UUUID_PLCS js)
+          (fn temp_UUUID_PLCS =>
+          res_bind (coq_JSON_get_Array coq_MAN_PUBKEY_PLCS js)
+            (fn temp_PUBKEY_PLCS =>
+            res_bind (coq_JSON_get_Array coq_MAN_TARGET_PLCS js)
+              (fn temp_TARGET_PLCS =>
+              res_bind (coq_JSON_get_Array coq_MAN_POLICY js)
+                (fn temp_POLICY =>
+                res_bind
+                  (let val Build_Serializable _ from_string =
+                     coq_Serializable_TARG_ID
+                   in
+                   from_string temp_ABS_PLC end) (fn aBS_PLC =>
+                  res_bind
+                    (list_InJson_to_manifest_set coq_Serializable_TARG_ID
+                      coq_Eq_Class_ID_Type temp_ASPS) (fn aSPS =>
+                    res_bind
+                      (list_InJson_to_manifest_set_pairs
+                        coq_Serializable_TARG_ID coq_Serializable_TARG_ID
+                        coq_Eq_Class_ID_Type coq_Eq_Class_ID_Type
+                        temp_APPR_ASPS) (fn aPPR_ASPS =>
+                      res_bind
+                        (list_InJson_to_manifest_set coq_Serializable_TARG_ID
+                          coq_Eq_Class_ID_Type temp_UUUID_PLCS)
+                        (fn uUID_PLCS =>
+                        res_bind
+                          (list_InJson_to_manifest_set
+                            coq_Serializable_TARG_ID coq_Eq_Class_ID_Type
+                            temp_PUBKEY_PLCS) (fn pUBKEY_PLCS =>
+                          res_bind
+                            (list_InJson_to_manifest_set
+                              coq_Serializable_TARG_ID coq_Eq_Class_ID_Type
+                              temp_TARGET_PLCS) (fn tARGET_PLCS =>
+                            res_bind
+                              (list_InJson_to_manifest_set_pairs
+                                coq_Serializable_TARG_ID
+                                coq_Serializable_TARG_ID coq_Eq_Class_ID_Type
+                                coq_Eq_Class_ID_Type temp_POLICY)
+                              (fn pOLICY => Coq_resultC (Build_Manifest
+                              aBS_PLC aSPS aPPR_ASPS uUID_PLCS pUBKEY_PLCS
+                              tARGET_PLCS pOLICY)))))))))))))))
+
+(** val coq_Jsonifiable_Manifest : coq_Manifest coq_Jsonifiable **)
+
+val coq_Jsonifiable_Manifest : coq_Manifest coq_Jsonifiable =
+  Build_Jsonifiable coq_Manifest_to_JSON coq_JSON_to_Manifest
+
+(** val coq_AM_Lib_to_JSON : coq_AM_Library -> coq_JSON **)
+
+fun coq_AM_Lib_to_JSON am =
+  let val Build_AM_Library clone_uuid lib_plcs lib_pubkeys = am in
+  JSON_Object ((coq_AM_CLONE_UUUID, (InJSON_String
+  (let val Build_Serializable to_string _ = coq_Serializable_UUUID in
+   to_string clone_uuid end))) :: ((coq_AM_LIB_PLCS, (InJSON_Object
+  (let val Build_Jsonifiable to_JSON _ =
+     jsonifiable_map_serial_serial coq_Serializable_TARG_ID
+       coq_Eq_Class_ID_Type coq_Serializable_UUUID
+   in
+   to_JSON lib_plcs end))) :: ((coq_AM_LIB_PUBKEYS, (InJSON_Object
+  (let val Build_Jsonifiable to_JSON _ =
+     jsonifiable_map_serial_serial coq_Serializable_TARG_ID
+       coq_Eq_Class_ID_Type coq_Serializable_PublicKey
+   in
+   to_JSON lib_pubkeys end))) :: []))) end
+
+(** val coq_JSON_to_AM_Lib :
+    coq_JSON -> (coq_AM_Library, string) coq_ResultT **)
+
+fun coq_JSON_to_AM_Lib js =
+  res_bind (coq_JSON_get_string coq_AM_CLONE_UUUID js)
+    (fn temp_CLONE_UUUID =>
+    res_bind (coq_JSON_get_Object coq_AM_LIB_PLCS js) (fn temp_LIB_PLCS =>
+      res_bind (coq_JSON_get_Object coq_AM_LIB_PUBKEYS js)
+        (fn temp_LIB_PUBKEYS =>
+        res_bind
+          (let val Build_Serializable _ from_string = coq_Serializable_UUUID
+           in
+           from_string temp_CLONE_UUUID end) (fn cLONE_UUUID =>
+          res_bind
+            (let val Build_Jsonifiable _ from_JSON =
+               jsonifiable_map_serial_serial coq_Serializable_TARG_ID
+                 coq_Eq_Class_ID_Type coq_Serializable_UUUID
+             in
+             from_JSON temp_LIB_PLCS end) (fn lIB_PLCS =>
+            res_bind
+              (let val Build_Jsonifiable _ from_JSON =
+                 jsonifiable_map_serial_serial coq_Serializable_TARG_ID
+                   coq_Eq_Class_ID_Type coq_Serializable_PublicKey
+               in
+               from_JSON temp_LIB_PUBKEYS end) (fn lIB_PUBKEYS => Coq_resultC
+              (Build_AM_Library cLONE_UUUID lIB_PLCS lIB_PUBKEYS)))))))
+
+(** val coq_Jsonifiable_AM_Library : coq_AM_Library coq_Jsonifiable **)
+
+val coq_Jsonifiable_AM_Library : coq_AM_Library coq_Jsonifiable =
+  Build_Jsonifiable coq_AM_Lib_to_JSON coq_JSON_to_AM_Lib

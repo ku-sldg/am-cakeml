@@ -1,3 +1,5 @@
-triple:
-	cd ../build && make demo
-	cd ./triple_seq && ./triple.sh
+
+ci:
+	./HeadlessDemo.sh -t cert
+	./HeadlessDemo.sh -t bg
+	./HeadlessDemo.sh -t parmut

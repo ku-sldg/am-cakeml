@@ -1,50 +1,22 @@
-(** val encodeEvRaw : coq_RawEv -> coq_BS **)
+(** val make_JSON_Network_Request :
+    coq_UUID -> coq_JSON -> (coq_JSON, string) coq_ResultT **)
 
-val encodeEvRaw : (coq_RawEv -> coq_BS) =
+val make_JSON_Network_Request : (coq_UUID -> coq_JSON -> (coq_JSON, string)
+                                coq_ResultT) =
   failwith "AXIOM TO BE REALIZED"
 
-(** val do_asp :
-    coq_ASP_PARAMS -> coq_RawEv -> coq_Plc -> coq_Event_ID -> coq_AM_Config
-    -> (coq_BS, coq_DispatcherErrors) coq_ResultT **)
-
-fun do_asp params e mpl _ ac =
-  let val Coq_mkAmConfig _ _ aspCb _ _ _ _ = ac in
-  aspCb params mpl (encodeEvRaw e) e end
-
-(** val doRemote_uuid :
-    coq_Term -> coq_UUID -> coq_RawEv -> (coq_RawEv, coq_CallBackErrors)
+(** val make_JSON_FS_Location_Request :
+    coq_FS_Location -> coq_ASP_ID -> coq_JSON -> (coq_JSON, string)
     coq_ResultT **)
 
-val doRemote_uuid : (coq_Term -> coq_UUID -> coq_RawEv -> (coq_RawEv,
-                    coq_CallBackErrors) coq_ResultT) =
+val make_JSON_FS_Location_Request : (coq_FS_Location -> coq_ASP_ID ->
+                                    coq_JSON -> (coq_JSON, string)
+                                    coq_ResultT) =
   failwith "AXIOM TO BE REALIZED"
-
-(** val do_remote :
-    coq_Term -> coq_Plc -> coq_EvC -> coq_AM_Config -> (coq_RawEv,
-    coq_DispatcherErrors) coq_ResultT **)
-
-fun do_remote t pTo e ac =
-  let val remote_uuid_res =
-    let val Coq_mkAmConfig _ _ _ _ plcCb _ _ = ac in plcCb pTo end
-  in
-  (case remote_uuid_res of
-     Coq_errC e0 => Coq_errC e0
-   | Coq_resultC uuid =>
-     (case doRemote_uuid t uuid (get_bits e) of
-        Coq_errC c => Coq_errC (Runtime c)
-      | Coq_resultC v => Coq_resultC v)) end
 
 (** val parallel_vm_thread : coq_Loc -> coq_EvC **)
 
 val parallel_vm_thread : (coq_Loc -> coq_EvC) =
-  failwith "AXIOM TO BE REALIZED"
-
-(** val am_sendReq'_app :
-    coq_UUID -> coq_Term -> coq_Plc -> coq_Evidence -> coq_RawEv ->
-    coq_AppResultC **)
-
-val am_sendReq'_app : (coq_UUID -> coq_Term -> coq_Plc -> coq_Evidence ->
-                      coq_RawEv -> coq_AppResultC) =
   failwith "AXIOM TO BE REALIZED"
 
 (** val do_start_par_thread :
@@ -57,23 +29,3 @@ fun do_start_par_thread _ _ _ =
 
 fun do_wait_par_thread loc =
   ret (parallel_vm_thread loc)
-
-(** val requester_bound : coq_Term -> coq_Plc -> coq_ReqAuthTok -> bool **)
-
-val requester_bound : (coq_Term -> coq_Plc -> coq_ReqAuthTok -> bool) =
-  failwith "AXIOM TO BE REALIZED"
-
-(** val appraise_auth_tok : coq_AppResultC -> bool **)
-
-val appraise_auth_tok : (coq_AppResultC -> bool) =
-  failwith "AXIOM TO BE REALIZED"
-
-(** val is_local_appraisal : coq_AM_Library -> bool **)
-
-val is_local_appraisal : (coq_AM_Library -> bool) =
-  failwith "AXIOM TO BE REALIZED"
-
-(** val pretty_print_manifest : coq_Manifest -> coq_StringT **)
-
-val pretty_print_manifest : (coq_Manifest -> coq_StringT) =
-  failwith "AXIOM TO BE REALIZED"

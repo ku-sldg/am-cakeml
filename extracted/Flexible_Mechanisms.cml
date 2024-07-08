@@ -1,0 +1,48 @@
+(** val certificate_style : coq_Term **)
+
+val certificate_style : coq_Term =
+  Coq_att coq_P1 (Coq_lseq (Coq_asp (ASPC ALL (EXTD (S O)) (Coq_asp_paramsC
+    attest_id [] coq_P1 sys_targ))) (Coq_att coq_P2 (Coq_lseq (Coq_asp (ASPC
+    ALL (EXTD (S O)) (Coq_asp_paramsC appraise_id [] coq_P2 sys_targ)))
+    (Coq_asp (ASPC ALL (EXTD (S O)) (Coq_asp_paramsC certificate_id [] coq_P2
+    sys_targ))))))
+
+(** val background_check : coq_Term **)
+
+val background_check : coq_Term =
+  Coq_lseq (Coq_att coq_P1 (Coq_asp (ASPC ALL (EXTD (S O)) (Coq_asp_paramsC
+    attest_id [] coq_P1 sys_targ)))) (Coq_att coq_P2 (Coq_asp (ASPC ALL (EXTD
+    (S O)) (Coq_asp_paramsC appraise_id [] coq_P2 sys_targ))))
+
+(** val parallel_mutual_1 : coq_Term **)
+
+val parallel_mutual_1 : coq_Term =
+  Coq_att coq_P1 (Coq_lseq (Coq_asp (ASPC ALL (EXTD (S O)) (Coq_asp_paramsC
+    attest_id [] coq_P1 sys_targ))) (Coq_att coq_P2 (Coq_asp (ASPC ALL (EXTD
+    (S O)) (Coq_asp_paramsC appraise_id [] coq_P2 sys_targ)))))
+
+(** val parallel_mutual_2 : coq_Term **)
+
+val parallel_mutual_2 : coq_Term =
+  Coq_att coq_P0 (Coq_lseq (Coq_asp (ASPC ALL (EXTD (S O)) (Coq_asp_paramsC
+    attest_id [] coq_P0 sys_targ))) (Coq_att coq_P2 (Coq_asp (ASPC ALL (EXTD
+    (S O)) (Coq_asp_paramsC appraise_id [] coq_P2 sys_targ)))))
+
+(** val layered_background_check : coq_Term **)
+
+val layered_background_check : coq_Term =
+  Coq_att coq_P1 (Coq_bpar (ALL, ALL) (Coq_lseq (Coq_att coq_P1 (Coq_asp
+    (ASPC ALL (EXTD (S O)) (Coq_asp_paramsC attest_id [] coq_P1 sys_targ))))
+    (Coq_lseq (Coq_asp (ASPC ALL (EXTD (S O)) (Coq_asp_paramsC attest_id []
+    coq_P3 att_targ))) (Coq_asp (ASPC ALL (EXTD (S O)) (Coq_asp_paramsC
+    attest_id [] coq_P4 att_targ))))) (Coq_bpar (ALL, ALL) (Coq_att coq_P3
+    (Coq_asp (ASPC ALL (EXTD (S O)) (Coq_asp_paramsC attest_id [] coq_P3
+    sys_targ)))) (Coq_lseq (Coq_att coq_P4 (Coq_asp (ASPC ALL (EXTD (S O))
+    (Coq_asp_paramsC attest_id [] coq_P4 sys_targ)))) (Coq_att coq_P2
+    (Coq_lseq (Coq_asp (ASPC ALL (EXTD (S O)) (Coq_asp_paramsC appraise_id []
+    coq_P2 it_targ))) (Coq_asp (ASPC ALL (EXTD (S O)) sig_params)))))))
+
+(** val flexible_mechanisms : coq_Term list **)
+
+val flexible_mechanisms : coq_Term list =
+  certificate_style :: (background_check :: (parallel_mutual_1 :: (parallel_mutual_2 :: (layered_background_check :: []))))

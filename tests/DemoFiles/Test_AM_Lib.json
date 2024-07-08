@@ -1,0 +1,13 @@
+{
+  "CLONE_UUID": "localhost:5100",
+  "LIB_PLCS": {
+    "P0": "localhost:5000",
+    "P1": "localhost:5001",
+    "P2": "localhost:5002",
+    "P3": "localhost:5003",
+    "P4": "localhost:5004",
+    "P5": "localhost:5005",
+    "P6": "localhost:5006"
+  },
+  "LIB_PUBKEYS": {}
+}

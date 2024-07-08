@@ -52,7 +52,7 @@ structure BString = struct
         (* bstring -> bstring *)
         val rev = mapStr StringExtra.rev
 
-        (* int -> int -> bstring -> bstring *)
+        (* bstring -> int -> int -> bstring *)
         fun substring bs i j = mapStr (fn s => String.substring s i j) bs
 
         (* int -> int option -> bstring -> bstring *)

@@ -25,11 +25,8 @@ CMakeCache.txt
 *src-pub.pem
 *src-parentkey-handle.txt
 *client_data.txt
-#stubs/IO_Stubs_extra*
-#stubs/IO_Stubs_extra_orig.sml
-do_extract.sh
-apps/ManifestCompiler/DemoFiles/FormalManifest_*
-tests/DemoFiles/*/FormalManifest_*
+
+tests/DemoFiles/Generated
 
 # Backup files
 *backup.*
