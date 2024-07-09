@@ -2,9 +2,9 @@ type coq_FS_Location (* AXIOM TO BE REALIZED *)
 
 type coq_UUID (* AXIOM TO BE REALIZED *)
 
-(** val coq_Serializable_UUUID : coq_UUID coq_Serializable **)
+(** val coq_Stringifiable_UUUID : coq_UUID coq_Stringifiable **)
 
-val coq_Serializable_UUUID : coq_UUID coq_Serializable =
+val coq_Stringifiable_UUUID : coq_UUID coq_Stringifiable =
   failwith "AXIOM TO BE REALIZED"
 
 (** val coq_Eq_Class_uuid : coq_UUID coq_EqClass **)
@@ -14,9 +14,9 @@ val coq_Eq_Class_uuid : coq_UUID coq_EqClass =
 
 type coq_PublicKey (* AXIOM TO BE REALIZED *)
 
-(** val coq_Serializable_PublicKey : coq_PublicKey coq_Serializable **)
+(** val coq_Stringifiable_PublicKey : coq_PublicKey coq_Stringifiable **)
 
-val coq_Serializable_PublicKey : coq_PublicKey coq_Serializable =
+val coq_Stringifiable_PublicKey : coq_PublicKey coq_Stringifiable =
   failwith "AXIOM TO BE REALIZED"
 
 (** val coq_Eq_Class_public_key : coq_PublicKey coq_EqClass **)

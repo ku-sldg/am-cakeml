@@ -1,7 +1,0 @@
-datatype 'a coq_Serializable =
-  Build_Serializable (('a -> string)) ((string -> ('a, string) coq_ResultT))
-
-(** val coq_Serializable_string : string coq_Serializable **)
-
-val coq_Serializable_string : string coq_Serializable =
-  Build_Serializable (fn s => s) (fn s => Coq_resultC s)

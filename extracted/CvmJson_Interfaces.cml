@@ -5,7 +5,7 @@ fun coq_ProtocolRunRequest_to_JSON req =
   JSON_Object ((coq_STR_TYPE, (InJSON_String
     coq_STR_REQUEST)) :: ((coq_STR_ACTION, (InJSON_String
     coq_STR_RUN)) :: ((coq_STR_REQ_PLC, (InJSON_String
-    (let val Build_Serializable to_string _ = coq_Serializable_TARG_ID in
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_ID_Type in
      to_string
        (let val Coq_mkPRReq _ prreq_req_plc _ = req in prreq_req_plc end) end))) :: ((coq_STR_TERM,
     (InJSON_Object
@@ -26,8 +26,8 @@ fun coq_JSON_to_ProtocolRunRequest req =
           (let val Build_Jsonifiable _ from_JSON = coq_Jsonifiable_Term in
            from_JSON temp_term end) (fn term =>
           res_bind
-            (let val Build_Serializable _ from_string =
-               coq_Serializable_TARG_ID
+            (let val Build_Stringifiable _ from_string =
+               coq_Stringifiable_ID_Type
              in
              from_string temp_req_plc end) (fn req_plc =>
             res_bind
@@ -92,8 +92,8 @@ fun coq_JSON_to_ProtocolAppraiseRequest req =
             (let val Build_Jsonifiable _ from_JSON = coq_Jsonifiable_Term in
              from_JSON temp_term end) (fn term =>
             res_bind
-              (let val Build_Serializable _ from_string =
-                 coq_Serializable_TARG_ID
+              (let val Build_Stringifiable _ from_string =
+                 coq_Stringifiable_ID_Type
                in
                from_string temp_plc end) (fn plc =>
               res_bind
@@ -117,7 +117,11 @@ fun coq_ProtocolAppraiseResponse_to_JSON resp =
     coq_STR_APPRAISE)) :: ((coq_STR_SUCCESS, (InJSON_Boolean
     (let val Coq_mkPAResp paresp_success _ = resp in paresp_success end))) :: ((coq_STR_PAYLOAD,
     (InJSON_Object
-    (let val Build_Jsonifiable to_JSON _ = coq_Jsonifiable_AppResultC in
+    (let val Build_Jsonifiable to_JSON _ =
+       coq_Jsonifiable_AppResultC
+         (jsonifiable_map_serial_serial coq_Stringifiable_ID_Type
+           coq_Eq_Class_ID_Type coq_Stringifiable_ID_Type)
+     in
      to_JSON
        (let val Coq_mkPAResp _ paresp_result = resp in paresp_result end) end))) :: []))))
 
@@ -128,7 +132,11 @@ fun coq_JSON_to_ProtocolAppraiseResponse resp =
   res_bind (coq_JSON_get_bool coq_STR_SUCCESS resp) (fn temp_success =>
     res_bind (coq_JSON_get_Object coq_STR_PAYLOAD resp) (fn temp_result =>
       res_bind
-        (let val Build_Jsonifiable _ from_JSON = coq_Jsonifiable_AppResultC in
+        (let val Build_Jsonifiable _ from_JSON =
+           coq_Jsonifiable_AppResultC
+             (jsonifiable_map_serial_serial coq_Stringifiable_ID_Type
+               coq_Eq_Class_ID_Type coq_Stringifiable_ID_Type)
+         in
          from_JSON temp_result end) (fn result => Coq_resultC (Coq_mkPAResp
         temp_success result))))
 
@@ -183,19 +191,22 @@ fun coq_ASPRunRequest_to_JSON req =
   JSON_Object ((coq_STR_TYPE, (InJSON_String
     coq_STR_REQUEST)) :: ((coq_STR_ACTION, (InJSON_String
     coq_STR_ASP_RUN)) :: ((coq_STR_ASP_ID, (InJSON_String
-    (let val Build_Serializable to_string _ = coq_Serializable_TARG_ID in
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_ID_Type in
      to_string
        (let val Coq_mkASPRReq asprreq_asp_id _ _ _ _ = req in
         asprreq_asp_id end) end))) :: ((coq_STR_ASP_ARGS, (InJSON_Object
-    (let val Build_Jsonifiable to_JSON _ = coq_Jsonifiable_ASP_ARGS in
+    (let val Build_Jsonifiable to_JSON _ =
+       jsonifiable_map_serial_serial coq_Stringifiable_ID_Type
+         coq_Eq_Class_ID_Type coq_Stringifiable_ID_Type
+     in
      to_JSON
        (let val Coq_mkASPRReq _ asprreq_asp_args _ _ _ = req in
         asprreq_asp_args end) end))) :: ((coq_STR_TARG_PLC, (InJSON_String
-    (let val Build_Serializable to_string _ = coq_Serializable_TARG_ID in
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_ID_Type in
      to_string
        (let val Coq_mkASPRReq _ _ asprreq_targ_plc _ _ = req in
         asprreq_targ_plc end) end))) :: ((coq_STR_TARG, (InJSON_String
-    (let val Build_Serializable to_string _ = coq_Serializable_TARG_ID in
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_ID_Type in
      to_string
        (let val Coq_mkASPRReq _ _ _ asprreq_targ _ = req in asprreq_targ end) end))) :: ((coq_STR_RAWEV,
     (InJSON_Object
