@@ -3,9 +3,6 @@ name: Build
 on:
   workflow_call:
     
-  schedule:
-    - cron: '0 0 * * 0' # Running at midnight every Sunday (to preserve caches mostly)
-
 jobs:
   build:
     strategy:
