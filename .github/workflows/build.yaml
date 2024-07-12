@@ -1,0 +1,59 @@
+name: Build
+
+on:
+  workflow_call:
+    
+  schedule:
+    - cron: '0 0 * * 0' # Running at midnight every Sunday (to preserve caches mostly)
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      
+    runs-on: ubuntu-latest
+
+    env:
+      CAKE_PATH: ~/cake-x64-64
+
+    steps:
+############### Setup and Caching for CakeML
+      - name: Restore Cake Cache
+        id: cake-cache-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ env.CAKE_PATH }}
+          key: ${{ runner.OS }}-CAKE-${{ vars.CAKE_VERSION }}
+
+      - name: Build Cake
+        run: |
+          cd ~
+          wget https://github.com/CakeML/cakeml/releases/download/${{ vars.CAKE_VERSION }}/cake-x64-64.tar.gz
+          tar -xvf cake-x64-64.tar.gz
+          cd ${{ env.CAKE_PATH }}
+          make cake
+      
+      - name: Cake Cache Save
+        id: cake-cache-install
+        if: steps.cake-cache-restore.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.CAKE_PATH }}
+          key: ${{ runner.OS }}-CAKE-${{ vars.CAKE_VERSION }}
+############### 
+
+############### Install Cake
+      - name: Install Cake
+        run:
+          sudo ln -s ${{ env.CAKE_PATH }}/cake /usr/bin
+
+############### Checkout and Build AM-CakeML
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Test Build
+        run: |
+          mkdir -p ${{ github.workspace }}/build
+          cd ${{ github.workspace }}/build
+          cmake ..
+          make all
