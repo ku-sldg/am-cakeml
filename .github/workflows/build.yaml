@@ -56,6 +56,7 @@ jobs:
         run: |
           cd ${{ github.workspace }}/build
           tar -czf bin.tar.gz ./bin
+          ls -al ${{ github.workspace }}/build
 
       - name: Upload Binaries
         uses: actions/upload-artifact@v4
