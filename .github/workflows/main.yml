@@ -14,9 +14,11 @@ jobs:
   build-and-test:
     strategy:
       fail-fast: false
+      matrix: 
+        os: [ubuntu-latest, macos-latest]
+    
+    runs-on: ${{ matrix.os }}
       
-    runs-on: ubuntu-latest
-
     env:
       CAKE_VERSION: "v2419"
       ASP_LIB_REPO_PATH: "ku-sldg/asp-libs"
