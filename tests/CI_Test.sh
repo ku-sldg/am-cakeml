@@ -85,7 +85,6 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   # Move to build folder
   mkdir -p $repoRoot/build
   cd $repoRoot/build
-  cmake ..
 
   # Generate the terms file
   $TERM_GEN -t $TERM_TYPE -o $TERM_FILE
