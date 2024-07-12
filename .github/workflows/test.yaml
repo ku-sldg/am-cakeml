@@ -52,12 +52,12 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: binaries
-          path: ${{ github.workspace }}/build/bin.tar.gz
+          path: ${{ github.workspace }}/build/bin.tar
 
-      # - name: Extract Binaries
-      #   run: |
-      #     cd ${{ github.workspace }}/build
-      #     tar -xvzf bin.tar.gz
+      - name: Extract Binaries
+        run: |
+          cd ${{ github.workspace }}/build
+          tar -xvf bin.tar
       
       - name: Run Tests
         run: |
