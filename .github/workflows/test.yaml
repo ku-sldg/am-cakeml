@@ -45,6 +45,9 @@ jobs:
 ###############
 
 ############### Pull down built binaries and run tests
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Download Binaries
         uses: actions/download-artifact@v3
         with:
