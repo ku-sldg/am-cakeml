@@ -35,9 +35,9 @@ TESTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Common Variables
 IP=localhost
 PORT=5000
-TERM_GEN=./apps/TermToJson/term_to_json
-MAN_GEN=./apps/ManifestGenerator/manifest_generator
-AM_EXEC=./apps/AttestationManager/attestation_manager
+TERM_GEN=./bin/term_to_json
+MAN_GEN=./bin/manifest_generator
+AM_EXEC=./bin/attestation_manager
 
 if [ -z ${ASP_BIN+x} ]; then
   echo "Variable 'ASP_BIN' is not set" 

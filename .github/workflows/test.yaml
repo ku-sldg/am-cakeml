@@ -42,6 +42,14 @@ jobs:
         with:
           path: ${{ vars.ASP_LIB_PATH }}
           key: ${{ runner.OS }}-ASP-LIBS-${{ env.COMMIT_HASH }}
+###############
+
+############### Pull down built binaries and run tests
+      - name: Download Binaries
+        uses: actions/download-artifact@v3
+        with:
+          name: binaries
+          path: ${{ github.workspace }}/build/bin
       
       - name: Run Tests
         run: |

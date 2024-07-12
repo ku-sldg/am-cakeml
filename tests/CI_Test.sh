@@ -87,11 +87,6 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   cd $repoRoot/build
   cmake ..
 
-  # Make targets
-  make term_to_json
-  make manifest_generator
-  make attestation_manager
-
   # Generate the terms file
   $TERM_GEN -t $TERM_TYPE -o $TERM_FILE
 

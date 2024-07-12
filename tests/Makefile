@@ -1,5 +1,5 @@
 
 ci:
-	./HeadlessDemo.sh -t cert
-	./HeadlessDemo.sh -t bg
-	./HeadlessDemo.sh -t parmut
+	./CI_Test.sh -t cert
+	./CI_Test.sh -t bg
+	./CI_Test.sh -t parmut

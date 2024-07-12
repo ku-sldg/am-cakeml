@@ -51,3 +51,9 @@ jobs:
           cd ${{ github.workspace }}/build
           cmake ..
           make all
+
+      - name: Upload Binaries
+        uses: actions/upload-artifact@v3
+        with:
+          name: binaries
+          path: ${{ github.workspace }}/build/bin
