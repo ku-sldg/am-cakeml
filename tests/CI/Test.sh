@@ -4,8 +4,11 @@ set -eu
 ################ PATH VARS ################
 # Assumes the following structure am-cakeml/tests/CI
 CI_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+echo "CI_DIR: $CI_DIR"
 TESTS_DIR="$(cd $CI_DIR && cd .. && pwd)"
+echo "TESTS_DIR: $TESTS_DIR"
 REPO_ROOT="$(cd "$TESTS_DIR" && cd .. && pwd)"
+echo "REPO_ROOT: $REPO_ROOT"
 ################ END PATH VARS ################
 
 # Function to display usage instructions
