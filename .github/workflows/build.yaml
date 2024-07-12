@@ -18,13 +18,13 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: ${{ env.CAKE_PATH }}
-          key: ${{ runner.OS }}-CAKE-${{ vars.CAKE_VERSION }}
+          key: ${{ runner.OS }}-CAKE-${{ env.CAKE_VERSION }}
 
       - name: Build Cake
         if: steps.cake-cache-restore.outputs.cache-hit != 'true'
         run: |
           cd ~
-          wget https://github.com/CakeML/cakeml/releases/download/${{ vars.CAKE_VERSION }}/cake-x64-64.tar.gz
+          wget https://github.com/CakeML/cakeml/releases/download/${{ env.CAKE_VERSION }}/cake-x64-64.tar.gz
           tar -xvf cake-x64-64.tar.gz
           cd ${{ env.CAKE_PATH }}
           make cake
