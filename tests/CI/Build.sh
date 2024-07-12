@@ -10,10 +10,9 @@ REPO_ROOT="$(cd "$TESTS_DIR" && cd .. && pwd)"
 ################ END PATH VARS ################
 
 if [[ "$REPO_ROOT" == */am-cakeml ]]; then
-  repoRoot=$(dirname "$PWD")
   # Move to build folder
-  mkdir -p $repoRoot/build
-  cd $repoRoot/build
+  mkdir -p $REPO_ROOT/build
+  cd $REPO_ROOT/build
   cmake ..
   make all
 else
