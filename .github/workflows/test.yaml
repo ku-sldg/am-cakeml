@@ -54,10 +54,10 @@ jobs:
           name: binaries
           path: ${{ github.workspace }}/build/bin.tar.gz
 
-      - name: Extract Binaries
-        run: |
-          cd ${{ github.workspace }}/build
-          tar -xvzf bin.tar.gz
+      # - name: Extract Binaries
+      #   run: |
+      #     cd ${{ github.workspace }}/build
+      #     tar -xvzf bin.tar.gz
       
       - name: Run Tests
         run: |
