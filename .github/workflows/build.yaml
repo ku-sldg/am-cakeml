@@ -20,6 +20,7 @@ jobs:
           key: ${{ runner.OS }}-CAKE-${{ vars.CAKE_VERSION }}
 
       - name: Build Cake
+        if: steps.cake-cache-restore.outputs.cache-hit != 'true'
         run: |
           cd ~
           wget https://github.com/CakeML/cakeml/releases/download/${{ vars.CAKE_VERSION }}/cake-x64-64.tar.gz
