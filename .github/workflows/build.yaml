@@ -53,7 +53,7 @@ jobs:
 
       - name: Tarball Binaries
         run: |
-          tar -cvf ${{ github.workspace}}/build/bin.tar ${{ github.workspace}}/build/bin
+          tar -cvf ${{ github.workspace }}/build/bin.tar ${{ github.workspace }}/build/bin
 
       - name: Upload Binaries
         uses: actions/upload-artifact@v4
