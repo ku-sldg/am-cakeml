@@ -52,8 +52,12 @@ jobs:
           cmake ..
           make all
 
+      - name: Tarball Binaries
+        run: |
+          tar -czf ${{ github.workspace }}/build/bin.tar.gz ${{ github.workspace }}/build/bin
+
       - name: Upload Binaries
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: binaries
-          path: ${{ github.workspace }}/build/bin
+          path: ${{ github.workspace }}/build/bin.tar.gz
