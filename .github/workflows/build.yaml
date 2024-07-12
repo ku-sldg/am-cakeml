@@ -54,7 +54,8 @@ jobs:
 
       - name: Tarball Binaries
         run: |
-          tar -czf ${{ github.workspace }}/build/bin.tar.gz ${{ github.workspace }}/build/bin
+          cd ${{ github.workspace }}/build
+          tar -czf bin.tar.gz ./bin
 
       - name: Upload Binaries
         uses: actions/upload-artifact@v4
