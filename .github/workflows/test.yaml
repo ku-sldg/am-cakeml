@@ -30,9 +30,9 @@ jobs:
         run: |
           rm -rf ${{ vars.ASP_LIB_PATH }}
           cd ~
-          git clone https://github.com/$ASP_LIB_REPO_PATH.git
+          git clone https://github.com/${{ vars.ASP_LIB_REPO_PATH }}.git
           cd ${{ vars.ASP_LIB_PATH }}
-          git switch $ASP_LIB_BRANCH
+          git switch ${{ vars.ASP_LIB_BRANCH }}
           make
       
       - name: ASP Lib Cache Save
@@ -40,15 +40,11 @@ jobs:
         if: steps.asp-lib-cache-restore.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
-          path: ${{ env.ASP_LIBS_PATH }}
+          path: ${{ vars.ASP_LIB_PATH }}
           key: ${{ runner.OS }}-ASP-LIBS-${{ env.COMMIT_HASH }}
-
-############### Final Testing Checkout and Build am-cakeml
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Test Build
+      
+      - name: Run Tests
         run: |
           cd ${{ github.workspace }}/tests
-          export ASP_BIN=${{ env.ASP_LIBS_PATH }}/bin
+          export ASP_BIN=${{ vars.ASP_LIB_PATH }}/bin
           make ci
