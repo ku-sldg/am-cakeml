@@ -9,6 +9,7 @@ jobs:
 
     env:
       CAKE_PATH: ~/cake-x64-64
+      CAKE_VERSION: v2419
 
     steps:
 ############### Setup and Caching for CakeML
@@ -34,7 +35,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: ${{ env.CAKE_PATH }}
-          key: ${{ runner.OS }}-CAKE-${{ vars.CAKE_VERSION }}
+          key: ${{ runner.OS }}-CAKE-${{ env.CAKE_VERSION }}
 ############### 
 
 ############### Install Cake
@@ -48,16 +49,11 @@ jobs:
 
       - name: Test Build
         run: |
-          mkdir -p ${{ github.workspace }}/build
-          cd ${{ github.workspace }}/build
-          cmake ..
-          make all
+          make -C ${{ github.workspace }}/tests ci_build
 
       - name: Tarball Binaries
         run: |
-          cd ${{ github.workspace }}/build
-          tar -cvf bin.tar ./bin
-          ls -al ${{ github.workspace }}/build
+          tar -cvf ${{ github.workspace}}/build/bin.tar ${{ github.workspace}}/build/bin
 
       - name: Upload Binaries
         uses: actions/upload-artifact@v4
