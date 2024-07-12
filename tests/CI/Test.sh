@@ -87,6 +87,7 @@ if [[ "$REPO_ROOT" == */am-cakeml ]]; then
   # Move to build folder
   mkdir -p $REPO_ROOT/build
   cd $REPO_ROOT/build
+  ls -al
 
   # Generate the terms file
   $TERM_GEN -t $TERM_TYPE -o $TERM_FILE
