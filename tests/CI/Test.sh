@@ -1,6 +1,13 @@
 #!/bin/bash
 set -eu
 
+################ PATH VARS ################
+# Assumes the following structure am-cakeml/tests/CI
+CI_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+TESTS_DIR="$(cd $CI_DIR && cd .. && pwd)"
+REPO_ROOT="$(cd "$TESTS_DIR" && cd .. && pwd)"
+################ END PATH VARS ################
+
 # Function to display usage instructions
 usage() {
   echo "Usage: $0 -t [cert|bg|parmut|layered_bg] [-a <path-to-asps>]"
@@ -43,11 +50,6 @@ kill_background_processes() {
 
 # Trap to ensure background processes are killed on script exit
 trap kill_background_processes EXIT
-
-# Assumes the following structure am-cakeml/tests/CI
-CI_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-TESTS_DIR="$(cd $CI_DIR && cd .. && pwd)"
-REPO_ROOT="$(cd "$TESTS_DIR" && cd .. && pwd)"
 
 # Common Variables
 IP=localhost
@@ -107,6 +109,6 @@ if [[ "$REPO_ROOT" == */am-cakeml ]]; then
   # We need this to be the last line so that the exit code is whether or not we found success
   grep "\"SUCCESS\":true" $GENERATED/output.out
 else
-  echo "You are in $PWD, with the root set as $REPO_ROOT, but you should be in 'am-cakeml/tests'"
+  echo "You are in $PWD, with the root set as $REPO_ROOT, but youre root should be 'am-cakeml'"
 fi
 
