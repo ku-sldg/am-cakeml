@@ -26,6 +26,13 @@ jobs:
       ASP_LIBS_PATH: ~/asp-libs
 
     steps:
+      - name: Debugging Message
+        if: ${{ runner.debug }} == 1
+        run: |
+          echo "Running on ${{ runner.OS }}"
+          echo "With Arch ${{ runner.arch }}"
+          uname -a
+
 ############### Setup and Caching for CakeML
       - name: Restore Cake Cache
         id: cake-cache-restore
