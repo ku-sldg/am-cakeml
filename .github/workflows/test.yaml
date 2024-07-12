@@ -61,8 +61,7 @@ jobs:
 
       - name: Extract Binaries
         run: |
-          cd ${{ github.workspace }}/build
-          tar -xvf bin.tar
+          tar -xvf ${{ github.workspace}}/build/bin.tar - C ${{ github.workspace}}/build/bin
       
       - name: Run Tests
         run: |
