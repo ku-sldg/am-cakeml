@@ -64,6 +64,6 @@ jobs:
           draft: ${{ inputs.draft }}
           tag_name: refs/tags/${{ inputs.tag_string }}
           generate_release_notes: true
-          name: ${{ github.ref_name }} Release
+          name: ${{ inpus.tag_string }} Release
 
   
