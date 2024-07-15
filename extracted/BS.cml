@@ -1,8 +1,8 @@
 type coq_BS (* AXIOM TO BE REALIZED *)
 
-(** val coq_Serializable_BS : coq_BS coq_Serializable **)
+(** val coq_Stringifiable_BS : coq_BS coq_Stringifiable **)
 
-val coq_Serializable_BS : coq_BS coq_Serializable =
+val coq_Stringifiable_BS : coq_BS coq_Stringifiable =
   failwith "AXIOM TO BE REALIZED"
 
 (** val passed_bs : coq_BS **)

@@ -1,0 +1,4 @@
+(** val coq_Stringifiable_nat : nat coq_Stringifiable **)
+
+val coq_Stringifiable_nat : nat coq_Stringifiable =
+  failwith "AXIOM TO BE REALIZED"
