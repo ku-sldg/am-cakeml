@@ -31,6 +31,7 @@ fun main () =
                             | "bg"          => background_check
                             | "parmut"      => parallel_mutual_1
                             | "layered_bg"  => layered_background_check
+                            | "filehash"    => filehash_auth_phrase
                             | _ => raise (Exception ("TermToJson Argument Error: \n" ^ usage))
         in
           write_term_to_file outTerm outFile
