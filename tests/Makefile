@@ -1,5 +1,13 @@
+.PHONY: ci_build ci_test
 
-ci:
-	./HeadlessDemo.sh -t cert
-	./HeadlessDemo.sh -t bg
-	./HeadlessDemo.sh -t parmut
+all:
+	make ci_build
+	make ci_test
+
+ci_build:
+	./CI/Build.sh
+
+ci_test:
+	./CI/Test.sh -t cert
+	./CI/Test.sh -t bg
+	./CI/Test.sh -t parmut

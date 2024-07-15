@@ -1,0 +1,20 @@
+name: Build and Test
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  schedule:
+    - cron: '0 0 * * 0' # Running at midnight every Sunday (to preserve caches mostly)
+  workflow_call:
+
+jobs:
+  build:
+    uses: ./.github/workflows/build.yaml
+
+  test:
+    needs: build
+    uses: ./.github/workflows/test.yaml

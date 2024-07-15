@@ -1,19 +1,30 @@
 #!/bin/bash
 set -eu
 
+################ PATH VARS ################
+# Assumes the following structure am-cakeml/tests/CI
+CI_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+echo "CI_DIR: $CI_DIR"
+TESTS_DIR="$(cd $CI_DIR && cd .. && pwd)"
+echo "TESTS_DIR: $TESTS_DIR"
+REPO_ROOT="$(cd "$TESTS_DIR" && cd .. && pwd)"
+echo "REPO_ROOT: $REPO_ROOT"
+################ END PATH VARS ################
+
 # Function to display usage instructions
 usage() {
-  echo "Usage: $0 -t [cert|bg|parmut|layered_bg]"
+  echo "Usage: $0 -t [cert|bg|parmut|layered_bg] [-a <path-to-asps>]"
   exit 1
 }
 
-TERM_TYPE=""
-
 # Parse command-line arguments
-while getopts "t:" opt; do
+while getopts "t:a:" opt; do
   case ${opt} in
     t )
       TERM_TYPE=$OPTARG
+      ;;
+    a )
+      ASP_BIN=$OPTARG
       ;;
     * )
       usage
@@ -38,21 +49,10 @@ PIDS=()
 kill_background_processes() {
     echo -e "\nKilling background processes...\n"
     kill ${PIDS[@]} || true
-    # for pid in ${PIDS[@]}; do
-    #   echo "Killing process with PID: $pid"
-    #   if kill $pid; then
-    #       echo "Killed process with PID: $pid"
-    #   else
-    #       echo "Failed to kill process with PID: $pid"
-    #   fi
-    # done
 }
 
 # Trap to ensure background processes are killed on script exit
 trap kill_background_processes EXIT
-
-
-TESTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Common Variables
 IP=localhost
@@ -63,7 +63,8 @@ AM_EXEC=./bin/attestation_manager
 
 if [ -z ${ASP_BIN+x} ]; then
   echo "Variable 'ASP_BIN' is not set" 
-  echo "Run: 'export ASP_BIN=<path-to-asps>'"
+  echo "Run: 'export ASP_BIN=<path-to-asps>' or"
+  usage
   exit 1
 fi
 
@@ -82,17 +83,11 @@ TERM_FILE="$GENERATED/$TERM_TYPE.json"
 rm -rf $GENERATED
 mkdir -p $GENERATED
 
-if [[ "$PWD" == */am-cakeml/tests ]]; then
-  repoRoot=$(dirname "$PWD")
+if [[ "$REPO_ROOT" == */am-cakeml ]]; then
   # Move to build folder
-  mkdir -p $repoRoot/build
-  cd $repoRoot/build
-  cmake ..
-
-  # Make targets
-  make term_to_json
-  make manifest_generator
-  make attestation_manager
+  mkdir -p $REPO_ROOT/build
+  cd $REPO_ROOT/build
+  ls -al
 
   # Generate the terms file
   $TERM_GEN -t $TERM_TYPE -o $TERM_FILE
@@ -118,6 +113,6 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   # We need this to be the last line so that the exit code is whether or not we found success
   grep "\"SUCCESS\":true" $GENERATED/output.out
 else
-  echo "You are not in the 'am-cakeml/tests' directory"
+  echo "You are in $PWD, with the root set as $REPO_ROOT, but youre root should be 'am-cakeml'"
 fi
 

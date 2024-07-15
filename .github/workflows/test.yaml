@@ -1,0 +1,71 @@
+name: Test
+
+# NOTE: This workflow requires a build to have been run first
+
+on:
+  workflow_call:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    env:
+      ASP_LIB_BRANCH: "main"
+      ASP_LIB_REPO_PATH: "ku-sldg/asp-libs"
+      ASP_LIB_PATH: ~/asp-libs
+
+    steps:
+############### Setup and Caching for ASP_Libs
+      - name: Get latest commit hash of Asp libs repo
+        id: get_commit_hash
+        run: |
+          response=$(curl -s "https://api.github.com/repos/${{ env.ASP_LIB_REPO_PATH}}/commits/${{ env.ASP_LIB_BRANCH }}")
+          commit_hash=$(echo "$response" | jq -r '.sha')
+          echo "COMMIT_HASH=$commit_hash" >> $GITHUB_ENV      
+
+      - name: Restore ASP Lib Cache
+        id: asp-lib-cache-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ env.ASP_LIB_PATH }}
+          key: ${{ runner.OS }}-ASP-LIBS-${{ env.COMMIT_HASH }}
+      
+      - name: Checkout and build ASP Libs
+        if: steps.asp-lib-cache-restore.outputs.cache-hit != 'true'
+        run: |
+          rm -rf ${{ env.ASP_LIB_PATH }}
+          cd ~
+          git clone https://github.com/${{ env.ASP_LIB_REPO_PATH }}.git
+          cd ${{ env.ASP_LIB_PATH }}
+          git switch ${{ env.ASP_LIB_BRANCH }}
+          make
+      
+      - name: ASP Lib Cache Save
+        id: asp-lib-cache-install
+        if: steps.asp-lib-cache-restore.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.ASP_LIB_PATH }}
+          key: ${{ runner.OS }}-ASP-LIBS-${{ env.COMMIT_HASH }}
+###############
+
+############### Pull down built binaries and run tests
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download Binaries
+        uses: actions/download-artifact@v4
+        with:
+          name: binaries
+          path: ${{ github.workspace }}/build/
+
+      - name: Extract Binaries
+        run: |
+          cd ${{ github.workspace }}/build
+          tar -xvf bin.tar 
+      
+      - name: Run Tests
+        run: |
+          cd ${{ github.workspace }}/tests
+          export ASP_BIN=${{ env.ASP_LIB_PATH }}/bin
+          make ci_test
