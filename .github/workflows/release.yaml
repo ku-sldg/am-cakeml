@@ -62,7 +62,7 @@ jobs:
           fail_on_unmatched_files: true
           prerelease: ${{ inputs.prerelease }}
           draft: ${{ inputs.draft }}
-          tag: refs/tags/${{ inputs.tag_string }}
+          tag_name: refs/tags/${{ inputs.tag_string }}
           generate_release_notes: true
           name: ${{ github.ref_name }} Release
 
