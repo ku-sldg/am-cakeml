@@ -9,6 +9,7 @@ on:
       - master
   schedule:
     - cron: '0 0 * * 0' # Running at midnight every Sunday (to preserve caches mostly)
+  workflow_call:
 
 jobs:
   build:
