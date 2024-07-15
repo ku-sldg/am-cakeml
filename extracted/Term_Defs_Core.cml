@@ -1,73 +1,32 @@
 type coq_Plc = coq_ID_Type
 
-(** val coq_Serializable_Plc : coq_Plc coq_Serializable **)
-
-val coq_Serializable_Plc : coq_Plc coq_Serializable =
-  Build_Serializable
-    (let val Build_Serializable to_string _ = coq_Serializable_ID_Type in
-     to_string end)
-    (let val Build_Serializable _ from_string = coq_Serializable_ID_Type in
-     from_string end)
-
 type coq_N_ID = nat
 
 type coq_Event_ID = nat
 
 type coq_ASP_ID = coq_ID_Type
 
-(** val coq_Serializable_ASP_ID : coq_ASP_ID coq_Serializable **)
-
-val coq_Serializable_ASP_ID : coq_ASP_ID coq_Serializable =
-  Build_Serializable
-    (let val Build_Serializable to_string _ = coq_Serializable_Plc in
-     to_string end)
-    (let val Build_Serializable _ from_string = coq_Serializable_Plc in
-     from_string end)
-
 type coq_TARG_ID = coq_ID_Type
 
-(** val coq_Serializable_TARG_ID : coq_TARG_ID coq_Serializable **)
-
-val coq_Serializable_TARG_ID : coq_TARG_ID coq_Serializable =
-  Build_Serializable
-    (let val Build_Serializable to_string _ = coq_Serializable_ASP_ID in
-     to_string end)
-    (let val Build_Serializable _ from_string = coq_Serializable_ASP_ID in
-     from_string end)
-
 type coq_ASP_ARGS = (string, string) coq_MapC
-
-(** val coq_Jsonifiable_ASP_ARGS : coq_ASP_ARGS coq_Jsonifiable **)
-
-val coq_Jsonifiable_ASP_ARGS : coq_ASP_ARGS coq_Jsonifiable =
-  Build_Jsonifiable
-    (let val Build_Jsonifiable to_JSON _ =
-       jsonifiable_map_serial_serial coq_Serializable_TARG_ID
-         coq_Eq_Class_ID_Type coq_Serializable_TARG_ID
-     in
-     to_JSON end)
-    (let val Build_Jsonifiable _ from_JSON =
-       jsonifiable_map_serial_serial coq_Serializable_TARG_ID
-         coq_Eq_Class_ID_Type coq_Serializable_TARG_ID
-     in
-     from_JSON end)
 
 datatype coq_ASP_PARAMS =
   Coq_asp_paramsC coq_ASP_ID coq_ASP_ARGS coq_Plc coq_TARG_ID
 
-(** val coq_Jsonifiable_ASP_Params : coq_ASP_PARAMS coq_Jsonifiable **)
+(** val coq_Jsonifiable_ASP_Params :
+    coq_ASP_ARGS coq_Jsonifiable -> coq_ASP_PARAMS coq_Jsonifiable **)
 
-val coq_Jsonifiable_ASP_Params : coq_ASP_PARAMS coq_Jsonifiable =
+fun coq_Jsonifiable_ASP_Params h =
   Build_Jsonifiable (fn asp_params =>
     let val Coq_asp_paramsC asp_id args plc targ_id = asp_params in
     JSON_Object (("ASP_ID", (InJSON_String
-    (let val Build_Serializable to_string _ = coq_Serializable_TARG_ID in
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_ID_Type in
      to_string asp_id end))) :: (("ASP_ARGS", (InJSON_Object
-    (let val Build_Jsonifiable to_JSON _ = coq_Jsonifiable_ASP_ARGS in
-     to_JSON args end))) :: (("ASP_PLC", (InJSON_String
-    (let val Build_Serializable to_string _ = coq_Serializable_TARG_ID in
+    (let val Build_Jsonifiable to_JSON _ = h in to_JSON args end))) :: (("ASP_PLC",
+    (InJSON_String
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_ID_Type in
      to_string plc end))) :: (("ASP_TARG_ID", (InJSON_String
-    (let val Build_Serializable to_string _ = coq_Serializable_TARG_ID in
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_ID_Type in
      to_string targ_id end))) :: [])))) end) (fn js =>
     case coq_JSON_get_string "ASP_ID" js of
       Coq_errC _ => Coq_errC "Invalid ASP_PARAMS JSON"
@@ -81,28 +40,26 @@ val coq_Jsonifiable_ASP_Params : coq_ASP_PARAMS coq_Jsonifiable =
             (case coq_JSON_get_string "ASP_TARG_ID" js of
                Coq_errC _ => Coq_errC "Invalid ASP_PARAMS JSON"
              | Coq_resultC targ_id =>
-               (case let val Build_Serializable _ from_string =
-                       coq_Serializable_TARG_ID
+               (case let val Build_Stringifiable _ from_string =
+                       coq_Stringifiable_ID_Type
                      in
                      from_string asp_id end of
                   Coq_errC _ => Coq_errC "Parsing ASP_PARAMS not successful"
                 | Coq_resultC asp_id0 =>
-                  (case let val Build_Jsonifiable _ from_JSON =
-                          coq_Jsonifiable_ASP_ARGS
-                        in
+                  (case let val Build_Jsonifiable _ from_JSON = h in
                         from_JSON args end of
                      Coq_errC _ =>
                      Coq_errC "Parsing ASP_PARAMS not successful"
                    | Coq_resultC args0 =>
-                     (case let val Build_Serializable _ from_string =
-                             coq_Serializable_TARG_ID
+                     (case let val Build_Stringifiable _ from_string =
+                             coq_Stringifiable_ID_Type
                            in
                            from_string plc end of
                         Coq_errC _ =>
                         Coq_errC "Parsing ASP_PARAMS not successful"
                       | Coq_resultC plc0 =>
-                        (case let val Build_Serializable _ from_string =
-                                coq_Serializable_TARG_ID
+                        (case let val Build_Stringifiable _ from_string =
+                                coq_Stringifiable_ID_Type
                               in
                               from_string targ_id end of
                            Coq_errC _ =>
@@ -128,7 +85,7 @@ val coq_Jsonifiable_FWD : coq_FWD coq_Jsonifiable =
     | EXTD n =>
       JSON_Object (("FWD_CONSTRUCTOR", (InJSON_String "EXTD")) :: (("EXTD_N",
         (InJSON_String
-        (let val Build_Serializable to_string _ = coq_Serializable_nat in
+        (let val Build_Stringifiable to_string _ = coq_Stringifiable_nat in
          to_string n end))) :: []))
     | KILL => JSON_Object (("FWD_CONSTRUCTOR", (InJSON_String "KILL")) :: [])
     | KEEP => JSON_Object (("FWD_CONSTRUCTOR", (InJSON_String "KEEP")) :: []))
@@ -153,8 +110,8 @@ val coq_Jsonifiable_FWD : coq_FWD coq_Jsonifiable =
                      (case coq_JSON_get_string "EXTD_N" js of
                         Coq_errC _ => Coq_errC "Parsing EXTD not successful"
                       | Coq_resultC n_str =>
-                        (case let val Build_Serializable _ from_string =
-                                coq_Serializable_nat
+                        (case let val Build_Stringifiable _ from_string =
+                                coq_Stringifiable_nat
                               in
                               from_string n_str end of
                            Coq_errC e => Coq_errC e
@@ -174,16 +131,20 @@ fun coq_Evidence_to_JSON e = case e of
 | Coq_nn n =>
   JSON_Object (("EVIDENCE_CONSTRUCTOR", (InJSON_String "nn")) :: (("N_ID",
     (InJSON_String
-    (let val Build_Serializable to_string _ = coq_Serializable_nat in
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_nat in
      to_string n end))) :: []))
 | Coq_uu plc fwd ps e' =>
   JSON_Object (("EVIDENCE_CONSTRUCTOR", (InJSON_String "uu")) :: (("PLC",
     (InJSON_String
-    (let val Build_Serializable to_string _ = coq_Serializable_TARG_ID in
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_ID_Type in
      to_string plc end))) :: (("FWD", (InJSON_Object
     (let val Build_Jsonifiable to_JSON _ = coq_Jsonifiable_FWD in
      to_JSON fwd end))) :: (("ASP_PARAMS", (InJSON_Object
-    (let val Build_Jsonifiable to_JSON _ = coq_Jsonifiable_ASP_Params in
+    (let val Build_Jsonifiable to_JSON _ =
+       coq_Jsonifiable_ASP_Params
+         (jsonifiable_map_serial_serial coq_Stringifiable_ID_Type
+           coq_Eq_Class_ID_Type coq_Stringifiable_ID_Type)
+     in
      to_JSON ps end))) :: (("EVIDENCE", (InJSON_Object
     (coq_Evidence_to_JSON e'))) :: [])))))
 | Coq_ss e1 e2 =>
@@ -207,8 +168,8 @@ fun coq_Evidence_from_JSON js =
           (case coq_JSON_get_string "N_ID" js of
              Coq_errC _ => Coq_errC "Parsing nn not successful"
            | Coq_resultC nVal =>
-             (case let val Build_Serializable _ from_string =
-                     coq_Serializable_nat
+             (case let val Build_Stringifiable _ from_string =
+                     coq_Stringifiable_nat
                    in
                    from_string nVal end of
                 Coq_errC e => Coq_errC e
@@ -247,9 +208,9 @@ fun coq_Evidence_from_JSON js =
                                         InJSON_Object ev' =>
                                         (case l3 of
                                            [] =>
-                                           (case let val Build_Serializable _
+                                           (case let val Build_Stringifiable _
                                                    from_string =
-                                                   coq_Serializable_TARG_ID
+                                                   coq_Stringifiable_ID_Type
                                                  in
                                                  from_string plc end of
                                               Coq_errC _ =>
@@ -268,6 +229,10 @@ fun coq_Evidence_from_JSON js =
                                                  (case let val Build_Jsonifiable _
                                                          from_JSON =
                                                          coq_Jsonifiable_ASP_Params
+                                                           (jsonifiable_map_serial_serial
+                                                             coq_Stringifiable_ID_Type
+                                                             coq_Eq_Class_ID_Type
+                                                             coq_Stringifiable_ID_Type)
                                                        in
                                                        from_JSON asp_par end of
                                                     Coq_errC _ =>
@@ -335,12 +300,12 @@ datatype coq_SP =
   ALL 
 | NONE 
 
-(** val coq_Serializable_SP : coq_SP coq_Serializable **)
+(** val coq_Stringifiable_SP : coq_SP coq_Stringifiable **)
 
-val coq_Serializable_SP : coq_SP coq_Serializable =
-  Build_Serializable (fn sp => case sp of
-                                 ALL => "ALL"
-                               | NONE => "NONE") (fn s =>
+val coq_Stringifiable_SP : coq_SP coq_Stringifiable =
+  Build_Stringifiable (fn sp => case sp of
+                                  ALL => "ALL"
+                                | NONE => "NONE") (fn s =>
     case (op=) s "ALL" of
       True => Coq_resultC ALL
     | False =>
@@ -366,18 +331,23 @@ val coq_Jsonifiable_ASP : coq_ASP coq_Jsonifiable =
     | ASPC sp fwd ps =>
       JSON_Object (("ASP_CONSTRUCTOR", (InJSON_String "ASPC")) :: (("ASP_SP",
         (InJSON_String
-        (let val Build_Serializable to_string _ = coq_Serializable_SP in
+        (let val Build_Stringifiable to_string _ = coq_Stringifiable_SP in
          to_string sp end))) :: (("ASP_FWD", (InJSON_Object
         (let val Build_Jsonifiable to_JSON _ = coq_Jsonifiable_FWD in
          to_JSON fwd end))) :: (("ASP_PARAMS", (InJSON_Object
-        (let val Build_Jsonifiable to_JSON _ = coq_Jsonifiable_ASP_Params in
+        (let val Build_Jsonifiable to_JSON _ =
+           coq_Jsonifiable_ASP_Params
+             (jsonifiable_map_serial_serial coq_Stringifiable_ID_Type
+               coq_Eq_Class_ID_Type coq_Stringifiable_ID_Type)
+         in
          to_JSON ps end))) :: []))))
     | SIG => JSON_Object (("ASP_CONSTRUCTOR", (InJSON_String "SIG")) :: [])
     | HSH => JSON_Object (("ASP_CONSTRUCTOR", (InJSON_String "HSH")) :: [])
     | ENC q =>
       JSON_Object (("ASP_CONSTRUCTOR", (InJSON_String "ENC")) :: (("ENC_PLC",
         (InJSON_String
-        (let val Build_Serializable to_string _ = coq_Serializable_TARG_ID in
+        (let val Build_Stringifiable to_string _ = coq_Stringifiable_ID_Type
+         in
          to_string q end))) :: []))) (fn js =>
     case coq_JSON_get_string "ASP_CONSTRUCTOR" js of
       Coq_errC _ => Coq_errC "Invalid JSON ASP Constructor Name"
@@ -399,8 +369,8 @@ val coq_Jsonifiable_ASP : coq_ASP coq_Jsonifiable =
                      (case coq_JSON_get_Object "ASP_PARAMS" js of
                         Coq_errC _ => Coq_errC "Parsing ASPC not successful"
                       | Coq_resultC ps =>
-                        (case let val Build_Serializable _ from_string =
-                                coq_Serializable_SP
+                        (case let val Build_Stringifiable _ from_string =
+                                coq_Stringifiable_SP
                               in
                               from_string sp end of
                            Coq_errC _ =>
@@ -415,6 +385,10 @@ val coq_Jsonifiable_ASP : coq_ASP coq_Jsonifiable =
                             | Coq_resultC fwd0 =>
                               (case let val Build_Jsonifiable _ from_JSON =
                                       coq_Jsonifiable_ASP_Params
+                                        (jsonifiable_map_serial_serial
+                                          coq_Stringifiable_ID_Type
+                                          coq_Eq_Class_ID_Type
+                                          coq_Stringifiable_ID_Type)
                                     in
                                     from_JSON ps end of
                                  Coq_errC _ =>
@@ -433,8 +407,8 @@ val coq_Jsonifiable_ASP : coq_ASP coq_Jsonifiable =
                         (case coq_JSON_get_string "ENC_PLC" js of
                            Coq_errC _ => Coq_errC "Parsing ENC not successful"
                          | Coq_resultC q =>
-                           (case let val Build_Serializable _ from_string =
-                                   coq_Serializable_TARG_ID
+                           (case let val Build_Stringifiable _ from_string =
+                                   coq_Stringifiable_ID_Type
                                  in
                                  from_string q end of
                               Coq_errC _ =>
@@ -451,9 +425,9 @@ val coq_Jsonifiable_Split : coq_Split coq_Jsonifiable =
   Build_Jsonifiable (fn pat =>
     let val (s1, s2) = pat in
     JSON_Object (("split1", (InJSON_String
-    (let val Build_Serializable to_string _ = coq_Serializable_SP in
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_SP in
      to_string s1 end))) :: (("split2", (InJSON_String
-    (let val Build_Serializable to_string _ = coq_Serializable_SP in
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_SP in
      to_string s2 end))) :: [])) end) (fn js =>
     case coq_JSON_get_string "split1" js of
       Coq_errC _ => Coq_errC "Invalid Split JSON"
@@ -461,13 +435,14 @@ val coq_Jsonifiable_Split : coq_Split coq_Jsonifiable =
       (case coq_JSON_get_string "split2" js of
          Coq_errC _ => Coq_errC "Invalid Split JSON"
        | Coq_resultC s2 =>
-         (case let val Build_Serializable _ from_string = coq_Serializable_SP
+         (case let val Build_Stringifiable _ from_string =
+                 coq_Stringifiable_SP
                in
                from_string s1 end of
             Coq_errC _ => Coq_errC "Parsing split not successful"
           | Coq_resultC s3 =>
-            (case let val Build_Serializable _ from_string =
-                    coq_Serializable_SP
+            (case let val Build_Stringifiable _ from_string =
+                    coq_Stringifiable_SP
                   in
                   from_string s2 end of
                Coq_errC _ => Coq_errC "Parsing split not successful"
@@ -491,7 +466,7 @@ fun coq_Term_to_JSON t = case t of
 | Coq_att p t1 =>
   JSON_Object (("TERM_CONSTRUCTOR", (InJSON_String "att")) :: (("TERM_BODY",
     (InJSON_Array ((InJSON_String
-    (let val Build_Serializable to_string _ = coq_Serializable_TARG_ID in
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_ID_Type in
      to_string p end)) :: ((InJSON_Object
     (coq_Term_to_JSON t1)) :: [])))) :: []))
 | Coq_lseq t1 t2 =>
@@ -563,9 +538,9 @@ fun coq_Term_from_JSON js =
                                   [] =>
                                   (case l0 of
                                      [] =>
-                                     (case let val Build_Serializable _
+                                     (case let val Build_Stringifiable _
                                              from_string =
-                                             coq_Serializable_TARG_ID
+                                             coq_Stringifiable_ID_Type
                                            in
                                            from_string plc end of
                                         Coq_errC _ =>
@@ -850,7 +825,7 @@ type coq_RawEv = coq_BS list
 val coq_Jsonifiable_RawEv : coq_RawEv coq_Jsonifiable =
   Build_Jsonifiable (fn ev => JSON_Object (("RawEv", (InJSON_Array
     (map (fn bs => InJSON_String
-      (let val Build_Serializable to_string _ = coq_Serializable_BS in
+      (let val Build_Stringifiable to_string _ = coq_Stringifiable_BS in
        to_string bs end)) ev))) :: [])) (fn js =>
     case coq_JSON_get_Array "RawEv" js of
       Coq_errC e => Coq_errC e
@@ -858,7 +833,7 @@ val coq_Jsonifiable_RawEv : coq_RawEv coq_Jsonifiable =
       result_map (fn js'0 =>
         case js'0 of
           InJSON_String s =>
-          let val Build_Serializable _ from_string = coq_Serializable_BS in
+          let val Build_Stringifiable _ from_string = coq_Stringifiable_BS in
           from_string s end
         | _ => Coq_errC "Invalid RawEv JSON") js')
 
@@ -870,62 +845,64 @@ datatype coq_AppResultC =
 | Coq_eec_app coq_Plc coq_ASP_PARAMS coq_BS coq_AppResultC
 | Coq_ssc_app coq_AppResultC coq_AppResultC
 
-(** val coq_AppResultC_to_Json : coq_AppResultC -> coq_JSON **)
+(** val coq_AppResultC_to_Json :
+    coq_ASP_ARGS coq_Jsonifiable -> coq_RawEv coq_Jsonifiable ->
+    coq_AppResultC -> coq_JSON **)
 
-fun coq_AppResultC_to_Json a = case a of
+fun coq_AppResultC_to_Json h h0 a = case a of
   Coq_mtc_app =>
   JSON_Object (("AppResultC_CONSTRUCTOR", (InJSON_String "mtc_app")) :: [])
 | Coq_nnc_app n bs =>
   JSON_Object (("AppResultC_CONSTRUCTOR", (InJSON_String
     "nnc_app")) :: (("N_ID", (InJSON_String
-    (let val Build_Serializable to_string _ = coq_Serializable_nat in
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_nat in
      to_string n end))) :: (("BS", (InJSON_String
-    (let val Build_Serializable to_string _ = coq_Serializable_BS in
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_BS in
      to_string bs end))) :: [])))
 | Coq_ggc_app plc ps rawEv res =>
   JSON_Object (("AppResultC_CONSTRUCTOR", (InJSON_String
     "ggc_app")) :: (("PLC", (InJSON_String
-    (let val Build_Serializable to_string _ = coq_Serializable_TARG_ID in
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_ID_Type in
      to_string plc end))) :: (("ASP_PARAMS", (InJSON_Object
-    (let val Build_Jsonifiable to_JSON _ = coq_Jsonifiable_ASP_Params in
+    (let val Build_Jsonifiable to_JSON _ = coq_Jsonifiable_ASP_Params h in
      to_JSON ps end))) :: (("RawEv", (InJSON_Object
-    (let val Build_Jsonifiable to_JSON _ = coq_Jsonifiable_RawEv in
-     to_JSON rawEv end))) :: (("AppResultC", (InJSON_Object
-    (coq_AppResultC_to_Json res))) :: [])))))
+    (let val Build_Jsonifiable to_JSON _ = h0 in to_JSON rawEv end))) :: (("AppResultC",
+    (InJSON_Object (coq_AppResultC_to_Json h h0 res))) :: [])))))
 | Coq_hhc_app plc ps bs res =>
   JSON_Object (("AppResultC_CONSTRUCTOR", (InJSON_String
     "hhc_app")) :: (("PLC", (InJSON_String
-    (let val Build_Serializable to_string _ = coq_Serializable_TARG_ID in
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_ID_Type in
      to_string plc end))) :: (("ASP_PARAMS", (InJSON_Object
-    (let val Build_Jsonifiable to_JSON _ = coq_Jsonifiable_ASP_Params in
+    (let val Build_Jsonifiable to_JSON _ = coq_Jsonifiable_ASP_Params h in
      to_JSON ps end))) :: (("BS", (InJSON_String
-    (let val Build_Serializable to_string _ = coq_Serializable_BS in
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_BS in
      to_string bs end))) :: (("AppResultC", (InJSON_Object
-    (coq_AppResultC_to_Json res))) :: [])))))
+    (coq_AppResultC_to_Json h h0 res))) :: [])))))
 | Coq_eec_app plc ps bs res =>
   JSON_Object (("AppResultC_CONSTRUCTOR", (InJSON_String
     "eec_app")) :: (("PLC", (InJSON_String
-    (let val Build_Serializable to_string _ = coq_Serializable_TARG_ID in
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_ID_Type in
      to_string plc end))) :: (("ASP_PARAMS", (InJSON_Object
-    (let val Build_Jsonifiable to_JSON _ = coq_Jsonifiable_ASP_Params in
+    (let val Build_Jsonifiable to_JSON _ = coq_Jsonifiable_ASP_Params h in
      to_JSON ps end))) :: (("BS", (InJSON_String
-    (let val Build_Serializable to_string _ = coq_Serializable_BS in
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_BS in
      to_string bs end))) :: (("AppResultC", (InJSON_Object
-    (coq_AppResultC_to_Json res))) :: [])))))
+    (coq_AppResultC_to_Json h h0 res))) :: [])))))
 | Coq_ssc_app res1 res2 =>
   JSON_Object (("AppResultC_CONSTRUCTOR", (InJSON_String
     "ssc_app")) :: (("AppResultC1", (InJSON_Object
-    (coq_AppResultC_to_Json res1))) :: (("AppResultC2", (InJSON_Object
-    (coq_AppResultC_to_Json res2))) :: [])))
+    (coq_AppResultC_to_Json h h0 res1))) :: (("AppResultC2", (InJSON_Object
+    (coq_AppResultC_to_Json h h0 res2))) :: [])))
 
 (** val coq_AppResultC_from_JSON :
-    coq_JSON -> (coq_AppResultC, string) coq_ResultT **)
+    coq_ASP_ARGS coq_Jsonifiable -> coq_RawEv coq_Jsonifiable -> coq_JSON ->
+    (coq_AppResultC, string) coq_ResultT **)
 
-fun coq_AppResultC_from_JSON js =
+fun coq_AppResultC_from_JSON h h0 js =
   case coq_JSON_get_string "AppResultC_CONSTRUCTOR" js of
-    Coq_errC _ => Coq_errC "Invalid AppResultC JSON"
+    Coq_errC _ => Coq_errC "Invalid AppResultC JSON: No Constructor"
   | Coq_resultC cons_name =>
-    (case (op=) cons_name "mt_app" of
+    (case (op=) cons_name "mtc_app" of
        True => Coq_resultC Coq_mtc_app
      | False =>
        (case (op=) cons_name "nnc_app" of
@@ -948,15 +925,15 @@ fun coq_AppResultC_from_JSON js =
                          InJSON_String bs =>
                          (case l1 of
                             [] =>
-                            (case let val Build_Serializable _ from_string =
-                                    coq_Serializable_nat
+                            (case let val Build_Stringifiable _ from_string =
+                                    coq_Stringifiable_nat
                                   in
                                   from_string n end of
                                Coq_errC _ =>
                                Coq_errC "Parsing nnc_app not successful"
                              | Coq_resultC n0 =>
-                               (case let val Build_Serializable _
-                                       from_string = coq_Serializable_BS
+                               (case let val Build_Stringifiable _
+                                       from_string = coq_Stringifiable_BS
                                      in
                                      from_string bs end of
                                   Coq_errC _ =>
@@ -1001,9 +978,9 @@ fun coq_AppResultC_from_JSON js =
                                         InJSON_Object res =>
                                         (case l3 of
                                            [] =>
-                                           (case let val Build_Serializable _
+                                           (case let val Build_Stringifiable _
                                                    from_string =
-                                                   coq_Serializable_TARG_ID
+                                                   coq_Stringifiable_ID_Type
                                                  in
                                                  from_string plc end of
                                               Coq_errC _ =>
@@ -1013,6 +990,7 @@ fun coq_AppResultC_from_JSON js =
                                               (case let val Build_Jsonifiable _
                                                       from_JSON =
                                                       coq_Jsonifiable_ASP_Params
+                                                        h
                                                     in
                                                     from_JSON ps end of
                                                  Coq_errC _ =>
@@ -1020,8 +998,7 @@ fun coq_AppResultC_from_JSON js =
                                                    "Parsing ggc_app not successful"
                                                | Coq_resultC ps0 =>
                                                  (case let val Build_Jsonifiable _
-                                                         from_JSON =
-                                                         coq_Jsonifiable_RawEv
+                                                         from_JSON = h0
                                                        in
                                                        from_JSON rawEv end of
                                                     Coq_errC _ =>
@@ -1029,7 +1006,7 @@ fun coq_AppResultC_from_JSON js =
                                                       "Parsing ggc_app not successful"
                                                   | Coq_resultC rawEv0 =>
                                                     (case coq_AppResultC_from_JSON
-                                                            res of
+                                                            h h0 res of
                                                        Coq_errC _ =>
                                                        Coq_errC
                                                          "Parsing ggc_app not successful"
@@ -1083,9 +1060,9 @@ fun coq_AppResultC_from_JSON js =
                                            InJSON_Object res =>
                                            (case l3 of
                                               [] =>
-                                              (case let val Build_Serializable _
+                                              (case let val Build_Stringifiable _
                                                       from_string =
-                                                      coq_Serializable_TARG_ID
+                                                      coq_Stringifiable_ID_Type
                                                     in
                                                     from_string plc end of
                                                  Coq_errC _ =>
@@ -1095,15 +1072,16 @@ fun coq_AppResultC_from_JSON js =
                                                  (case let val Build_Jsonifiable _
                                                          from_JSON =
                                                          coq_Jsonifiable_ASP_Params
+                                                           h
                                                        in
                                                        from_JSON ps end of
                                                     Coq_errC _ =>
                                                     Coq_errC
                                                       "Parsing hhc_app not successful"
                                                   | Coq_resultC ps0 =>
-                                                    (case let val Build_Serializable _
+                                                    (case let val Build_Stringifiable _
                                                             from_string =
-                                                            coq_Serializable_BS
+                                                            coq_Stringifiable_BS
                                                           in
                                                           from_string bs end of
                                                        Coq_errC _ =>
@@ -1111,7 +1089,7 @@ fun coq_AppResultC_from_JSON js =
                                                          "Parsing hhc_app not successful"
                                                      | Coq_resultC bs0 =>
                                                        (case coq_AppResultC_from_JSON
-                                                               res of
+                                                               h h0 res of
                                                           Coq_errC _ =>
                                                           Coq_errC
                                                             "Parsing hhc_app not successful"
@@ -1165,9 +1143,9 @@ fun coq_AppResultC_from_JSON js =
                                               InJSON_Object res =>
                                               (case l3 of
                                                  [] =>
-                                                 (case let val Build_Serializable _
+                                                 (case let val Build_Stringifiable _
                                                          from_string =
-                                                         coq_Serializable_TARG_ID
+                                                         coq_Stringifiable_ID_Type
                                                        in
                                                        from_string plc end of
                                                     Coq_errC _ =>
@@ -1177,15 +1155,16 @@ fun coq_AppResultC_from_JSON js =
                                                     (case let val Build_Jsonifiable _
                                                             from_JSON =
                                                             coq_Jsonifiable_ASP_Params
+                                                              h
                                                           in
                                                           from_JSON ps end of
                                                        Coq_errC _ =>
                                                        Coq_errC
                                                          "Parsing eec_app not successful"
                                                      | Coq_resultC ps0 =>
-                                                       (case let val Build_Serializable _
+                                                       (case let val Build_Stringifiable _
                                                                from_string =
-                                                               coq_Serializable_BS
+                                                               coq_Stringifiable_BS
                                                              in
                                                              from_string bs end of
                                                           Coq_errC _ =>
@@ -1193,7 +1172,7 @@ fun coq_AppResultC_from_JSON js =
                                                             "Parsing eec_app not successful"
                                                         | Coq_resultC bs0 =>
                                                           (case coq_AppResultC_from_JSON
-                                                                  res of
+                                                                  h h0 res of
                                                              Coq_errC _ =>
                                                              Coq_errC
                                                                "Parsing eec_app not successful"
@@ -1236,12 +1215,14 @@ fun coq_AppResultC_from_JSON js =
                                      InJSON_Object res2 =>
                                      (case l1 of
                                         [] =>
-                                        (case coq_AppResultC_from_JSON res1 of
+                                        (case coq_AppResultC_from_JSON h h0
+                                                res1 of
                                            Coq_errC _ =>
                                            Coq_errC
                                              "Parsing ssc_app not successful"
                                          | Coq_resultC res3 =>
-                                           (case coq_AppResultC_from_JSON res2 of
+                                           (case coq_AppResultC_from_JSON h
+                                                   h0 res2 of
                                               Coq_errC _ =>
                                               Coq_errC
                                                 "Parsing ssc_app not successful"
@@ -1256,7 +1237,9 @@ fun coq_AppResultC_from_JSON js =
                              | _ => Coq_errC "Parsing ssc_app not successful") end)) end
                     | False => Coq_errC "Invalid AppResultC JSON"))))))
 
-(** val coq_Jsonifiable_AppResultC : coq_AppResultC coq_Jsonifiable **)
+(** val coq_Jsonifiable_AppResultC :
+    coq_ASP_ARGS coq_Jsonifiable -> coq_AppResultC coq_Jsonifiable **)
 
-val coq_Jsonifiable_AppResultC : coq_AppResultC coq_Jsonifiable =
-  Build_Jsonifiable coq_AppResultC_to_Json coq_AppResultC_from_JSON
+fun coq_Jsonifiable_AppResultC h =
+  Build_Jsonifiable (coq_AppResultC_to_Json h coq_Jsonifiable_RawEv)
+    (coq_AppResultC_from_JSON h coq_Jsonifiable_RawEv)

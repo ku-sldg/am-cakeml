@@ -21,10 +21,10 @@ fun nat_from_int_result i =
 
 val natToString = Int.toString o natToInt
 
-(** val coq_Serializable_nat : nat coq_Serializable **)
+(** val coq_Stringifiable_nat : nat coq_Stringifiable **)
 
-val coq_Serializable_nat : nat coq_Serializable =
-  Build_Serializable 
+val coq_Stringifiable_nat : nat coq_Stringifiable =
+  Build_Stringifiable 
     natToString 
     (fn s => 
       case (Int.fromString s) of

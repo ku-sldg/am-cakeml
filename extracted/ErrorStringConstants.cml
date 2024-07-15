@@ -73,11 +73,6 @@ val errStr_run_cvm_at_error_dynamic : string =
 val errStr_run_cvm_at_error_static : string =
   "errStr_run_cvm_at_error_static"
 
-(** val errStr_json_to_map : string **)
-
-val errStr_json_to_map : string =
-  "errStr_json_to_map"
-
 (** val errStr_json_to_pair : string **)
 
 val errStr_json_to_pair : string =

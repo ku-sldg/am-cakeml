@@ -1,4 +1,0 @@
-(** val coq_Serializable_nat : nat coq_Serializable **)
-
-val coq_Serializable_nat : nat coq_Serializable =
-  failwith "AXIOM TO BE REALIZED"

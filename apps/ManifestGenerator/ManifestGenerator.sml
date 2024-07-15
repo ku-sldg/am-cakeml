@@ -15,7 +15,8 @@ structure ManGen_CLI_Utils = struct
         case (cakeML_JSON_to_coq_JSON js) of
           Coq_errC c => Coq_errC c
         | Coq_resultC js =>
-          let val (Build_Jsonifiable _ from_JSON) = coq_Jsonifiable_Evidence_Plc_list
+          let val (Build_Jsonifiable _ from_JSON) = (coq_Jsonifiable_Evidence_Plc_list coq_Jsonifiable_Evidence)
+          (* NOTE: We have to tell it the jsonifiable class for evidence in case there would be multiple ways to jsonify evidence *)
           in
             from_JSON js
           end
@@ -33,7 +34,8 @@ structure ManGen_CLI_Utils = struct
         case (cakeML_JSON_to_coq_JSON js) of
           Coq_errC c => Coq_errC c
         | Coq_resultC js =>
-          let val (Build_Jsonifiable _ from_JSON) = coq_Jsonifiable_Term_Plc_list
+          let val (Build_Jsonifiable _ from_JSON) = (coq_Jsonifiable_Term_Plc_list coq_Jsonifiable_Term)
+          (* NOTE: Same as above for evidence, we have to tell it the jsonifiable class for Terms in case there would be multiple ways *)
           in
             from_JSON js
           end

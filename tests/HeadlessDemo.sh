@@ -7,6 +7,8 @@ usage() {
   exit 1
 }
 
+TERM_TYPE=""
+
 # Parse command-line arguments
 while getopts "t:" opt; do
   case ${opt} in

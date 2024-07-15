@@ -1,12 +1,12 @@
 type coq_ID_Type = string
 
-(** val coq_Serializable_ID_Type : coq_ID_Type coq_Serializable **)
+(** val coq_Stringifiable_ID_Type : coq_ID_Type coq_Stringifiable **)
 
-val coq_Serializable_ID_Type : coq_ID_Type coq_Serializable =
-  Build_Serializable
-    (let val Build_Serializable to_string _ = coq_Serializable_string in
+val coq_Stringifiable_ID_Type : coq_ID_Type coq_Stringifiable =
+  Build_Stringifiable
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_string in
      to_string end)
-    (let val Build_Serializable _ from_string = coq_Serializable_string in
+    (let val Build_Stringifiable _ from_string = coq_Stringifiable_string in
      from_string end)
 
 (** val coq_Eq_Class_ID_Type : coq_ID_Type coq_EqClass **)

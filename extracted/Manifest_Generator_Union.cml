@@ -29,22 +29,23 @@ fun mangen_plcEvidence_list_union ls =
 
 type coq_Evidence_Plc_list = (coq_Evidence * coq_Plc) list
 
-(** val coq_Evidence_Plc_list_to_JSON : coq_Evidence_Plc_list -> coq_JSON **)
+(** val coq_Evidence_Plc_list_to_JSON :
+    coq_Evidence coq_Jsonifiable -> coq_Evidence_Plc_list -> coq_JSON **)
 
-fun coq_Evidence_Plc_list_to_JSON ls =
+fun coq_Evidence_Plc_list_to_JSON h ls =
   JSON_Object (("Evidence_Plc_list", (InJSON_Array
     (map (fn pat =>
       let val (et, p) = pat in
       InJSON_Array ((InJSON_Object
-      (let val Build_Jsonifiable to_JSON _ = coq_Jsonifiable_Evidence in
-       to_JSON et end)) :: ((InJSON_String
-      (let val Build_Serializable to_string _ = coq_Serializable_TARG_ID in
+      (let val Build_Jsonifiable to_JSON _ = h in to_JSON et end)) :: ((InJSON_String
+      (let val Build_Stringifiable to_string _ = coq_Stringifiable_ID_Type in
        to_string p end)) :: [])) end) ls))) :: [])
 
 (** val coq_Evidence_Plc_list_from_JSON :
-    coq_JSON -> (coq_Evidence_Plc_list, string) coq_ResultT **)
+    coq_Evidence coq_Jsonifiable -> coq_JSON -> (coq_Evidence_Plc_list,
+    string) coq_ResultT **)
 
-fun coq_Evidence_Plc_list_from_JSON js =
+fun coq_Evidence_Plc_list_from_JSON h js =
   case coq_JSON_get_Array "Evidence_Plc_list" js of
     Coq_errC e => Coq_errC e
   | Coq_resultC jsArr =>
@@ -66,15 +67,13 @@ fun coq_Evidence_Plc_list_from_JSON js =
                   | InJSON_String jsP =>
                     (case l1 of
                        [] =>
-                       (case let val Build_Jsonifiable _ from_JSON =
-                               coq_Jsonifiable_Evidence
-                             in
+                       (case let val Build_Jsonifiable _ from_JSON = h in
                              from_JSON jsEt end of
                           Coq_errC _ =>
                           Coq_errC "Error in parsing Evidence_Plc_list"
                         | Coq_resultC et =>
-                          (case let val Build_Serializable _ from_string =
-                                  coq_Serializable_TARG_ID
+                          (case let val Build_Stringifiable _ from_string =
+                                  coq_Stringifiable_ID_Type
                                 in
                                 from_string jsP end of
                              Coq_errC _ =>
@@ -86,30 +85,31 @@ fun coq_Evidence_Plc_list_from_JSON js =
       | _ => Coq_errC "Not a pair") jsArr
 
 (** val coq_Jsonifiable_Evidence_Plc_list :
-    coq_Evidence_Plc_list coq_Jsonifiable **)
+    coq_Evidence coq_Jsonifiable -> coq_Evidence_Plc_list coq_Jsonifiable **)
 
-val coq_Jsonifiable_Evidence_Plc_list : coq_Evidence_Plc_list coq_Jsonifiable =
-  Build_Jsonifiable coq_Evidence_Plc_list_to_JSON
-    coq_Evidence_Plc_list_from_JSON
+fun coq_Jsonifiable_Evidence_Plc_list h =
+  Build_Jsonifiable (coq_Evidence_Plc_list_to_JSON h)
+    (coq_Evidence_Plc_list_from_JSON h)
 
 type coq_Term_Plc_list = (coq_Term * coq_Plc) list
 
-(** val coq_Term_Plc_list_to_JSON : coq_Term_Plc_list -> coq_JSON **)
+(** val coq_Term_Plc_list_to_JSON :
+    coq_Term coq_Jsonifiable -> coq_Term_Plc_list -> coq_JSON **)
 
-fun coq_Term_Plc_list_to_JSON ls =
+fun coq_Term_Plc_list_to_JSON h ls =
   JSON_Object (("Term_Plc_list", (InJSON_Array
     (map (fn pat =>
       let val (et, p) = pat in
       InJSON_Array ((InJSON_Object
-      (let val Build_Jsonifiable to_JSON _ = coq_Jsonifiable_Term in
-       to_JSON et end)) :: ((InJSON_String
-      (let val Build_Serializable to_string _ = coq_Serializable_TARG_ID in
+      (let val Build_Jsonifiable to_JSON _ = h in to_JSON et end)) :: ((InJSON_String
+      (let val Build_Stringifiable to_string _ = coq_Stringifiable_ID_Type in
        to_string p end)) :: [])) end) ls))) :: [])
 
 (** val coq_Term_Plc_list_from_JSON :
-    coq_JSON -> (coq_Term_Plc_list, string) coq_ResultT **)
+    coq_Term coq_Jsonifiable -> coq_JSON -> (coq_Term_Plc_list, string)
+    coq_ResultT **)
 
-fun coq_Term_Plc_list_from_JSON js =
+fun coq_Term_Plc_list_from_JSON h js =
   case coq_JSON_get_Array "Term_Plc_list" js of
     Coq_errC e => Coq_errC e
   | Coq_resultC jsArr =>
@@ -131,15 +131,13 @@ fun coq_Term_Plc_list_from_JSON js =
                   | InJSON_String jsP =>
                     (case l1 of
                        [] =>
-                       (case let val Build_Jsonifiable _ from_JSON =
-                               coq_Jsonifiable_Term
-                             in
+                       (case let val Build_Jsonifiable _ from_JSON = h in
                              from_JSON jsTerm end of
                           Coq_errC _ =>
                           Coq_errC "Error in parsing Term_Plc_list"
                         | Coq_resultC et =>
-                          (case let val Build_Serializable _ from_string =
-                                  coq_Serializable_TARG_ID
+                          (case let val Build_Stringifiable _ from_string =
+                                  coq_Stringifiable_ID_Type
                                 in
                                 from_string jsP end of
                              Coq_errC _ =>
@@ -150,10 +148,12 @@ fun coq_Term_Plc_list_from_JSON js =
             | _ => Coq_errC "Not a pair"))
       | _ => Coq_errC "Not a pair") jsArr
 
-(** val coq_Jsonifiable_Term_Plc_list : coq_Term_Plc_list coq_Jsonifiable **)
+(** val coq_Jsonifiable_Term_Plc_list :
+    coq_Term coq_Jsonifiable -> coq_Term_Plc_list coq_Jsonifiable **)
 
-val coq_Jsonifiable_Term_Plc_list : coq_Term_Plc_list coq_Jsonifiable =
-  Build_Jsonifiable coq_Term_Plc_list_to_JSON coq_Term_Plc_list_from_JSON
+fun coq_Jsonifiable_Term_Plc_list h =
+  Build_Jsonifiable (coq_Term_Plc_list_to_JSON h)
+    (coq_Term_Plc_list_from_JSON h)
 
 (** val knowsof_myPlc_manifest_update_env' :
     (coq_Plc * coq_Manifest) -> coq_Plc * coq_Manifest **)
