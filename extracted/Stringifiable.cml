@@ -1,0 +1,7 @@
+datatype 'a coq_Stringifiable =
+  Build_Stringifiable (('a -> string)) ((string -> ('a, string) coq_ResultT))
+
+(** val coq_Stringifiable_string : string coq_Stringifiable **)
+
+val coq_Stringifiable_string : string coq_Stringifiable =
+  Build_Stringifiable (fn s => s) (fn s => Coq_resultC s)

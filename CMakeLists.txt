@@ -47,9 +47,9 @@ get_files(copland_am_src
 
     # A more faithful extraction of the Coq code following _CoqProject
     extracted/ResultT.cml
-    extracted/Serializable.cml
+    extracted/Stringifiable.cml
 
-    stubs/Serializable_Class_Admits.sml
+    stubs/Stringifiable_Class_Admits.sml
 
     extracted/EqClass.cml
     extracted/ID_Type.cml
