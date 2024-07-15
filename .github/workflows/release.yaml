@@ -1,8 +1,16 @@
 name: Make Release
 
 on:
-  workflow_call:
+  workflow_dispatch:
+    inputs:
+      tag_string:
+        description: 'Release version'
+        required: true
+        type: string
+        default: 'v*.*.*'
   push:
+    branches:
+      - master
     tags:
       - 'v*.*.*'
 
@@ -29,14 +37,29 @@ jobs:
           tar -xvf bin.tar
           rm bin.tar
 
+## Doing the complicated part of the release management
+########## If we a dispatch, then we checkout and create a new tag for the release
+      - name: Checkout code
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/checkout@v4
+
+      - name: Create a new tag
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          cd ${{ github.workspace }}
+          git tag -a ${{ inputs.tag_string }} -m "Release ${{ inputs.tag_string }}"
+          git push --tags
+
+########## Otherwise we are just building the release
       - name: Create Release
+        if: github.event_name == 'push'
         uses: softprops/action-gh-release@v2
         with:
           body: "Release of MAESTRO executables built for x64 Linux"
           files: bin/*
           fail_on_unmatched_files: true
           prerelease: false
-          draft: true
+          draft: false
           generate_release_notes: true
           name: ${{ github.ref_name }} Release
 
