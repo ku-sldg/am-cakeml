@@ -105,6 +105,9 @@ get_files(copland_am_src
     extracted/Appraisal_Defs.cml
     extracted/Impl_appraisal.cml
     extracted/AM_Json_Interfaces.cml
+    extracted/Flexible_Mechanisms_Vars.cml
+    extracted/Flexible_Mechanisms.cml
+    extracted/Client_AM.cml
     extracted/Server_AM.cml
     util/AM_CLI.sml
 )

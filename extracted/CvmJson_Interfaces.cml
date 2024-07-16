@@ -79,6 +79,26 @@ fun coq_JSON_to_ProtocolNegotiateResponse resp =
          from_JSON temp_term end) (fn term => Coq_resultC (Coq_mkPNResp
         temp_success term))))
 
+(** val coq_ProtocolAppraiseRequest_to_JSON :
+    coq_ProtocolAppraiseRequest -> coq_JSON **)
+
+fun coq_ProtocolAppraiseRequest_to_JSON req =
+  JSON_Object ((coq_STR_TYPE, (InJSON_String
+    coq_STR_REQUEST)) :: ((coq_STR_ACTION, (InJSON_String
+    coq_STR_APPRAISE)) :: ((coq_STR_TERM, (InJSON_Object
+    (let val Build_Jsonifiable to_JSON _ = coq_Jsonifiable_Term in
+     to_JSON (let val Coq_mkPAReq pareq_term _ _ _ = req in pareq_term end) end))) :: ((coq_STR_REQ_PLC,
+    (InJSON_String
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_ID_Type in
+     to_string (let val Coq_mkPAReq _ pareq_plc _ _ = req in pareq_plc end) end))) :: ((coq_STR_EVIDENCE,
+    (InJSON_Object
+    (let val Build_Jsonifiable to_JSON _ = coq_Jsonifiable_Evidence in
+     to_JSON
+       (let val Coq_mkPAReq _ _ pareq_evidence _ = req in pareq_evidence end) end))) :: ((coq_STR_RAWEV,
+    (InJSON_Object
+    (let val Build_Jsonifiable to_JSON _ = coq_Jsonifiable_RawEv in
+     to_JSON (let val Coq_mkPAReq _ _ _ pareq_ev = req in pareq_ev end) end))) :: []))))))
+
 (** val coq_JSON_to_ProtocolAppraiseRequest :
     coq_JSON -> (coq_ProtocolAppraiseRequest, string) coq_ResultT **)
 

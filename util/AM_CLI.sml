@@ -51,45 +51,54 @@ structure AM_CLI_Utils = struct
 
   (* Retrieves the manifest filename and private key (as strings)
     based upon Command Line arguments
-    : () -> (string, string) 
+    : () -> option (string, string, string, string) 
   *)
   fun retrieve_CLI_args _ =
     let val name = CommandLine.name ()
-        val usage = ("Usage: " ^ name ^ " -m <ManifestFile>.json -l <AmLibFile>.json -b <asp_bin_location> (-k <privateKeyFile>)\n\ne.g.\t" ^ name ^ " -m formMan.json -l amLib.json -b /opt/asps -k ~/.ssh/id_ed25519\n\n")
+        val usage = ("Usage: " ^ name ^ "-c | -m <ManifestFile>.json -l <AmLibFile>.json -b <asp_bin_location> (-k <privateKeyFile>)\n\ne.g.\t" ^ name ^ " -m formMan.json -l amLib.json -b /opt/asps -k ~/.ssh/id_ed25519\n\n")
         val argList = CommandLine.arguments ()
+        val clientInd     = ListExtra.find_index argList "-c"
         val manInd        = ListExtra.find_index argList "-m"
         val amLibInd      = ListExtra.find_index argList "-l"
         val aspBinInd     = ListExtra.find_index argList "-b"
         val keyInd        = ListExtra.find_index argList "-k"
+        val clientIndBool = argIndPresent clientInd 
         val manIndBool    = argIndPresent manInd 
         val amLibIndBool  = argIndPresent amLibInd
         val aspBinBool    = argIndPresent aspBinInd
         val keyIndBool    = argIndPresent keyInd
     in 
-      if ((manIndBool = False) orelse (amLibIndBool = False) orelse (aspBinBool = False))
-      then raise (Exception ("Invalid Arguments\n" ^ usage))
-      else (
-        if (keyIndBool = False)
-        then (* We do not have a priv key yet, later we hope to offer it as option to be provisioned later *) 
-            raise (Exception ("Invalid Arguments, WE REQUIRE PRIV KEY CURRENTLY!\n" ^ usage))
+      if (clientIndBool) 
+      then ( (* Client AM case *)
+          None  (* TODO:  use something better than option type here *)
+         )
+        
+      else ( (* Server AM case *)
+        if ((manIndBool = False) orelse (amLibIndBool = False) orelse (aspBinBool = False))
+        then raise (Exception ("Invalid Arguments\n" ^ usage))
         else (
-          let val manFileName   = List.nth argList (manInd + 1)
-              val amLibFileName = List.nth argList (amLibInd + 1)
-              val aspBinLoc     = List.nth argList (aspBinInd + 1)
-              val privKeyFile   = List.nth argList (keyInd + 1)
-          in
-            (case (parse_manifest_from_file manFileName) of
-              Coq_errC e => raise (Exception ("Could not parse JSON Manifest file: " ^ e ^ "\n"))
-            | Coq_resultC manifest =>
-              (case (parse_am_lib_from_file amLibFileName) of
-                Coq_errC e => raise (Exception ("Could not parse JSON AM Lib file: " ^ e ^ "\n"))
-              | Coq_resultC am_lib =>
-                (case (parse_private_key privKeyFile) of
-                  Coq_errC e => raise (Exception ("Could not parse private key file: " ^ e ^ "\n"))
-                | Coq_resultC priv_key => (manifest, am_lib, aspBinLoc, priv_key)
+          if (keyIndBool = False)
+          then (* We do not have a priv key yet, later we hope to offer it as option to be provisioned later *) 
+              raise (Exception ("Invalid Arguments, WE REQUIRE PRIV KEY CURRENTLY!\n" ^ usage))
+          else (
+            let val manFileName   = List.nth argList (manInd + 1)
+                val amLibFileName = List.nth argList (amLibInd + 1)
+                val aspBinLoc     = List.nth argList (aspBinInd + 1)
+                val privKeyFile   = List.nth argList (keyInd + 1)
+            in
+              (case (parse_manifest_from_file manFileName) of
+                Coq_errC e => raise (Exception ("Could not parse JSON Manifest file: " ^ e ^ "\n"))
+              | Coq_resultC manifest =>
+                (case (parse_am_lib_from_file amLibFileName) of
+                  Coq_errC e => raise (Exception ("Could not parse JSON AM Lib file: " ^ e ^ "\n"))
+                | Coq_resultC am_lib =>
+                  (case (parse_private_key privKeyFile) of
+                    Coq_errC e => raise (Exception ("Could not parse private key file: " ^ e ^ "\n"))
+                  | Coq_resultC priv_key => Some (manifest, am_lib, aspBinLoc, priv_key)
+                  )
                 )
               )
-            )
-          end))
+            end))
+      )
     end
 end

@@ -1,0 +1,55 @@
+(** val am_sendReq :
+    coq_Plc -> coq_Term -> coq_UUID -> coq_RawEv -> (coq_RawEv, string)
+    coq_ResultT **)
+
+fun am_sendReq req_plc t uuid e =
+  let val req = Coq_mkPRReq t req_plc e in
+  let val js = coq_ProtocolRunRequest_to_JSON req in
+  let val resp_res = make_JSON_Network_Request uuid js in
+  (case resp_res of
+     Coq_errC msg => Coq_errC msg
+   | Coq_resultC js_res =>
+     (case coq_JSON_to_ProtocolRunResponse js_res of
+        Coq_errC msg => Coq_errC msg
+      | Coq_resultC res =>
+        let val Coq_mkPRResp success ev = res in
+        (case success of
+           True => Coq_resultC ev
+         | False => Coq_errC errStr_remote_am_failure) end)) end end end
+
+(** val am_sendReq_app :
+    coq_UUID -> coq_Term -> coq_Plc -> coq_Evidence -> coq_RawEv ->
+    (coq_AppResultC, string) coq_ResultT **)
+
+fun am_sendReq_app uuid t p e ev =
+  let val req = Coq_mkPAReq t p e ev in
+  let val js = coq_ProtocolAppraiseRequest_to_JSON req in
+  let val resp_res = make_JSON_Network_Request uuid js in
+  (case resp_res of
+     Coq_errC msg => Coq_errC msg
+   | Coq_resultC js_res =>
+     (case coq_JSON_to_ProtocolAppraiseResponse js_res of
+        Coq_errC msg => Coq_errC msg
+      | Coq_resultC res =>
+        let val Coq_mkPAResp success result = res in
+        (case success of
+           True => Coq_resultC result
+         | False => Coq_errC errStr_remote_am_failure) end)) end end end
+
+(** val run_appraisal_client :
+    coq_Term -> coq_Plc -> coq_Evidence -> coq_RawEv -> coq_UUID ->
+    (coq_AppResultC, string) coq_ResultT **)
+
+fun run_appraisal_client t p et re addr =
+  am_sendReq_app addr t p et re
+
+(** val run_demo_client_AM :
+    coq_Term -> coq_Plc -> coq_Plc -> coq_Evidence -> coq_RawEv -> coq_UUID
+    -> coq_UUID -> (coq_AppResultC, string) coq_ResultT **)
+
+fun run_demo_client_AM t top_plc att_plc et re attester_addr appraiser_addr =
+  let val att_result = am_sendReq top_plc t attester_addr re in
+  (case att_result of
+     Coq_errC msg => Coq_errC msg
+   | Coq_resultC att_rawev =>
+     run_appraisal_client t att_plc et att_rawev appraiser_addr) end

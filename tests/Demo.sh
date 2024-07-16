@@ -3,7 +3,7 @@ set -eu
 
 # Function to display usage instructions
 usage() {
-  echo "Usage: $0 -t [cert|bg|parmut|layered_bg]"
+  echo "Usage: $0 -t [cert|bg|parmut|filehash|layered_bg]"
   exit 1
 }
 
@@ -38,6 +38,7 @@ TESTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 IP=localhost
 PORT=5000
 TERM_GEN=./bin/term_to_json
+EV_GEN=./bin/evidence_to_json
 MAN_GEN=./bin/manifest_generator
 AM_EXEC=./bin/attestation_manager
 
@@ -57,6 +58,7 @@ TEST_AM_LIB=$DEMO_FILES/Test_AM_Lib.json
 
 # Specific Variables
 TERM_FILE="$GENERATED/$TERM_TYPE.json"
+EV_FILE="$GENERATED/$TERM_TYPE-Evidence.json"
 
 # Clean and rebuild generated dir
 rm -rf $GENERATED
@@ -71,6 +73,7 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
 
   # Make targets
   make term_to_json
+  make evidence_to_json
   make manifest_generator
   make attestation_manager
 
@@ -80,8 +83,14 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   # Generate the term pair list
   $TESTS_DIR/term_to_term_pair_list.sh -f $TERM_FILE
 
+  # Generate the evidence file
+  $EV_GEN -t $TERM_TYPE -o $EV_FILE
+
+  # Generate the evidence pair list
+  $TESTS_DIR/evidence_to_evidence_pair_list.sh -f $EV_FILE
+
   # First, generate the manifests
-  $MAN_GEN -t $GENERATED/TermPairList.json -e $DEMO_FILES/Evid_List.json -o $GENERATED
+  $MAN_GEN -t $GENERATED/TermPairList.json -e $GENERATED/EvidencePairList.json -o $GENERATED
 
   # Setup tmux windows
   tmux new-session -d -s ServerProcess 'bash -i'
@@ -99,7 +108,9 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   done
   
   # Now send the request, on the very last window
-  tmux send-keys -t $I "sleep 1 && $TESTS_DIR/send_term_req.sh -h $IP -p $PORT -f $TERM_FILE" Enter
+  tmux send-keys -t $I "sleep 1 && $AM_EXEC -c" Enter
+
+  #tmux send-keys -t $I "sleep 1 && $TESTS_DIR/send_term_req.sh -h $IP -p $PORT -f $TERM_FILE" Enter
 
   tmux attach-session -d -t ServerProcess
 

@@ -48,7 +48,17 @@ val filehash_auth_phrase : coq_Term =
   Coq_att coq_P1 (Coq_lseq (Coq_asp (ASPC ALL (EXTD (S O)) (Coq_asp_paramsC
     hashfile_id [] coq_P1 hashfile_targ))) (Coq_asp SIG))
 
+(** val filehash_demo_evidence_type : coq_Evidence **)
+
+val filehash_demo_evidence_type : coq_Evidence =
+  eval filehash_auth_phrase coq_P0 (Coq_nn O)
+
 (** val flexible_mechanisms : coq_Term list **)
 
 val flexible_mechanisms : coq_Term list =
   certificate_style :: (background_check :: (parallel_mutual_1 :: (parallel_mutual_2 :: (layered_background_check :: (filehash_auth_phrase :: [])))))
+
+(** val flexible_mechanisms_evidence : coq_Evidence list **)
+
+val flexible_mechanisms_evidence : coq_Evidence list =
+  filehash_demo_evidence_type :: []
