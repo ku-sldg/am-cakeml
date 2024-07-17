@@ -4,8 +4,12 @@
 #   point to the src folder of your local copland-avm Coq development:
 #   i.e:  export COPLAND_AVM_DIR="<your-path>/copland-avm/src"
 
+# Get the directory of the script
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
-CML_DIR="./extracted"
+REPO_ROOT=$SCRIPT_DIR
+
+CML_DIR=$REPO_ROOT/extracted
 
 if [ -n "${COPLAND_AVM_DIR}" ]; then
   rm ${CML_DIR}/*.cml
