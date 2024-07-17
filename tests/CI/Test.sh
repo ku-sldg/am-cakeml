@@ -4,11 +4,8 @@ set -eu
 ################ PATH VARS ################
 # Assumes the following structure am-cakeml/tests/CI
 CI_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-echo "CI_DIR: $CI_DIR"
 TESTS_DIR="$(cd $CI_DIR && cd .. && pwd)"
-echo "TESTS_DIR: $TESTS_DIR"
 REPO_ROOT="$(cd "$TESTS_DIR" && cd .. && pwd)"
-echo "REPO_ROOT: $REPO_ROOT"
 ################ END PATH VARS ################
 
 # Function to display usage instructions
@@ -87,7 +84,6 @@ if [[ "$REPO_ROOT" == */am-cakeml ]]; then
   # Move to build folder
   mkdir -p $REPO_ROOT/build
   cd $REPO_ROOT/build
-  ls -al
 
   # Generate the terms file
   $TERM_GEN -t $TERM_TYPE -o $TERM_FILE
