@@ -105,9 +105,9 @@ if [[ "$REPO_ROOT" == */am-cakeml ]]; then
   
   # Now send the request, on the very last window
   sleep 1 
-  $TESTS_DIR/send_term_req.sh -h $IP -p $PORT -f $TERM_FILE > $GENERATED/output.out
+  $TESTS_DIR/send_term_req.sh -h $IP -p $PORT -f $TERM_FILE > $GENERATED/output_resp.json
   # We need this to be the last line so that the exit code is whether or not we found success
-  grep "\"SUCCESS\":true" $GENERATED/output.out
+  grep "\"SUCCESS\":true" $GENERATED/output_resp.json
 else
   echo "You are in $PWD, with the root set as $REPO_ROOT, but youre root should be 'am-cakeml'"
 fi
