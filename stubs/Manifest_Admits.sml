@@ -3,6 +3,14 @@
 
 type coq_FS_Location = string
 
+type coq_Concrete_ASP_ID = string
+
+(** val coq_Stringifiable_Concrete_ASP_ID :
+    coq_Concrete_ASP_ID coq_Stringifiable **)
+
+val coq_Stringifiable_Concrete_ASP_ID : coq_Concrete_ASP_ID coq_Stringifiable =
+  Build_Stringifiable (fn v => v) (fn v => Coq_resultC v)
+
 type coq_UUID = string (* AXIOM TO BE REALIZED *)
 
 (** val coq_Stringifiable_UUUID : coq_UUID coq_Stringifiable **)

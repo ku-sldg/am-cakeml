@@ -12,64 +12,54 @@ fun minify_mapD hA hB m f =
      | False => minify_mapD hA hB tl f) end
 
 (** val generate_ASP_dispatcher' :
-    coq_Manifest -> coq_FS_Location -> coq_ASP_PARAMS -> coq_RawEv ->
-    (coq_RawEv, coq_DispatcherErrors) coq_ResultT **)
+    coq_Manifest -> coq_AM_Library -> coq_FS_Location -> coq_ASP_PARAMS ->
+    coq_RawEv -> (coq_RawEv, coq_DispatcherErrors) coq_ResultT **)
 
-fun generate_ASP_dispatcher' am aspBin par rawEv =
+fun generate_ASP_dispatcher' am al aspBin par rawEv =
   let val Coq_asp_paramsC aspid args targ_plc targ = par in
   let val asps = let val Build_Manifest _ asps _ _ _ _ _ = am in asps end in
-  (case in_dec_set coq_Eq_Class_ID_Type aspid asps of
-     True =>
-     let val asp_req = Coq_mkASPRReq aspid args targ_plc targ rawEv in
-     let val js_req = coq_ASPRunRequest_to_JSON asp_req in
-     let val resp_res = make_JSON_FS_Location_Request aspBin aspid js_req in
-     (case resp_res of
-        Coq_errC msg => Coq_errC (Runtime msg)
-      | Coq_resultC js_resp =>
-        (case coq_JSON_to_ASPRunResponse js_resp of
-           Coq_errC msg => Coq_errC (Runtime msg)
-         | Coq_resultC r =>
-           let val Coq_mkASPRResp _ bs = r in Coq_resultC bs end)) end end end
-   | False => Coq_errC Unavailable) end end
-
-(** val generate_ASP_dispatcher :
-    coq_ID_Type coq_EqClass -> coq_Manifest -> coq_FS_Location ->
-    coq_DispatcherErrors coq_ASPCallback **)
-
-fun generate_ASP_dispatcher _ =
-  generate_ASP_dispatcher'
-
-(** val generate_appraisal_ASP_dispatcher' :
-    coq_Manifest -> coq_FS_Location -> coq_ASP_PARAMS -> coq_RawEv ->
-    (coq_RawEv, coq_DispatcherErrors) coq_ResultT **)
-
-fun generate_appraisal_ASP_dispatcher' am aspBin par rawEv =
-  let val Coq_asp_paramsC aspid args targ_plc targ = par in
-  let val asps =
+  let val appr_asps =
     let val Build_Manifest _ _ appraisal_asps _ _ _ _ = am in
     appraisal_asps end
   in
-  (case in_dec_set (pair_EqClass coq_Eq_Class_ID_Type coq_Eq_Class_ID_Type)
-          (targ_plc, aspid) asps of
+  let val asp_to_concrete_map =
+    let val Build_AM_Library _ lib_ASPs _ _ _ = al in lib_ASPs end
+  in
+  let val is_attest_asp =
+    case in_dec_set coq_Eq_Class_ID_Type aspid asps of
+      True => True
+    | False => False
+  in
+  let val is_appr_asp =
+    case in_dec_set coq_Eq_Class_ID_Type aspid appr_asps of
+      True => True
+    | False => False
+  in
+  (case (fn x => fn y => x orelse y) is_attest_asp is_appr_asp of
      True =>
-     let val asp_req = Coq_mkASPRReq aspid args targ_plc targ rawEv in
-     let val js_req = coq_ASPRunRequest_to_JSON asp_req in
-     let val resp_res = make_JSON_FS_Location_Request aspBin aspid js_req in
-     (case resp_res of
-        Coq_errC msg => Coq_errC (Runtime msg)
-      | Coq_resultC js_resp =>
-        (case coq_JSON_to_ASPRunResponse js_resp of
+     (case map_get coq_Eq_Class_ID_Type asp_to_concrete_map aspid of
+        Some conc_asp_loc =>
+        let val asp_req = Coq_mkASPRReq aspid args targ_plc targ rawEv in
+        let val js_req = coq_ASPRunRequest_to_JSON asp_req in
+        let val resp_res =
+          make_JSON_FS_Location_Request aspBin conc_asp_loc js_req
+        in
+        (case resp_res of
            Coq_errC msg => Coq_errC (Runtime msg)
-         | Coq_resultC r =>
-           let val Coq_mkASPRResp _ ev = r in Coq_resultC ev end)) end end end
-   | False => Coq_errC Unavailable) end end
+         | Coq_resultC js_resp =>
+           (case coq_JSON_to_ASPRunResponse js_resp of
+              Coq_errC msg => Coq_errC (Runtime msg)
+            | Coq_resultC r =>
+              let val Coq_mkASPRResp _ bs = r in Coq_resultC bs end)) end end end
+      | None => Coq_errC Unavailable)
+   | False => Coq_errC Unavailable) end end end end end end
 
-(** val generate_appraisal_ASP_dispatcher :
-    coq_ID_Type coq_EqClass -> coq_Manifest -> coq_FS_Location ->
-    coq_DispatcherErrors coq_ASPCallback **)
+(** val generate_ASP_dispatcher :
+    coq_ID_Type coq_EqClass -> coq_Manifest -> coq_AM_Library ->
+    coq_FS_Location -> coq_DispatcherErrors coq_ASPCallback **)
 
-fun generate_appraisal_ASP_dispatcher _ =
-  generate_appraisal_ASP_dispatcher'
+fun generate_ASP_dispatcher _ =
+  generate_ASP_dispatcher'
 
 (** val generate_Plc_dispatcher :
     coq_ID_Type coq_EqClass -> coq_AM_Library -> coq_Manifest ->
@@ -77,7 +67,7 @@ fun generate_appraisal_ASP_dispatcher _ =
 
 fun generate_Plc_dispatcher hID al am =
   let val local_plc_map =
-    let val Build_AM_Library _ lib_Plcs _ = al in lib_Plcs end
+    let val Build_AM_Library _ _ lib_Plcs _ _ = al in lib_Plcs end
   in
   let val abstract_plcs =
     let val Build_Manifest _ _ _ uuidPlcs _ _ _ = am in uuidPlcs end
@@ -99,7 +89,7 @@ fun generate_Plc_dispatcher hID al am =
 
 fun generate_PubKey_dispatcher hID al am =
   let val local_pubkey_map =
-    let val Build_AM_Library _ _ lib_PubKeys = al in lib_PubKeys end
+    let val Build_AM_Library _ _ _ lib_PubKeys _ = al in lib_PubKeys end
   in
   let val abstract_plcs =
     let val Build_Manifest _ _ _ _ pubKeyPlcs _ _ = am in pubKeyPlcs end
@@ -120,8 +110,7 @@ fun generate_PubKey_dispatcher hID al am =
 
 fun manifest_compiler m al aspBin =
   Coq_mkAmConfig m
-    (let val Build_AM_Library uUID_AM_Clone _ _ = al in uUID_AM_Clone end)
-    (generate_ASP_dispatcher coq_Eq_Class_ID_Type m aspBin)
-    (generate_appraisal_ASP_dispatcher coq_Eq_Class_ID_Type m aspBin)
+    (let val Build_AM_Library uUID_AM_Clone _ _ _ _ = al in uUID_AM_Clone end)
+    (generate_ASP_dispatcher coq_Eq_Class_ID_Type m al aspBin)
     (generate_Plc_dispatcher coq_Eq_Class_ID_Type al m)
     (generate_PubKey_dispatcher coq_Eq_Class_ID_Type al m)

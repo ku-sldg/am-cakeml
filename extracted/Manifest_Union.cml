@@ -8,8 +8,7 @@ fun manifest_union m1 m2 =
     _ = m2
   in
   Build_Manifest myPlc (manset_union coq_Eq_Class_ID_Type asps1 asps2)
-  (manset_union (pair_EqClass coq_Eq_Class_ID_Type coq_Eq_Class_ID_Type)
-    app_asps1 app_asps2)
+  (manset_union coq_Eq_Class_ID_Type app_asps1 app_asps2)
   (manset_union coq_Eq_Class_ID_Type uuidPlcs1 uuidPlcs2)
   (manset_union coq_Eq_Class_ID_Type pubKeyPlcs1 pubKeyPlcs2)
   (manset_union coq_Eq_Class_ID_Type targPlcs1 targPlcs2) myPol end end

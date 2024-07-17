@@ -25,7 +25,7 @@ val get_pl : coq_Plc coq_CVM =
   bind get_CVM_amConfig (fn ac =>
     ret
       (let val Build_Manifest my_abstract_plc _ _ _ _ _ _ =
-         let val Coq_mkAmConfig absMan _ _ _ _ _ = ac in absMan end
+         let val Coq_mkAmConfig absMan _ _ _ _ = ac in absMan end
        in
        my_abstract_plc end))
 
@@ -90,7 +90,7 @@ fun fwd_asp fwd rwev e p ps =
 
 fun do_asp params e _ =
   bind get_CVM_amConfig (fn ac =>
-    case let val Coq_mkAmConfig _ _ aspCb _ _ _ = ac in aspCb params e end of
+    case let val Coq_mkAmConfig _ _ aspCb _ _ = ac in aspCb params e end of
       Coq_errC e0 => failm (Coq_dispatch_error e0)
     | Coq_resultC r => ret r)
 
@@ -171,7 +171,7 @@ val get_cvm_policy : coq_PolicyT coq_CVM =
   bind get_CVM_amConfig (fn ac =>
     ret
       (let val Build_Manifest _ _ _ _ _ _ policy =
-         let val Coq_mkAmConfig absMan _ _ _ _ _ = ac in absMan end
+         let val Coq_mkAmConfig absMan _ _ _ _ = ac in absMan end
        in
        policy end))
 
@@ -190,14 +190,14 @@ fun check_cvm_policy t pTo et =
 
 fun do_remote t pTo e ac =
   let val remote_uuid_res =
-    let val Coq_mkAmConfig _ _ _ _ plcCb _ = ac in plcCb pTo end
+    let val Coq_mkAmConfig _ _ _ plcCb _ = ac in plcCb pTo end
   in
   (case remote_uuid_res of
      Coq_errC e0 => Coq_errC e0
    | Coq_resultC uuid =>
      let val my_plc =
        let val Build_Manifest my_abstract_plc _ _ _ _ _ _ =
-         let val Coq_mkAmConfig absMan _ _ _ _ _ = ac in absMan end
+         let val Coq_mkAmConfig absMan _ _ _ _ = ac in absMan end
        in
        my_abstract_plc end
      in

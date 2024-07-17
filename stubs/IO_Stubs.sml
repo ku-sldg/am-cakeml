@@ -31,10 +31,10 @@ fun make_JSON_Network_Request (u : coq_UUID) (js : coq_JSON) =
   end) : (coq_JSON, string) coq_ResultT 
 
 (** val make_JSON_FS_Location_Request :
-    coq_FS_Location -> coq_ASP_ID -> coq_JSON -> (coq_JSON, string)
+    coq_FS_Location -> coq_Concrete_ASP_ID -> coq_JSON -> (coq_JSON, string)
     coq_ResultT **)
-fun make_JSON_FS_Location_Request (aspBin : coq_FS_Location) (aspId : coq_ASP_ID) (js : coq_JSON) = 
-  (let val loc = aspBin ^ "/" ^ aspId
+fun make_JSON_FS_Location_Request (aspBin : coq_FS_Location) (conc_asp_id : coq_Concrete_ASP_ID) (js : coq_JSON) = 
+  (let val loc = aspBin ^ "/" ^ coq_Concrete_ASP_ID
       val _ = print ("Sending a request to the FS: " ^ loc ^ "\n")
       val req_str = loc ^ " \"" ^ (SysFFI.shellEscapeString (coq_JSON_to_string js)) ^ "\""
       val _ = print ("Request string: " ^ req_str ^ "\n")

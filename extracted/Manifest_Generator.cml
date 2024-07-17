@@ -128,15 +128,15 @@ fun environment_to_manifest_list e =
   map_vals coq_Eq_Class_ID_Type e
 
 (** val app_aspid_manifest_update :
-    coq_ASP_ID -> coq_Plc -> coq_Manifest -> coq_Manifest **)
+    coq_ASP_ID -> coq_Manifest -> coq_Manifest **)
 
-fun app_aspid_manifest_update i p m =
+fun app_aspid_manifest_update i m =
   let val Build_Manifest oldPlc oldasps old_app_asps oldKnowsOf oldContext
     oldTargets oldPolicy = m
   in
   Build_Manifest oldPlc oldasps
-  (manset_add (pair_EqClass coq_Eq_Class_ID_Type coq_Eq_Class_ID_Type) (i, p)
-    old_app_asps) oldKnowsOf oldContext oldTargets oldPolicy end
+  (manset_add coq_Eq_Class_ID_Type i old_app_asps) oldKnowsOf oldContext
+  oldTargets oldPolicy end
 
 (** val manifest_generator_app'' :
     coq_Evidence -> coq_Manifest -> coq_Manifest **)
@@ -149,8 +149,8 @@ fun manifest_generator_app'' et m =
        let val Coq_asp_paramsC _ _ p' _ = ps in
        manifest_generator_app'' e' (pubkey_manifest_update p' m) end
      | EXTD _ =>
-       let val Coq_asp_paramsC a _ targ _ = ps in
-       manifest_generator_app'' e' (app_aspid_manifest_update targ a m) end
+       let val Coq_asp_paramsC a _ _ _ = ps in
+       manifest_generator_app'' e' (app_aspid_manifest_update a m) end
      | KEEP => manifest_generator_app'' e' m
      | _ => m)
   | Coq_ss e1 e2 =>

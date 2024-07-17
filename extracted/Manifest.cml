@@ -18,9 +18,9 @@ val empty_PolicyT : coq_PolicyT =
   []
 
 datatype coq_Manifest =
-  Build_Manifest coq_Plc (coq_ASP_ID manifest_set)
-   ((coq_Plc * coq_ASP_ID) manifest_set) (coq_Plc manifest_set)
-   (coq_Plc manifest_set) (coq_Plc manifest_set) coq_PolicyT
+  Build_Manifest coq_Plc (coq_ASP_ID manifest_set) (coq_ASP_ID manifest_set)
+   (coq_Plc manifest_set) (coq_Plc manifest_set) (coq_Plc manifest_set)
+   coq_PolicyT
 
 (** val empty_Manifest : coq_Manifest **)
 
@@ -29,9 +29,10 @@ val empty_Manifest : coq_Manifest =
     manifest_set_empty manifest_set_empty manifest_set_empty empty_PolicyT
 
 datatype coq_AM_Library =
-  Build_AM_Library coq_UUID ((coq_Plc, coq_UUID) coq_MapC)
-   ((coq_Plc, coq_PublicKey) coq_MapC)
+  Build_AM_Library coq_UUID ((coq_ASP_ID, coq_Concrete_ASP_ID) coq_MapC)
+   ((coq_Plc, coq_UUID) coq_MapC) ((coq_Plc, coq_PublicKey) coq_MapC)
+   ((coq_ASP_ID, coq_ASP_ID) coq_MapC)
 
 datatype coq_AM_Config =
   Coq_mkAmConfig coq_Manifest coq_UUID (coq_DispatcherErrors coq_ASPCallback)
-   (coq_DispatcherErrors coq_ASPCallback) coq_PlcCallback coq_PubKeyCallback
+   coq_PlcCallback coq_PubKeyCallback

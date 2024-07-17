@@ -38,6 +38,11 @@ val coq_MAN_POLICY : string =
 val coq_AM_CLONE_UUUID : string =
   "CLONE_UUID"
 
+(** val coq_AM_LIB_ASPS : string **)
+
+val coq_AM_LIB_ASPS : string =
+  "LIB_ASPS"
+
 (** val coq_AM_LIB_PLCS : string **)
 
 val coq_AM_LIB_PLCS : string =
@@ -47,3 +52,8 @@ val coq_AM_LIB_PLCS : string =
 
 val coq_AM_LIB_PUBKEYS : string =
   "LIB_PUBKEYS"
+
+(** val coq_AM_LIB_COMPAT_ASPS : string **)
+
+val coq_AM_LIB_COMPAT_ASPS : string =
+  "ASP_COMPAT_MAP"
