@@ -92,7 +92,7 @@ if [[ "$REPO_ROOT" == */am-cakeml ]]; then
   $TESTS_DIR/term_to_term_pair_list.sh -f $TERM_FILE
 
   # First, generate the manifests
-  $MAN_GEN -t $GENERATED/TermPairList.json -e $DEMO_FILES/Evid_List.json -o $GENERATED
+  $MAN_GEN -t $GENERATED/TermPairList.json -e $DEMO_FILES/Evid_List.json -l $TEST_AM_LIB -o $GENERATED
 
   PIDS=()
   
