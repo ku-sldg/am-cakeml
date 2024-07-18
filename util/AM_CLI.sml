@@ -70,14 +70,17 @@ structure AM_CLI_Utils = struct
   
   fun retrieve_Client_AM_CLI_args _ =
     let val name = CommandLine.name ()
-        val usage = ("Usage: " ^ name ^ "-m <ManifestFile>.json -t <term_file>.json\n\ne.g.\t" ^ name ^ " -m formMan.json -t cert.json\n\n")
+        val usage = ("Usage: " ^ name ^ "you basically cant use this wrong")
+        val argList = CommandLine.arguments ()
+        (* val usage = ("Usage: " ^ name ^ "-m <ManifestFile>.json -t <term_file>.json\n\ne.g.\t" ^ name ^ " -m formMan.json -t cert.json\n\n")
         val argList = CommandLine.arguments ()
         val manInd        = ListExtra.find_index argList "-m"
         val termInd        = ListExtra.find_index argList "-t"
         val manIndBool    = argIndPresent manInd 
-        val termIndBool   = argIndPresent termInd 
+        val termIndBool   = argIndPresent termInd  *)
     in 
-    if ((manIndBool = False) orelse (termIndBool = False))
+      ()
+    (* if ((manIndBool = False) orelse (termIndBool = False))
     then raise (Exception ("Invalid Arguments\n" ^ usage))
     else (
       let val manFileName   = List.nth argList (manInd + 1)
@@ -86,19 +89,19 @@ structure AM_CLI_Utils = struct
         (case (parse_manifest_from_file manFileName) of
           Coq_errC e => raise (Exception ("Could not parse JSON Manifest file: " ^ e ^ "\n"))
         | Coq_resultC manifest =>
-          (case (parse_term_from_file term_file) of
+          (case (parse_term_from_file termFileName) of
             Coq_errC e => raise (Exception ("Could not parse Term file: " ^ e ^ "\n"))
           | Coq_resultC term => (manifest, term)
           )
           )
-      end)
+      end) *)
     end
 
   (* Retrieves the manifest filename and private key (as strings)
     based upon Command Line arguments
     : () -> am_args_t
   *)
-  fun retrieve_AM_Server_CLI_args _ =
+  fun retrieve_Server_AM_CLI_args _ =
     let val name = CommandLine.name ()
         val usage = ("Usage: " ^ name ^ "-m <ManifestFile>.json -l <AmLibFile>.json -b <asp_bin_location> (-k <privateKeyFile>)\n\ne.g.\t" ^ name ^ " -m formMan.json -l amLib.json -b /opt/asps -k ~/.ssh/id_ed25519\n\n")
         val argList = CommandLine.arguments ()
@@ -131,7 +134,7 @@ structure AM_CLI_Utils = struct
               | Coq_resultC am_lib =>
                 (case (parse_private_key privKeyFile) of
                   Coq_errC e => raise (Exception ("Could not parse private key file: " ^ e ^ "\n"))
-                | Coq_resultC priv_key => Some (manifest, am_lib, aspBinLoc, priv_key)
+                | Coq_resultC priv_key => (manifest, am_lib, aspBinLoc, priv_key)
                 )
               )
             )
