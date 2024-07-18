@@ -2,7 +2,7 @@
   "CLONE_UUID": "localhost:5100",
   "LIB_ASPS": {
     "attest_id": "attest_id",
-    "hashfile_id": "hashfile_id",
+    "hashfile_id": "attest_id",
     "appraise_id": "appraise_id",
     "sig_id": "attest_id",
     "certificate_id": "certificate_id"
