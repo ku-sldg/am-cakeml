@@ -2,19 +2,19 @@
     coq_ASP_ID -> coq_Manifest -> coq_Manifest **)
 
 fun aspid_manifest_update i m =
-  let val Build_Manifest oldPlc oldasps old_app_asps oldKnowsOf oldContext
-    oldTargets oldPolicy = m
+  let val Build_Manifest oldPlc oldasps oldKnowsOf oldContext oldTargets
+    oldPolicy = m
   in
   Build_Manifest oldPlc (manset_add coq_Eq_Class_ID_Type i oldasps)
-  old_app_asps oldKnowsOf oldContext oldTargets oldPolicy end
+  oldKnowsOf oldContext oldTargets oldPolicy end
 
 (** val knowsof_manifest_update : coq_Plc -> coq_Manifest -> coq_Manifest **)
 
 fun knowsof_manifest_update toPlc m =
-  let val Build_Manifest oldPlc oldasps old_app_asps oldKnowsOf oldContext
-    oldTargets oldPolicy = m
+  let val Build_Manifest oldPlc oldasps oldKnowsOf oldContext oldTargets
+    oldPolicy = m
   in
-  Build_Manifest oldPlc oldasps old_app_asps
+  Build_Manifest oldPlc oldasps
   (manset_add coq_Eq_Class_ID_Type toPlc oldKnowsOf) oldContext oldTargets
   oldPolicy end
 
@@ -22,35 +22,34 @@ fun knowsof_manifest_update toPlc m =
 
 fun knowsof_myPlc_manifest_update m =
   knowsof_manifest_update
-    (let val Build_Manifest my_abstract_plc _ _ _ _ _ _ = m in
+    (let val Build_Manifest my_abstract_plc _ _ _ _ _ = m in
      my_abstract_plc end) m
 
 (** val myPlc_manifest_update : coq_Plc -> coq_Manifest -> coq_Manifest **)
 
 fun myPlc_manifest_update p m =
-  let val Build_Manifest _ oldasps old_app_asps oldKnowsOf oldContext
-    oldTargets oldPolicy = m
+  let val Build_Manifest _ oldasps oldKnowsOf oldContext oldTargets
+    oldPolicy = m
   in
-  Build_Manifest p oldasps old_app_asps oldKnowsOf oldContext oldTargets
-  oldPolicy end
+  Build_Manifest p oldasps oldKnowsOf oldContext oldTargets oldPolicy end
 
 (** val pubkey_manifest_update : coq_Plc -> coq_Manifest -> coq_Manifest **)
 
 fun pubkey_manifest_update p m =
-  let val Build_Manifest oldPlc oldasps old_app_asps oldKnowsOf oldContext
-    oldTargets oldPolicy = m
+  let val Build_Manifest oldPlc oldasps oldKnowsOf oldContext oldTargets
+    oldPolicy = m
   in
-  Build_Manifest oldPlc oldasps old_app_asps oldKnowsOf
+  Build_Manifest oldPlc oldasps oldKnowsOf
   (manset_add coq_Eq_Class_ID_Type p oldContext) oldTargets oldPolicy end
 
 (** val pubkeys_manifest_update :
     coq_Plc manifest_set -> coq_Manifest -> coq_Manifest **)
 
 fun pubkeys_manifest_update ps m =
-  let val Build_Manifest oldMyPlc oldasps old_app_asps oldKnowsOf oldPubs
-    oldTargets oldPolicy = m
+  let val Build_Manifest oldMyPlc oldasps oldKnowsOf oldPubs oldTargets
+    oldPolicy = m
   in
-  Build_Manifest oldMyPlc oldasps old_app_asps oldKnowsOf
+  Build_Manifest oldMyPlc oldasps oldKnowsOf
   (fold_right (manset_add coq_Eq_Class_ID_Type) oldPubs ps) oldTargets
   oldPolicy end
 
@@ -58,10 +57,10 @@ fun pubkeys_manifest_update ps m =
     coq_Plc -> coq_Plc -> coq_Manifest -> coq_Manifest **)
 
 fun update_manifest_policy_targ targp _ m =
-  let val Build_Manifest oldMyPlc oldasps old_app_asps oldKnowsOf oldContext
-    oldTargets oldPolicy = m
+  let val Build_Manifest oldMyPlc oldasps oldKnowsOf oldContext oldTargets
+    oldPolicy = m
   in
-  Build_Manifest oldMyPlc oldasps old_app_asps oldKnowsOf oldContext
+  Build_Manifest oldMyPlc oldasps oldKnowsOf oldContext
   (manset_add coq_Eq_Class_ID_Type targp oldTargets) oldPolicy end
 
 (** val asp_manifest_update : coq_ASP -> coq_Manifest -> coq_Manifest **)
@@ -78,6 +77,20 @@ fun asp_manifest_update a m =
     let val m' = pubkey_manifest_update p m in
     aspid_manifest_update enc_aspid m' end
   | _ => m
+
+(** val manifest_update_env_res :
+    coq_Plc -> coq_EnvironmentM -> (coq_Manifest -> (coq_Manifest, string)
+    coq_ResultT) -> (coq_EnvironmentM, string) coq_ResultT **)
+
+fun manifest_update_env_res p e f =
+  let val m =
+    case map_get coq_Eq_Class_ID_Type e p of
+      Some mm => mm
+    | None => myPlc_manifest_update p empty_Manifest
+  in
+  (case f m of
+     Coq_errC e0 => Coq_errC e0
+   | Coq_resultC m' => Coq_resultC (map_set coq_Eq_Class_ID_Type e p m')) end
 
 (** val manifest_update_env :
     coq_Plc -> coq_EnvironmentM -> (coq_Manifest -> coq_Manifest) ->
@@ -127,44 +140,56 @@ fun manifest_generator t p =
 fun environment_to_manifest_list e =
   map_vals coq_Eq_Class_ID_Type e
 
-(** val app_aspid_manifest_update :
-    coq_ASP_ID -> coq_Manifest -> coq_Manifest **)
-
-fun app_aspid_manifest_update i m =
-  let val Build_Manifest oldPlc oldasps old_app_asps oldKnowsOf oldContext
-    oldTargets oldPolicy = m
-  in
-  Build_Manifest oldPlc oldasps
-  (manset_add coq_Eq_Class_ID_Type i old_app_asps) oldKnowsOf oldContext
-  oldTargets oldPolicy end
-
 (** val manifest_generator_app'' :
-    coq_Evidence -> coq_Manifest -> coq_Manifest **)
+    coq_Evidence -> coq_AM_Library -> coq_Manifest -> (coq_Manifest, string)
+    coq_ResultT **)
 
-fun manifest_generator_app'' et m =
+fun manifest_generator_app'' et al m =
   case et of
     Coq_uu _ fwd ps e' =>
     (case fwd of
        ENCR =>
-       let val Coq_asp_paramsC _ _ p' _ = ps in
-       manifest_generator_app'' e' (pubkey_manifest_update p' m) end
+       let val Coq_asp_paramsC a _ p' _ = ps in
+       (case map_get coq_Eq_Class_ID_Type
+               (let val Build_AM_Library _ _ _ _ aSP_Compat_Map = al in
+                aSP_Compat_Map end) a of
+          Some a' =>
+          manifest_generator_app'' e' al
+            (aspid_manifest_update a' (pubkey_manifest_update p' m))
+        | None => Coq_errC "Compatible Appraisal ASP not found in AM Library") end
      | EXTD _ =>
        let val Coq_asp_paramsC a _ _ _ = ps in
-       manifest_generator_app'' e' (app_aspid_manifest_update a m) end
-     | KEEP => manifest_generator_app'' e' m
-     | _ => m)
+       (case map_get coq_Eq_Class_ID_Type
+               (let val Build_AM_Library _ _ _ _ aSP_Compat_Map = al in
+                aSP_Compat_Map end) a of
+          Some a' =>
+          manifest_generator_app'' e' al (aspid_manifest_update a' m)
+        | None => Coq_errC "Compatible Appraisal ASP not found in AM Library") end
+     | KEEP =>
+       let val Coq_asp_paramsC a _ _ _ = ps in
+       (case map_get coq_Eq_Class_ID_Type
+               (let val Build_AM_Library _ _ _ _ aSP_Compat_Map = al in
+                aSP_Compat_Map end) a of
+          Some a' =>
+          manifest_generator_app'' e' al (aspid_manifest_update a' m)
+        | None => Coq_errC "Compatible Appraisal ASP not found in AM Library") end
+     | _ => Coq_resultC m)
   | Coq_ss e1 e2 =>
-    manifest_generator_app'' e2 (manifest_generator_app'' e1 m)
-  | _ => m
+    (case manifest_generator_app'' e1 al m of
+       Coq_errC e => Coq_errC e
+     | Coq_resultC m' => manifest_generator_app'' e2 al m')
+  | _ => Coq_resultC m
 
 (** val manifest_generator_app' :
-    coq_Plc -> coq_Evidence -> coq_EnvironmentM -> coq_EnvironmentM **)
+    coq_Plc -> coq_Evidence -> coq_AM_Library -> coq_EnvironmentM ->
+    (coq_EnvironmentM, string) coq_ResultT **)
 
-fun manifest_generator_app' p et env =
-  manifest_update_env p env (manifest_generator_app'' et)
+fun manifest_generator_app' p et al env =
+  manifest_update_env_res p env (manifest_generator_app'' et al)
 
 (** val manifest_generator_app :
-    coq_Evidence -> coq_Plc -> coq_EnvironmentM **)
+    coq_Evidence -> coq_Plc -> coq_AM_Library -> (coq_EnvironmentM, string)
+    coq_ResultT **)
 
-fun manifest_generator_app et p =
-  manifest_generator_app' p et e_empty
+fun manifest_generator_app et p al =
+  manifest_generator_app' p et al e_empty

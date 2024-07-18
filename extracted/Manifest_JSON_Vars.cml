@@ -8,11 +8,6 @@ val coq_MAN_ABS_PLC : string =
 val coq_MAN_ASPS : string =
   "ASPS"
 
-(** val coq_MAN_APPR_ASPS : string **)
-
-val coq_MAN_APPR_ASPS : string =
-  "APPR_ASPS"
-
 (** val coq_MAN_UUUID_PLCS : string **)
 
 val coq_MAN_UUUID_PLCS : string =

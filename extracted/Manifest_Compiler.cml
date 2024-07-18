@@ -17,25 +17,11 @@ fun minify_mapD hA hB m f =
 
 fun generate_ASP_dispatcher' am al aspBin par rawEv =
   let val Coq_asp_paramsC aspid args targ_plc targ = par in
-  let val asps = let val Build_Manifest _ asps _ _ _ _ _ = am in asps end in
-  let val appr_asps =
-    let val Build_Manifest _ _ appraisal_asps _ _ _ _ = am in
-    appraisal_asps end
-  in
+  let val asps = let val Build_Manifest _ asps _ _ _ _ = am in asps end in
   let val asp_to_concrete_map =
     let val Build_AM_Library _ lib_ASPs _ _ _ = al in lib_ASPs end
   in
-  let val is_attest_asp =
-    case in_dec_set coq_Eq_Class_ID_Type aspid asps of
-      True => True
-    | False => False
-  in
-  let val is_appr_asp =
-    case in_dec_set coq_Eq_Class_ID_Type aspid appr_asps of
-      True => True
-    | False => False
-  in
-  (case (fn x => fn y => x orelse y) is_attest_asp is_appr_asp of
+  (case in_dec_set coq_Eq_Class_ID_Type aspid asps of
      True =>
      (case map_get coq_Eq_Class_ID_Type asp_to_concrete_map aspid of
         Some conc_asp_loc =>
@@ -52,7 +38,7 @@ fun generate_ASP_dispatcher' am al aspBin par rawEv =
             | Coq_resultC r =>
               let val Coq_mkASPRResp _ bs = r in Coq_resultC bs end)) end end end
       | None => Coq_errC Unavailable)
-   | False => Coq_errC Unavailable) end end end end end end
+   | False => Coq_errC Unavailable) end end end
 
 (** val generate_ASP_dispatcher :
     coq_ID_Type coq_EqClass -> coq_Manifest -> coq_AM_Library ->
@@ -70,7 +56,7 @@ fun generate_Plc_dispatcher hID al am =
     let val Build_AM_Library _ _ lib_Plcs _ _ = al in lib_Plcs end
   in
   let val abstract_plcs =
-    let val Build_Manifest _ _ _ uuidPlcs _ _ _ = am in uuidPlcs end
+    let val Build_Manifest _ _ uuidPlcs _ _ _ = am in uuidPlcs end
   in
   let val shrunk_map =
     minify_mapD hID coq_Eq_Class_uuid local_plc_map (fn x =>
@@ -92,7 +78,7 @@ fun generate_PubKey_dispatcher hID al am =
     let val Build_AM_Library _ _ _ lib_PubKeys _ = al in lib_PubKeys end
   in
   let val abstract_plcs =
-    let val Build_Manifest _ _ _ _ pubKeyPlcs _ _ = am in pubKeyPlcs end
+    let val Build_Manifest _ _ _ pubKeyPlcs _ _ = am in pubKeyPlcs end
   in
   let val shrunk_map =
     minify_mapD hID coq_Eq_Class_public_key local_pubkey_map (fn x =>
@@ -111,6 +97,8 @@ fun generate_PubKey_dispatcher hID al am =
 fun manifest_compiler m al aspBin =
   Coq_mkAmConfig m
     (let val Build_AM_Library uUID_AM_Clone _ _ _ _ = al in uUID_AM_Clone end)
+    (let val Build_AM_Library _ _ _ _ aSP_Compat_Map = al in
+     aSP_Compat_Map end)
     (generate_ASP_dispatcher coq_Eq_Class_ID_Type m al aspBin)
     (generate_Plc_dispatcher coq_Eq_Class_ID_Type al m)
     (generate_PubKey_dispatcher coq_Eq_Class_ID_Type al m)

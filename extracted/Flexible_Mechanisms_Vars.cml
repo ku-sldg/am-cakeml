@@ -38,6 +38,11 @@ val appraise_id : coq_ASP_ID =
 val certificate_id : coq_ASP_ID =
   "certificate_id"
 
+(** val hashfile_id : coq_ASP_ID **)
+
+val hashfile_id : coq_ASP_ID =
+  "hashfile_id"
+
 (** val sys_targ : coq_TARG_ID **)
 
 val sys_targ : coq_TARG_ID =
@@ -52,3 +57,8 @@ val att_targ : coq_TARG_ID =
 
 val it_targ : coq_TARG_ID =
   "it_targ"
+
+(** val hashfile_targ : coq_TARG_ID **)
+
+val hashfile_targ : coq_TARG_ID =
+  "hashfile_targ"
