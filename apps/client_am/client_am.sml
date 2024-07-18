@@ -23,7 +23,9 @@ fun main () =
       
       val app_result = run_demo_client_AM demo_term top_plc att_plc init_et init_rawev attester_addr appraiser_addr 
   in 
-    ()
+    case app_result of 
+      Coq_resultC v => print ("\n\nClient AM SUCCESS:  \n\n" ^ (stringify_AppResultC_json v))
+    | Coq_errC s => raise (Exception ("Client AM FAILURE:  " ^ s))
   end
   handle Exception e => TextIO.print_err e 
           | Word8Extra.InvalidHex => TextIO.print_err "BSTRING UNSHOW ERROR"

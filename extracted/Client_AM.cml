@@ -43,6 +43,17 @@ fun am_sendReq_app uuid t p e ev =
 fun run_appraisal_client t p et re addr =
   am_sendReq_app addr t p et re
 
+(** val stringify_AppResultC_json : coq_AppResultC -> string **)
+
+fun stringify_AppResultC_json v =
+  let val appres_json =
+    coq_AppResultC_to_Json
+      (jsonifiable_map_serial_serial coq_Stringifiable_ID_Type
+        coq_Eq_Class_ID_Type coq_Stringifiable_ID_Type) coq_Jsonifiable_RawEv
+      v
+  in
+  coq_JSON_to_string appres_json end
+
 (** val run_demo_client_AM :
     coq_Term -> coq_Plc -> coq_Plc -> coq_Evidence -> coq_RawEv -> coq_UUID
     -> coq_UUID -> (coq_AppResultC, string) coq_ResultT **)
