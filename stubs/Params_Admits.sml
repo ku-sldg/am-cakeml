@@ -1,6 +1,6 @@
 (** val sig_params : coq_ASP_PARAMS **)
 
-val sig_aspid = "sigid"
+val sig_aspid = "sig_id"
 (*
 val sig_params = Coq_asp_paramsC sig_aspid [] "0" "sigtargid"
 *)
@@ -14,7 +14,7 @@ val sig_params = Coq_asp_paramsC sig_aspid sig_aspargs sig_targplc sig_targid
 
 (** val hsh_params : coq_ASP_PARAMS **)
 
-val hsh_aspid = "hshid"
+val hsh_aspid = "hsh_id"
 
 val hsh_aspargs = []
 
@@ -27,7 +27,7 @@ val hsh_params = Coq_asp_paramsC hsh_aspid hsh_aspargs hsh_targplc hsh_targid
 
 (** val enc_params :: coq_Plc -> coq_ASP_PARAMS **)
 
-val enc_aspid = "encid"
+val enc_aspid = "enc_id"
 
 val enc_aspargs = []
 

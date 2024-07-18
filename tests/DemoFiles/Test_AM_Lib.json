@@ -2,7 +2,9 @@
   "CLONE_UUID": "localhost:5100",
   "LIB_ASPS": {
     "attest_id": "attest_id",
+    "hashfile_id": "hashfile_id",
     "appraise_id": "appraise_id",
+    "sig_id": "attest_id",
     "certificate_id": "certificate_id"
   },
   "LIB_PLCS": {
@@ -15,5 +17,8 @@
     "P6": "localhost:5006"
   },
   "LIB_PUBKEYS": {},
-  "ASP_COMPAT_MAP": {}
+  "ASP_COMPAT_MAP": {
+    "sig_id": "certificate_id",
+    "hashfile_id": "appraise_id"
+  }
 }
