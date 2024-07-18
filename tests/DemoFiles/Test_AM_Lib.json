@@ -18,7 +18,10 @@
   },
   "LIB_PUBKEYS": {},
   "ASP_COMPAT_MAP": {
-    "sig_id": "certificate_id",
-    "hashfile_id": "appraise_id"
+    "sig_id": "appraise_id",
+    "hashfile_id": "appraise_id",
+    "attest_id": "appraise_id",
+    "appraise_id": "appraise_id",
+    "certificate_id":"appraise_id"
   }
 }

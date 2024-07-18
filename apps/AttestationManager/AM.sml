@@ -28,7 +28,7 @@ fun handleIncoming (listener_and_ac) =
     let val (listener, ac) = listener_and_ac
         val client = Socket.accept listener
         val _ = TextIOExtra.printLn "Accepted connection\n"
-        val nonceval = passed_bs (* BString.fromString "anonce" *) (* TODO: should this be hardcoded here? *)
+        val nonceval = default_bs (* BString.fromString "anonce" *) (* TODO: should this be hardcoded here? *)
     in 
       (respondToMsg client nonceval ac);
       Socket.close client

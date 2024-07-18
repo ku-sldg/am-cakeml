@@ -28,7 +28,10 @@ fun main () =
             val outFile   = List.nth argList (outFileInd + 1)
             val outTerm   = case termName of
                               "filehash"    => filehash_demo_evidence_type
-                            | _ => raise (Exception ("TermToJson Argument Error: \n" ^ usage))
+                            | "cert"        => cert_demo_evidence_type
+                            | "bg"          => bg_demo_evidence_type
+                            | "parmut"      => parmut_1_demo_evidence_type
+                            | _ => raise (Exception ("EvidenceToJson Argument Error: \n" ^ usage))
                           (*
                               "cert"        => certificate_style
                             | "bg"          => background_check

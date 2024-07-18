@@ -70,31 +70,30 @@ structure AM_CLI_Utils = struct
   
   fun retrieve_Client_AM_CLI_args _ =
     let val name = CommandLine.name ()
-        val usage = ("Usage: " ^ name ^ "you basically cant use this wrong")
+        (* val usage = ("Usage: " ^ name ^ "you basically cant use this wrong") *)
+        val usage = ("Usage: " ^ name ^ "-t <term_file>.json\n\ne.g.\t" ^ name ^ " -t cert.json\n\n")
         val argList = CommandLine.arguments ()
         (* val usage = ("Usage: " ^ name ^ "-m <ManifestFile>.json -t <term_file>.json\n\ne.g.\t" ^ name ^ " -m formMan.json -t cert.json\n\n")
         val argList = CommandLine.arguments ()
         val manInd        = ListExtra.find_index argList "-m"
         val termInd        = ListExtra.find_index argList "-t"
-        val manIndBool    = argIndPresent manInd 
-        val termIndBool   = argIndPresent termInd  *)
+        val manIndBool    = argIndPresent manInd  *)
+        val termInd        = ListExtra.find_index argList "-t"
+        val termIndBool   = argIndPresent termInd
     in 
-      ()
-    (* if ((manIndBool = False) orelse (termIndBool = False))
+    (
+    if ((termIndBool = False))
     then raise (Exception ("Invalid Arguments\n" ^ usage))
     else (
-      let val manFileName   = List.nth argList (manInd + 1)
-          val termFileName  = List.nth argList (termInd + 1)
+      let val termFileName  = List.nth argList (termInd + 1)
       in
-        (case (parse_manifest_from_file manFileName) of
-          Coq_errC e => raise (Exception ("Could not parse JSON Manifest file: " ^ e ^ "\n"))
-        | Coq_resultC manifest =>
           (case (parse_term_from_file termFileName) of
             Coq_errC e => raise (Exception ("Could not parse Term file: " ^ e ^ "\n"))
-          | Coq_resultC term => (manifest, term)
+          | Coq_resultC term => (term)
           )
-          )
-      end) *)
+      end
+    )
+    )
     end
 
   (* Retrieves the manifest filename and private key (as strings)

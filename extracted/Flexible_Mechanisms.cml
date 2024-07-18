@@ -53,6 +53,26 @@ val filehash_auth_phrase : coq_Term =
 val filehash_demo_evidence_type : coq_Evidence =
   eval filehash_auth_phrase coq_P0 (Coq_nn O)
 
+(** val cert_demo_evidence_type : coq_Evidence **)
+
+val cert_demo_evidence_type : coq_Evidence =
+  eval certificate_style coq_P0 (Coq_nn O)
+
+(** val bg_demo_evidence_type : coq_Evidence **)
+
+val bg_demo_evidence_type : coq_Evidence =
+  eval background_check coq_P0 (Coq_nn O)
+
+(** val parmut_1_demo_evidence_type : coq_Evidence **)
+
+val parmut_1_demo_evidence_type : coq_Evidence =
+  eval parallel_mutual_1 coq_P0 (Coq_nn O)
+
+(** val parmut_2_demo_evidence_type : coq_Evidence **)
+
+val parmut_2_demo_evidence_type : coq_Evidence =
+  eval parallel_mutual_2 coq_P0 (Coq_nn O)
+
 (** val flexible_mechanisms : coq_Term list **)
 
 val flexible_mechanisms : coq_Term list =
@@ -61,4 +81,4 @@ val flexible_mechanisms : coq_Term list =
 (** val flexible_mechanisms_evidence : coq_Evidence list **)
 
 val flexible_mechanisms_evidence : coq_Evidence list =
-  filehash_demo_evidence_type :: []
+  filehash_demo_evidence_type :: (cert_demo_evidence_type :: (bg_demo_evidence_type :: (parmut_1_demo_evidence_type :: (parmut_2_demo_evidence_type :: []))))

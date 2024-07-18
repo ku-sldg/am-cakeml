@@ -3,7 +3,7 @@ set -eu
 
 # Function to display usage instructions
 usage() {
-  echo "Usage: $0 -t [filehash] (the client am only supports filehash right now)"
+  echo "Usage: $0 -t [cert|bg|parmut|filehash|layered_bg]"
   exit 1
 }
 
@@ -26,11 +26,11 @@ if [[ -z "$TERM_TYPE" ]]; then
   usage
 fi
 
-if [[ "$TERM_TYPE" != "filehash" ]]; then
-  echo "Only filehash is supported by the client AM right now..."
-  usage
-  exit 1
-fi
+#if [[ "$TERM_TYPE" != "filehash" ]]; then
+#  echo "Only filehash is supported by the client AM right now..."
+#  usage
+#  exit 1
+#fi
 
 if [[ "$TERM_TYPE" == "layered_bg" ]]; then
   echo "Layered BG is not yet supported..."
@@ -112,7 +112,7 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   done
   
   # Now send the request, on the very last window
-  tmux send-keys -t $I "sleep 1 && $CLIENT_AM_EXEC" Enter
+  tmux send-keys -t $I "sleep 1 && $CLIENT_AM_EXEC -t $TERM_FILE" Enter
 
   tmux attach-session -d -t ServerProcess
 
