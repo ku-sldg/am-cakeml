@@ -59,14 +59,21 @@ fun startServer ac =
 
 (* () -> () *)
 fun main () =
-  let val (manifest, am_lib, aspBin, priv_key) = AM_CLI_Utils.retrieve_CLI_args ()
-      val ac = manifest_compiler manifest am_lib aspBin
-      (* Retrieving implicit self place from manifest here *)
-      val (Coq_mkAmConfig man _ _ _ _) = ac 
-      val (Build_Manifest my_plc _ _ _ _ _ _) = man 
-      val _ = print ("My Place (retrieved from Manifest): " ^ my_plc ^ "\n\n")
-  in
-    startServer ac
+  let val (manifest, term) = AM_CLI_Utils.retrieve_Client_AM_CLI_args ()
+      val demo_term : coq_Term = filehash_auth_phrase
+      val top_plc   : coq_Plc = "TOP_PLC"
+      val att_plc   : coq_Plc = "P0" 
+      val et        : coq_Evidence = Coq_nn O 
+      val init_rawev : coq_RawEv = [passed_bs]
+      val attester_addr : coq_UUID = "localhost:5000"
+      val appraiser_addr : coq_UUID = "localhost:5003" 
+      
+      val app_result = run_demo_client_AM demo_term top_plc att_plc et init_rawev attester_addr appraiser_addr 
+  in 
+    ()
   end
+  handle Exception e => TextIO.print_err e 
+          | Word8Extra.InvalidHex => TextIO.print_err "BSTRING UNSHOW ERROR"
+          | _          => TextIO.print_err "Fatal: unknown error!\n"
 
 val () = main ()

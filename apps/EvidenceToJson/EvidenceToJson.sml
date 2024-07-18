@@ -1,8 +1,8 @@
 
   
-fun write_term_to_file (term : coq_Term) (filename : string) =
+fun write_evidence_to_file (term : coq_Evidence) (filename : string) =
   let
-    val (Build_Jsonifiable to_JSON _) = coq_Jsonifiable_Term
+    val (Build_Jsonifiable to_JSON _) = coq_Jsonifiable_Evidence
     val coq_json = to_JSON term
     val json_str = coq_JSON_to_string coq_json
   in
@@ -27,14 +27,18 @@ fun main () =
         let val termName  = List.nth argList (termInd + 1) 
             val outFile   = List.nth argList (outFileInd + 1)
             val outTerm   = case termName of
+                              "filehash"    => filehash_demo_evidence_type
+                            | _ => raise (Exception ("TermToJson Argument Error: \n" ^ usage))
+                          (*
                               "cert"        => certificate_style
                             | "bg"          => background_check
                             | "parmut"      => parallel_mutual_1
                             | "layered_bg"  => layered_background_check
                             | "filehash"    => filehash_auth_phrase
                             | _ => raise (Exception ("TermToJson Argument Error: \n" ^ usage))
+                          *)
         in
-          write_term_to_file outTerm outFile
+          write_evidence_to_file outTerm outFile
         end
     end
     handle Exception e => TextIO.print_err e 
