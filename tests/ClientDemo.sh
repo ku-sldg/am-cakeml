@@ -3,7 +3,7 @@ set -eu
 
 # Function to display usage instructions
 usage() {
-  echo "Usage: $0 -t [cert|bg|parmut|filehash|layered_bg]"
+  echo "Usage: $0 -t [filehash] (the client am only supports filehash right now)"
   exit 1
 }
 
@@ -26,10 +26,16 @@ if [[ -z "$TERM_TYPE" ]]; then
   usage
 fi
 
+if [[ "$TERM_TYPE" != "filehash" ]]; then
+  echo "Only filehash is supported by the client AM right now..."
+  usage
+  exit 1
+fi
+
 if [[ "$TERM_TYPE" == "layered_bg" ]]; then
   echo "Layered BG is not yet supported..."
   usage
-  exit 0
+  exit 1
 fi
 
 TESTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -41,6 +47,7 @@ TERM_GEN=./bin/term_to_json
 EV_GEN=./bin/evidence_to_json
 MAN_GEN=./bin/manifest_generator
 AM_EXEC=./bin/attestation_manager
+CLIENT_AM_EXEC=./bin/client_am
 
 if [ -z ${ASP_BIN+x} ]; then
   echo "Variable 'ASP_BIN' is not set" 
@@ -105,7 +112,7 @@ if [[ "$PWD" == */am-cakeml/tests ]]; then
   done
   
   # Now send the request, on the very last window
-  tmux send-keys -t $I "sleep 1 && $TESTS_DIR/send_term_req.sh -h $IP -p $PORT -f $TERM_FILE" Enter
+  tmux send-keys -t $I "sleep 1 && $CLIENT_AM_EXEC" Enter
 
   tmux attach-session -d -t ServerProcess
 
