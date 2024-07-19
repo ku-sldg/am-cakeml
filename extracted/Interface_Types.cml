@@ -32,3 +32,14 @@ datatype coq_AM_Protocol_Responses =
   Protocol_Run_Response coq_ProtocolRunResponse
 | Protocol_Negotiate_Response coq_ProtocolNegotiateResponse
 | Protocol_Appraise_Response coq_ProtocolAppraiseResponse
+
+(** val stringify_AppResultC_json : coq_AppResultC -> string **)
+
+fun stringify_AppResultC_json v =
+  let val appres_json =
+    coq_AppResultC_to_Json
+      (jsonifiable_map_serial_serial coq_Stringifiable_ID_Type
+        coq_Eq_Class_ID_Type coq_Stringifiable_ID_Type) coq_Jsonifiable_RawEv
+      v
+  in
+  coq_JSON_to_string appres_json end

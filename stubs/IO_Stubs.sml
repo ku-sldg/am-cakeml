@@ -132,3 +132,18 @@ fun is_local_appraisal amLib =
   case amLib of 
     Build_AM_Library clone_uuid _ _ _ _ => clone_uuid = ""
 
+fun print_attestation_request req uuid = (stringify_ProtocolRunRequest_json req)
+
+fun print_attestation_response resp = (stringify_ProtocolRunResponse_json resp)
+
+fun print_appraisal_request req uuid = (stringify_ProtocolAppraiseRequest_json req)
+
+fun print_appraisal_response resp = (stringify_ProtocolAppraiseResponse_json resp)
+
+(*
+Definition print_attestation_response (resp:ProtocolRunResponse) : unit.  Admitted.
+
+Definition print_appraisal_request (req:ProtocolAppraiseRequest) (uuid:UUID) : unit.  Admitted.
+
+Definition print_appraisal_response (resp:ProtocolAppraiseResponse) : unit.  Admitted.
+*)

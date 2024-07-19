@@ -80,10 +80,11 @@ get_files(copland_am_src
     extracted/Manifest_JSON.cml
     extracted/Cvm_St.cml
 
+    extracted/CvmJson_Interfaces.cml
+    
     stubs/IO_Stubs.sml
 
     extracted/Anno_Term_Defs.cml
-    extracted/CvmJson_Interfaces.cml
     extracted/Manifest_Compiler.cml
     extracted/EnvironmentM.cml
     extracted/Manifest_Union.cml

@@ -2,10 +2,12 @@
   "CLONE_UUID": "localhost:5100",
   "LIB_ASPS": {
     "attest_id": "attest_id",
-    "hashfile_id": "attest_id",
+    "hashfile_id": "hashfile_id",
     "appraise_id": "appraise_id",
-    "sig_id": "attest_id",
-    "certificate_id": "certificate_id"
+    "sig_id": "sigid",
+    "certificate_id": "certificate_id",
+    "checkhash_id": "checkhash_id",
+    "checksig_id": "checksig_id"
   },
   "LIB_PLCS": {
     "P0": "localhost:5000",
@@ -18,8 +20,8 @@
   },
   "LIB_PUBKEYS": {},
   "ASP_COMPAT_MAP": {
-    "sig_id": "appraise_id",
-    "hashfile_id": "appraise_id",
+    "sig_id": "checksig_id",
+    "hashfile_id": "checkhash_id",
     "attest_id": "appraise_id",
     "appraise_id": "appraise_id",
     "certificate_id":"appraise_id"

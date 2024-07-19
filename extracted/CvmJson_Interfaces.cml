@@ -250,3 +250,31 @@ fun coq_JSON_to_ASPRunResponse resp =
 fun coq_ErrorResponseJSON msg =
   JSON_Object ((coq_STR_SUCCESS, (InJSON_Boolean
     False)) :: ((coq_STR_PAYLOAD, (InJSON_String msg)) :: []))
+
+(** val stringify_ProtocolRunRequest_json :
+    coq_ProtocolRunRequest -> string **)
+
+fun stringify_ProtocolRunRequest_json v =
+  let val appres_json = coq_ProtocolRunRequest_to_JSON v in
+  coq_JSON_to_string appres_json end
+
+(** val stringify_ProtocolRunResponse_json :
+    coq_ProtocolRunResponse -> string **)
+
+fun stringify_ProtocolRunResponse_json v =
+  let val appres_json = coq_ProtocolRunResponse_to_JSON v in
+  coq_JSON_to_string appres_json end
+
+(** val stringify_ProtocolAppraiseRequest_json :
+    coq_ProtocolAppraiseRequest -> string **)
+
+fun stringify_ProtocolAppraiseRequest_json v =
+  let val appres_json = coq_ProtocolAppraiseRequest_to_JSON v in
+  coq_JSON_to_string appres_json end
+
+(** val stringify_ProtocolAppraiseResponse_json :
+    coq_ProtocolAppraiseResponse -> string **)
+
+fun stringify_ProtocolAppraiseResponse_json v =
+  let val appres_json = coq_ProtocolAppraiseResponse_to_JSON v in
+  coq_JSON_to_string appres_json end

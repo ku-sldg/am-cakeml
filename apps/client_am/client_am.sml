@@ -17,18 +17,29 @@ fun main () =
       val top_plc   : coq_Plc = "TOP_PLC"
       val att_plc   : coq_Plc = "P0" 
       val init_et        : coq_Evidence = Coq_nn O 
-      val init_rawev : coq_RawEv = [default_bs]
+      val init_rawev : coq_RawEv = [nonce_bs]
       val attester_addr : coq_UUID = "localhost:5000"
       val appraiser_addr : coq_UUID = "localhost:5003" 
       
-      val app_result = run_demo_client_AM demo_term top_plc att_plc init_et init_rawev attester_addr appraiser_addr 
-  in 
-    case app_result of 
-      Coq_resultC v => print ("\n\nClient AM SUCCESS:  \n\n" ^ (stringify_AppResultC_json v))
-    | Coq_errC s => raise (Exception ("Client AM FAILURE:  " ^ s))
+      val v = run_demo_client_AM demo_term top_plc att_plc init_et init_rawev attester_addr appraiser_addr in 
+      (
+      case v of 
+        Coq_resultC ((((v'', attReqString), attRespString), appReqString), appRespString) (* (res, (_, (_, (_, _)))) *) =>
+          let val _ = print ("\nSent Attestation Request: \n" ^ attReqString ^ "\n\n")
+              val _ = print ("Received Attestation Response: \n" ^ attRespString ^ "\n\n")
+              val _ = print ("Sent Appraisal Request: \n" ^ appReqString ^ "\n\n")
+              val _ = print ("Received Appraisal Response: \n" ^ appRespString ^ "\n\n") in
+               (print ("\n\nClient AM SUCCESS:  \n\n" ^ (stringify_AppResultC_json (v''))))
+          end
+      | Coq_errC s => raise (Exception ("Client AM FAILURE:  " ^ s))
+      )
   end
   handle Exception e => TextIO.print_err e 
-          | Word8Extra.InvalidHex => TextIO.print_err "BSTRING UNSHOW ERROR"
-          | _          => TextIO.print_err "Fatal: unknown error!\n"
+    | Word8Extra.InvalidHex => TextIO.print_err "BSTRING UNSHOW ERROR"
+    | _          => TextIO.print_err "Fatal: unknown error!\n"
 
 val () = main ()
+
+
+(* val ((((v'', attReqString), attRespString), appReqString), appRespString) = v' *)
+(* ("Sent Attestation Request: \n" ^ attReqString ^ "\n") in  *)

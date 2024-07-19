@@ -29,3 +29,26 @@ fun do_start_par_thread _ _ _ =
 
 fun do_wait_par_thread loc =
   ret (parallel_vm_thread loc)
+
+(** val print_attestation_request :
+    coq_ProtocolRunRequest -> coq_UUID -> string **)
+
+val print_attestation_request : (coq_ProtocolRunRequest -> coq_UUID -> string) =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val print_attestation_response : coq_ProtocolRunResponse -> string **)
+
+val print_attestation_response : (coq_ProtocolRunResponse -> string) =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val print_appraisal_request :
+    coq_ProtocolAppraiseRequest -> coq_UUID -> string **)
+
+val print_appraisal_request : (coq_ProtocolAppraiseRequest -> coq_UUID ->
+                              string) =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val print_appraisal_response : coq_ProtocolAppraiseResponse -> string **)
+
+val print_appraisal_response : (coq_ProtocolAppraiseResponse -> string) =
+  failwith "AXIOM TO BE REALIZED"

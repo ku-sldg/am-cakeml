@@ -13,3 +13,4 @@ val coq_Stringifiable_BS : coq_BS coq_Stringifiable =
 val passed_bs = BString.fromString "PASSED"
 val failed_bs = BString.fromString "FAILED"
 val default_bs = BString.fromString "default_bs"
+val nonce_bs = BString.fromString "a_nonce"
