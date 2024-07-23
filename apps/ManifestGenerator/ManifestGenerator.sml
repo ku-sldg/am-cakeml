@@ -1,7 +1,7 @@
 (* Depends on: util, copland, am/Measurements, am/ServerAm *)
 
 structure ManGen_CLI_Utils = struct
-  type ManGenArgs = (coq_Evidence_Plc_list * coq_Term_Plc_list * string)
+  type ManGenArgs = (coq_Evidence_Plc_list * coq_Term_Plc_list * coq_AM_Library * string)
 
   (* Parse a JSON file into a coq_Evidence_Plc_list *)
   (* : string -> (coq_Evidence_Plc_list, string) coq_ResultT *)
@@ -40,6 +40,24 @@ structure ManGen_CLI_Utils = struct
             from_JSON js
           end
     end
+  
+  (* Parse a JSON file into a coq_AM_Library *)
+  (* : string -> (coq_AM_Library, string) coq_ResultT *)
+  fun parse_am_lib_from_file (filename : string) =
+    let
+      val file_text = TextIOExtra.readFile filename
+    in
+      case (Json.parse file_text) of
+        Err c => Coq_errC c
+      | Ok js => 
+        case (cakeML_JSON_to_coq_JSON js) of
+          Coq_errC c => Coq_errC c
+        | Coq_resultC js =>
+          let val (Build_Jsonifiable _ from_JSON) = coq_Jsonifiable_AM_Library
+          in
+            from_JSON js
+          end
+    end
 
 
     (**
@@ -48,23 +66,26 @@ structure ManGen_CLI_Utils = struct
     *)
   fun retrieve_CLI_args () =
       (let val name = CommandLine.name()
-          val usage = ("Usage: " ^ name ^ " -t <terms_file>.json -e <evidences_file>.json -o <output_directory>\n")
+          val usage = ("Usage: " ^ name ^ " -t <terms_file>.json -e <evidences_file>.json -l <am_lib>.json -o <output_directory>\n")
       in
         case (CommandLine.arguments()) of
           argList =>
             let val termFileInd   = ListExtra.find_index argList "-t"
                 val evidFileInd   = ListExtra.find_index argList "-e"
+                val amLibInd      = ListExtra.find_index argList "-l"
                 val outDirInd     = ListExtra.find_index argList "-o"
 
                 val termFileBool  = (termFileInd <> ~1)
                 val evidFileBool  = (evidFileInd <> ~1)
+                val amLibBool     = (amLibInd <> ~1)
                 val outDirBool    = (outDirInd <> ~1)
             in
-              if ((not termFileBool) orelse (not evidFileBool) orelse (not outDirBool))
+              if ((not termFileBool) orelse (not evidFileBool) orelse (not outDirBool) orelse (not amLibBool))
               then (raise (Exception ("Manifest Generator Argument Error: \n" ^ usage)))
               else
                 let val termFile  = List.nth argList (termFileInd + 1) 
                     val evidFile  = List.nth argList (evidFileInd + 1) 
+                    val amLibFile = List.nth argList (amLibInd + 1) 
                     val outDir    = List.nth argList (outDirInd + 1)
                 in
                   (case (parse_ev_list_from_file evidFile) of
@@ -72,7 +93,12 @@ structure ManGen_CLI_Utils = struct
                   | Coq_resultC evs =>
                     (case (parse_term_list_from_file termFile) of
                       Coq_errC c => raise (Exception ("Error parsing term file: " ^ c))
-                    | Coq_resultC terms => (evs, terms, outDir)))
+                    | Coq_resultC terms => 
+                      (case (parse_am_lib_from_file amLibFile) of
+                        Coq_errC c => raise (Exception ("Error parsing AM Library file: " ^ c))
+                      | Coq_resultC al => (evs, terms, al, outDir))
+                    )
+                  )
                 end
             end
       end) : ManGenArgs
@@ -94,13 +120,15 @@ fun write_out_manifests (out_dir : string) (env_list : coq_EnvironmentM) =
     ) env_list
 
 fun main () =
-    let val (evid_list, term_list, out_path) = ManGen_CLI_Utils.retrieve_CLI_args ()
+    let val (evid_list, term_list, amLib, out_path) = ManGen_CLI_Utils.retrieve_CLI_args ()
         val _ = print "Manifest Generator CLI Args Retrieved\n"
 
-        val environment = end_to_end_mangen evid_list term_list
+        val environment = end_to_end_mangen evid_list term_list amLib
         val _ = print "Manifests Generated\n"
 
-        val _ = write_out_manifests out_path environment
+        val _ = case environment of
+                  Coq_errC e => raise (Exception e)
+                | Coq_resultC res => write_out_manifests out_path res
         val _ = print "Manifests Written to File\n"
     in
       ()

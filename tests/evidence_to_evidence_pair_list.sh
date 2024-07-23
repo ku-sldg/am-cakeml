@@ -3,12 +3,12 @@
 TESTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 GENERATED=$TESTS_DIR/DemoFiles/Generated
-TOP_PLC="P0"
-TERM_PAIR_FILE=$GENERATED/TermPairList.json
+TOP_PLC="P3"
+TERM_PAIR_FILE=$GENERATED/EvidencePairList.json
 
 # Function to display usage instructions
 usage() {
-  echo "Usage: $0 -f <json_term_file>"
+  echo "Usage: $0 -f <json_evidence_file>"
   exit 1
 }
 
@@ -38,8 +38,8 @@ fi
 # Read JSON data from the file
 JSON_TERM_DATA=$(cat "$JSON_TERM_FILE")
 
-# Build Term_Plc_list JSON structure
-TERM_FILE_JSON="{ \"Term_Plc_list\": [ [$JSON_TERM_DATA, \"$TOP_PLC\" ] ] }" 
+# Build Evidnce_Plc_list JSON structure
+TERM_FILE_JSON="{ \"Evidence_Plc_list\": [ [$JSON_TERM_DATA, \"$TOP_PLC\" ] ] }" 
 
 # Write to generated temporarily
 echo $TERM_FILE_JSON > $TERM_PAIR_FILE

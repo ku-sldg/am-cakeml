@@ -23,17 +23,3 @@ val str_eq_class : string coq_EqClass =
 
 val nat_EqClass : nat coq_EqClass =
   Nat.eqb
-
-(** val eqbPair :
-    'a1 coq_EqClass -> 'a2 coq_EqClass -> ('a1 * 'a2) -> ('a1 * 'a2) -> bool **)
-
-fun eqbPair h h' p1 p2 =
-  let val (a1, b1) = p1 in
-  let val (a2, b2) = p2 in
-  (fn x => fn y => x andalso y) (eqb h a1 a2) (eqb h' b1 b2) end end
-
-(** val pair_EqClass :
-    'a1 coq_EqClass -> 'a2 coq_EqClass -> ('a1 * 'a2) coq_EqClass **)
-
-val pair_EqClass =
-  eqbPair

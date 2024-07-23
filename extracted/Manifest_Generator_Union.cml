@@ -16,16 +16,21 @@ fun mangen_plcTerm_list_union ls =
   env_list_union (manifest_generator_plcTerm_list ls)
 
 (** val manifest_generator_plcEvidence_list :
-    (coq_Evidence * coq_Plc) list -> coq_EnvironmentM list **)
+    (coq_Evidence * coq_Plc) list -> coq_AM_Library -> (coq_EnvironmentM
+    list, string) coq_ResultT **)
 
-fun manifest_generator_plcEvidence_list ls =
-  map (fn pat => let val (et, p) = pat in manifest_generator_app et p end) ls
+fun manifest_generator_plcEvidence_list ls al =
+  result_map (fn pat =>
+    let val (et, p) = pat in manifest_generator_app et p al end) ls
 
 (** val mangen_plcEvidence_list_union :
-    (coq_Evidence * coq_Plc) list -> coq_EnvironmentM **)
+    (coq_Evidence * coq_Plc) list -> coq_AM_Library -> (coq_EnvironmentM,
+    string) coq_ResultT **)
 
-fun mangen_plcEvidence_list_union ls =
-  env_list_union (manifest_generator_plcEvidence_list ls)
+fun mangen_plcEvidence_list_union ls al =
+  case manifest_generator_plcEvidence_list ls al of
+    Coq_errC e => Coq_errC e
+  | Coq_resultC ls' => Coq_resultC (env_list_union ls')
 
 type coq_Evidence_Plc_list = (coq_Evidence * coq_Plc) list
 
@@ -179,12 +184,15 @@ fun update_pubkeys_env pubs env =
   map (update_pubkeys_env' pubs) env
 
 (** val end_to_end_mangen' :
-    coq_Evidence_Plc_list -> coq_Term_Plc_list -> coq_EnvironmentM **)
+    coq_Evidence_Plc_list -> coq_Term_Plc_list -> coq_AM_Library ->
+    (coq_EnvironmentM, string) coq_ResultT **)
 
-fun end_to_end_mangen' ls ts =
-  let val app_env = mangen_plcEvidence_list_union ls in
+fun end_to_end_mangen' ls ts al =
+  let val app_env = mangen_plcEvidence_list_union ls al in
   let val att_env = mangen_plcTerm_list_union ts in
-  environment_union app_env att_env end end
+  (case app_env of
+     Coq_errC e => Coq_errC e
+   | Coq_resultC app_env0 => Coq_resultC (environment_union app_env0 att_env)) end end
 
 (** val manset_union_list :
     'a1 coq_EqClass -> 'a1 manifest_set manifest_set -> 'a1 manifest_set **)
@@ -204,14 +212,21 @@ fun get_all_unique_places ls ets =
   manset_union coq_Eq_Class_ID_Type ts_ps ets_ps end end end
 
 (** val end_to_end_mangen :
-    coq_Evidence_Plc_list -> coq_Term_Plc_list -> coq_EnvironmentM **)
+    coq_Evidence_Plc_list -> coq_Term_Plc_list -> coq_AM_Library ->
+    (coq_EnvironmentM, string) coq_ResultT **)
 
-fun end_to_end_mangen ls ts =
+fun end_to_end_mangen ls ts al =
   let val ps = get_all_unique_places ts ls in
-  update_pubkeys_env ps (update_knowsOf_myPlc_env (end_to_end_mangen' ls ts)) end
+  (case end_to_end_mangen' ls ts al of
+     Coq_errC e => Coq_errC e
+   | Coq_resultC env =>
+     Coq_resultC (update_pubkeys_env ps (update_knowsOf_myPlc_env env))) end
 
 (** val end_to_end_mangen_final :
-    coq_Evidence_Plc_list -> coq_Term_Plc_list -> coq_Manifest list **)
+    coq_Evidence_Plc_list -> coq_Term_Plc_list -> coq_AM_Library ->
+    (coq_Manifest list, string) coq_ResultT **)
 
-fun end_to_end_mangen_final ls ts =
-  environment_to_manifest_list (end_to_end_mangen ls ts)
+fun end_to_end_mangen_final ls ts al =
+  case end_to_end_mangen ls ts al of
+    Coq_errC e => Coq_errC e
+  | Coq_resultC env => Coq_resultC (environment_to_manifest_list env)

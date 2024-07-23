@@ -28,7 +28,7 @@ fun handleIncoming (listener_and_ac) =
     let val (listener, ac) = listener_and_ac
         val client = Socket.accept listener
         val _ = TextIOExtra.printLn "Accepted connection\n"
-        val nonceval = BString.fromString "anonce" (* TODO: should this be hardcoded here? *)
+        val nonceval = passed_bs (* BString.fromString "anonce" *) (* TODO: should this be hardcoded here? *)
     in 
       (respondToMsg client nonceval ac);
       Socket.close client
@@ -40,8 +40,8 @@ fun handleIncoming (listener_and_ac) =
 (* coq_AM_Config -> unit *)
 fun startServer ac =
     let val queueLength = 5 (* TODO: Hardcoded queuelength *)
-        val (Coq_mkAmConfig man _ _ _ uuidCb _) = ac 
-        val (Build_Manifest my_plc _ _ _ _ _ _) = man 
+        val (Coq_mkAmConfig man clone_uuid compatMap aspCb uuidCb pubCb) = ac
+        val (Build_Manifest my_plc _ _ _ _ _) = man 
         val uuid = case uuidCb my_plc of
                       Coq_resultC u => u
                     | Coq_errC s => raise Exception ("UUID lookup error: Could not find own UUID in AM Config")
@@ -59,17 +59,14 @@ fun startServer ac =
 
 (* () -> () *)
 fun main () =
-  let val (manifest, am_lib, aspBin, priv_key) = AM_CLI_Utils.retrieve_CLI_args ()
+  let val (manifest, am_lib, aspBin, priv_key) = AM_CLI_Utils.retrieve_Server_AM_CLI_args ()
       val ac = manifest_compiler manifest am_lib aspBin
       (* Retrieving implicit self place from manifest here *)
       val (Coq_mkAmConfig man _ _ _ _ _) = ac 
-      val (Build_Manifest my_plc _ _ _ _ _ _) = man 
+      val (Build_Manifest my_plc _ _ _ _ _) = man 
       val _ = print ("My Place (retrieved from Manifest): " ^ my_plc ^ "\n\n")
   in
     startServer ac
   end
-  handle Exception e => TextIO.print_err e 
-          | Word8Extra.InvalidHex => TextIO.print_err "BSTRING UNSHOW ERROR"
-          | _          => TextIO.print_err "Fatal: unknown error!\n"
 
 val () = main ()

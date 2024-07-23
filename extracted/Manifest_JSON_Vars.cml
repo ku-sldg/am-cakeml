@@ -8,11 +8,6 @@ val coq_MAN_ABS_PLC : string =
 val coq_MAN_ASPS : string =
   "ASPS"
 
-(** val coq_MAN_APPR_ASPS : string **)
-
-val coq_MAN_APPR_ASPS : string =
-  "APPR_ASPS"
-
 (** val coq_MAN_UUUID_PLCS : string **)
 
 val coq_MAN_UUUID_PLCS : string =
@@ -38,6 +33,11 @@ val coq_MAN_POLICY : string =
 val coq_AM_CLONE_UUUID : string =
   "CLONE_UUID"
 
+(** val coq_AM_LIB_ASPS : string **)
+
+val coq_AM_LIB_ASPS : string =
+  "LIB_ASPS"
+
 (** val coq_AM_LIB_PLCS : string **)
 
 val coq_AM_LIB_PLCS : string =
@@ -47,3 +47,8 @@ val coq_AM_LIB_PLCS : string =
 
 val coq_AM_LIB_PUBKEYS : string =
   "LIB_PUBKEYS"
+
+(** val coq_AM_LIB_COMPAT_ASPS : string **)
+
+val coq_AM_LIB_COMPAT_ASPS : string =
+  "ASP_COMPAT_MAP"

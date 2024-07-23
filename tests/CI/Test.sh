@@ -4,11 +4,8 @@ set -eu
 ################ PATH VARS ################
 # Assumes the following structure am-cakeml/tests/CI
 CI_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-echo "CI_DIR: $CI_DIR"
 TESTS_DIR="$(cd $CI_DIR && cd .. && pwd)"
-echo "TESTS_DIR: $TESTS_DIR"
 REPO_ROOT="$(cd "$TESTS_DIR" && cd .. && pwd)"
-echo "REPO_ROOT: $REPO_ROOT"
 ################ END PATH VARS ################
 
 # Function to display usage instructions
@@ -87,7 +84,6 @@ if [[ "$REPO_ROOT" == */am-cakeml ]]; then
   # Move to build folder
   mkdir -p $REPO_ROOT/build
   cd $REPO_ROOT/build
-  ls -al
 
   # Generate the terms file
   $TERM_GEN -t $TERM_TYPE -o $TERM_FILE
@@ -96,7 +92,7 @@ if [[ "$REPO_ROOT" == */am-cakeml ]]; then
   $TESTS_DIR/term_to_term_pair_list.sh -f $TERM_FILE
 
   # First, generate the manifests
-  $MAN_GEN -t $GENERATED/TermPairList.json -e $DEMO_FILES/Evid_List.json -o $GENERATED
+  $MAN_GEN -t $GENERATED/TermPairList.json -e $DEMO_FILES/Evid_List.json -l $TEST_AM_LIB -o $GENERATED
 
   PIDS=()
   
@@ -109,9 +105,9 @@ if [[ "$REPO_ROOT" == */am-cakeml ]]; then
   
   # Now send the request, on the very last window
   sleep 1 
-  $TESTS_DIR/send_term_req.sh -h $IP -p $PORT -f $TERM_FILE > $GENERATED/output.out
+  $TESTS_DIR/send_term_req.sh -h $IP -p $PORT -f $TERM_FILE > $GENERATED/output_resp.json
   # We need this to be the last line so that the exit code is whether or not we found success
-  grep "\"SUCCESS\":true" $GENERATED/output.out
+  grep "\"SUCCESS\":true" $GENERATED/output_resp.json
 else
   echo "You are in $PWD, with the root set as $REPO_ROOT, but youre root should be 'am-cakeml'"
 fi
