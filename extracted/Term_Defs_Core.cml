@@ -75,48 +75,74 @@ datatype coq_FWD =
 | KILL 
 | KEEP 
 
+(** val coq_FWD_to_JSON : coq_FWD -> coq_JSON **)
+
+fun coq_FWD_to_JSON fwd = case fwd of
+  COMP => JSON_Object (("FWD_CONSTRUCTOR", (InJSON_String "COMP")) :: [])
+| ENCR => JSON_Object (("FWD_CONSTRUCTOR", (InJSON_String "ENCR")) :: [])
+| EXTD n =>
+  JSON_Object (("FWD_CONSTRUCTOR", (InJSON_String "EXTD")) :: (("FWD_BODY",
+    (InJSON_String
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_nat in
+     to_string n end))) :: []))
+| KILL => JSON_Object (("FWD_CONSTRUCTOR", (InJSON_String "KILL")) :: [])
+| KEEP => JSON_Object (("FWD_CONSTRUCTOR", (InJSON_String "KEEP")) :: [])
+
+(** val coq_FWD_from_JSON : coq_JSON -> (coq_FWD, string) coq_ResultT **)
+
+fun coq_FWD_from_JSON js =
+  case coq_JSON_get_string "FWD_CONSTRUCTOR" js of
+    Coq_errC e => Coq_errC e
+  | Coq_resultC cons_name =>
+    (case (op=) cons_name "COMP" of
+       True => Coq_resultC COMP
+     | False =>
+       (case (op=) cons_name "ENCR" of
+          True => Coq_resultC ENCR
+        | False =>
+          (case (op=) cons_name "KILL" of
+             True => Coq_resultC KILL
+           | False =>
+             (case (op=) cons_name "KEEP" of
+                True => Coq_resultC KEEP
+              | False =>
+                (case (op=) cons_name "EXTD" of
+                   True =>
+                   let val JSON_Object m = js in
+                   (case m of
+                      [] =>
+                      Coq_errC
+                        "Invalid EXTD JSON: REMEMBER IT MUST BE IN A SPECIFIC FORMAT AND ORDER"
+                    | _ :: l =>
+                      (case l of
+                         [] =>
+                         Coq_errC
+                           "Invalid EXTD JSON: REMEMBER IT MUST BE IN A SPECIFIC FORMAT AND ORDER"
+                       | p :: l0 =>
+                         let val (_, i) = p in
+                         (case i of
+                            InJSON_String n =>
+                            (case l0 of
+                               [] =>
+                               (case let val Build_Stringifiable _
+                                       from_string = coq_Stringifiable_nat
+                                     in
+                                     from_string n end of
+                                  Coq_errC _ =>
+                                  Coq_errC "Parsing EXTD not successful"
+                                | Coq_resultC n0 => Coq_resultC (EXTD n0))
+                             | _ :: _ =>
+                               Coq_errC
+                                 "Invalid EXTD JSON: REMEMBER IT MUST BE IN A SPECIFIC FORMAT AND ORDER")
+                          | _ =>
+                            Coq_errC
+                              "Invalid EXTD JSON: REMEMBER IT MUST BE IN A SPECIFIC FORMAT AND ORDER") end)) end
+                 | False => Coq_errC "Invalid FWD JSON")))))
+
 (** val coq_Jsonifiable_FWD : coq_FWD coq_Jsonifiable **)
 
 val coq_Jsonifiable_FWD : coq_FWD coq_Jsonifiable =
-  Build_Jsonifiable (fn fwd =>
-    case fwd of
-      COMP => JSON_Object (("FWD_CONSTRUCTOR", (InJSON_String "COMP")) :: [])
-    | ENCR => JSON_Object (("FWD_CONSTRUCTOR", (InJSON_String "ENCR")) :: [])
-    | EXTD n =>
-      JSON_Object (("FWD_CONSTRUCTOR", (InJSON_String "EXTD")) :: (("EXTD_N",
-        (InJSON_String
-        (let val Build_Stringifiable to_string _ = coq_Stringifiable_nat in
-         to_string n end))) :: []))
-    | KILL => JSON_Object (("FWD_CONSTRUCTOR", (InJSON_String "KILL")) :: [])
-    | KEEP => JSON_Object (("FWD_CONSTRUCTOR", (InJSON_String "KEEP")) :: []))
-    (fn js =>
-    case coq_JSON_get_string "FWD_CONSTRUCTOR" js of
-      Coq_errC e => Coq_errC e
-    | Coq_resultC cons_name =>
-      (case (op=) cons_name "COMP" of
-         True => Coq_resultC COMP
-       | False =>
-         (case (op=) cons_name "ENCR" of
-            True => Coq_resultC ENCR
-          | False =>
-            (case (op=) cons_name "KILL" of
-               True => Coq_resultC KILL
-             | False =>
-               (case (op=) cons_name "KEEP" of
-                  True => Coq_resultC KEEP
-                | False =>
-                  (case (op=) cons_name "EXTD" of
-                     True =>
-                     (case coq_JSON_get_string "EXTD_N" js of
-                        Coq_errC _ => Coq_errC "Parsing EXTD not successful"
-                      | Coq_resultC n_str =>
-                        (case let val Build_Stringifiable _ from_string =
-                                coq_Stringifiable_nat
-                              in
-                              from_string n_str end of
-                           Coq_errC e => Coq_errC e
-                         | Coq_resultC n => Coq_resultC (EXTD n)))
-                   | False => Coq_errC "Invalid FWD JSON"))))))
+  Build_Jsonifiable coq_FWD_to_JSON coq_FWD_from_JSON
 
 datatype coq_Evidence =
   Coq_mt 
@@ -321,101 +347,201 @@ datatype coq_ASP =
 | HSH 
 | ENC coq_Plc
 
+(** val coq_ASP_to_JSON : coq_ASP -> coq_JSON **)
+
+fun coq_ASP_to_JSON a = case a of
+  NULL => JSON_Object (("ASP_CONSTRUCTOR", (InJSON_String "NULL")) :: [])
+| CPY => JSON_Object (("ASP_CONSTRUCTOR", (InJSON_String "CPY")) :: [])
+| ASPC sp fwd ps =>
+  JSON_Object (("ASP_CONSTRUCTOR", (InJSON_String "ASPC")) :: (("ASP_BODY",
+    (InJSON_Array ((InJSON_String
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_SP in
+     to_string sp end)) :: ((InJSON_Object
+    (let val Build_Jsonifiable to_JSON _ = coq_Jsonifiable_FWD in
+     to_JSON fwd end)) :: ((InJSON_Object
+    (let val Build_Jsonifiable to_JSON _ =
+       coq_Jsonifiable_ASP_Params
+         (jsonifiable_map_serial_serial coq_Stringifiable_ID_Type
+           coq_Eq_Class_ID_Type coq_Stringifiable_ID_Type)
+     in
+     to_JSON ps end)) :: []))))) :: []))
+| SIG => JSON_Object (("ASP_CONSTRUCTOR", (InJSON_String "SIG")) :: [])
+| HSH => JSON_Object (("ASP_CONSTRUCTOR", (InJSON_String "HSH")) :: [])
+| ENC q =>
+  JSON_Object (("ASP_CONSTRUCTOR", (InJSON_String "ENC")) :: (("ASP_BODY",
+    (InJSON_Array ((InJSON_String
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_ID_Type in
+     to_string q end)) :: []))) :: []))
+
+(** val coq_ASP_from_JSON : coq_JSON -> (coq_ASP, string) coq_ResultT **)
+
+fun coq_ASP_from_JSON js =
+  case coq_JSON_get_string "ASP_CONSTRUCTOR" js of
+    Coq_errC _ => Coq_resultC NULL
+  | Coq_resultC cons_name =>
+    (case (op=) cons_name "NULL" of
+       True => Coq_resultC NULL
+     | False =>
+       (case (op=) cons_name "CPY" of
+          True => Coq_resultC CPY
+        | False =>
+          (case (op=) cons_name "SIG" of
+             True => Coq_resultC SIG
+           | False =>
+             (case (op=) cons_name "HSH" of
+                True => Coq_resultC HSH
+              | False =>
+                (case (op=) cons_name "ENC" of
+                   True =>
+                   let val JSON_Object m = js in
+                   (case m of
+                      [] =>
+                      Coq_errC
+                        "Invalid ENC JSON: REMEMBER IT MUST BE IN A SPECIFIC FORMAT AND ORDER"
+                    | _ :: l =>
+                      (case l of
+                         [] =>
+                         Coq_errC
+                           "Invalid ENC JSON: REMEMBER IT MUST BE IN A SPECIFIC FORMAT AND ORDER"
+                       | p :: l0 =>
+                         let val (_, i) = p in
+                         (case i of
+                            InJSON_Array l1 =>
+                            (case l1 of
+                               [] =>
+                               Coq_errC
+                                 "Invalid ENC JSON: REMEMBER IT MUST BE IN A SPECIFIC FORMAT AND ORDER"
+                             | i0 :: l2 =>
+                               (case i0 of
+                                  InJSON_String plc =>
+                                  (case l2 of
+                                     [] =>
+                                     (case l0 of
+                                        [] =>
+                                        (case let val Build_Stringifiable _
+                                                from_string =
+                                                coq_Stringifiable_ID_Type
+                                              in
+                                              from_string plc end of
+                                           Coq_errC _ =>
+                                           Coq_errC
+                                             "Parsing ENC not successful"
+                                         | Coq_resultC plc0 =>
+                                           Coq_resultC (ENC plc0))
+                                      | _ :: _ =>
+                                        Coq_errC
+                                          "Invalid ENC JSON: REMEMBER IT MUST BE IN A SPECIFIC FORMAT AND ORDER")
+                                   | _ :: _ =>
+                                     Coq_errC
+                                       "Invalid ENC JSON: REMEMBER IT MUST BE IN A SPECIFIC FORMAT AND ORDER")
+                                | _ =>
+                                  Coq_errC
+                                    "Invalid ENC JSON: REMEMBER IT MUST BE IN A SPECIFIC FORMAT AND ORDER"))
+                          | _ =>
+                            Coq_errC
+                              "Invalid ENC JSON: REMEMBER IT MUST BE IN A SPECIFIC FORMAT AND ORDER") end)) end
+                 | False =>
+                   (case (op=) cons_name "ASPC" of
+                      True =>
+                      let val JSON_Object m = js in
+                      (case m of
+                         [] =>
+                         Coq_errC
+                           "Invalid ASPC JSON: REMEMBER IT MUST BE IN A SPECIFIC FORMAT AND ORDER"
+                       | _ :: l =>
+                         (case l of
+                            [] =>
+                            Coq_errC
+                              "Invalid ASPC JSON: REMEMBER IT MUST BE IN A SPECIFIC FORMAT AND ORDER"
+                          | p :: l0 =>
+                            let val (_, i) = p in
+                            (case i of
+                               InJSON_Array l1 =>
+                               (case l1 of
+                                  [] =>
+                                  Coq_errC
+                                    "Invalid ASPC JSON: REMEMBER IT MUST BE IN A SPECIFIC FORMAT AND ORDER"
+                                | i0 :: l2 =>
+                                  (case i0 of
+                                     InJSON_String sp =>
+                                     (case l2 of
+                                        [] =>
+                                        Coq_errC
+                                          "Invalid ASPC JSON: REMEMBER IT MUST BE IN A SPECIFIC FORMAT AND ORDER"
+                                      | i1 :: l3 =>
+                                        (case i1 of
+                                           InJSON_Object js' =>
+                                           (case l3 of
+                                              [] =>
+                                              Coq_errC
+                                                "Invalid ASPC JSON: REMEMBER IT MUST BE IN A SPECIFIC FORMAT AND ORDER"
+                                            | i2 :: l4 =>
+                                              (case i2 of
+                                                 InJSON_Object js'' =>
+                                                 (case l4 of
+                                                    [] =>
+                                                    (case l0 of
+                                                       [] =>
+                                                       (case let val Build_Stringifiable _
+                                                               from_string =
+                                                               coq_Stringifiable_SP
+                                                             in
+                                                             from_string sp end of
+                                                          Coq_errC _ =>
+                                                          Coq_errC
+                                                            "Parsing ASPC not successful"
+                                                        | Coq_resultC sp0 =>
+                                                          (case let val Build_Jsonifiable _
+                                                                  from_JSON =
+                                                                  coq_Jsonifiable_FWD
+                                                                in
+                                                                from_JSON js' end of
+                                                             Coq_errC _ =>
+                                                             Coq_errC
+                                                               "Parsing ASPC not successful"
+                                                           | Coq_resultC fwd =>
+                                                             (case let val Build_Jsonifiable _
+                                                                    from_JSON =
+                                                                    coq_Jsonifiable_ASP_Params
+                                                                    (jsonifiable_map_serial_serial
+                                                                    coq_Stringifiable_ID_Type
+                                                                    coq_Eq_Class_ID_Type
+                                                                    coq_Stringifiable_ID_Type)
+                                                                   in
+                                                                   from_JSON
+                                                                    js'' end of
+                                                                Coq_errC _ =>
+                                                                Coq_errC
+                                                                  "Parsing ASPC not successful"
+                                                              | Coq_resultC params =>
+                                                                Coq_resultC
+                                                                  (ASPC sp0
+                                                                  fwd params))))
+                                                     | _ :: _ =>
+                                                       Coq_errC
+                                                         "Invalid ASPC JSON: REMEMBER IT MUST BE IN A SPECIFIC FORMAT AND ORDER")
+                                                  | _ :: _ =>
+                                                    Coq_errC
+                                                      "Invalid ASPC JSON: REMEMBER IT MUST BE IN A SPECIFIC FORMAT AND ORDER")
+                                               | _ =>
+                                                 Coq_errC
+                                                   "Invalid ASPC JSON: REMEMBER IT MUST BE IN A SPECIFIC FORMAT AND ORDER"))
+                                         | _ =>
+                                           Coq_errC
+                                             "Invalid ASPC JSON: REMEMBER IT MUST BE IN A SPECIFIC FORMAT AND ORDER"))
+                                   | _ =>
+                                     Coq_errC
+                                       "Invalid ASPC JSON: REMEMBER IT MUST BE IN A SPECIFIC FORMAT AND ORDER"))
+                             | _ =>
+                               Coq_errC
+                                 "Invalid ASPC JSON: REMEMBER IT MUST BE IN A SPECIFIC FORMAT AND ORDER") end)) end
+                    | False =>
+                      Coq_errC "Invalid ASP CONSTRUCTOR in ASP_from_JSON"))))))
+
 (** val coq_Jsonifiable_ASP : coq_ASP coq_Jsonifiable **)
 
-val coq_Jsonifiable_ASP : coq_ASP coq_Jsonifiable =
-  Build_Jsonifiable (fn a =>
-    case a of
-      NULL => JSON_Object (("ASP_CONSTRUCTOR", (InJSON_String "NULL")) :: [])
-    | CPY => JSON_Object (("ASP_CONSTRUCTOR", (InJSON_String "CPY")) :: [])
-    | ASPC sp fwd ps =>
-      JSON_Object (("ASP_CONSTRUCTOR", (InJSON_String "ASPC")) :: (("ASP_SP",
-        (InJSON_String
-        (let val Build_Stringifiable to_string _ = coq_Stringifiable_SP in
-         to_string sp end))) :: (("ASP_FWD", (InJSON_Object
-        (let val Build_Jsonifiable to_JSON _ = coq_Jsonifiable_FWD in
-         to_JSON fwd end))) :: (("ASP_PARAMS", (InJSON_Object
-        (let val Build_Jsonifiable to_JSON _ =
-           coq_Jsonifiable_ASP_Params
-             (jsonifiable_map_serial_serial coq_Stringifiable_ID_Type
-               coq_Eq_Class_ID_Type coq_Stringifiable_ID_Type)
-         in
-         to_JSON ps end))) :: []))))
-    | SIG => JSON_Object (("ASP_CONSTRUCTOR", (InJSON_String "SIG")) :: [])
-    | HSH => JSON_Object (("ASP_CONSTRUCTOR", (InJSON_String "HSH")) :: [])
-    | ENC q =>
-      JSON_Object (("ASP_CONSTRUCTOR", (InJSON_String "ENC")) :: (("ENC_PLC",
-        (InJSON_String
-        (let val Build_Stringifiable to_string _ = coq_Stringifiable_ID_Type
-         in
-         to_string q end))) :: []))) (fn js =>
-    case coq_JSON_get_string "ASP_CONSTRUCTOR" js of
-      Coq_errC _ => Coq_errC "Invalid JSON ASP Constructor Name"
-    | Coq_resultC cons_name =>
-      (case (op=) cons_name "NULL" of
-         True => Coq_resultC NULL
-       | False =>
-         (case (op=) cons_name "CPY" of
-            True => Coq_resultC CPY
-          | False =>
-            (case (op=) cons_name "ASPC" of
-               True =>
-               (case coq_JSON_get_string "ASP_SP" js of
-                  Coq_errC _ => Coq_errC "Parsing ASPC not successful"
-                | Coq_resultC sp =>
-                  (case coq_JSON_get_Object "ASP_FWD" js of
-                     Coq_errC _ => Coq_errC "Parsing ASPC not successful"
-                   | Coq_resultC fwd =>
-                     (case coq_JSON_get_Object "ASP_PARAMS" js of
-                        Coq_errC _ => Coq_errC "Parsing ASPC not successful"
-                      | Coq_resultC ps =>
-                        (case let val Build_Stringifiable _ from_string =
-                                coq_Stringifiable_SP
-                              in
-                              from_string sp end of
-                           Coq_errC _ =>
-                           Coq_errC "Parsing ASPC not successful"
-                         | Coq_resultC sp0 =>
-                           (case let val Build_Jsonifiable _ from_JSON =
-                                   coq_Jsonifiable_FWD
-                                 in
-                                 from_JSON fwd end of
-                              Coq_errC _ =>
-                              Coq_errC "Parsing ASPC not successful"
-                            | Coq_resultC fwd0 =>
-                              (case let val Build_Jsonifiable _ from_JSON =
-                                      coq_Jsonifiable_ASP_Params
-                                        (jsonifiable_map_serial_serial
-                                          coq_Stringifiable_ID_Type
-                                          coq_Eq_Class_ID_Type
-                                          coq_Stringifiable_ID_Type)
-                                    in
-                                    from_JSON ps end of
-                                 Coq_errC _ =>
-                                 Coq_errC "Parsing ASPC not successful"
-                               | Coq_resultC ps0 =>
-                                 Coq_resultC (ASPC sp0 fwd0 ps0)))))))
-             | False =>
-               (case (op=) cons_name "SIG" of
-                  True => Coq_resultC SIG
-                | False =>
-                  (case (op=) cons_name "HSH" of
-                     True => Coq_resultC HSH
-                   | False =>
-                     (case (op=) cons_name "ENC" of
-                        True =>
-                        (case coq_JSON_get_string "ENC_PLC" js of
-                           Coq_errC _ => Coq_errC "Parsing ENC not successful"
-                         | Coq_resultC q =>
-                           (case let val Build_Stringifiable _ from_string =
-                                   coq_Stringifiable_ID_Type
-                                 in
-                                 from_string q end of
-                              Coq_errC _ =>
-                              Coq_errC
-                                "Parsing ENC PLC from string not successful"
-                            | Coq_resultC q0 => Coq_resultC (ENC q0)))
-                      | False => Coq_errC "Invalid JSON ASP Constructor Name")))))))
+val coq_Jsonifiable_ASP : coq_ASP coq_Jsonifiable = Build_Jsonifiable coq_ASP_to_JSON coq_ASP_from_JSON
+  (* failwith "AXIOM TO BE REALIZED" *)
 
 type coq_Split = coq_SP * coq_SP
 
@@ -800,8 +926,8 @@ fun coq_Term_from_JSON js =
 
 (** val coq_Jsonifiable_Term : coq_Term coq_Jsonifiable **)
 
-val coq_Jsonifiable_Term : coq_Term coq_Jsonifiable =
-  Build_Jsonifiable coq_Term_to_JSON coq_Term_from_JSON
+val coq_Jsonifiable_Term : coq_Term coq_Jsonifiable = Build_Jsonifiable coq_Term_to_JSON coq_Term_from_JSON
+  (* failwith "AXIOM TO BE REALIZED" *)
 
 datatype coq_ASP_Core =
   NULLC 
