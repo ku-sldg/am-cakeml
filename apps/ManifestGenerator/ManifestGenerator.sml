@@ -107,7 +107,7 @@ end
   
 fun write_manifest_to_file (manifest : coq_Manifest) (filename : string) =
   let
-    val (Build_Jsonifiable to_JSON _) = coq_Jsonifiable_Manifest
+    val (Build_Jsonifiable to_JSON _) = concrete_Jsonifiable_Manifest
     val coq_json = to_JSON manifest
     val json_str = coq_JSON_to_string coq_json
   in
