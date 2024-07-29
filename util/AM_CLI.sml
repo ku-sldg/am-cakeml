@@ -3,8 +3,7 @@
 structure AM_CLI_Utils = struct
   type priv_key_t = string
   type server_am_args_t = coq_AM_Manager_Config
-  (* (coq_Manifest * coq_AM_Library * coq_FS_Location * priv_key_t) *)
-  type client_am_args_t = (coq_Manifest * coq_Term)
+  type client_am_args_t = (coq_Term * coq_Attestation_Session)
   
   (* Parse a JSON file into a JSON object *)
   (* : string -> (coq_Manifest, string) coq_ResultT *)
@@ -19,6 +18,24 @@ structure AM_CLI_Utils = struct
           Coq_errC c => Coq_errC c
         | Coq_resultC js =>
           let val (Build_Jsonifiable _ from_JSON) = coq_Jsonifiable_Term
+          in
+            from_JSON js
+          end
+    end
+  
+  (* Parse a JSON file into a JSON object *)
+  (* : string -> (coq_Attestation_Session, string) coq_ResultT *)
+  fun parse_att_session_from_file (filename : string) =
+    let
+      val file_text = TextIOExtra.readFile filename
+    in
+      case (Json.parse file_text) of
+        Err c => Coq_errC c
+      | Ok js => 
+        case (cakeML_JSON_to_coq_JSON js) of
+          Coq_errC c => Coq_errC c
+        | Coq_resultC js =>
+          let val (Build_Jsonifiable _ from_JSON) = concrete_Jsonifiable_Attestation_Session
           in
             from_JSON js
           end
@@ -46,31 +63,31 @@ structure AM_CLI_Utils = struct
   
   fun retrieve_Client_AM_CLI_args _ =
     let val name = CommandLine.name ()
-        val usage = ("Usage: " ^ name ^ "you basically cant use this wrong")
+        val usage = ("Usage: " ^ name ^ "-t <term_file>.json -s <att_session.json>\n\ne.g.\t" ^ name ^ " -t cert.json -s my_session.json\n\n")
         val argList = CommandLine.arguments ()
-        (* val usage = ("Usage: " ^ name ^ "-m <ManifestFile>.json -t <term_file>.json\n\ne.g.\t" ^ name ^ " -m formMan.json -t cert.json\n\n")
-        val argList = CommandLine.arguments ()
-        val manInd        = ListExtra.find_index argList "-m"
         val termInd        = ListExtra.find_index argList "-t"
-        val manIndBool    = argIndPresent manInd 
-        val termIndBool   = argIndPresent termInd  *)
+        val sessInd        = ListExtra.find_index argList "-s"
+        val termIndBool   = argIndPresent termInd
+        val sessIndBool   = argIndPresent sessInd
     in 
-      ()
-    (* if ((manIndBool = False) orelse (termIndBool = False))
+    (
+    if ((termIndBool = False) orelse (sessIndBool = False))
     then raise (Exception ("Invalid Arguments\n" ^ usage))
     else (
-      let val manFileName   = List.nth argList (manInd + 1)
-          val termFileName  = List.nth argList (termInd + 1)
+      let val termFileName  = List.nth argList (termInd + 1)
+          val sessFileName  = List.nth argList (sessInd + 1)
       in
-        (case (parse_manifest_from_file manFileName) of
-          Coq_errC e => raise (Exception ("Could not parse JSON Manifest file: " ^ e ^ "\n"))
-        | Coq_resultC manifest =>
           (case (parse_term_from_file termFileName) of
             Coq_errC e => raise (Exception ("Could not parse Term file: " ^ e ^ "\n"))
-          | Coq_resultC term => (manifest, term)
+          | Coq_resultC term =>
+            (case (parse_att_session_from_file sessFileName) of
+              Coq_errC e => raise (Exception ("Could not parse Attestation Session from Json: " ^ e ^ "\n"))
+            | Coq_resultC sess => (term, sess)
+            )
           )
-          )
-      end) *)
+      end
+      )
+    )
     end
 
   (* Retrieves the manifest filename and private key (as strings)
