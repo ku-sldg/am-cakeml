@@ -1,5 +1,10 @@
 type coq_FS_Location (* AXIOM TO BE REALIZED *)
 
+(** val coq_Stringifiable_FS_Location : coq_FS_Location coq_Stringifiable **)
+
+val coq_Stringifiable_FS_Location : coq_FS_Location coq_Stringifiable =
+  failwith "AXIOM TO BE REALIZED"
+
 type coq_UUID (* AXIOM TO BE REALIZED *)
 
 (** val coq_Stringifiable_UUUID : coq_UUID coq_Stringifiable **)

@@ -8,7 +8,7 @@ When things go well, handle_AM_request returns a string response that holds an
 When things go wrong, handle_AM_request returns a raw error message string. 
   In the future, we may want to wrap said error messages in JSON as well to make 
   it easier on the client. *)
-fun respondToMsg client nonce ac = 
+fun respondToMsg ammconf client nonce = 
   let val inString  = Socket.inputAll client 
       val _ = print ("\n\nReceived request string: \n" ^ inString ^ "\n")
       (* val jsonTest = case string_to_JSON inString of
@@ -16,7 +16,7 @@ fun respondToMsg client nonce ac =
             | Coq_resultC js => coq_JSON_to_string js
       val _ = print "TEsting json conversion\n"
       val _ = print ("jsonTest: " ^ jsonTest ^ "\n") *)
-      val outString = handle_AM_request inString ac nonce
+      val outString = handle_AM_request ammconf inString nonce
       val _ = print ("\n\nSending response string: \n" ^ outString) 
   in 
     Socket.output client outString
@@ -24,13 +24,13 @@ fun respondToMsg client nonce ac =
   handle Json.Exn s1 s2 =>
           (TextIO.print_err ("JSON error" ^ s1 ^ ": " ^ s2 ^ "\n"); ())
             
-fun handleIncoming (listener_and_ac) =
-    let val (listener, ac) = listener_and_ac
+fun handleIncoming (listener_and_ammconf) =
+    let val (listener, ammconf) = listener_and_ammconf
         val client = Socket.accept listener
         val _ = TextIOExtra.printLn "Accepted connection\n"
         val nonceval = passed_bs (* BString.fromString "anonce" *) (* TODO: should this be hardcoded here? *)
     in 
-      (respondToMsg client nonceval ac);
+      (respondToMsg ammconf client nonceval);
       Socket.close client
     end
     handle Socket.Err s     => TextIOExtra.printLn_err ("Socket failure: " ^ s)
@@ -38,18 +38,14 @@ fun handleIncoming (listener_and_ac) =
 
 
 (* coq_AM_Config -> unit *)
-fun startServer ac =
+fun startServer ammconf =
     let val queueLength = 5 (* TODO: Hardcoded queuelength *)
-        val (Coq_mkAmConfig man clone_uuid compatMap aspCb uuidCb pubCb) = ac
-        val (Build_Manifest my_plc _ _ _ _ _) = man 
-        val uuid = case uuidCb my_plc of
-                      Coq_resultC u => u
-                    | Coq_errC s => raise Exception ("UUID lookup error: Could not find own UUID in AM Config")
-        val (ip, port) = decodeUUID uuid
+        val (Coq_mkAM_Man_Conf man aspBin uuidStr) = ammconf
+        val (ip, port) = decodeUUID uuidStr
         val _ = TextIOExtra.printLn ("Starting up Server")
         val _ = TextIOExtra.printLn ("On port: " ^ (Int.toString port) ^ "\nQueue Length: " ^ (Int.toString queueLength))
     in 
-     loop handleIncoming ((Socket.listen port queueLength), ac)
+     loop handleIncoming ((Socket.listen port queueLength), ammconf)
     end
     handle Socket.Err s => TextIO.print_err ("Socket failure on listener instantiation: " ^ s ^ "\n")
          | Exception s => TextIO.print_err ("EXCEPTION: " ^ s ^ "\n")
@@ -59,14 +55,9 @@ fun startServer ac =
 
 (* () -> () *)
 fun main () =
-  let val (manifest, am_lib, aspBin, priv_key) = AM_CLI_Utils.retrieve_Server_AM_CLI_args ()
-      val ac = manifest_compiler manifest am_lib aspBin
-      (* Retrieving implicit self place from manifest here *)
-      val (Coq_mkAmConfig man _ _ _ _ _) = ac 
-      val (Build_Manifest my_plc _ _ _ _ _) = man 
-      val _ = print ("My Place (retrieved from Manifest): " ^ my_plc ^ "\n\n")
+  let val ammconf = AM_CLI_Utils.retrieve_Server_AM_CLI_args ()
   in
-    startServer ac
+    startServer ammconf
   end
 
 val () = main ()

@@ -66,25 +66,24 @@ get_files(copland_am_src
     extracted/Term_Defs_Core.cml
 
     stubs/Params_Admits.sml
+    stubs/Manifest_Admits.sml
 
     extracted/Term_Defs.cml
+    extracted/Manifest_Set.cml
+    extracted/Manifest.cml
     extracted/Attestation_Session.cml
     extracted/Interface_Strings_Vars.cml
     extracted/Interface_Types.cml
-    extracted/Interface_JSON.v
+    extracted/Interface_JSON.cml
     extracted/ErrorStMonad_Coq.cml
-
-    stubs/Manifest_Admits.sml
-
-    extracted/Manifest_Set.cml
-    extracted/Manifest.cml
     extracted/Manifest_JSON_Vars.cml
     extracted/Manifest_JSON.cml
-    extracted/Session_Config_Compiler.cml
     extracted/Cvm_St.cml
 
     stubs/IO_Stubs.sml
 
+    extracted/AM_Manager.cml
+    extracted/Session_Config_Compiler.cml
     extracted/Anno_Term_Defs.cml
     extracted/EnvironmentM.cml
     extracted/Manifest_Union.cml
@@ -109,7 +108,7 @@ get_files(copland_am_src
     extracted/Flexible_Mechanisms.cml
     extracted/Client_AM.cml
     extracted/Server_AM.cml
-    extracted/AM_Manager.cml
+    extracted/Concrete_Extractables.cml
     util/AM_CLI.sml
 )
 

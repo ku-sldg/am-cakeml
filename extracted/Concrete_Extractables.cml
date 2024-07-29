@@ -1,0 +1,15 @@
+(** val concrete_Jsonifiable_Manifest : coq_Manifest coq_Jsonifiable **)
+
+val concrete_Jsonifiable_Manifest : coq_Manifest coq_Jsonifiable =
+  coq_Jsonifiable_Manifest
+    (jsonifiable_map_serial_serial coq_Stringifiable_ID_Type
+      coq_Eq_Class_ID_Type coq_Stringifiable_FS_Location)
+    (jsonifiable_map_serial_serial coq_Stringifiable_ID_Type
+      coq_Eq_Class_ID_Type coq_Stringifiable_ID_Type)
+
+(** val concrete_Jsonifiable_ASP_Compat_MapT :
+    coq_ASP_Compat_MapT coq_Jsonifiable **)
+
+val concrete_Jsonifiable_ASP_Compat_MapT : coq_ASP_Compat_MapT coq_Jsonifiable =
+  jsonifiable_map_serial_serial coq_Stringifiable_ID_Type
+    coq_Eq_Class_ID_Type coq_Stringifiable_ID_Type

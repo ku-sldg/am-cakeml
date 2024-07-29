@@ -31,10 +31,10 @@ fun make_JSON_Network_Request (u : coq_UUID) (js : coq_JSON) =
   end) : (coq_JSON, string) coq_ResultT 
 
 (** val make_JSON_FS_Location_Request :
-    coq_FS_Location -> coq_Concrete_ASP_ID -> coq_JSON -> (coq_JSON, string)
+    coq_FS_Location -> coq_FS_Location -> coq_JSON -> (coq_JSON, string)
     coq_ResultT **)
-fun make_JSON_FS_Location_Request (aspBin : coq_FS_Location) (conc_asp_id : coq_Concrete_ASP_ID) (js : coq_JSON) = 
-  (let val loc = aspBin ^ "/" ^ (conc_asp_id)
+fun make_JSON_FS_Location_Request (aspBin : coq_FS_Location) (conc_asp_loc : coq_FS_Location) (js : coq_JSON) = 
+  (let val loc = aspBin ^ "/" ^ (conc_asp_loc)
       val _ = print ("Sending a request to the FS: " ^ loc ^ "\n")
       val req_str = loc ^ " \"" ^ (SysFFI.shellEscapeString (coq_JSON_to_string js)) ^ "\""
       val _ = print ("Request string: " ^ req_str ^ "\n")
@@ -123,12 +123,3 @@ fun requester_bound t p tok = True
 
 fun appraise_auth_tok appres = True
   (* failwith "AXIOM TO BE REALIZED" *)
-
-
-
-(** val is_local_appraisal : coq_AM_Library -> bool **)
-fun is_local_appraisal amLib =
-  (* Basically if we dont have a clone its local *)
-  case amLib of 
-    Build_AM_Library clone_uuid _ _ _ _ => clone_uuid = ""
-
