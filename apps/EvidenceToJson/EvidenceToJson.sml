@@ -22,23 +22,17 @@ fun main () =
         val usage = ("Usage: " ^ name ^ " -t [cert|bg|parmut|layered_bg] -o <output_file>\n")
     in
       if ((not termBool) orelse (not outFileBool))
-      then (raise (Exception ("TermToJson Argument Error: \n" ^ usage)))
+      then (raise (Exception ("EvidToJson Argument Error: \n" ^ usage)))
       else
         let val termName  = List.nth argList (termInd + 1) 
             val outFile   = List.nth argList (outFileInd + 1)
-            val outTerm   = case termName of
-                              "filehash"    => filehash_demo_evidence_type
-                            | _ => raise (Exception ("TermToJson Argument Error: \n" ^ usage))
-                          (*
-                              "cert"        => certificate_style
-                            | "bg"          => background_check
-                            | "parmut"      => parallel_mutual_1
-                            | "layered_bg"  => layered_background_check
-                            | "filehash"    => filehash_auth_phrase
-                            | _ => raise (Exception ("TermToJson Argument Error: \n" ^ usage))
-                          *)
+            val outEvid   = 
+            case map_get coq_Eq_Class_ID_Type full_flexible_mechanisms termName of
+              Some term_ev_pair => snd term_ev_pair
+            | None => 
+              raise (Exception ("EvidToJson Argument Error - Unknown term identifier: \"" ^ termName ^ "\"\n" ^ usage))
         in
-          write_evidence_to_file outTerm outFile
+          write_evidence_to_file outEvid outFile
         end
     end
     handle Exception e => TextIO.print_err e 

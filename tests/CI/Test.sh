@@ -6,19 +6,27 @@ set -eu
 CI_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TESTS_DIR="$(cd $CI_DIR && cd .. && pwd)"
 REPO_ROOT="$(cd "$TESTS_DIR" && cd .. && pwd)"
+BUILD_DIR="$REPO_ROOT/build"
+BUILD_BIN="$BUILD_DIR/bin"
 ################ END PATH VARS ################
 
 # Function to display usage instructions
 usage() {
-  echo "Usage: $0 -t [cert|bg|parmut|layered_bg] [-a <path-to-asps>]"
+  echo "Usage: $0 -t [cert|bg|parmut|layered_bg] (-h (headless)) [-a <path-to-asps>]"
   exit 1
 }
 
+TERM_TYPE=""
+HEADLESS=0
+
 # Parse command-line arguments
-while getopts "t:a:" opt; do
+while getopts "t:ha:" opt; do
   case ${opt} in
     t )
       TERM_TYPE=$OPTARG
+      ;;
+    h )
+      HEADLESS=1
       ;;
     a )
       ASP_BIN=$OPTARG
@@ -32,6 +40,7 @@ done
 # Check if all required arguments are provided
 if [[ -z "$TERM_TYPE" ]]; then
   usage
+  exit 1
 fi
 
 if [[ "$TERM_TYPE" == "layered_bg" ]]; then
@@ -44,8 +53,10 @@ PIDS=()
 
 # Function to kill all background processes
 kill_background_processes() {
+  if [[ $HEADLESS -ne 0 ]]; then
     echo -e "\nKilling background processes...\n"
     kill ${PIDS[@]} || true
+  fi
 }
 
 # Trap to ensure background processes are killed on script exit
@@ -54,9 +65,11 @@ trap kill_background_processes EXIT
 # Common Variables
 IP=localhost
 PORT=5000
-TERM_GEN=./bin/term_to_json
-MAN_GEN=./bin/manifest_generator
-AM_EXEC=./bin/attestation_manager
+TERM_GEN=$BUILD_BIN/term_to_json
+EV_GEN=$BUILD_BIN/evidence_to_json
+MAN_GEN=$BUILD_BIN/manifest_generator
+AM_EXEC=$BUILD_BIN/attestation_manager
+CLIENT_AM_EXEC=$BUILD_BIN/client_am
 
 if [ -z ${ASP_BIN+x} ]; then
   echo "Variable 'ASP_BIN' is not set" 
@@ -70,12 +83,15 @@ DEMO_FILES=$TESTS_DIR/DemoFiles
 GENERATED=$DEMO_FILES/Generated
 
 # Reusable Variables
-TEST_PRIVKEY=$DEMO_FILES/Test_PrivKey
 TEST_COMP_MAP=$DEMO_FILES/ASP_Compat_Map.json
 TEST_ATT_SESS=$DEMO_FILES/Test_Session.json
 
 # Specific Variables
 TERM_FILE="$GENERATED/$TERM_TYPE.json"
+TERM_PAIR_LIST="$GENERATED/TermPairList.json"
+
+EV_FILE="$GENERATED/$TERM_TYPE-Evidence.json"
+EVID_PAIR_LIST="$GENERATED/EvidPairList.json"
 
 # Clean and rebuild generated dir
 rm -rf $GENERATED
@@ -83,36 +99,64 @@ mkdir -p $GENERATED
 
 if [[ "$REPO_ROOT" == */am-cakeml ]]; then
   # Move to build folder
-  mkdir -p $REPO_ROOT/build
-  cd $REPO_ROOT/build
+  mkdir -p $BUILD_DIR
+  cd $BUILD_DIR
 
   # Generate the terms file
   $TERM_GEN -t $TERM_TYPE -o $TERM_FILE
 
   # Generate the term pair list
-  $TESTS_DIR/term_to_term_pair_list.sh -f $TERM_FILE
+  $TESTS_DIR/term_to_term_pair_list.sh -f $TERM_FILE -o $TERM_PAIR_LIST
+
+  # Generate the evidence file
+  $EV_GEN -t $TERM_TYPE -o $EV_FILE
+
+  # Generate the evidence pair list
+  $TESTS_DIR/evidence_to_evidence_pair_list.sh -f $EV_FILE -o $EVID_PAIR_LIST
 
   # First, generate the manifests
-  $MAN_GEN -cm $TEST_COMP_MAP -t $GENERATED/TermPairList.json -e $DEMO_FILES/Evid_List.json -o $GENERATED
+  $MAN_GEN -cm $TEST_COMP_MAP -t $TERM_PAIR_LIST -e $EVID_PAIR_LIST -o $GENERATED
 
   PIDS=()
+
+  # If not headless, start tmux
+  if [[ $HEADLESS -eq 0 ]]; then
+    tmux new-session -d -s ServerProcess 'bash -i'
+  fi
   
-  RUNNING_PORT=$PORT
+  I=0
   # Generate an AM for each manifest
   for MANIFEST in $GENERATED/Manifest_*.json; do
     # Increment the running port
-    echo "Starting AM on port $RUNNING_PORT for manifest $MANIFEST"
-    # Start the AM in the background and store its PID
-    $AM_EXEC -m $MANIFEST -b $ASP_BIN -u "$IP:$RUNNING_PORT" &
-    PIDS+=($!)
-    RUNNING_PORT=$((RUNNING_PORT + 1))
+    CUR_PORT=$((PORT + I))
+    if [[ $HEADLESS -eq 0 ]]; then
+      tmux new-window -t ServerProcess -n "AM_$I" "bash -i"
+
+      tmux send-keys -t ServerProcess:AM_$I "echo \"Starting AM on port $CUR_PORT for manifest $MANIFEST\"" C-m
+
+      tmux send-keys -t ServerProcess:AM_$I "$AM_EXEC -m $MANIFEST -b $ASP_BIN -u \"$IP:$CUR_PORT\"" C-m
+    else
+      echo "Starting AM on port $CUR_PORT for manifest $MANIFEST"
+      # Start the AM in the background and store its PID
+      $AM_EXEC -m $MANIFEST -b $ASP_BIN -u "$IP:$CUR_PORT" &
+      PIDS+=($!)
+    fi
+    I=$((I + 1))
   done
   
   # Now send the request, on the very last window
-  sleep 1 
-  $TESTS_DIR/send_term_req.sh -h $IP -p $PORT -f $TERM_FILE -s $TEST_ATT_SESS > $GENERATED/output_resp.json
-  # We need this to be the last line so that the exit code is whether or not we found success
-  grep "\"SUCCESS\":true" $GENERATED/output_resp.json
+  if [[ $HEADLESS -eq 0 ]]; then
+    tmux new-window -t ServerProcess -n "Client"
+
+    tmux send-keys -t ServerProcess:Client "sleep 1 && $CLIENT_AM_EXEC -t $TERM_FILE -s $TEST_ATT_SESS" C-m
+      
+    tmux attach-session -d -t ServerProcess
+  else
+    sleep 1 
+    $TESTS_DIR/send_term_req.sh -h $IP -p $PORT -f $TERM_FILE -s $TEST_ATT_SESS > $GENERATED/output_resp.json
+    # We need this to be the last line so that the exit code is whether or not we found success
+    grep "\"SUCCESS\":true" $GENERATED/output_resp.json
+  fi
 else
   echo "You are in $PWD, with the root set as $REPO_ROOT, but youre root should be 'am-cakeml'"
 fi

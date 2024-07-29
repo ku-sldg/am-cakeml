@@ -63,7 +63,7 @@ structure AM_CLI_Utils = struct
   
   fun retrieve_Client_AM_CLI_args _ =
     let val name = CommandLine.name ()
-        val usage = ("Usage: " ^ name ^ "-t <term_file>.json -s <att_session.json>\n\ne.g.\t" ^ name ^ " -t cert.json -s my_session.json\n\n")
+        val usage = ("Usage: " ^ name ^ " -t <term_file>.json -s <att_session.json>\n\ne.g.\t" ^ name ^ " -t cert.json -s my_session.json\n\n")
         val argList = CommandLine.arguments ()
         val termInd        = ListExtra.find_index argList "-t"
         val sessInd        = ListExtra.find_index argList "-s"

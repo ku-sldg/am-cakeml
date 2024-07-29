@@ -26,13 +26,11 @@ fun main () =
       else
         let val termName  = List.nth argList (termInd + 1) 
             val outFile   = List.nth argList (outFileInd + 1)
-            val outTerm   = case termName of
-                              "cert"        => certificate_style
-                            | "bg"          => background_check
-                            | "parmut"      => parallel_mutual_1
-                            | "layered_bg"  => layered_background_check
-                            | "filehash"    => filehash_auth_phrase
-                            | _ => raise (Exception ("TermToJson Argument Error: \n" ^ usage))
+            val outTerm   = 
+              case map_get coq_Eq_Class_ID_Type full_flexible_mechanisms termName of
+                Some term_ev_pair => fst term_ev_pair
+              | None => 
+                  raise (Exception ("TermToJson Argument Error - Unknown term identifier: \"" ^ termName ^ "\"\n" ^ usage))
         in
           write_term_to_file outTerm outFile
         end
