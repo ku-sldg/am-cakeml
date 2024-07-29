@@ -1,0 +1,215 @@
+(** val coq_Jsonifiable_ProtocolRunRequest :
+    coq_Term coq_Jsonifiable -> coq_RawEv coq_Jsonifiable ->
+    coq_Attestation_Session coq_Jsonifiable -> coq_ProtocolRunRequest
+    coq_Jsonifiable **)
+
+fun coq_Jsonifiable_ProtocolRunRequest h h0 h1 =
+  Build_Jsonifiable (fn req => JSON_Object ((coq_STR_TYPE, (InJSON_String
+    coq_STR_REQUEST)) :: ((coq_STR_ACTION, (InJSON_String
+    coq_STR_RUN)) :: ((coq_STR_ATTEST_SESS, (InJSON_Object
+    (let val Build_Jsonifiable to_JSON _ = h1 in
+     to_JSON
+       (let val Coq_mkPRReq prreq_att_sess _ _ _ = req in prreq_att_sess end) end))) :: ((coq_STR_REQ_PLC,
+    (InJSON_String
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_ID_Type in
+     to_string
+       (let val Coq_mkPRReq _ _ prreq_req_plc _ = req in prreq_req_plc end) end))) :: ((coq_STR_TERM,
+    (InJSON_Object
+    (let val Build_Jsonifiable to_JSON _ = h in
+     to_JSON (let val Coq_mkPRReq _ prreq_term _ _ = req in prreq_term end) end))) :: ((coq_STR_RAWEV,
+    (InJSON_Object
+    (let val Build_Jsonifiable to_JSON _ = h0 in
+     to_JSON (let val Coq_mkPRReq _ _ _ prreq_rawev = req in prreq_rawev end) end))) :: [])))))))
+    (fn j =>
+    res_bind (coq_JSON_get_Object coq_STR_ATTEST_SESS j) (fn temp_att_sess =>
+      res_bind (coq_JSON_get_Object coq_STR_TERM j) (fn temp_term =>
+        res_bind (coq_JSON_get_string coq_STR_REQ_PLC j) (fn temp_req_plc =>
+          res_bind (coq_JSON_get_Object coq_STR_RAWEV j) (fn temp_ev =>
+            res_bind
+              (let val Build_Jsonifiable _ from_JSON = h1 in
+               from_JSON temp_att_sess end) (fn att_sess =>
+              res_bind
+                (let val Build_Jsonifiable _ from_JSON = h in
+                 from_JSON temp_term end) (fn term =>
+                res_bind
+                  (let val Build_Stringifiable _ from_string =
+                     coq_Stringifiable_ID_Type
+                   in
+                   from_string temp_req_plc end) (fn req_plc =>
+                  res_bind
+                    (let val Build_Jsonifiable _ from_JSON = h0 in
+                     from_JSON temp_ev end) (fn ev => Coq_resultC
+                    (Coq_mkPRReq att_sess term req_plc ev))))))))))
+
+(** val coq_Jsonifiable_ProtocolRunResponse :
+    coq_RawEv coq_Jsonifiable -> coq_ProtocolRunResponse coq_Jsonifiable **)
+
+fun coq_Jsonifiable_ProtocolRunResponse h =
+  Build_Jsonifiable (fn resp => JSON_Object ((coq_STR_TYPE, (InJSON_String
+    coq_STR_RESPONSE)) :: ((coq_STR_ACTION, (InJSON_String
+    coq_STR_RUN)) :: ((coq_STR_SUCCESS, (InJSON_Boolean
+    (let val Coq_mkPRResp prresp_success _ = resp in prresp_success end))) :: ((coq_STR_PAYLOAD,
+    (InJSON_Object
+    (let val Build_Jsonifiable to_JSON _ = h in
+     to_JSON (let val Coq_mkPRResp _ prresp_ev = resp in prresp_ev end) end))) :: [])))))
+    (fn resp =>
+    res_bind (coq_JSON_get_bool coq_STR_SUCCESS resp) (fn temp_success =>
+      res_bind (coq_JSON_get_Object coq_STR_PAYLOAD resp) (fn temp_ev =>
+        res_bind
+          (let val Build_Jsonifiable _ from_JSON = h in from_JSON temp_ev end)
+          (fn ev => Coq_resultC (Coq_mkPRResp temp_success ev)))))
+
+(** val coq_Jsonifiable_ProtocolAppraiseRequest :
+    coq_Term coq_Jsonifiable -> coq_RawEv coq_Jsonifiable -> coq_Evidence
+    coq_Jsonifiable -> coq_Attestation_Session coq_Jsonifiable ->
+    coq_ProtocolAppraiseRequest coq_Jsonifiable **)
+
+fun coq_Jsonifiable_ProtocolAppraiseRequest h h0 h1 h2 =
+  Build_Jsonifiable (fn req => JSON_Object ((coq_STR_TYPE, (InJSON_String
+    coq_STR_REQUEST)) :: ((coq_STR_ACTION, (InJSON_String
+    coq_STR_APPRAISE)) :: ((coq_STR_ATTEST_SESS, (InJSON_Object
+    (let val Build_Jsonifiable to_JSON _ = h2 in
+     to_JSON
+       (let val Coq_mkPAReq pareq_att_sess _ _ _ _ = req in pareq_att_sess end) end))) :: ((coq_STR_TERM,
+    (InJSON_Object
+    (let val Build_Jsonifiable to_JSON _ = h in
+     to_JSON (let val Coq_mkPAReq _ pareq_term _ _ _ = req in pareq_term end) end))) :: ((coq_STR_REQ_PLC,
+    (InJSON_String
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_ID_Type in
+     to_string (let val Coq_mkPAReq _ _ pareq_plc _ _ = req in pareq_plc end) end))) :: ((coq_STR_EVIDENCE,
+    (InJSON_Object
+    (let val Build_Jsonifiable to_JSON _ = h1 in
+     to_JSON
+       (let val Coq_mkPAReq _ _ _ pareq_evidence _ = req in pareq_evidence end) end))) :: ((coq_STR_RAWEV,
+    (InJSON_Object
+    (let val Build_Jsonifiable to_JSON _ = h0 in
+     to_JSON (let val Coq_mkPAReq _ _ _ _ pareq_ev = req in pareq_ev end) end))) :: []))))))))
+    (fn j =>
+    res_bind (coq_JSON_get_Object coq_STR_ATTEST_SESS j) (fn temp_att_sess =>
+      res_bind (coq_JSON_get_Object coq_STR_TERM j) (fn temp_term =>
+        res_bind (coq_JSON_get_string coq_STR_REQ_PLC j) (fn temp_plc =>
+          res_bind (coq_JSON_get_Object coq_STR_EVIDENCE j)
+            (fn temp_evidence =>
+            res_bind (coq_JSON_get_Object coq_STR_RAWEV j) (fn temp_ev =>
+              res_bind
+                (let val Build_Jsonifiable _ from_JSON = h2 in
+                 from_JSON temp_att_sess end) (fn att_sess =>
+                res_bind
+                  (let val Build_Jsonifiable _ from_JSON = h in
+                   from_JSON temp_term end) (fn term =>
+                  res_bind
+                    (let val Build_Stringifiable _ from_string =
+                       coq_Stringifiable_ID_Type
+                     in
+                     from_string temp_plc end) (fn plc =>
+                    res_bind
+                      (let val Build_Jsonifiable _ from_JSON = h1 in
+                       from_JSON temp_evidence end) (fn evidence =>
+                      res_bind
+                        (let val Build_Jsonifiable _ from_JSON = h0 in
+                         from_JSON temp_ev end) (fn ev => Coq_resultC
+                        (Coq_mkPAReq att_sess term plc evidence ev))))))))))))
+
+(** val coq_Jsonifiable_ProtocolAppraiseResponse :
+    coq_AppResultC coq_Jsonifiable -> coq_ProtocolAppraiseResponse
+    coq_Jsonifiable **)
+
+fun coq_Jsonifiable_ProtocolAppraiseResponse h =
+  Build_Jsonifiable (fn resp => JSON_Object ((coq_STR_TYPE, (InJSON_String
+    coq_STR_RESPONSE)) :: ((coq_STR_ACTION, (InJSON_String
+    coq_STR_APPRAISE)) :: ((coq_STR_SUCCESS, (InJSON_Boolean
+    (let val Coq_mkPAResp paresp_success _ = resp in paresp_success end))) :: ((coq_STR_PAYLOAD,
+    (InJSON_Object
+    (let val Build_Jsonifiable to_JSON _ = h in
+     to_JSON
+       (let val Coq_mkPAResp _ paresp_result = resp in paresp_result end) end))) :: [])))))
+    (fn resp =>
+    res_bind (coq_JSON_get_bool coq_STR_SUCCESS resp) (fn temp_success =>
+      res_bind (coq_JSON_get_Object coq_STR_PAYLOAD resp) (fn temp_result =>
+        res_bind
+          (let val Build_Jsonifiable _ from_JSON = h in
+           from_JSON temp_result end) (fn result => Coq_resultC (Coq_mkPAResp
+          temp_success result)))))
+
+(** val coq_Jsonifiable_ASPRunRequest :
+    coq_RawEv coq_Jsonifiable -> coq_ASP_ARGS coq_Jsonifiable ->
+    coq_ASPRunRequest coq_Jsonifiable **)
+
+fun coq_Jsonifiable_ASPRunRequest h h0 =
+  Build_Jsonifiable (fn req => JSON_Object ((coq_STR_TYPE, (InJSON_String
+    coq_STR_REQUEST)) :: ((coq_STR_ACTION, (InJSON_String
+    coq_STR_ASP_RUN)) :: ((coq_STR_ASP_ID, (InJSON_String
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_ID_Type in
+     to_string
+       (let val Coq_mkASPRReq asprreq_asp_id _ _ _ _ = req in
+        asprreq_asp_id end) end))) :: ((coq_STR_ASP_ARGS, (InJSON_Object
+    (let val Build_Jsonifiable to_JSON _ = h0 in
+     to_JSON
+       (let val Coq_mkASPRReq _ asprreq_asp_args _ _ _ = req in
+        asprreq_asp_args end) end))) :: ((coq_STR_TARG_PLC, (InJSON_String
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_ID_Type in
+     to_string
+       (let val Coq_mkASPRReq _ _ asprreq_targ_plc _ _ = req in
+        asprreq_targ_plc end) end))) :: ((coq_STR_TARG, (InJSON_String
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_ID_Type in
+     to_string
+       (let val Coq_mkASPRReq _ _ _ asprreq_targ _ = req in asprreq_targ end) end))) :: ((coq_STR_RAWEV,
+    (InJSON_Object
+    (let val Build_Jsonifiable to_JSON _ = h in
+     to_JSON
+       (let val Coq_mkASPRReq _ _ _ _ asprreq_rawev = req in asprreq_rawev end) end))) :: []))))))))
+    (fn j =>
+    res_bind (coq_JSON_get_string coq_STR_ASP_ID j) (fn temp_asp_id =>
+      res_bind (coq_JSON_get_Object coq_STR_ASP_ARGS j) (fn temp_asp_args =>
+        res_bind (coq_JSON_get_string coq_STR_TARG_PLC j)
+          (fn temp_targ_plc =>
+          res_bind (coq_JSON_get_string coq_STR_TARG j) (fn temp_targ =>
+            res_bind (coq_JSON_get_Object coq_STR_RAWEV j) (fn temp_ev =>
+              res_bind
+                (let val Build_Stringifiable _ from_string =
+                   coq_Stringifiable_ID_Type
+                 in
+                 from_string temp_asp_id end) (fn asp_id =>
+                res_bind
+                  (let val Build_Jsonifiable _ from_JSON = h0 in
+                   from_JSON temp_asp_args end) (fn asp_args =>
+                  res_bind
+                    (let val Build_Stringifiable _ from_string =
+                       coq_Stringifiable_ID_Type
+                     in
+                     from_string temp_targ_plc end) (fn targ_plc =>
+                    res_bind
+                      (let val Build_Stringifiable _ from_string =
+                         coq_Stringifiable_ID_Type
+                       in
+                       from_string temp_targ end) (fn targ =>
+                      res_bind
+                        (let val Build_Jsonifiable _ from_JSON = h in
+                         from_JSON temp_ev end) (fn ev => Coq_resultC
+                        (Coq_mkASPRReq asp_id asp_args targ_plc targ ev))))))))))))
+
+(** val coq_Jsonifiable_ASPRunResponse :
+    coq_RawEv coq_Jsonifiable -> coq_ASPRunResponse coq_Jsonifiable **)
+
+fun coq_Jsonifiable_ASPRunResponse h =
+  Build_Jsonifiable (fn resp => JSON_Object ((coq_STR_TYPE, (InJSON_String
+    coq_STR_RESPONSE)) :: ((coq_STR_ACTION, (InJSON_String
+    coq_STR_ASP_RUN)) :: ((coq_STR_SUCCESS, (InJSON_Boolean
+    (let val Coq_mkASPRResp asprresp_success _ = resp in asprresp_success end))) :: ((coq_STR_PAYLOAD,
+    (InJSON_Object
+    (let val Build_Jsonifiable to_JSON _ = h in
+     to_JSON
+       (let val Coq_mkASPRResp _ asprresp_rawev = resp in asprresp_rawev end) end))) :: [])))))
+    (fn resp =>
+    res_bind (coq_JSON_get_bool coq_STR_SUCCESS resp) (fn temp_success =>
+      res_bind (coq_JSON_get_Object coq_STR_PAYLOAD resp) (fn temp_rawev =>
+        res_bind
+          (let val Build_Jsonifiable _ from_JSON = h in
+           from_JSON temp_rawev end) (fn rawev => Coq_resultC (Coq_mkASPRResp
+          temp_success rawev)))))
+
+(** val coq_ErrorResponseJSON : string -> coq_JSON **)
+
+fun coq_ErrorResponseJSON msg =
+  JSON_Object ((coq_STR_SUCCESS, (InJSON_Boolean
+    False)) :: ((coq_STR_PAYLOAD, (InJSON_String msg)) :: []))

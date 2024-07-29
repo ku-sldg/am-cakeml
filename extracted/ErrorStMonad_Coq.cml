@@ -20,11 +20,6 @@ fun bind m f s =
 fun failm e s =
   ((Coq_errC e), s)
 
-(** val modify : ('a1 -> 'a1) -> ('a1, unit, 'a2) coq_Err **)
-
-fun modify f s =
-  ((Coq_resultC ()), (f s))
-
 (** val put : 'a1 -> ('a1, unit, 'a2) coq_Err **)
 
 fun put s _ =

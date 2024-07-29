@@ -1,13 +1,5 @@
 type coq_FS_Location (* AXIOM TO BE REALIZED *)
 
-type coq_Concrete_ASP_ID (* AXIOM TO BE REALIZED *)
-
-(** val coq_Stringifiable_Concrete_ASP_ID :
-    coq_Concrete_ASP_ID coq_Stringifiable **)
-
-val coq_Stringifiable_Concrete_ASP_ID : coq_Concrete_ASP_ID coq_Stringifiable =
-  failwith "AXIOM TO BE REALIZED"
-
 type coq_UUID (* AXIOM TO BE REALIZED *)
 
 (** val coq_Stringifiable_UUUID : coq_UUID coq_Stringifiable **)
@@ -15,24 +7,9 @@ type coq_UUID (* AXIOM TO BE REALIZED *)
 val coq_Stringifiable_UUUID : coq_UUID coq_Stringifiable =
   failwith "AXIOM TO BE REALIZED"
 
-(** val coq_Eq_Class_uuid : coq_UUID coq_EqClass **)
-
-val coq_Eq_Class_uuid : coq_UUID coq_EqClass =
-  failwith "AXIOM TO BE REALIZED"
-
 type coq_PublicKey (* AXIOM TO BE REALIZED *)
 
 (** val coq_Stringifiable_PublicKey : coq_PublicKey coq_Stringifiable **)
 
 val coq_Stringifiable_PublicKey : coq_PublicKey coq_Stringifiable =
-  failwith "AXIOM TO BE REALIZED"
-
-(** val coq_Eq_Class_public_key : coq_PublicKey coq_EqClass **)
-
-val coq_Eq_Class_public_key : coq_PublicKey coq_EqClass =
-  failwith "AXIOM TO BE REALIZED"
-
-(** val empty_Manifest_Plc : coq_Plc **)
-
-val empty_Manifest_Plc : coq_Plc =
   failwith "AXIOM TO BE REALIZED"

@@ -1,5 +1,5 @@
 datatype cvm_st =
-  Coq_mk_st coq_EvC (coq_Ev list) coq_Event_ID coq_AM_Config
+  Coq_mk_st coq_EvC (coq_Ev list) coq_Event_ID coq_Session_Config
 
 datatype coq_CVM_Error =
   Coq_at_error_static coq_Term coq_Plc coq_EvC

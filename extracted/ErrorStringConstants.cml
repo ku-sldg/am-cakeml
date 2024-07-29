@@ -48,16 +48,6 @@ val errStr_raw_evidence_too_long : string =
 val errStr_remote_am_failure : string =
   "errStr_remote_am_failure"
 
-(** val errStr_incorrect_resp_type : string **)
-
-val errStr_incorrect_resp_type : string =
-  "errStr_incorrect_resp_type"
-
-(** val errStr_invalid_request_type : string **)
-
-val errStr_invalid_request_type : string =
-  "errStr_invalid_request_type"
-
 (** val errStr_negotiation_not_implemented : string **)
 
 val errStr_negotiation_not_implemented : string =

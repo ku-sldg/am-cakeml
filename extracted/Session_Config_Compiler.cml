@@ -1,0 +1,69 @@
+(** val generate_ASP_dispatcher' :
+    coq_Manifest -> coq_Attestation_Session -> coq_FS_Location ->
+    coq_ASP_PARAMS -> coq_RawEv -> (coq_RawEv, coq_DispatcherErrors)
+    coq_ResultT **)
+
+fun generate_ASP_dispatcher' am _ aspBin par rawEv =
+  let val Coq_asp_paramsC aspid args targ_plc targ = par in
+  let val asps = let val Build_Manifest asps _ _ _ = am in asps end in
+  let val asp_map =
+    let val Build_Manifest _ _ aSP_Mapping _ = am in aSP_Mapping end
+  in
+  (case in_dec_set coq_Eq_Class_ID_Type aspid asps of
+     True =>
+     (case map_get coq_Eq_Class_ID_Type asp_map aspid of
+        Some conc_asp_loc =>
+        let val asp_req = Coq_mkASPRReq aspid args targ_plc targ rawEv in
+        let val js_req =
+          let val Build_Jsonifiable to_JSON _ =
+            coq_Jsonifiable_ASPRunRequest coq_Jsonifiable_RawEv
+              (jsonifiable_map_serial_serial coq_Stringifiable_ID_Type
+                coq_Eq_Class_ID_Type coq_Stringifiable_ID_Type)
+          in
+          to_JSON asp_req end
+        in
+        let val resp_res =
+          make_JSON_FS_Location_Request aspBin conc_asp_loc js_req
+        in
+        (case resp_res of
+           Coq_errC msg => Coq_errC (Runtime msg)
+         | Coq_resultC js_resp =>
+           (case let val Build_Jsonifiable _ from_JSON =
+                   coq_Jsonifiable_ASPRunResponse coq_Jsonifiable_RawEv
+                 in
+                 from_JSON js_resp end of
+              Coq_errC msg => Coq_errC (Runtime msg)
+            | Coq_resultC r =>
+              let val Coq_mkASPRResp _ bs = r in Coq_resultC bs end)) end end end
+      | None => Coq_errC Unavailable)
+   | False => Coq_errC Unavailable) end end end
+
+(** val generate_ASP_dispatcher :
+    coq_ID_Type coq_EqClass -> coq_Manifest -> coq_Attestation_Session ->
+    coq_FS_Location -> coq_DispatcherErrors coq_ASPCallback **)
+
+fun generate_ASP_dispatcher _ =
+  generate_ASP_dispatcher'
+
+(** val session_config_compiler :
+    coq_AM_Manager_Config -> coq_Attestation_Session -> coq_Session_Config **)
+
+fun session_config_compiler conf ats =
+  let val Coq_mkAM_Man_Conf man aspBin _ = conf in
+  Build_Session_Config
+  (let val Coq_mkAtt_Sess session_Plc _ _ = ats in session_Plc end)
+  (let val Build_Manifest _ aSP_Compat_Map _ _ = man in aSP_Compat_Map end)
+  (generate_ASP_dispatcher coq_Eq_Class_ID_Type man ats aspBin)
+  (let val Coq_mkAtt_Sess _ plc_Mapping _ = ats in plc_Mapping end)
+  (let val Coq_mkAtt_Sess _ _ pubKey_Mapping = ats in pubKey_Mapping end)
+  (let val Build_Manifest _ _ _ man_policy = man in man_policy end) end
+
+(** val session_config_decompiler :
+    coq_Session_Config -> coq_Attestation_Session **)
+
+fun session_config_decompiler sc =
+  Coq_mkAtt_Sess
+    (let val Build_Session_Config session_plc _ _ _ _ _ = sc in
+     session_plc end)
+    (let val Build_Session_Config _ _ _ plc_map _ _ = sc in plc_map end)
+    (let val Build_Session_Config _ _ _ _ pubkey_map _ = sc in pubkey_map end)

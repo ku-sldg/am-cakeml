@@ -1,0 +1,2 @@
+datatype coq_AM_Manager_Config =
+  Coq_mkAM_Man_Conf coq_Manifest coq_FS_Location coq_UUID
