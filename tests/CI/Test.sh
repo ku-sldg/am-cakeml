@@ -71,7 +71,8 @@ GENERATED=$DEMO_FILES/Generated
 
 # Reusable Variables
 TEST_PRIVKEY=$DEMO_FILES/Test_PrivKey
-TEST_AM_LIB=$DEMO_FILES/Test_AM_Lib.json
+TEST_COMP_MAP=$DEMO_FILES/ASP_Compat_Map.json
+TEST_ATT_SESS=$DEMO_FILES/Test_Session.json
 
 # Specific Variables
 TERM_FILE="$GENERATED/$TERM_TYPE.json"
@@ -92,20 +93,24 @@ if [[ "$REPO_ROOT" == */am-cakeml ]]; then
   $TESTS_DIR/term_to_term_pair_list.sh -f $TERM_FILE
 
   # First, generate the manifests
-  $MAN_GEN -t $GENERATED/TermPairList.json -e $DEMO_FILES/Evid_List.json -l $TEST_AM_LIB -o $GENERATED
+  $MAN_GEN -cm $TEST_COMP_MAP -t $GENERATED/TermPairList.json -e $DEMO_FILES/Evid_List.json -o $GENERATED
 
   PIDS=()
   
+  RUNNING_PORT=$PORT
   # Generate an AM for each manifest
   for MANIFEST in $GENERATED/Manifest_*.json; do
+    # Increment the running port
+    echo "Starting AM on port $RUNNING_PORT for manifest $MANIFEST"
     # Start the AM in the background and store its PID
-    $AM_EXEC -m $MANIFEST -l $TEST_AM_LIB -b $ASP_BIN -k $TEST_PRIVKEY &
+    $AM_EXEC -m $MANIFEST -b $ASP_BIN -u "$IP:$RUNNING_PORT" &
     PIDS+=($!)
+    RUNNING_PORT=$((RUNNING_PORT + 1))
   done
   
   # Now send the request, on the very last window
   sleep 1 
-  $TESTS_DIR/send_term_req.sh -h $IP -p $PORT -f $TERM_FILE > $GENERATED/output_resp.json
+  $TESTS_DIR/send_term_req.sh -h $IP -p $PORT -f $TERM_FILE -s $TEST_ATT_SESS > $GENERATED/output_resp.json
   # We need this to be the last line so that the exit code is whether or not we found success
   grep "\"SUCCESS\":true" $GENERATED/output_resp.json
 else

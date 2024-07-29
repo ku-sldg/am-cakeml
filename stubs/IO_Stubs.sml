@@ -30,6 +30,11 @@ fun make_JSON_Network_Request (u : coq_UUID) (js : coq_JSON) =
     string_to_JSON resp
   end) : (coq_JSON, string) coq_ResultT 
 
+(** val aspid_to_fs_location : coq_ASP_ID -> coq_FS_Location **)
+
+fun aspid_to_fs_location (a : coq_ASP_ID) =
+  a
+
 (** val make_JSON_FS_Location_Request :
     coq_FS_Location -> coq_FS_Location -> coq_JSON -> (coq_JSON, string)
     coq_ResultT **)
