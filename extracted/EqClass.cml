@@ -22,4 +22,4 @@ val str_eq_class : string coq_EqClass =
 (** val nat_EqClass : nat coq_EqClass **)
 
 val nat_EqClass : nat coq_EqClass =
-  Nat.eqb
+  (op=)
