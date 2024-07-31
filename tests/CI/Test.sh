@@ -12,7 +12,7 @@ BUILD_BIN="$BUILD_DIR/bin"
 
 # Function to display usage instructions
 usage() {
-  echo "Usage: $0 -t [cert|bg|parmut|layered_bg] (-h (headless)) [-a <path-to-asps>]"
+  echo "Usage: $0 -t [cert|bg|parmut|filehash] (-h (headless)) [-a <path-to-asps>]"
   exit 1
 }
 
@@ -124,24 +124,32 @@ if [[ "$REPO_ROOT" == */am-cakeml ]]; then
     tmux new-session -d -s ServerProcess 'bash -i'
   fi
   
-  I=0
+  manifest_pattern='Manifest_P.\.json' # regex to find "Manifest_PX.json" in full path to manifest
+  MAN_REL_PATH="" # Relative filepath string: "Manifest_PX.json"
+  MAN_PLC_STR=""  # Place string:  "X" in "Manifest_PX.json"
   # Generate an AM for each manifest
   for MANIFEST in $GENERATED/Manifest_*.json; do
+    if [[ $MANIFEST =~ $manifest_pattern ]]; then 
+      MAN_REL_PATH=${BASH_REMATCH[0]}
+      MAN_PLC_STR=${MAN_REL_PATH:10:1}
+    else echo "Failed to find 'Manifest_PX.json' pattern in generated manifest file"
+    fi
+
     # Increment the running port
-    CUR_PORT=$((PORT + I))
+    CUR_PORT=$((PORT + $MAN_PLC_STR))
     if [[ $HEADLESS -eq 0 ]]; then
-      tmux new-window -t ServerProcess -n "AM_$I" "bash -i"
+      tmux new-window -t ServerProcess -n "AM_$MAN_PLC_STR" "bash -i"
 
-      tmux send-keys -t ServerProcess:AM_$I "echo \"Starting AM on port $CUR_PORT for manifest $MANIFEST\"" C-m
+      tmux send-keys -t ServerProcess:AM_$MAN_PLC_STR "echo \"Starting AM on port $CUR_PORT for manifest $MANIFEST\"" C-m
 
-      tmux send-keys -t ServerProcess:AM_$I "$AM_EXEC -m $MANIFEST -b $ASP_BIN -u \"$IP:$CUR_PORT\"" C-m
+      tmux send-keys -t ServerProcess:AM_$MAN_PLC_STR "$AM_EXEC -m $MANIFEST -b $ASP_BIN -u \"$IP:$CUR_PORT\"" C-m
     else
       echo "Starting AM on port $CUR_PORT for manifest $MANIFEST"
       # Start the AM in the background and store its PID
       $AM_EXEC -m $MANIFEST -b $ASP_BIN -u "$IP:$CUR_PORT" &
       PIDS+=($!)
     fi
-    I=$((I + 1))
+    #I=$((I + 1))
   done
   
   # Now send the request, on the very last window
