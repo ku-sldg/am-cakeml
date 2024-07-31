@@ -3,7 +3,7 @@ set -eu
 
 # Function to display usage instructions
 usage() {
-  echo "Usage: $0 -t [cert|bg|parmut|filehash|layered_bg]"
+  echo "Usage: $0 -t [cert|bg|parmut|filehash]"
   exit 1
 }
 

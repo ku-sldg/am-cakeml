@@ -11,3 +11,4 @@ ci_test:
 	./CI/Test.sh -t cert -h
 	./CI/Test.sh -t bg -h
 	./CI/Test.sh -t parmut -h
+	./CI/Test.sh -t filehash -h
