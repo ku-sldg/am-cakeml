@@ -132,7 +132,9 @@ if [[ "$REPO_ROOT" == */am-cakeml ]]; then
     if [[ $MANIFEST =~ $manifest_pattern ]]; then 
       MAN_REL_PATH=${BASH_REMATCH[0]}
       MAN_PLC_STR=${MAN_REL_PATH:10:1}
-    else echo "Failed to find 'Manifest_PX.json' pattern in generated manifest file"
+    else 
+      echo "Failed to find 'Manifest_PX.json' pattern in generated manifest file"
+      exit 1
     fi
 
     # Increment the running port
@@ -149,7 +151,6 @@ if [[ "$REPO_ROOT" == */am-cakeml ]]; then
       $AM_EXEC -m $MANIFEST -b $ASP_BIN -u "$IP:$CUR_PORT" &
       PIDS+=($!)
     fi
-    #I=$((I + 1))
   done
   
   # Now send the request, on the very last window
