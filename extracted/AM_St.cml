@@ -1,5 +1,5 @@
 datatype coq_AM_St =
-  Coq_mkAM_St ((coq_N_ID, coq_BS) coq_MapC) coq_N_ID coq_AM_Config
+  Coq_mkAM_St ((coq_N_ID, coq_BS) coq_MapC) coq_N_ID coq_Session_Config
 
 datatype coq_AM_Error =
   Coq_cvm_error coq_CVM_Error

@@ -1,10 +1,5 @@
 type 'a manifest_set = 'a list
 
-(** val manifest_set_empty : 'a1 manifest_set **)
-
-val manifest_set_empty =
-  []
-
 (** val manset_add :
     'a1 coq_EqClass -> 'a1 -> 'a1 manifest_set -> 'a1 manifest_set **)
 

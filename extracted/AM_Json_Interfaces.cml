@@ -1,38 +1,82 @@
 (** val do_appraisal_session :
-    coq_ProtocolAppraiseRequest -> coq_AM_Config -> coq_BS ->
+    coq_AM_Manager_Config -> coq_ProtocolAppraiseRequest -> coq_BS ->
     (coq_ProtocolAppraiseResponse, string) coq_ResultT **)
 
-fun do_appraisal_session appreq ac nonceVal =
-  let val Coq_mkPAReq t p et ev = appreq in
+fun do_appraisal_session conf appreq nonceVal =
+  let val Coq_mkPAReq att_sess t p et ev = appreq in
   let val expected_et = eval t p et in
   let val app_am = gen_appraise_AM expected_et ev in
   let val init_noncemap = (O, nonceVal) :: [] in
   let val init_nonceid = S O in
-  let val my_amst = Coq_mkAM_St init_noncemap init_nonceid ac in
+  let val sess_config = session_config_compiler conf att_sess in
+  let val my_amst = Coq_mkAM_St init_noncemap init_nonceid sess_config in
   (case run_am_app_comp_init app_am my_amst of
      Coq_errC e => Coq_errC e
-   | Coq_resultC appres => Coq_resultC (Coq_mkPAResp True appres)) end end end end end end
+   | Coq_resultC appres => Coq_resultC (Coq_mkPAResp True appres)) end end end end end end end
 
 (** val handle_AM_request_JSON :
-    coq_JSON -> coq_AM_Config -> coq_BS -> coq_JSON **)
+    coq_AM_Manager_Config -> coq_JSON -> coq_BS -> coq_JSON **)
 
-fun handle_AM_request_JSON js ac nonceVal =
-  case coq_JSON_to_AM_Protocol_Request js of
+fun handle_AM_request_JSON conf js nonceVal =
+  case coq_JSON_get_string coq_STR_ACTION js of
     Coq_errC msg => coq_ErrorResponseJSON msg
-  | Coq_resultC a =>
-    (case a of
-       Protocol_Run_Request r =>
-       let val Coq_mkPRReq cop_term _ ev = r in
-       let val cvm_resp = run_cvm_rawEv cop_term ev ac in
-       (case cvm_resp of
-          Coq_errC e => coq_ErrorResponseJSON e
-        | Coq_resultC res_ev =>
-          coq_ProtocolRunResponse_to_JSON (Coq_mkPRResp True res_ev)) end end
-     | Protocol_Negotiate_Request _ =>
-       coq_ErrorResponseJSON errStr_negotiation_not_implemented
-     | Protocol_Appraise_Request appreq =>
-       let val app_resp = do_appraisal_session appreq ac nonceVal in
-       (case app_resp of
-          Coq_errC e => coq_ErrorResponseJSON e
-        | Coq_resultC app_resp0 =>
-          coq_ProtocolAppraiseResponse_to_JSON app_resp0) end)
+  | Coq_resultC req_type =>
+    (case (op=) req_type coq_STR_RUN of
+       True =>
+       (case let val Build_Jsonifiable _ from_JSON =
+               coq_Jsonifiable_ProtocolRunRequest coq_Jsonifiable_Term
+                 coq_Jsonifiable_RawEv
+                 (coq_Jsonifiable_Attestation_Session
+                   (jsonifiable_map_serial_serial coq_Stringifiable_ID_Type
+                     coq_Eq_Class_ID_Type coq_Stringifiable_UUUID)
+                   (jsonifiable_map_serial_serial coq_Stringifiable_ID_Type
+                     coq_Eq_Class_ID_Type coq_Stringifiable_PublicKey))
+             in
+             from_JSON js end of
+          Coq_errC msg => coq_ErrorResponseJSON msg
+        | Coq_resultC r =>
+          let val Coq_mkPRReq att_sess cop_term _ ev = r in
+          let val sc = session_config_compiler conf att_sess in
+          let val cvm_resp = run_cvm_rawEv cop_term ev sc in
+          (case cvm_resp of
+             Coq_errC e => coq_ErrorResponseJSON e
+           | Coq_resultC res_ev =>
+             let val Build_Jsonifiable to_JSON _ =
+               coq_Jsonifiable_ProtocolRunResponse coq_Jsonifiable_RawEv
+             in
+             to_JSON (Coq_mkPRResp True res_ev) end) end end end)
+     | False =>
+       (case (op=) req_type coq_STR_NEGOTIATE of
+          True => coq_ErrorResponseJSON errStr_negotiation_not_implemented
+        | False =>
+          (case (op=) req_type coq_STR_APPRAISE of
+             True =>
+             (case let val Build_Jsonifiable _ from_JSON =
+                     coq_Jsonifiable_ProtocolAppraiseRequest
+                       coq_Jsonifiable_Term coq_Jsonifiable_RawEv
+                       coq_Jsonifiable_Evidence
+                       (coq_Jsonifiable_Attestation_Session
+                         (jsonifiable_map_serial_serial
+                           coq_Stringifiable_ID_Type coq_Eq_Class_ID_Type
+                           coq_Stringifiable_UUUID)
+                         (jsonifiable_map_serial_serial
+                           coq_Stringifiable_ID_Type coq_Eq_Class_ID_Type
+                           coq_Stringifiable_PublicKey))
+                   in
+                   from_JSON js end of
+                Coq_errC msg => coq_ErrorResponseJSON msg
+              | Coq_resultC appreq =>
+                let val app_resp = do_appraisal_session conf appreq nonceVal
+                in
+                (case app_resp of
+                   Coq_errC e => coq_ErrorResponseJSON e
+                 | Coq_resultC app_resp0 =>
+                   let val Build_Jsonifiable to_JSON _ =
+                     coq_Jsonifiable_ProtocolAppraiseResponse
+                       (coq_Jsonifiable_AppResultC
+                         (jsonifiable_map_serial_serial
+                           coq_Stringifiable_ID_Type coq_Eq_Class_ID_Type
+                           coq_Stringifiable_ID_Type))
+                   in
+                   to_JSON app_resp0 end) end)
+           | False => coq_ErrorResponseJSON "Invalid request type")))

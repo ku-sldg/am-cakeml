@@ -13,11 +13,11 @@ fun run_am_app_comp_init am_comp st =
     Coq_errC e => Coq_errC (am_error_to_string e)
   | Coq_resultC x => Coq_resultC x
 
-(** val get_AM_amConfig : coq_AM_Config coq_AM **)
+(** val get_AM_config : coq_Session_Config coq_AM **)
 
-val get_AM_amConfig : coq_AM_Config coq_AM =
+val get_AM_config : coq_Session_Config coq_AM =
   bind get (fn st =>
-    ret (let val Coq_mkAM_St _ _ amConfig = st in amConfig end))
+    ret (let val Coq_mkAM_St _ _ am_config = st in am_config end))
 
 (** val am_getNonce : nat -> coq_BS coq_AM **)
 

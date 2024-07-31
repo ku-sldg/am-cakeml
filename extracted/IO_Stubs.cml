@@ -5,12 +5,17 @@ val make_JSON_Network_Request : (coq_UUID -> coq_JSON -> (coq_JSON, string)
                                 coq_ResultT) =
   failwith "AXIOM TO BE REALIZED"
 
+(** val aspid_to_fs_location : coq_ASP_ID -> coq_FS_Location **)
+
+val aspid_to_fs_location : (coq_ASP_ID -> coq_FS_Location) =
+  failwith "AXIOM TO BE REALIZED"
+
 (** val make_JSON_FS_Location_Request :
-    coq_FS_Location -> coq_Concrete_ASP_ID -> coq_JSON -> (coq_JSON, string)
+    coq_FS_Location -> coq_FS_Location -> coq_JSON -> (coq_JSON, string)
     coq_ResultT **)
 
-val make_JSON_FS_Location_Request : (coq_FS_Location -> coq_Concrete_ASP_ID
-                                    -> coq_JSON -> (coq_JSON, string)
+val make_JSON_FS_Location_Request : (coq_FS_Location -> coq_FS_Location ->
+                                    coq_JSON -> (coq_JSON, string)
                                     coq_ResultT) =
   failwith "AXIOM TO BE REALIZED"
 

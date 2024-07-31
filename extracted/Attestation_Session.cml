@@ -1,0 +1,60 @@
+datatype coq_Attestation_Session =
+  Coq_mkAtt_Sess coq_Plc ((coq_Plc, coq_UUID) coq_MapC)
+   ((coq_Plc, coq_PublicKey) coq_MapC)
+
+datatype coq_DispatcherErrors =
+  Unavailable 
+| Runtime string
+
+type 'errType coq_ASPCallback =
+  coq_ASP_PARAMS -> coq_RawEv -> (coq_RawEv, 'errType) coq_ResultT
+
+type coq_PolicyT = (coq_Plc * coq_ASP_ID) list
+
+datatype coq_Session_Config =
+  Build_Session_Config coq_Plc coq_ASP_Compat_MapT
+   (coq_DispatcherErrors coq_ASPCallback) ((coq_Plc, coq_UUID) coq_MapC)
+   ((coq_Plc, coq_PublicKey) coq_MapC) coq_PolicyT
+
+(** val coq_Jsonifiable_Attestation_Session :
+    (coq_Plc, coq_UUID) coq_MapC coq_Jsonifiable -> (coq_Plc, coq_PublicKey)
+    coq_MapC coq_Jsonifiable -> coq_Attestation_Session coq_Jsonifiable **)
+
+fun coq_Jsonifiable_Attestation_Session h h0 =
+  Build_Jsonifiable (fn v => JSON_Object (("Session_Plc", (InJSON_String
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_ID_Type in
+     to_string (let val Coq_mkAtt_Sess session_Plc _ _ = v in session_Plc end) end))) :: (("Plc_Mapping",
+    (InJSON_Object
+    (let val Build_Jsonifiable to_JSON _ = h in
+     to_JSON (let val Coq_mkAtt_Sess _ plc_Mapping _ = v in plc_Mapping end) end))) :: (("PubKey_Mapping",
+    (InJSON_Object
+    (let val Build_Jsonifiable to_JSON _ = h0 in
+     to_JSON
+       (let val Coq_mkAtt_Sess _ _ pubKey_Mapping = v in pubKey_Mapping end) end))) :: []))))
+    (fn j =>
+    case coq_JSON_get_string "Session_Plc" j of
+      Coq_errC _ => Coq_errC "Error in parsing Attestation_Session"
+    | Coq_resultC plc =>
+      (case coq_JSON_get_Object "Plc_Mapping" j of
+         Coq_errC _ => Coq_errC "Error in parsing Attestation_Session"
+       | Coq_resultC plc_map =>
+         (case coq_JSON_get_Object "PubKey_Mapping" j of
+            Coq_errC _ => Coq_errC "Error in parsing Attestation_Session"
+          | Coq_resultC pub_map =>
+            (case let val Build_Stringifiable _ from_string =
+                    coq_Stringifiable_ID_Type
+                  in
+                  from_string plc end of
+               Coq_errC _ => Coq_errC "Error in parsing Attestation_Session"
+             | Coq_resultC plc' =>
+               (case let val Build_Jsonifiable _ from_JSON = h in
+                     from_JSON plc_map end of
+                  Coq_errC _ =>
+                  Coq_errC "Error in parsing Attestation_Session"
+                | Coq_resultC plc_map' =>
+                  (case let val Build_Jsonifiable _ from_JSON = h0 in
+                        from_JSON pub_map end of
+                     Coq_errC _ =>
+                     Coq_errC "Error in parsing Attestation_Session"
+                   | Coq_resultC pub_map' =>
+                     Coq_resultC (Coq_mkAtt_Sess plc' plc_map' pub_map')))))))

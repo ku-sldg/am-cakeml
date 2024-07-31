@@ -11,17 +11,16 @@ When things go wrong, handle_AM_request returns a raw error message string.
 
 (* () -> () *)
 fun main () =
-  let val _ = AM_CLI_Utils.retrieve_Client_AM_CLI_args ()
-      (* Maybe someday we tak args *)
-      val demo_term : coq_Term = filehash_auth_phrase
+  let val (demo_term, att_sess) = AM_CLI_Utils.retrieve_Client_AM_CLI_args ()
+      (* TODO: Maybe someday we refactor args *)
       val top_plc   : coq_Plc = "TOP_PLC"
       val att_plc   : coq_Plc = "P0" 
-      val et        : coq_Evidence = Coq_nn O 
+      val init_et        : coq_Evidence = Coq_nn O 
       val init_rawev : coq_RawEv = [passed_bs]
       val attester_addr : coq_UUID = "localhost:5000"
       val appraiser_addr : coq_UUID = "localhost:5003" 
       
-      val app_result = run_demo_client_AM demo_term top_plc att_plc et init_rawev attester_addr appraiser_addr 
+      val app_result = run_demo_client_AM demo_term top_plc att_plc init_et att_sess init_rawev attester_addr appraiser_addr 
   in 
     ()
   end

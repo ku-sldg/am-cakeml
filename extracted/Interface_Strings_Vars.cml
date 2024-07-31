@@ -63,6 +63,11 @@ val coq_STR_REQUEST : string =
 val coq_STR_RESPONSE : string =
   "RESPONSE"
 
+(** val coq_STR_ATTEST_SESS : string **)
+
+val coq_STR_ATTEST_SESS : string =
+  "ATTESTATION_SESSION"
+
 (** val coq_STR_ASP_RUN : string **)
 
 val coq_STR_ASP_RUN : string =

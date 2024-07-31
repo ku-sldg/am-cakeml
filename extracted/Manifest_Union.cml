@@ -1,14 +1,11 @@
-(** val manifest_union : coq_Manifest -> coq_Manifest -> coq_Manifest **)
+(** val manifest_union_asps :
+    coq_Manifest -> coq_Manifest -> coq_Manifest **)
 
-fun manifest_union m1 m2 =
-  let val Build_Manifest myPlc asps1 uuidPlcs1 pubKeyPlcs1 targPlcs1 myPol =
-    m1
-  in
-  let val Build_Manifest _ asps2 uuidPlcs2 pubKeyPlcs2 targPlcs2 _ = m2 in
-  Build_Manifest myPlc (manset_union coq_Eq_Class_ID_Type asps1 asps2)
-  (manset_union coq_Eq_Class_ID_Type uuidPlcs1 uuidPlcs2)
-  (manset_union coq_Eq_Class_ID_Type pubKeyPlcs1 pubKeyPlcs2)
-  (manset_union coq_Eq_Class_ID_Type targPlcs1 targPlcs2) myPol end end
+fun manifest_union_asps m1 m2 =
+  let val Build_Manifest asps1 asp_comp_map1 asp_fs_map1 myPol1 = m1 in
+  let val Build_Manifest asps2 _ _ _ = m2 in
+  Build_Manifest (manset_union coq_Eq_Class_ID_Type asps1 asps2)
+  asp_comp_map1 asp_fs_map1 myPol1 end end
 
 (** val environment_union'' :
     coq_Plc -> coq_Manifest -> coq_EnvironmentM -> coq_EnvironmentM **)
@@ -16,7 +13,7 @@ fun manifest_union m1 m2 =
 fun environment_union'' p m1 e2 =
   case map_get coq_Eq_Class_ID_Type e2 p of
     Some m2 =>
-    let val new_man = manifest_union m2 m1 in
+    let val new_man = manifest_union_asps m2 m1 in
     map_set coq_Eq_Class_ID_Type e2 p new_man end
   | None => map_set coq_Eq_Class_ID_Type e2 p m1
 

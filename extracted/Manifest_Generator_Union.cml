@@ -16,19 +16,19 @@ fun mangen_plcTerm_list_union ls =
   env_list_union (manifest_generator_plcTerm_list ls)
 
 (** val manifest_generator_plcEvidence_list :
-    (coq_Evidence * coq_Plc) list -> coq_AM_Library -> (coq_EnvironmentM
+    coq_ASP_Compat_MapT -> (coq_Evidence * coq_Plc) list -> (coq_EnvironmentM
     list, string) coq_ResultT **)
 
-fun manifest_generator_plcEvidence_list ls al =
+fun manifest_generator_plcEvidence_list comp_map ls =
   result_map (fn pat =>
-    let val (et, p) = pat in manifest_generator_app et p al end) ls
+    let val (et, p) = pat in manifest_generator_app comp_map et p end) ls
 
 (** val mangen_plcEvidence_list_union :
-    (coq_Evidence * coq_Plc) list -> coq_AM_Library -> (coq_EnvironmentM,
-    string) coq_ResultT **)
+    coq_ASP_Compat_MapT -> (coq_Evidence * coq_Plc) list ->
+    (coq_EnvironmentM, string) coq_ResultT **)
 
-fun mangen_plcEvidence_list_union ls al =
-  case manifest_generator_plcEvidence_list ls al of
+fun mangen_plcEvidence_list_union comp_map ls =
+  case manifest_generator_plcEvidence_list comp_map ls of
     Coq_errC e => Coq_errC e
   | Coq_resultC ls' => Coq_resultC (env_list_union ls')
 
@@ -47,10 +47,10 @@ fun coq_Evidence_Plc_list_to_JSON h ls =
        to_string p end)) :: [])) end) ls))) :: [])
 
 (** val coq_Evidence_Plc_list_from_JSON :
-    coq_Evidence coq_Jsonifiable -> coq_JSON -> (coq_Evidence_Plc_list,
-    string) coq_ResultT **)
+    coq_Evidence coq_Jsonifiable -> coq_ASP_Compat_MapT coq_Jsonifiable ->
+    coq_JSON -> (coq_Evidence_Plc_list, string) coq_ResultT **)
 
-fun coq_Evidence_Plc_list_from_JSON h js =
+fun coq_Evidence_Plc_list_from_JSON h _ js =
   case coq_JSON_get_Array "Evidence_Plc_list" js of
     Coq_errC e => Coq_errC e
   | Coq_resultC jsArr =>
@@ -94,7 +94,9 @@ fun coq_Evidence_Plc_list_from_JSON h js =
 
 fun coq_Jsonifiable_Evidence_Plc_list h =
   Build_Jsonifiable (coq_Evidence_Plc_list_to_JSON h)
-    (coq_Evidence_Plc_list_from_JSON h)
+    (coq_Evidence_Plc_list_from_JSON h
+      (jsonifiable_map_serial_serial coq_Stringifiable_ID_Type
+        coq_Eq_Class_ID_Type coq_Stringifiable_ID_Type))
 
 type coq_Term_Plc_list = (coq_Term * coq_Plc) list
 
@@ -160,73 +162,26 @@ fun coq_Jsonifiable_Term_Plc_list h =
   Build_Jsonifiable (coq_Term_Plc_list_to_JSON h)
     (coq_Term_Plc_list_from_JSON h)
 
-(** val knowsof_myPlc_manifest_update_env' :
-    (coq_Plc * coq_Manifest) -> coq_Plc * coq_Manifest **)
-
-fun knowsof_myPlc_manifest_update_env' p =
-  ((fst p), (knowsof_myPlc_manifest_update (snd p)))
-
-(** val update_knowsOf_myPlc_env : coq_EnvironmentM -> coq_EnvironmentM **)
-
-fun update_knowsOf_myPlc_env env =
-  map knowsof_myPlc_manifest_update_env' env
-
-(** val update_pubkeys_env' :
-    coq_Plc manifest_set -> (coq_Plc * coq_Manifest) -> coq_Plc * coq_Manifest **)
-
-fun update_pubkeys_env' pubs p =
-  ((fst p), (pubkeys_manifest_update pubs (snd p)))
-
-(** val update_pubkeys_env :
-    coq_Plc manifest_set -> coq_EnvironmentM -> coq_EnvironmentM **)
-
-fun update_pubkeys_env pubs env =
-  map (update_pubkeys_env' pubs) env
-
-(** val end_to_end_mangen' :
-    coq_Evidence_Plc_list -> coq_Term_Plc_list -> coq_AM_Library ->
+(** val end_to_end_mangen :
+    coq_ASP_Compat_MapT -> coq_Evidence_Plc_list -> coq_Term_Plc_list ->
     (coq_EnvironmentM, string) coq_ResultT **)
 
-fun end_to_end_mangen' ls ts al =
-  let val app_env = mangen_plcEvidence_list_union ls al in
+fun end_to_end_mangen comp_map ls ts =
+  let val app_env = mangen_plcEvidence_list_union comp_map ls in
   let val att_env = mangen_plcTerm_list_union ts in
   (case app_env of
      Coq_errC e => Coq_errC e
-   | Coq_resultC app_env0 => Coq_resultC (environment_union app_env0 att_env)) end end
-
-(** val manset_union_list :
-    'a1 coq_EqClass -> 'a1 manifest_set manifest_set -> 'a1 manifest_set **)
-
-fun manset_union_list hA lss =
-  fold_right (manset_union hA) [] lss
-
-(** val get_all_unique_places :
-    coq_Term_Plc_list -> coq_Evidence_Plc_list -> coq_Plc manifest_set **)
-
-fun get_all_unique_places ls ets =
-  let val lss =
-    map (fn pat => let val (t, p) = pat in places_manset p t end) ls
-  in
-  let val ts_ps = manset_union_list coq_Eq_Class_ID_Type lss in
-  let val ets_ps = map (fn pat => let val (_, p) = pat in p end) ets in
-  manset_union coq_Eq_Class_ID_Type ts_ps ets_ps end end end
-
-(** val end_to_end_mangen :
-    coq_Evidence_Plc_list -> coq_Term_Plc_list -> coq_AM_Library ->
-    (coq_EnvironmentM, string) coq_ResultT **)
-
-fun end_to_end_mangen ls ts al =
-  let val ps = get_all_unique_places ts ls in
-  (case end_to_end_mangen' ls ts al of
-     Coq_errC e => Coq_errC e
-   | Coq_resultC env =>
-     Coq_resultC (update_pubkeys_env ps (update_knowsOf_myPlc_env env))) end
+   | Coq_resultC app_env0 =>
+     Coq_resultC
+       (environment_union app_env0
+         (map_map coq_Eq_Class_ID_Type (fn m =>
+           add_compat_map_manifest m comp_map) att_env))) end end
 
 (** val end_to_end_mangen_final :
-    coq_Evidence_Plc_list -> coq_Term_Plc_list -> coq_AM_Library ->
+    coq_ASP_Compat_MapT -> coq_Evidence_Plc_list -> coq_Term_Plc_list ->
     (coq_Manifest list, string) coq_ResultT **)
 
-fun end_to_end_mangen_final ls ts al =
-  case end_to_end_mangen ls ts al of
+fun end_to_end_mangen_final comp_map ls ts =
+  case end_to_end_mangen comp_map ls ts of
     Coq_errC e => Coq_errC e
   | Coq_resultC env => Coq_resultC (environment_to_manifest_list env)

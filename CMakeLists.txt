@@ -66,25 +66,25 @@ get_files(copland_am_src
     extracted/Term_Defs_Core.cml
 
     stubs/Params_Admits.sml
-
-    extracted/Term_Defs.cml
-    extracted/Interface_Strings_Vars.cml
-    extracted/Interface_Types.cml
-    extracted/ErrorStMonad_Coq.cml
-
     stubs/Manifest_Admits.sml
 
+    extracted/Term_Defs.cml
     extracted/Manifest_Set.cml
     extracted/Manifest.cml
+    extracted/Attestation_Session.cml
+    extracted/Interface_Strings_Vars.cml
+    extracted/Interface_Types.cml
+    extracted/Interface_JSON.cml
+    extracted/ErrorStMonad_Coq.cml
     extracted/Manifest_JSON_Vars.cml
     extracted/Manifest_JSON.cml
     extracted/Cvm_St.cml
 
     stubs/IO_Stubs.sml
 
+    extracted/AM_Manager.cml
+    extracted/Session_Config_Compiler.cml
     extracted/Anno_Term_Defs.cml
-    extracted/CvmJson_Interfaces.cml
-    extracted/Manifest_Compiler.cml
     extracted/EnvironmentM.cml
     extracted/Manifest_Union.cml
 
@@ -94,7 +94,6 @@ get_files(copland_am_src
     extracted/Cvm_Monad.cml
     extracted/Cvm_Impl.cml
     extracted/Cvm_Run.cml
-    extracted/Manifest_Generator_Helpers.cml
     extracted/Manifest_Generator.cml
     extracted/Manifest_Generator_Union.cml
     extracted/AM_St.cml
@@ -109,6 +108,7 @@ get_files(copland_am_src
     extracted/Flexible_Mechanisms.cml
     extracted/Client_AM.cml
     extracted/Server_AM.cml
+    extracted/Concrete_Extractables.cml
     util/AM_CLI.sml
 )
 

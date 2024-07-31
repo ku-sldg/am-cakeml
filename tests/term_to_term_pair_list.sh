@@ -1,22 +1,28 @@
 #!/bin/bash
+set -eu
 
 TESTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 GENERATED=$TESTS_DIR/DemoFiles/Generated
 TOP_PLC="P0"
-TERM_PAIR_FILE=$GENERATED/TermPairList.json
 
 # Function to display usage instructions
 usage() {
-  echo "Usage: $0 -f <json_term_file>"
+  echo "Usage: $0 -f <json_term_file> -o <output_file>"
   exit 1
 }
 
+JSON_TERM_FILE=""
+TERM_PAIR_FILE=""
+
 # Parse command-line arguments
-while getopts "f:" opt; do
+while getopts "f:o:" opt; do
   case ${opt} in
     f )
       JSON_TERM_FILE=$OPTARG
+      ;;
+    o )
+      TERM_PAIR_FILE=$OPTARG
       ;;
     * )
       usage
@@ -25,8 +31,9 @@ while getopts "f:" opt; do
 done
 
 # Check if all required arguments are provided
-if [[ -z "$JSON_TERM_FILE" ]]; then
+if [[ -z "$JSON_TERM_FILE" || -z "$TERM_PAIR_FILE" ]]; then
   usage
+  exit 1
 fi
 
 # Check if the JSON file exists

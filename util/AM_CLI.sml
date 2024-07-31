@@ -2,8 +2,8 @@
 (* TODO: dependencies *)
 structure AM_CLI_Utils = struct
   type priv_key_t = string
-  type server_am_args_t = (coq_Manifest * coq_AM_Library * coq_FS_Location * priv_key_t)
-  type client_am_args_t = (coq_Manifest * coq_Term)
+  type server_am_args_t = coq_AM_Manager_Config
+  type client_am_args_t = (coq_Term * coq_Attestation_Session)
   
   (* Parse a JSON file into a JSON object *)
   (* : string -> (coq_Manifest, string) coq_ResultT *)
@@ -22,6 +22,24 @@ structure AM_CLI_Utils = struct
             from_JSON js
           end
     end
+  
+  (* Parse a JSON file into a JSON object *)
+  (* : string -> (coq_Attestation_Session, string) coq_ResultT *)
+  fun parse_att_session_from_file (filename : string) =
+    let
+      val file_text = TextIOExtra.readFile filename
+    in
+      case (Json.parse file_text) of
+        Err c => Coq_errC c
+      | Ok js => 
+        case (cakeML_JSON_to_coq_JSON js) of
+          Coq_errC c => Coq_errC c
+        | Coq_resultC js =>
+          let val (Build_Jsonifiable _ from_JSON) = concrete_Jsonifiable_Attestation_Session
+          in
+            from_JSON js
+          end
+    end
 
   (* Parse a JSON file into a JSON object *)
   (* : string -> (coq_Manifest, string) coq_ResultT *)
@@ -35,66 +53,41 @@ structure AM_CLI_Utils = struct
         case (cakeML_JSON_to_coq_JSON js) of
           Coq_errC c => Coq_errC c
         | Coq_resultC js =>
-          let val (Build_Jsonifiable _ from_JSON) = coq_Jsonifiable_Manifest
+          let val (Build_Jsonifiable _ from_JSON) = concrete_Jsonifiable_Manifest
           in
             from_JSON js
           end
     end
 
-  (* Parse a JSON file into a JSON object *)
-  (* : string -> (coq_AM_Library, string) coq_ResultT *)
-  fun parse_am_lib_from_file (filename : string) =
-    let
-      val file_text = TextIOExtra.readFile filename
-    in
-      case (Json.parse file_text) of
-        Err c => Coq_errC c
-      | Ok js => 
-        case (cakeML_JSON_to_coq_JSON js) of
-          Coq_errC c => Coq_errC c
-        | Coq_resultC js =>
-          let val (Build_Jsonifiable _ from_JSON) = coq_Jsonifiable_AM_Library
-          in
-            from_JSON js
-          end
-    end
-  
-  (* Parse a private key file into a string *)
-  (* : string -> (string, string) coq_ResultT *)
-  (* TODO: better error handling here -- i.e. reasonable error message if file not found... *)
-  fun parse_private_key file =
-    Coq_resultC (BString.unshow (TextIOExtra.readFile file))
-    handle Word8Extra.InvalidHex => Coq_errC "BString Unshow Error in parsing private key"
-  
   fun argIndPresent (i:int) = (i <> ~1)
   
   fun retrieve_Client_AM_CLI_args _ =
     let val name = CommandLine.name ()
-        val usage = ("Usage: " ^ name ^ "you basically cant use this wrong")
+        val usage = ("Usage: " ^ name ^ " -t <term_file>.json -s <att_session.json>\n\ne.g.\t" ^ name ^ " -t cert.json -s my_session.json\n\n")
         val argList = CommandLine.arguments ()
-        (* val usage = ("Usage: " ^ name ^ "-m <ManifestFile>.json -t <term_file>.json\n\ne.g.\t" ^ name ^ " -m formMan.json -t cert.json\n\n")
-        val argList = CommandLine.arguments ()
-        val manInd        = ListExtra.find_index argList "-m"
         val termInd        = ListExtra.find_index argList "-t"
-        val manIndBool    = argIndPresent manInd 
-        val termIndBool   = argIndPresent termInd  *)
+        val sessInd        = ListExtra.find_index argList "-s"
+        val termIndBool   = argIndPresent termInd
+        val sessIndBool   = argIndPresent sessInd
     in 
-      ()
-    (* if ((manIndBool = False) orelse (termIndBool = False))
+    (
+    if ((termIndBool = False) orelse (sessIndBool = False))
     then raise (Exception ("Invalid Arguments\n" ^ usage))
     else (
-      let val manFileName   = List.nth argList (manInd + 1)
-          val termFileName  = List.nth argList (termInd + 1)
+      let val termFileName  = List.nth argList (termInd + 1)
+          val sessFileName  = List.nth argList (sessInd + 1)
       in
-        (case (parse_manifest_from_file manFileName) of
-          Coq_errC e => raise (Exception ("Could not parse JSON Manifest file: " ^ e ^ "\n"))
-        | Coq_resultC manifest =>
           (case (parse_term_from_file termFileName) of
             Coq_errC e => raise (Exception ("Could not parse Term file: " ^ e ^ "\n"))
-          | Coq_resultC term => (manifest, term)
+          | Coq_resultC term =>
+            (case (parse_att_session_from_file sessFileName) of
+              Coq_errC e => raise (Exception ("Could not parse Attestation Session from Json: " ^ e ^ "\n"))
+            | Coq_resultC sess => (term, sess)
+            )
           )
-          )
-      end) *)
+      end
+      )
+    )
     end
 
   (* Retrieves the manifest filename and private key (as strings)
@@ -102,43 +95,29 @@ structure AM_CLI_Utils = struct
     : () -> am_args_t
   *)
   fun retrieve_Server_AM_CLI_args _ =
-    let val name = CommandLine.name ()
-        val usage = ("Usage: " ^ name ^ "-m <ManifestFile>.json -l <AmLibFile>.json -b <asp_bin_location> (-k <privateKeyFile>)\n\ne.g.\t" ^ name ^ " -m formMan.json -l amLib.json -b /opt/asps -k ~/.ssh/id_ed25519\n\n")
+    (let val name = CommandLine.name ()
+        val usage = ("Usage: " ^ name ^ "-m <ManifestFile>.json -b <asp_bin_location> -u <ip:port>\n\ne.g.\t" ^ name ^ " -m formMan.json -b /opt/asps -u localhost:5000\n\n")
         val argList = CommandLine.arguments ()
         val manInd        = ListExtra.find_index argList "-m"
-        val amLibInd      = ListExtra.find_index argList "-l"
         val aspBinInd     = ListExtra.find_index argList "-b"
-        val keyInd        = ListExtra.find_index argList "-k"
+        val uuidInd       = ListExtra.find_index argList "-u"
         val manIndBool    = argIndPresent manInd 
-        val amLibIndBool  = argIndPresent amLibInd
         val aspBinBool    = argIndPresent aspBinInd
-        val keyIndBool    = argIndPresent keyInd
+        val uuidIndBool   = argIndPresent uuidInd
     in 
-      if ((manIndBool = False) orelse (amLibIndBool = False) orelse (aspBinBool = False))
+      if ((manIndBool = False) orelse (aspBinBool = False) orelse (uuidIndBool = False))
       then raise (Exception ("Invalid Arguments\n" ^ usage))
       else (
-        if (keyIndBool = False)
-        then (* We do not have a priv key yet, later we hope to offer it as option to be provisioned later *) 
-            raise (Exception ("Invalid Arguments, WE REQUIRE PRIV KEY CURRENTLY!\n" ^ usage))
-        else (
-          let val manFileName   = List.nth argList (manInd + 1)
-              val amLibFileName = List.nth argList (amLibInd + 1)
-              val aspBinLoc     = List.nth argList (aspBinInd + 1)
-              val privKeyFile   = List.nth argList (keyInd + 1)
-          in
-            (case (parse_manifest_from_file manFileName) of
-              Coq_errC e => raise (Exception ("Could not parse JSON Manifest file: " ^ e ^ "\n"))
-            | Coq_resultC manifest =>
-              (case (parse_am_lib_from_file amLibFileName) of
-                Coq_errC e => raise (Exception ("Could not parse JSON AM Lib file: " ^ e ^ "\n"))
-              | Coq_resultC am_lib =>
-                (case (parse_private_key privKeyFile) of
-                  Coq_errC e => raise (Exception ("Could not parse private key file: " ^ e ^ "\n"))
-                | Coq_resultC priv_key => (manifest, am_lib, aspBinLoc, priv_key)
-                )
-              )
-            )
-          end)
+        let val manFileName   = List.nth argList (manInd + 1)
+            val aspBinLoc     = List.nth argList (aspBinInd + 1)
+            val uuidLoc       = List.nth argList (uuidInd + 1)
+        in
+          (case (parse_manifest_from_file manFileName) of
+            Coq_errC e => raise (Exception ("Could not parse JSON Manifest file: " ^ e ^ "\n"))
+          | Coq_resultC manifest =>
+              (Coq_mkAM_Man_Conf manifest aspBinLoc uuidLoc)
+          )
+        end
       )
-    end
+    end) : server_am_args_t
 end

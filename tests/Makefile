@@ -8,6 +8,6 @@ ci_build:
 	./CI/Build.sh
 
 ci_test:
-	./CI/Test.sh -t cert
-	./CI/Test.sh -t bg
-	./CI/Test.sh -t parmut
+	./CI/Test.sh -t cert -h
+	./CI/Test.sh -t bg -h
+	./CI/Test.sh -t parmut -h
