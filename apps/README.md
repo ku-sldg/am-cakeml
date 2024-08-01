@@ -1,5 +1,7 @@
 ## Contents ##
 
-- [`AttestationManager/`](./AttestationManager/) Attestation Manager executable
-- [`ManifestGenerator/`](./ManifestGenerator/) Manifest Generator executable
-- [`TermToJson/`](./TermToJson/) Executable to transform Coq -> CakeML extracted Terms into a JSON file
+- [`attestation_manager/`](./attestation_manager/) Attestation Manager executable
+- [`evidence_to_json/`](./evidence_to_json/) Executable to transform Coq -> CakeML extracted Evidence into a JSON file
+- [`manifest_generator/`](./manifest_generator/) Manifest Generator executable
+- [`term_to_json/`](./term_to_json/) Executable to transform Coq -> CakeML extracted Terms into a JSON file
+- [`client_am/`](./client_am/) Attestation Manager Client executable
