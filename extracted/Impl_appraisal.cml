@@ -2,47 +2,47 @@
 
 fun peel_bs_am ls = case ls of
   [] => am_failm (Coq_am_error errStr_peel_bs_am)
-| bs :: ls' => ret (bs, ls')
+| bs :: ls' => err_ret (bs, ls')
 
 (** val peel_n_am : nat -> coq_RawEv -> (coq_RawEv * coq_RawEv) coq_AM **)
 
 fun peel_n_am n ls =
   case n of
-    O => ret ([], ls)
+    O => err_ret ([], ls)
   | S n' =>
     (case ls of
        [] => am_failm (Coq_am_error errStr_peel_n_am)
      | x :: ls' =>
-       bind (peel_n_am n' ls') (fn v =>
-         let val (ls1, ls2) = v in ret ((x :: ls1), ls2) end))
+       err_bind (peel_n_am n' ls') (fn v =>
+         let val (ls1, ls2) = v in err_ret ((x :: ls1), ls2) end))
 
 (** val gen_appraise_AM :
     coq_Evidence -> coq_RawEv -> coq_AppResultC coq_AM **)
 
 fun gen_appraise_AM et ls =
   case et of
-    Coq_mt => ret Coq_mtc_app
+    Coq_mt => err_ret Coq_mtc_app
   | Coq_nn nid =>
-    bind (peel_bs_am ls) (fn v =>
+    err_bind (peel_bs_am ls) (fn v =>
       let val (bs, _) = v in
-      bind (checkNonce' nid bs) (fn res => ret (Coq_nnc_app nid res)) end)
+      err_bind (checkNonce' nid bs) (fn res => err_ret (Coq_nnc_app nid res)) end)
   | Coq_uu p fwd params et' =>
     (case fwd of
        ENCR =>
-       bind (peel_bs_am ls) (fn v =>
+       err_bind (peel_bs_am ls) (fn v =>
          let val (bs, _) = v in
-         bind (decrypt_bs_to_rawev' bs params et') (fn decrypted_ls =>
-           bind (gen_appraise_AM et' decrypted_ls) (fn rest =>
-             ret (Coq_eec_app p params passed_bs rest))) end)
+         err_bind (decrypt_bs_to_rawev' bs params et') (fn decrypted_ls =>
+           err_bind (gen_appraise_AM et' decrypted_ls) (fn rest =>
+             err_ret (Coq_eec_app p params passed_bs rest))) end)
      | EXTD n =>
-       bind (peel_n_am n ls) (fn v =>
+       err_bind (peel_n_am n ls) (fn v =>
          let val (rawEv, ls') = v in
-         bind (check_asp_EXTD' params p rawEv ls') (fn v0 =>
-           bind (gen_appraise_AM et' ls') (fn rest =>
-             ret (Coq_ggc_app p params v0 rest))) end)
+         err_bind (check_asp_EXTD' params p rawEv ls') (fn v0 =>
+           err_bind (gen_appraise_AM et' ls') (fn rest =>
+             err_ret (Coq_ggc_app p params v0 rest))) end)
      | KEEP => gen_appraise_AM et' ls
-     | _ => ret Coq_mtc_app)
+     | _ => err_ret Coq_mtc_app)
   | Coq_ss et1 et2 =>
-    bind (gen_appraise_AM et1 (firstn (et_size et1) ls)) (fn x =>
-      bind (gen_appraise_AM et2 (skipn (et_size et1) ls)) (fn y =>
-        ret (Coq_ssc_app x y)))
+    err_bind (gen_appraise_AM et1 (firstn (et_size et1) ls)) (fn x =>
+      err_bind (gen_appraise_AM et2 (skipn (et_size et1) ls)) (fn y =>
+        err_ret (Coq_ssc_app x y)))

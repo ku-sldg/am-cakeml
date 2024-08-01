@@ -16,17 +16,17 @@ fun run_am_app_comp_init am_comp st =
 (** val get_AM_config : coq_Session_Config coq_AM **)
 
 val get_AM_config : coq_Session_Config coq_AM =
-  bind get (fn st =>
-    ret (let val Coq_mkAM_St _ _ am_config = st in am_config end))
+  err_bind err_get (fn st =>
+    err_ret (let val Coq_mkAM_St _ _ am_config = st in am_config end))
 
 (** val am_getNonce : nat -> coq_BS coq_AM **)
 
 fun am_getNonce nid =
-  bind get (fn oldSt =>
+  err_bind err_get (fn oldSt =>
     let val oldMap =
       let val Coq_mkAM_St am_nonceMap _ _ = oldSt in am_nonceMap end
     in
     let val resopt = map_get nat_EqClass oldMap nid in
     (case resopt of
-       Some res => ret res
+       Some res => err_ret res
      | None => am_failm (Coq_am_error errStr_amNonce)) end end)
