@@ -36,6 +36,9 @@ get_files(manGen_src
   ../../extracted/Manifest_Union.cml
   ../../extracted/Manifest_Generator.cml
   ../../extracted/Manifest_Generator_Union.cml
+  ../../extracted/Manifest_JSON_Vars.cml
+  ../../extracted/Manifest_JSON.cml
+  ../../extracted/Concrete_Extractables.cml
   manifest_generator.sml)
 
 build_posix_am("manifest_generator" ${manGen_src})
