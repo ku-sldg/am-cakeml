@@ -112,12 +112,12 @@ val am_sendReq =
     coq_Loc -> coq_Core_Term -> coq_RawEv -> unit coq_IO **)
 
 fun do_start_par_thread _ _ _ =
-  ret ()
+  err_ret ()
 
 (** val do_wait_par_thread : coq_Loc -> coq_EvC coq_IO **)
 
 fun do_wait_par_thread loc =
-  ret (parallel_vm_thread loc)
+  err_ret (parallel_vm_thread loc)
 
 (** val requester_bound : coq_Term -> coq_Plc -> coq_ReqAuthTok -> bool **)
 

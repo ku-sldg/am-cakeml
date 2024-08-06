@@ -141,10 +141,3 @@ datatype coq_Ev =
 | Coq_join nat coq_Plc
 | Coq_cvm_thread_start coq_Loc coq_Plc coq_Core_Term coq_Evidence
 | Coq_cvm_thread_end coq_Loc
-
-(** val policy_list_not_disclosed :
-    coq_Term -> coq_Plc -> coq_Evidence -> (coq_Plc * coq_ASP_ID) list -> bool **)
-
-fun policy_list_not_disclosed t p e ls =
-  forallb (fn pr =>
-    negb (term_discloses_aspid_to_remote_enc_bool t p e (fst pr) (snd pr))) ls

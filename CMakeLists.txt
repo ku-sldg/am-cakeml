@@ -35,16 +35,15 @@ get_files(util_src util/Extra.sml
     util/ByteString.sml util/Misc.sml util/Parser.sml util/Json.sml
     util/BinaryParser.sml util/Http.sml)
 
-get_files(copland_am_src
+get_files(extraction_preamble_src
     # Require Extraction Files for Types
     extracted/Datatypes.cml
     extracted/Nat.cml
     extracted/Specif.cml
-    extracted/List.cml
+    extracted/List.cml)
 
-    # Random needed stuff (likely extraction bug related)
-    stubs/Preamble_Stuff.sml
-
+get_files(copland_am_src
+    ${extraction_preamble_src}
     # A more faithful extraction of the Coq code following _CoqProject
     extracted/ResultT.cml
     extracted/Stringifiable.cml
@@ -157,6 +156,15 @@ mark_as_advanced(CLEAR
     CMAKE_C_COMPILER CMAKE_ASM_COMPILER CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG
     CMAKE_C_FLAGS_RELEASE CMAKE_EXE_LINKER_FLAGS CMAKE_VERBOSE_MAKEFILE
 )
+
+function(build_binary name)
+    build_cake("${name}.cake" SOURCES "${ARGN}")
+    add_executable(${name} ${BASIS_FILE})
+    if(${STATIC_LINKING})
+        set(link_flags "-static-libgcc -static")
+    endif()
+    target_link_libraries(${name} "${name}.cake" ${link_flags})
+endfunction()
 
 function(build_posix_am name)
     build_cake("${name}.cake" SOURCES "${ARGN}")
