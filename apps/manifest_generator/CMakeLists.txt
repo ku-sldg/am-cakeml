@@ -17,6 +17,7 @@ get_files(manGen_src
   ../../extracted/JSON.cml
   ../../stubs/BS.sml
   ../../extracted/Term_Defs_Core.cml
+  ../../extracted/JSON_Core.cml
   ../../stubs/Params_Admits.sml
   ../../extracted/Term_Defs.cml
   ../../extracted/ErrorStMonad_Coq.cml

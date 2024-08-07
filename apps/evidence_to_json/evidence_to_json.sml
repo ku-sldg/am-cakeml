@@ -2,7 +2,15 @@
   
 fun write_evidence_to_file (term : coq_Evidence) (filename : string) =
   let
-    val (Build_Jsonifiable to_JSON _) = coq_Jsonifiable_Evidence
+    val (Build_Jsonifiable to_JSON _) = (coq_Jsonifiable_Evidence
+                         (jsonifiable_map_serial_serial
+                           coq_Stringifiable_ID_Type coq_Eq_Class_ID_Type
+                           coq_Stringifiable_ID_Type) coq_Jsonifiable_FWD
+                         coq_Jsonifiable_nat
+                         (coq_Jsonifiable_ASP_Params
+                           (jsonifiable_map_serial_serial
+                             coq_Stringifiable_ID_Type coq_Eq_Class_ID_Type
+                             coq_Stringifiable_ID_Type)))
     val coq_json = to_JSON term
     val json_str = coq_JSON_to_string coq_json
   in

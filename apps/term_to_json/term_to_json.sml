@@ -2,7 +2,12 @@
   
 fun write_term_to_file (term : coq_Term) (filename : string) =
   let
-    val (Build_Jsonifiable to_JSON _) = coq_Jsonifiable_Term
+    val (Build_Jsonifiable to_JSON _) = (coq_Jsonifiable_Term
+                   (coq_Jsonifiable_ASP coq_Jsonifiable_FWD
+                     (coq_Jsonifiable_ASP_Params
+                       (jsonifiable_map_serial_serial
+                         coq_Stringifiable_ID_Type coq_Eq_Class_ID_Type
+                         coq_Stringifiable_ID_Type))) coq_Jsonifiable_Split)
     val coq_json = to_JSON term
     val json_str = coq_JSON_to_string coq_json
   in
