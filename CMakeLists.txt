@@ -63,6 +63,7 @@ get_files(copland_am_src
 
     extracted/JSON.cml
     extracted/Term_Defs_Core.cml
+    extracted/JSON_Core.cml
 
     stubs/Params_Admits.sml
     stubs/Manifest_Admits.sml
