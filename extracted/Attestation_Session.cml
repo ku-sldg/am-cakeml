@@ -21,16 +21,14 @@ datatype coq_Session_Config =
     coq_MapC coq_Jsonifiable -> coq_Attestation_Session coq_Jsonifiable **)
 
 fun coq_Jsonifiable_Attestation_Session h h0 =
-  Build_Jsonifiable (fn v => JSON_Object (("Session_Plc", (InJSON_String
+  Build_Jsonifiable (fn v => JSON_Object (("Session_Plc", (JSON_String
     (let val Build_Stringifiable to_string _ = coq_Stringifiable_ID_Type in
      to_string (let val Coq_mkAtt_Sess session_Plc _ _ = v in session_Plc end) end))) :: (("Plc_Mapping",
-    (InJSON_Object
     (let val Build_Jsonifiable to_JSON _ = h in
-     to_JSON (let val Coq_mkAtt_Sess _ plc_Mapping _ = v in plc_Mapping end) end))) :: (("PubKey_Mapping",
-    (InJSON_Object
+     to_JSON (let val Coq_mkAtt_Sess _ plc_Mapping _ = v in plc_Mapping end) end)) :: (("PubKey_Mapping",
     (let val Build_Jsonifiable to_JSON _ = h0 in
      to_JSON
-       (let val Coq_mkAtt_Sess _ _ pubKey_Mapping = v in pubKey_Mapping end) end))) :: []))))
+       (let val Coq_mkAtt_Sess _ _ pubKey_Mapping = v in pubKey_Mapping end) end)) :: []))))
     (fn j =>
     case coq_JSON_get_string "Session_Plc" j of
       Coq_errC _ => Coq_errC "Error in parsing Attestation_Session"

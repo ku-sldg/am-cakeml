@@ -3,19 +3,16 @@
     coq_ASP_Compat_MapT coq_Jsonifiable -> coq_Manifest coq_Jsonifiable **)
 
 fun coq_Jsonifiable_Manifest h h0 =
-  Build_Jsonifiable (fn m => JSON_Object ((coq_MAN_ASPS, (InJSON_Array
-    (manifest_set_to_list_InJson coq_Stringifiable_ID_Type
-      coq_Eq_Class_ID_Type
+  Build_Jsonifiable (fn m => JSON_Object ((coq_MAN_ASPS, (JSON_Array
+    (manifest_set_to_list_JSON coq_Stringifiable_ID_Type coq_Eq_Class_ID_Type
       (let val Build_Manifest asps _ _ _ = m in asps end)))) :: ((coq_MAN_ASP_COMPAT_MAP,
-    (InJSON_Object
     (let val Build_Jsonifiable to_JSON _ = h0 in
      to_JSON
-       (let val Build_Manifest _ aSP_Compat_Map _ _ = m in aSP_Compat_Map end) end))) :: ((coq_MAN_ASP_FS_MAP,
-    (InJSON_Object
+       (let val Build_Manifest _ aSP_Compat_Map _ _ = m in aSP_Compat_Map end) end)) :: ((coq_MAN_ASP_FS_MAP,
     (let val Build_Jsonifiable to_JSON _ = h in
-     to_JSON (let val Build_Manifest _ _ aSP_Mapping _ = m in aSP_Mapping end) end))) :: ((coq_MAN_POLICY,
-    (InJSON_Array
-    (manifest_set_pairs_to_list_InJson coq_Stringifiable_ID_Type
+     to_JSON (let val Build_Manifest _ _ aSP_Mapping _ = m in aSP_Mapping end) end)) :: ((coq_MAN_POLICY,
+    (JSON_Array
+    (manifest_set_pairs_to_list_JSON coq_Stringifiable_ID_Type
       coq_Stringifiable_ID_Type
       (let val Build_Manifest _ _ _ man_policy = m in man_policy end)))) :: [])))))
     (fn js =>
@@ -26,7 +23,7 @@ fun coq_Jsonifiable_Manifest h h0 =
           (fn temp_ASP_FS_MAP =>
           res_bind (coq_JSON_get_Array coq_MAN_POLICY js) (fn temp_POLICY =>
             res_bind
-              (list_InJson_to_manifest_set coq_Stringifiable_ID_Type
+              (list_JSON_to_manifest_set coq_Stringifiable_ID_Type
                 coq_Eq_Class_ID_Type temp_ASPS) (fn aSPS =>
               res_bind
                 (let val Build_Jsonifiable _ from_JSON = h0 in
@@ -35,7 +32,7 @@ fun coq_Jsonifiable_Manifest h h0 =
                   (let val Build_Jsonifiable _ from_JSON = h in
                    from_JSON temp_ASP_FS_MAP end) (fn aSP_FS_MAP =>
                   res_bind
-                    (list_InJson_to_manifest_set_pairs
+                    (list_JSON_to_manifest_set_pairs
                       coq_Stringifiable_ID_Type coq_Stringifiable_ID_Type
                       coq_Eq_Class_ID_Type coq_Eq_Class_ID_Type temp_POLICY)
                     (fn pOLICY => Coq_resultC (Build_Manifest aSPS
