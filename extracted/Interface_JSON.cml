@@ -139,11 +139,11 @@ fun coq_Jsonifiable_ASPRunRequest h h0 =
     (let val Build_Jsonifiable to_JSON _ = h0 in
      to_JSON
        (let val Coq_mkASPRReq _ asprreq_asp_args _ _ _ = req in
-        asprreq_asp_args end) end)) :: ((coq_STR_TARG_PLC, (JSON_String
+        asprreq_asp_args end) end)) :: ((coq_STR_ASP_PLC, (JSON_String
     (let val Build_Stringifiable to_string _ = coq_Stringifiable_ID_Type in
      to_string
        (let val Coq_mkASPRReq _ _ asprreq_targ_plc _ _ = req in
-        asprreq_targ_plc end) end))) :: ((coq_STR_TARG, (JSON_String
+        asprreq_targ_plc end) end))) :: ((coq_STR_ASP_TARG_ID, (JSON_String
     (let val Build_Stringifiable to_string _ = coq_Stringifiable_ID_Type in
      to_string
        (let val Coq_mkASPRReq _ _ _ asprreq_targ _ = req in asprreq_targ end) end))) :: ((coq_STR_RAWEV,
@@ -153,9 +153,9 @@ fun coq_Jsonifiable_ASPRunRequest h h0 =
     (fn j =>
     res_bind (coq_JSON_get_string coq_STR_ASP_ID j) (fn temp_asp_id =>
       res_bind (coq_JSON_get_Object coq_STR_ASP_ARGS j) (fn temp_asp_args =>
-        res_bind (coq_JSON_get_string coq_STR_TARG_PLC j)
-          (fn temp_targ_plc =>
-          res_bind (coq_JSON_get_string coq_STR_TARG j) (fn temp_targ =>
+        res_bind (coq_JSON_get_string coq_STR_ASP_PLC j) (fn temp_targ_plc =>
+          res_bind (coq_JSON_get_string coq_STR_ASP_TARG_ID j)
+            (fn temp_targ =>
             res_bind (coq_JSON_get_Object coq_STR_RAWEV j) (fn temp_ev =>
               res_bind
                 (let val Build_Stringifiable _ from_string =

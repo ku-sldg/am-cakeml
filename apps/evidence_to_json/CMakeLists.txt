@@ -19,6 +19,8 @@ get_files(evidenceToJson_src
 
   ../../stubs/BS.sml
 
+  ../../extracted/Interface_Strings_Vars.cml
+
   ../../extracted/Term_Defs_Core.cml
   ../../extracted/JSON_Core.cml
 

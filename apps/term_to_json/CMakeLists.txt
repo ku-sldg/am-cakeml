@@ -20,6 +20,8 @@ get_files(termToJson_src
 
   ../../extracted/JSON.cml
 
+  ../../extracted/Interface_Strings_Vars.cml
+
   ../../stubs/BS.sml
 
   ../../extracted/Term_Defs_Core.cml

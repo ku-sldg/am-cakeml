@@ -16,6 +16,7 @@ get_files(manGen_src
   ../../stubs/Stringifiable_Class_Admits.sml
   ../../extracted/JSON.cml
   ../../stubs/BS.sml
+  ../../extracted/Interface_Strings_Vars.cml
   ../../extracted/Term_Defs_Core.cml
   ../../extracted/JSON_Core.cml
   ../../stubs/Params_Admits.sml

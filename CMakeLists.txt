@@ -61,6 +61,8 @@ get_files(copland_am_src
 
     stubs/JSON_Admits.sml
 
+    extracted/Interface_Strings_Vars.cml
+
     extracted/JSON.cml
     extracted/Term_Defs_Core.cml
     extracted/JSON_Core.cml
@@ -72,7 +74,6 @@ get_files(copland_am_src
     extracted/Manifest_Set.cml
     extracted/Manifest.cml
     extracted/Attestation_Session.cml
-    extracted/Interface_Strings_Vars.cml
     extracted/Interface_Types.cml
     extracted/Interface_JSON.cml
     extracted/ErrorStMonad_Coq.cml

@@ -9,7 +9,7 @@ fun coq_JSON_get_Object key js = case js of
   JSON_Object m =>
   (case map_get coq_Eq_Class_ID_Type m key of
      Some v => Coq_resultC v
-   | None => Coq_errC "JSON_get_Object: KEY NOT FOUND")
+   | None => Coq_errC (String.^ "JSON_get_Object: KEY NOT FOUND : " key))
 | _ => Coq_errC "JSON_get_Object: NOT AN OBJECT"
 
 (** val coq_JSON_get_Array :
