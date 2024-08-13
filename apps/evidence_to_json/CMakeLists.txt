@@ -11,6 +11,7 @@ get_files(evidenceToJson_src
   ../../extracted/Maps.cml
   ../../extracted/JSON_Type.cml
   ../../extracted/ErrorStringConstants.cml
+  ../../extracted/Interface_Strings_Vars.cml
 
   ../../stubs/JSON_Admits.sml
   ../../stubs/Stringifiable_Class_Admits.sml
@@ -20,6 +21,7 @@ get_files(evidenceToJson_src
   ../../stubs/BS.sml
 
   ../../extracted/Term_Defs_Core.cml
+  ../../extracted/JSON_Core.cml
 
   ../../stubs/Params_Admits.sml
 

@@ -38,11 +38,11 @@ type coq_Evidence_Plc_list = (coq_Evidence * coq_Plc) list
     coq_Evidence coq_Jsonifiable -> coq_Evidence_Plc_list -> coq_JSON **)
 
 fun coq_Evidence_Plc_list_to_JSON h ls =
-  JSON_Object (("Evidence_Plc_list", (InJSON_Array
+  JSON_Object (("Evidence_Plc_list", (JSON_Array
     (map (fn pat =>
       let val (et, p) = pat in
-      InJSON_Array ((InJSON_Object
-      (let val Build_Jsonifiable to_JSON _ = h in to_JSON et end)) :: ((InJSON_String
+      JSON_Array
+      ((let val Build_Jsonifiable to_JSON _ = h in to_JSON et end) :: ((JSON_String
       (let val Build_Stringifiable to_string _ = coq_Stringifiable_ID_Type in
        to_string p end)) :: [])) end) ls))) :: [])
 
@@ -56,37 +56,34 @@ fun coq_Evidence_Plc_list_from_JSON h _ js =
   | Coq_resultC jsArr =>
     result_map (fn js0 =>
       case js0 of
-        InJSON_Object _ => Coq_errC "Not a pair"
-      | InJSON_Array l =>
+        JSON_Object _ => Coq_errC "Not a pair"
+      | JSON_Array l =>
         (case l of
            [] => Coq_errC "Not a pair"
-         | i :: l0 =>
-           (case i of
-              InJSON_Object jsEt =>
-              (case l0 of
-                 [] => Coq_errC "Not a pair"
-               | i0 :: l1 =>
-                 (case i0 of
-                    InJSON_Object _ => Coq_errC "Not a pair"
-                  | InJSON_Array _ => Coq_errC "Not a pair"
-                  | InJSON_String jsP =>
-                    (case l1 of
-                       [] =>
-                       (case let val Build_Jsonifiable _ from_JSON = h in
-                             from_JSON jsEt end of
+         | jsEt :: l0 =>
+           (case l0 of
+              [] => Coq_errC "Not a pair"
+            | j :: l1 =>
+              (case j of
+                 JSON_Object _ => Coq_errC "Not a pair"
+               | JSON_Array _ => Coq_errC "Not a pair"
+               | JSON_String jsP =>
+                 (case l1 of
+                    [] =>
+                    (case let val Build_Jsonifiable _ from_JSON = h in
+                          from_JSON jsEt end of
+                       Coq_errC _ =>
+                       Coq_errC "Error in parsing Evidence_Plc_list"
+                     | Coq_resultC et =>
+                       (case let val Build_Stringifiable _ from_string =
+                               coq_Stringifiable_ID_Type
+                             in
+                             from_string jsP end of
                           Coq_errC _ =>
                           Coq_errC "Error in parsing Evidence_Plc_list"
-                        | Coq_resultC et =>
-                          (case let val Build_Stringifiable _ from_string =
-                                  coq_Stringifiable_ID_Type
-                                in
-                                from_string jsP end of
-                             Coq_errC _ =>
-                             Coq_errC "Error in parsing Evidence_Plc_list"
-                           | Coq_resultC p => Coq_resultC (et, p)))
-                     | _ :: _ => Coq_errC "Not a pair")
-                  | InJSON_Boolean _ => Coq_errC "Not a pair"))
-            | _ => Coq_errC "Not a pair"))
+                        | Coq_resultC p => Coq_resultC (et, p)))
+                  | _ :: _ => Coq_errC "Not a pair")
+               | JSON_Boolean _ => Coq_errC "Not a pair")))
       | _ => Coq_errC "Not a pair") jsArr
 
 (** val coq_Jsonifiable_Evidence_Plc_list :
@@ -104,11 +101,11 @@ type coq_Term_Plc_list = (coq_Term * coq_Plc) list
     coq_Term coq_Jsonifiable -> coq_Term_Plc_list -> coq_JSON **)
 
 fun coq_Term_Plc_list_to_JSON h ls =
-  JSON_Object (("Term_Plc_list", (InJSON_Array
+  JSON_Object (("Term_Plc_list", (JSON_Array
     (map (fn pat =>
       let val (et, p) = pat in
-      InJSON_Array ((InJSON_Object
-      (let val Build_Jsonifiable to_JSON _ = h in to_JSON et end)) :: ((InJSON_String
+      JSON_Array
+      ((let val Build_Jsonifiable to_JSON _ = h in to_JSON et end) :: ((JSON_String
       (let val Build_Stringifiable to_string _ = coq_Stringifiable_ID_Type in
        to_string p end)) :: [])) end) ls))) :: [])
 
@@ -122,37 +119,33 @@ fun coq_Term_Plc_list_from_JSON h js =
   | Coq_resultC jsArr =>
     result_map (fn js0 =>
       case js0 of
-        InJSON_Object _ => Coq_errC "Not a pair"
-      | InJSON_Array l =>
+        JSON_Object _ => Coq_errC "Not a pair"
+      | JSON_Array l =>
         (case l of
            [] => Coq_errC "Not a pair"
-         | i :: l0 =>
-           (case i of
-              InJSON_Object jsTerm =>
-              (case l0 of
-                 [] => Coq_errC "Not a pair"
-               | i0 :: l1 =>
-                 (case i0 of
-                    InJSON_Object _ => Coq_errC "Not a pair"
-                  | InJSON_Array _ => Coq_errC "Not a pair"
-                  | InJSON_String jsP =>
-                    (case l1 of
-                       [] =>
-                       (case let val Build_Jsonifiable _ from_JSON = h in
-                             from_JSON jsTerm end of
+         | jsTerm :: l0 =>
+           (case l0 of
+              [] => Coq_errC "Not a pair"
+            | j :: l1 =>
+              (case j of
+                 JSON_Object _ => Coq_errC "Not a pair"
+               | JSON_Array _ => Coq_errC "Not a pair"
+               | JSON_String jsP =>
+                 (case l1 of
+                    [] =>
+                    (case let val Build_Jsonifiable _ from_JSON = h in
+                          from_JSON jsTerm end of
+                       Coq_errC _ => Coq_errC "Error in parsing Term_Plc_list"
+                     | Coq_resultC et =>
+                       (case let val Build_Stringifiable _ from_string =
+                               coq_Stringifiable_ID_Type
+                             in
+                             from_string jsP end of
                           Coq_errC _ =>
                           Coq_errC "Error in parsing Term_Plc_list"
-                        | Coq_resultC et =>
-                          (case let val Build_Stringifiable _ from_string =
-                                  coq_Stringifiable_ID_Type
-                                in
-                                from_string jsP end of
-                             Coq_errC _ =>
-                             Coq_errC "Error in parsing Term_Plc_list"
-                           | Coq_resultC p => Coq_resultC (et, p)))
-                     | _ :: _ => Coq_errC "Not a pair")
-                  | InJSON_Boolean _ => Coq_errC "Not a pair"))
-            | _ => Coq_errC "Not a pair"))
+                        | Coq_resultC p => Coq_resultC (et, p)))
+                  | _ :: _ => Coq_errC "Not a pair")
+               | JSON_Boolean _ => Coq_errC "Not a pair")))
       | _ => Coq_errC "Not a pair") jsArr
 
 (** val coq_Jsonifiable_Term_Plc_list :

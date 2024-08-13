@@ -1,0 +1,1877 @@
+(** val coq_ASP_PARAMS_to_JSON :
+    coq_ASP_ARGS coq_Jsonifiable -> coq_ASP_PARAMS -> coq_JSON **)
+
+fun coq_ASP_PARAMS_to_JSON h t = case t of
+  Coq_asp_paramsC asp_id args plc targ_id =>
+  JSON_Object ((coq_STR_ASP_ID, (JSON_String
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_ID_Type in
+     to_string asp_id end))) :: ((coq_STR_ASP_ARGS,
+    (let val Build_Jsonifiable to_JSON _ = h in to_JSON args end)) :: ((coq_STR_ASP_PLC,
+    (JSON_String
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_ID_Type in
+     to_string plc end))) :: ((coq_STR_ASP_TARG_ID, (JSON_String
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_ID_Type in
+     to_string targ_id end))) :: []))))
+
+(** val coq_ASP_PARAMS_from_JSON :
+    coq_ASP_ARGS coq_Jsonifiable -> coq_JSON -> (coq_ASP_PARAMS, string)
+    coq_ResultT **)
+
+fun coq_ASP_PARAMS_from_JSON h js =
+  res_bind (coq_JSON_get_string coq_STR_ASP_ID js) (fn asp_id =>
+    res_bind (coq_JSON_get_Object coq_STR_ASP_ARGS js) (fn args =>
+      res_bind (coq_JSON_get_string coq_STR_ASP_PLC js) (fn plc =>
+        res_bind (coq_JSON_get_string coq_STR_ASP_TARG_ID js) (fn targ =>
+          res_bind
+            (let val Build_Stringifiable _ from_string =
+               coq_Stringifiable_ID_Type
+             in
+             from_string asp_id end) (fn asp_id' =>
+            res_bind
+              (let val Build_Jsonifiable _ from_JSON = h in from_JSON args end)
+              (fn args' =>
+              res_bind
+                (let val Build_Stringifiable _ from_string =
+                   coq_Stringifiable_ID_Type
+                 in
+                 from_string plc end) (fn plc' =>
+                res_bind
+                  (let val Build_Stringifiable _ from_string =
+                     coq_Stringifiable_ID_Type
+                   in
+                   from_string targ end) (fn targ' => Coq_resultC
+                  (Coq_asp_paramsC asp_id' args' plc' targ')))))))))
+
+(** val coq_Jsonifiable_ASP_Params :
+    coq_ASP_ARGS coq_Jsonifiable -> coq_ASP_PARAMS coq_Jsonifiable **)
+
+fun coq_Jsonifiable_ASP_Params h =
+  Build_Jsonifiable (coq_ASP_PARAMS_to_JSON h) (coq_ASP_PARAMS_from_JSON h)
+
+(** val type_string_constant : string **)
+
+val type_string_constant : string =
+  "CONSTRUCTOR"
+
+(** val body_string_constant : string **)
+
+val body_string_constant : string =
+  "BODY"
+
+(** val fwd_name_constant : string **)
+
+val fwd_name_constant : string =
+  "FWD"
+
+(** val comp_name_constant : string **)
+
+val comp_name_constant : string =
+  "COMP"
+
+(** val encr_name_constant : string **)
+
+val encr_name_constant : string =
+  "ENCR"
+
+(** val extd_name_constant : string **)
+
+val extd_name_constant : string =
+  "EXTD"
+
+(** val kill_name_constant : string **)
+
+val kill_name_constant : string =
+  "KILL"
+
+(** val keep_name_constant : string **)
+
+val keep_name_constant : string =
+  "KEEP"
+
+(** val mt_name_constant : string **)
+
+val mt_name_constant : string =
+  "mt"
+
+(** val nn_name_constant : string **)
+
+val nn_name_constant : string =
+  "nn"
+
+(** val uu_name_constant : string **)
+
+val uu_name_constant : string =
+  "uu"
+
+(** val ss_name_constant : string **)
+
+val ss_name_constant : string =
+  "ss"
+
+(** val asp_name_constant : string **)
+
+val asp_name_constant : string =
+  "asp"
+
+(** val null_name_constant : string **)
+
+val null_name_constant : string =
+  "NULL"
+
+(** val copy_name_constant : string **)
+
+val copy_name_constant : string =
+  "CPY"
+
+(** val aspc_name_constant : string **)
+
+val aspc_name_constant : string =
+  "ASPC"
+
+(** val sig_name_constant : string **)
+
+val sig_name_constant : string =
+  "SIG"
+
+(** val hsh_name_constant : string **)
+
+val hsh_name_constant : string =
+  "HSH"
+
+(** val enc_name_constant : string **)
+
+val enc_name_constant : string =
+  "ENC"
+
+(** val att_name_constant : string **)
+
+val att_name_constant : string =
+  "att"
+
+(** val lseq_name_constant : string **)
+
+val lseq_name_constant : string =
+  "lseq"
+
+(** val bseq_name_constant : string **)
+
+val bseq_name_constant : string =
+  "bseq"
+
+(** val bpar_name_constant : string **)
+
+val bpar_name_constant : string =
+  "bpar"
+
+(** val rawev_name_constant : string **)
+
+val rawev_name_constant : string =
+  "RawEv"
+
+(** val appresult_name_constant : string **)
+
+val appresult_name_constant : string =
+  "AppResultC"
+
+(** val mtc_app_name_constant : string **)
+
+val mtc_app_name_constant : string =
+  "mtc_app"
+
+(** val nnc_app_name_constant : string **)
+
+val nnc_app_name_constant : string =
+  "nnc_app"
+
+(** val hhc_app_name_constant : string **)
+
+val hhc_app_name_constant : string =
+  "hhc_app"
+
+(** val ggc_app_name_constant : string **)
+
+val ggc_app_name_constant : string =
+  "ggc_app"
+
+(** val eec_app_name_constant : string **)
+
+val eec_app_name_constant : string =
+  "eec_app"
+
+(** val ssc_app_name_constant : string **)
+
+val ssc_app_name_constant : string =
+  "ssc_app"
+
+(** val sp_name_constant : string **)
+
+val sp_name_constant : string =
+  "SP"
+
+(** val all_name_constant : string **)
+
+val all_name_constant : string =
+  "ALL"
+
+(** val none_name_constant : string **)
+
+val none_name_constant : string =
+  "NONE"
+
+(** val noArgConstructor_to_JSON : string -> string -> coq_JSON **)
+
+fun noArgConstructor_to_JSON type_name cons_name =
+  JSON_Object (((String.^ type_name (String.^ "_" type_string_constant)),
+    (JSON_String cons_name)) :: [])
+
+(** val oneArgConstructor_to_JSON :
+    string -> string -> coq_JSON -> coq_JSON **)
+
+fun oneArgConstructor_to_JSON type_name cons_name inner =
+  JSON_Object (((String.^ type_name (String.^ "_" type_string_constant)),
+    (JSON_String
+    cons_name)) :: (((String.^ type_name (String.^ "_" body_string_constant)),
+    inner) :: []))
+
+(** val multiArgConstructor_to_JSON :
+    string -> string -> coq_JSON list -> coq_JSON **)
+
+fun multiArgConstructor_to_JSON type_name cons_name ls =
+  JSON_Object (((String.^ type_name (String.^ "_" type_string_constant)),
+    (JSON_String
+    cons_name)) :: (((String.^ type_name (String.^ "_" body_string_constant)),
+    (JSON_Array ls)) :: []))
+
+(** val constructor_to_JSON :
+    string -> string -> coq_JSON list -> coq_JSON **)
+
+fun constructor_to_JSON type_name cons_name ls = case ls of
+  [] => noArgConstructor_to_JSON type_name cons_name
+| v :: l =>
+  (case l of
+     [] => oneArgConstructor_to_JSON type_name cons_name v
+   | _ :: _ => multiArgConstructor_to_JSON type_name cons_name ls)
+
+(** val coq_Jsonifiable_nat : nat coq_Jsonifiable **)
+
+val coq_Jsonifiable_nat : nat coq_Jsonifiable =
+  Build_Jsonifiable (fn s => JSON_String
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_nat in
+     to_string s end)) (fn js =>
+    case js of
+      JSON_String natString =>
+      (case let val Build_Stringifiable _ from_string = coq_Stringifiable_nat
+            in
+            from_string natString end of
+         Coq_errC e =>
+         Coq_errC
+           (String.^
+             "Error:  cannot interpret nat string in Jsonifiable_nat:  " e)
+       | Coq_resultC s => Coq_resultC s)
+    | _ => Coq_errC "Invalid nat JSON (not a JSON String)")
+
+(** val constructor_body_from_JSON_gen :
+    string -> coq_JSON -> coq_JSON list **)
+
+fun constructor_body_from_JSON_gen type_name js =
+  case coq_JSON_get_Object
+         (String.^ type_name (String.^ "_" body_string_constant)) js of
+    Coq_errC _ => []
+  | Coq_resultC jv => (case jv of
+                         JSON_Array ls => ls
+                       | _ => jv :: [])
+
+(** val from_JSON_gen :
+    string -> (string, coq_JSON -> ('a1, string) coq_ResultT) coq_MapC ->
+    coq_JSON -> ('a1, string) coq_ResultT **)
+
+fun from_JSON_gen type_name cmap js =
+  case coq_JSON_get_Object
+         (String.^ type_name (String.^ "_" type_string_constant)) js of
+    Coq_errC e => Coq_errC e
+  | Coq_resultC j =>
+    (case j of
+       JSON_String cons_name =>
+       (case map_get coq_Eq_Class_ID_Type cmap cons_name of
+          Some f => f js
+        | None =>
+          Coq_errC
+            (String.^ "Invalid "
+              (String.^ type_name
+                (String.^ " JSON:  unrecognized constructor name: " cons_name))))
+     | _ =>
+       Coq_errC
+         (String.^ "Invalid "
+           (String.^ type_name " JSON:  no constructor name string")))
+
+(** val coq_FWD_to_JSON : coq_FWD -> coq_JSON **)
+
+fun coq_FWD_to_JSON t = case t of
+  COMP => constructor_to_JSON fwd_name_constant comp_name_constant []
+| ENCR => constructor_to_JSON fwd_name_constant encr_name_constant []
+| EXTD n =>
+  constructor_to_JSON fwd_name_constant extd_name_constant
+    ((let val Build_Jsonifiable to_JSON _ = coq_Jsonifiable_nat in
+      to_JSON n end) :: [])
+| KILL => constructor_to_JSON fwd_name_constant kill_name_constant []
+| KEEP => constructor_to_JSON fwd_name_constant keep_name_constant []
+
+(** val constructor_from_JSON :
+    string -> (coq_JSON list -> ('a1, string) coq_ResultT) -> coq_JSON ->
+    ('a1, string) coq_ResultT **)
+
+fun constructor_from_JSON type_name f js =
+  f (constructor_body_from_JSON_gen type_name js)
+
+(** val coq_FWD_from_JSON_map :
+    (string, coq_JSON -> (coq_FWD, string) coq_ResultT) coq_MapC **)
+
+val coq_FWD_from_JSON_map : (string, coq_JSON -> (coq_FWD, string)
+                            coq_ResultT) coq_MapC =
+  (comp_name_constant,
+    (constructor_from_JSON fwd_name_constant (fn _ => Coq_resultC COMP))) :: ((encr_name_constant,
+    (constructor_from_JSON fwd_name_constant (fn _ => Coq_resultC ENCR))) :: ((keep_name_constant,
+    (constructor_from_JSON fwd_name_constant (fn _ => Coq_resultC KEEP))) :: ((kill_name_constant,
+    (constructor_from_JSON fwd_name_constant (fn _ => Coq_resultC KILL))) :: ((extd_name_constant,
+    (constructor_from_JSON fwd_name_constant (fn ljs =>
+      case ljs of
+        [] => Coq_errC (String.^ "Invalid JSON args for " extd_name_constant)
+      | n_js :: l =>
+        (case l of
+           [] =>
+           (case let val Build_Jsonifiable _ from_JSON = coq_Jsonifiable_nat
+                 in
+                 from_JSON n_js end of
+              Coq_errC _ =>
+              Coq_errC (String.^ "Invalid JSON args for " extd_name_constant)
+            | Coq_resultC n => Coq_resultC (EXTD n))
+         | _ :: _ =>
+           Coq_errC (String.^ "Invalid JSON args for " extd_name_constant))))) :: []))))
+
+(** val coq_FWD_from_JSON : coq_JSON -> (coq_FWD, string) coq_ResultT **)
+
+fun coq_FWD_from_JSON js =
+  from_JSON_gen fwd_name_constant coq_FWD_from_JSON_map js
+
+(** val coq_Jsonifiable_FWD : coq_FWD coq_Jsonifiable **)
+
+val coq_Jsonifiable_FWD : coq_FWD coq_Jsonifiable =
+  Build_Jsonifiable coq_FWD_to_JSON coq_FWD_from_JSON
+
+(** val coq_Evidence_to_JSON :
+    coq_FWD coq_Jsonifiable -> nat coq_Jsonifiable -> coq_ASP_PARAMS
+    coq_Jsonifiable -> coq_Evidence -> coq_JSON **)
+
+fun coq_Evidence_to_JSON h h0 h1 e = case e of
+  Coq_mt => constructor_to_JSON coq_STR_EVIDENCE mt_name_constant []
+| Coq_nn n =>
+  constructor_to_JSON coq_STR_EVIDENCE nn_name_constant
+    ((let val Build_Jsonifiable to_JSON _ = h0 in to_JSON n end) :: [])
+| Coq_uu plc fwd ps e' =>
+  constructor_to_JSON coq_STR_EVIDENCE uu_name_constant ((JSON_String
+    plc) :: ((let val Build_Jsonifiable to_JSON _ = h in to_JSON fwd end) :: (
+    (let val Build_Jsonifiable to_JSON _ = h1 in to_JSON ps end) :: (
+    (coq_Evidence_to_JSON h h0 h1 e') :: []))))
+| Coq_ss e1 e2 =>
+  constructor_to_JSON coq_STR_EVIDENCE ss_name_constant
+    ((coq_Evidence_to_JSON h h0 h1 e1) :: ((coq_Evidence_to_JSON h h0 h1 e2) :: []))
+
+(** val coq_Evidence_from_JSON :
+    coq_FWD coq_Jsonifiable -> nat coq_Jsonifiable -> coq_ASP_PARAMS
+    coq_Jsonifiable -> coq_JSON -> (coq_Evidence, string) coq_ResultT **)
+
+fun coq_Evidence_from_JSON h h0 h1 js =
+  case coq_JSON_get_Object
+         (String.^ coq_STR_EVIDENCE (String.^ "_" type_string_constant)) js of
+    Coq_errC e => Coq_errC e
+  | Coq_resultC j =>
+    (case j of
+       JSON_String cons_name =>
+       (case eqb coq_Eq_Class_ID_Type cons_name mt_name_constant of
+          True => Coq_resultC Coq_mt
+        | False =>
+          (case eqb coq_Eq_Class_ID_Type cons_name nn_name_constant of
+             True =>
+             (case js of
+                JSON_Object m =>
+                (case m of
+                   [] =>
+                   Coq_errC
+                     (String.^ "JSON Parsing "
+                       (String.^ nn_name_constant
+                         " ARGS:  wrong number of JSON args (expected 1)"))
+                 | _ :: l =>
+                   (case l of
+                      [] =>
+                      Coq_errC
+                        (String.^ "JSON Parsing "
+                          (String.^ nn_name_constant
+                            " ARGS:  wrong number of JSON args (expected 1)"))
+                    | p0 :: l0 =>
+                      let val (_, n_js) = p0 in
+                      (case l0 of
+                         [] =>
+                         res_bind
+                           (let val Build_Jsonifiable _ from_JSON = h0 in
+                            from_JSON n_js end) (fn n_js0 => Coq_resultC
+                           (Coq_nn n_js0))
+                       | _ :: _ =>
+                         Coq_errC
+                           (String.^ "JSON Parsing "
+                             (String.^ nn_name_constant
+                               " ARGS:  wrong number of JSON args (expected 1)"))) end))
+              | _ =>
+                Coq_errC
+                  (String.^ "JSON Parsing "
+                    (String.^ nn_name_constant
+                      " ARGS:  wrong number of JSON args (expected 1)")))
+           | False =>
+             (case eqb coq_Eq_Class_ID_Type cons_name uu_name_constant of
+                True =>
+                (case js of
+                   JSON_Object m =>
+                   (case m of
+                      [] =>
+                      Coq_errC
+                        (String.^ "JSON Parsing "
+                          (String.^ uu_name_constant
+                            " ARGS:  wrong number of JSON args (expected 4)"))
+                    | _ :: l =>
+                      (case l of
+                         [] =>
+                         Coq_errC
+                           (String.^ "JSON Parsing "
+                             (String.^ uu_name_constant
+                               " ARGS:  wrong number of JSON args (expected 4)"))
+                       | p0 :: l0 =>
+                         let val (_, j0) = p0 in
+                         (case j0 of
+                            JSON_Array l1 =>
+                            (case l1 of
+                               [] =>
+                               Coq_errC
+                                 (String.^ "JSON Parsing "
+                                   (String.^ uu_name_constant
+                                     " ARGS:  wrong number of JSON args (expected 4)"))
+                             | j1 :: l2 =>
+                               (case j1 of
+                                  JSON_String plc =>
+                                  (case l2 of
+                                     [] =>
+                                     Coq_errC
+                                       (String.^ "JSON Parsing "
+                                         (String.^ uu_name_constant
+                                           " ARGS:  wrong number of JSON args (expected 4)"))
+                                   | fwd :: l3 =>
+                                     (case l3 of
+                                        [] =>
+                                        Coq_errC
+                                          (String.^ "JSON Parsing "
+                                            (String.^ uu_name_constant
+                                              " ARGS:  wrong number of JSON args (expected 4)"))
+                                      | asp_par :: l4 =>
+                                        (case l4 of
+                                           [] =>
+                                           Coq_errC
+                                             (String.^ "JSON Parsing "
+                                               (String.^ uu_name_constant
+                                                 " ARGS:  wrong number of JSON args (expected 4)"))
+                                         | ev' :: l5 =>
+                                           (case l5 of
+                                              [] =>
+                                              (case l0 of
+                                                 [] =>
+                                                 res_bind
+                                                   (let val Build_Stringifiable _
+                                                      from_string =
+                                                      coq_Stringifiable_ID_Type
+                                                    in
+                                                    from_string plc end)
+                                                   (fn plc0 =>
+                                                   res_bind
+                                                     (let val Build_Jsonifiable _
+                                                        from_JSON = h
+                                                      in
+                                                      from_JSON fwd end)
+                                                     (fn fwd0 =>
+                                                     res_bind
+                                                       (let val Build_Jsonifiable _
+                                                          from_JSON = h1
+                                                        in
+                                                        from_JSON asp_par end)
+                                                       (fn asp_par0 =>
+                                                       res_bind
+                                                         (coq_Evidence_from_JSON
+                                                           h h0 h1 ev')
+                                                         (fn ev'0 =>
+                                                         Coq_resultC (Coq_uu
+                                                         plc0 fwd0 asp_par0
+                                                         ev'0)))))
+                                               | _ :: _ =>
+                                                 Coq_errC
+                                                   (String.^ "JSON Parsing "
+                                                     (String.^
+                                                       uu_name_constant
+                                                       " ARGS:  wrong number of JSON args (expected 4)")))
+                                            | _ :: _ =>
+                                              Coq_errC
+                                                (String.^ "JSON Parsing "
+                                                  (String.^ uu_name_constant
+                                                    " ARGS:  wrong number of JSON args (expected 4)"))))))
+                                | _ =>
+                                  Coq_errC
+                                    (String.^ "JSON Parsing "
+                                      (String.^ uu_name_constant
+                                        " ARGS:  wrong number of JSON args (expected 4)"))))
+                          | _ =>
+                            Coq_errC
+                              (String.^ "JSON Parsing "
+                                (String.^ uu_name_constant
+                                  " ARGS:  wrong number of JSON args (expected 4)"))) end))
+                 | _ =>
+                   Coq_errC
+                     (String.^ "JSON Parsing "
+                       (String.^ uu_name_constant
+                         " ARGS:  wrong number of JSON args (expected 4)")))
+              | False =>
+                (case eqb coq_Eq_Class_ID_Type cons_name ss_name_constant of
+                   True =>
+                   (case js of
+                      JSON_Object m =>
+                      (case m of
+                         [] =>
+                         Coq_errC
+                           (String.^ "JSON Parsing "
+                             (String.^ ss_name_constant
+                               " ARGS:  wrong number of JSON args (expected 2)"))
+                       | _ :: l =>
+                         (case l of
+                            [] =>
+                            Coq_errC
+                              (String.^ "JSON Parsing "
+                                (String.^ ss_name_constant
+                                  " ARGS:  wrong number of JSON args (expected 2)"))
+                          | p0 :: l0 =>
+                            let val (_, j0) = p0 in
+                            (case j0 of
+                               JSON_Array l1 =>
+                               (case l1 of
+                                  [] =>
+                                  Coq_errC
+                                    (String.^ "JSON Parsing "
+                                      (String.^ ss_name_constant
+                                        " ARGS:  wrong number of JSON args (expected 2)"))
+                                | ev1 :: l2 =>
+                                  (case l2 of
+                                     [] =>
+                                     Coq_errC
+                                       (String.^ "JSON Parsing "
+                                         (String.^ ss_name_constant
+                                           " ARGS:  wrong number of JSON args (expected 2)"))
+                                   | ev2 :: l3 =>
+                                     (case l3 of
+                                        [] =>
+                                        (case l0 of
+                                           [] =>
+                                           res_bind
+                                             (coq_Evidence_from_JSON h h0 h1
+                                               ev1) (fn ev3 =>
+                                             res_bind
+                                               (coq_Evidence_from_JSON h h0
+                                                 h1 ev2) (fn ev4 =>
+                                               Coq_resultC (Coq_ss ev3 ev4)))
+                                         | _ :: _ =>
+                                           Coq_errC
+                                             (String.^ "JSON Parsing "
+                                               (String.^ ss_name_constant
+                                                 " ARGS:  wrong number of JSON args (expected 2)")))
+                                      | _ :: _ =>
+                                        Coq_errC
+                                          (String.^ "JSON Parsing "
+                                            (String.^ ss_name_constant
+                                              " ARGS:  wrong number of JSON args (expected 2)")))))
+                             | _ =>
+                               Coq_errC
+                                 (String.^ "JSON Parsing "
+                                   (String.^ ss_name_constant
+                                     " ARGS:  wrong number of JSON args (expected 2)"))) end))
+                    | _ =>
+                      Coq_errC
+                        (String.^ "JSON Parsing "
+                          (String.^ ss_name_constant
+                            " ARGS:  wrong number of JSON args (expected 2)")))
+                 | False => Coq_errC "Invalid Evidence JSON constructor name"))))
+     | _ =>
+       Coq_errC
+         (String.^ "Invalid "
+           (String.^ coq_STR_EVIDENCE " JSON:  no constructor name string")))
+
+(** val coq_Jsonifiable_Evidence :
+    coq_ASP_ARGS coq_Jsonifiable -> coq_FWD coq_Jsonifiable -> nat
+    coq_Jsonifiable -> coq_ASP_PARAMS coq_Jsonifiable -> coq_Evidence
+    coq_Jsonifiable **)
+
+fun coq_Jsonifiable_Evidence _ h0 h1 h2 =
+  Build_Jsonifiable (coq_Evidence_to_JSON h0 h1 h2)
+    (coq_Evidence_from_JSON h0 h1 h2)
+
+(** val coq_Stringifiable_SP : coq_SP coq_Stringifiable **)
+
+val coq_Stringifiable_SP : coq_SP coq_Stringifiable =
+  Build_Stringifiable (fn sp =>
+    case sp of
+      ALL => all_name_constant
+    | NONE => none_name_constant) (fn s =>
+    case eqb coq_Eq_Class_ID_Type s all_name_constant of
+      True => Coq_resultC ALL
+    | False =>
+      (case eqb coq_Eq_Class_ID_Type s none_name_constant of
+         True => Coq_resultC NONE
+       | False =>
+         Coq_errC (String.^ "Invalid " (String.^ sp_name_constant " string"))))
+
+(** val coq_ASP_to_JSON :
+    coq_FWD coq_Jsonifiable -> coq_Plc coq_Stringifiable -> coq_SP
+    coq_Stringifiable -> coq_ASP_PARAMS coq_Jsonifiable -> coq_ASP -> coq_JSON **)
+
+fun coq_ASP_to_JSON h h0 h1 h2 t = case t of
+  NULL => constructor_to_JSON coq_STR_ASP null_name_constant []
+| CPY => constructor_to_JSON coq_STR_ASP copy_name_constant []
+| ASPC sp fwd ps =>
+  constructor_to_JSON coq_STR_ASP aspc_name_constant ((JSON_String
+    (let val Build_Stringifiable to_string _ = h1 in to_string sp end)) :: (
+    (let val Build_Jsonifiable to_JSON _ = h in to_JSON fwd end) :: (
+    (let val Build_Jsonifiable to_JSON _ = h2 in to_JSON ps end) :: [])))
+| SIG => constructor_to_JSON coq_STR_ASP sig_name_constant []
+| HSH => constructor_to_JSON coq_STR_ASP hsh_name_constant []
+| ENC q =>
+  constructor_to_JSON coq_STR_ASP enc_name_constant ((JSON_String
+    (let val Build_Stringifiable to_string _ = h0 in to_string q end)) :: [])
+
+(** val coq_ASP_from_JSON_map :
+    coq_FWD coq_Jsonifiable -> coq_Plc coq_Stringifiable -> coq_SP
+    coq_Stringifiable -> coq_ASP_PARAMS coq_Jsonifiable -> (string, coq_JSON
+    -> (coq_ASP, string) coq_ResultT) coq_MapC **)
+
+fun coq_ASP_from_JSON_map h h0 h1 h2 =
+  (null_name_constant,
+    (constructor_from_JSON coq_STR_ASP (fn _ => Coq_resultC NULL))) :: ((copy_name_constant,
+    (constructor_from_JSON coq_STR_ASP (fn _ => Coq_resultC CPY))) :: ((aspc_name_constant,
+    (constructor_from_JSON coq_STR_ASP (fn ljs =>
+      case ljs of
+        [] =>
+        Coq_errC
+          (String.^ "Parsing "
+            (String.^ aspc_name_constant " not successful"))
+      | j :: l =>
+        (case j of
+           JSON_String sp_js =>
+           (case l of
+              [] =>
+              Coq_errC
+                (String.^ "Parsing "
+                  (String.^ aspc_name_constant " not successful"))
+            | fwd_js :: l0 =>
+              (case l0 of
+                 [] =>
+                 Coq_errC
+                   (String.^ "Parsing "
+                     (String.^ aspc_name_constant " not successful"))
+               | ps_js :: l1 =>
+                 (case l1 of
+                    [] =>
+                    (case let val Build_Stringifiable _ from_string = h1 in
+                          from_string sp_js end of
+                       Coq_errC _ =>
+                       Coq_errC
+                         (String.^ "Parsing "
+                           (String.^ aspc_name_constant " not successful"))
+                     | Coq_resultC sp =>
+                       (case let val Build_Jsonifiable _ from_JSON = h in
+                             from_JSON fwd_js end of
+                          Coq_errC _ =>
+                          Coq_errC
+                            (String.^ "Parsing "
+                              (String.^ aspc_name_constant " not successful"))
+                        | Coq_resultC fwd =>
+                          (case let val Build_Jsonifiable _ from_JSON = h2 in
+                                from_JSON ps_js end of
+                             Coq_errC _ =>
+                             Coq_errC
+                               (String.^ "Parsing "
+                                 (String.^ aspc_name_constant
+                                   " not successful"))
+                           | Coq_resultC ps => Coq_resultC (ASPC sp fwd ps))))
+                  | _ :: _ =>
+                    Coq_errC
+                      (String.^ "Parsing "
+                        (String.^ aspc_name_constant " not successful")))))
+         | _ =>
+           Coq_errC
+             (String.^ "Parsing "
+               (String.^ aspc_name_constant " not successful")))))) :: ((sig_name_constant,
+    (constructor_from_JSON coq_STR_ASP (fn _ => Coq_resultC SIG))) :: ((hsh_name_constant,
+    (constructor_from_JSON coq_STR_ASP (fn _ => Coq_resultC HSH))) :: ((enc_name_constant,
+    (constructor_from_JSON coq_STR_ASP (fn ljs =>
+      case ljs of
+        [] => Coq_errC (String.^ "Invalid JSON args for " enc_name_constant)
+      | j :: l =>
+        (case j of
+           JSON_String n_js =>
+           (case l of
+              [] =>
+              (case let val Build_Stringifiable _ from_string = h0 in
+                    from_string n_js end of
+                 Coq_errC _ =>
+                 Coq_errC
+                   (String.^ "Invalid JSON args for " enc_name_constant)
+               | Coq_resultC n => Coq_resultC (ENC n))
+            | _ :: _ =>
+              Coq_errC (String.^ "Invalid JSON args for " enc_name_constant))
+         | _ => Coq_errC (String.^ "Invalid JSON args for " enc_name_constant))))) :: [])))))
+
+(** val coq_ASP_from_JSON :
+    coq_FWD coq_Jsonifiable -> coq_ASP_PARAMS coq_Jsonifiable -> coq_JSON ->
+    (coq_ASP, string) coq_ResultT **)
+
+fun coq_ASP_from_JSON h h0 js =
+  from_JSON_gen coq_STR_ASP
+    (coq_ASP_from_JSON_map h coq_Stringifiable_ID_Type coq_Stringifiable_SP
+      h0) js
+
+(** val coq_Jsonifiable_ASP :
+    coq_FWD coq_Jsonifiable -> coq_ASP_PARAMS coq_Jsonifiable -> coq_ASP
+    coq_Jsonifiable **)
+
+fun coq_Jsonifiable_ASP h h0 =
+  Build_Jsonifiable
+    (coq_ASP_to_JSON h coq_Stringifiable_ID_Type coq_Stringifiable_SP h0)
+    (coq_ASP_from_JSON h h0)
+
+(** val coq_Jsonifiable_Split : coq_Split coq_Jsonifiable **)
+
+val coq_Jsonifiable_Split : coq_Split coq_Jsonifiable =
+  Build_Jsonifiable (fn pat =>
+    let val (s1, s2) = pat in
+    JSON_Object (("split1", (JSON_String
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_SP in
+     to_string s1 end))) :: (("split2", (JSON_String
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_SP in
+     to_string s2 end))) :: [])) end) (fn js =>
+    case coq_JSON_get_string "split1" js of
+      Coq_errC _ => Coq_errC "Invalid Split JSON"
+    | Coq_resultC s1 =>
+      (case coq_JSON_get_string "split2" js of
+         Coq_errC _ => Coq_errC "Invalid Split JSON"
+       | Coq_resultC s2 =>
+         (case let val Build_Stringifiable _ from_string =
+                 coq_Stringifiable_SP
+               in
+               from_string s1 end of
+            Coq_errC _ => Coq_errC "Parsing split not successful"
+          | Coq_resultC s3 =>
+            (case let val Build_Stringifiable _ from_string =
+                    coq_Stringifiable_SP
+                  in
+                  from_string s2 end of
+               Coq_errC _ => Coq_errC "Parsing split not successful"
+             | Coq_resultC s4 => Coq_resultC (s3, s4)))))
+
+(** val coq_Term_to_JSON :
+    coq_ASP coq_Jsonifiable -> coq_Split coq_Jsonifiable -> coq_Term ->
+    coq_JSON **)
+
+fun coq_Term_to_JSON h h0 t = case t of
+  Coq_asp a =>
+  constructor_to_JSON coq_STR_TERM asp_name_constant
+    ((let val Build_Jsonifiable to_JSON _ = h in to_JSON a end) :: [])
+| Coq_att p t' =>
+  constructor_to_JSON coq_STR_TERM att_name_constant ((JSON_String
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_ID_Type in
+     to_string p end)) :: ((coq_Term_to_JSON h h0 t') :: []))
+| Coq_lseq t1 t2 =>
+  constructor_to_JSON coq_STR_TERM lseq_name_constant
+    ((coq_Term_to_JSON h h0 t1) :: ((coq_Term_to_JSON h h0 t2) :: []))
+| Coq_bseq sp t1 t2 =>
+  constructor_to_JSON coq_STR_TERM bseq_name_constant
+    ((let val Build_Jsonifiable to_JSON _ = h0 in to_JSON sp end) :: (
+    (coq_Term_to_JSON h h0 t1) :: ((coq_Term_to_JSON h h0 t2) :: [])))
+| Coq_bpar sp t1 t2 =>
+  constructor_to_JSON coq_STR_TERM bpar_name_constant
+    ((let val Build_Jsonifiable to_JSON _ = h0 in to_JSON sp end) :: (
+    (coq_Term_to_JSON h h0 t1) :: ((coq_Term_to_JSON h h0 t2) :: [])))
+
+(** val coq_Term_from_JSON :
+    coq_ASP coq_Jsonifiable -> coq_Split coq_Jsonifiable -> coq_JSON ->
+    (coq_Term, string) coq_ResultT **)
+
+fun coq_Term_from_JSON h h0 js =
+  let val type_str = String.^ coq_STR_TERM (String.^ "_" type_string_constant)
+  in
+  let val body_str = String.^ coq_STR_TERM (String.^ "_" body_string_constant)
+  in
+  (case coq_JSON_get_Object type_str js of
+     Coq_errC e => Coq_errC e
+   | Coq_resultC j =>
+     (case j of
+        JSON_String cons_name =>
+        (case eqb coq_Eq_Class_ID_Type cons_name asp_name_constant of
+           True =>
+           res_bind (coq_JSON_get_Object body_str js) (fn asp_js =>
+             res_bind
+               (let val Build_Jsonifiable _ from_JSON = h in
+                from_JSON asp_js end) (fn asp_val => Coq_resultC (Coq_asp
+               asp_val)))
+         | False =>
+           (case eqb coq_Eq_Class_ID_Type cons_name att_name_constant of
+              True =>
+              (case js of
+                 JSON_Object m =>
+                 (case m of
+                    [] =>
+                    Coq_errC
+                      (String.^ "JSON Parsing "
+                        (String.^ "'"
+                          (String.^ att_name_constant
+                            "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; term])")))
+                  | _ :: l =>
+                    (case l of
+                       [] =>
+                       Coq_errC
+                         (String.^ "JSON Parsing "
+                           (String.^ "'"
+                             (String.^ att_name_constant
+                               "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; term])")))
+                     | p0 :: l0 =>
+                       let val (_, j0) = p0 in
+                       (case j0 of
+                          JSON_Array l1 =>
+                          (case l1 of
+                             [] =>
+                             Coq_errC
+                               (String.^ "JSON Parsing "
+                                 (String.^ "'"
+                                   (String.^ att_name_constant
+                                     "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; term])")))
+                           | j1 :: l2 =>
+                             (case j1 of
+                                JSON_String plc =>
+                                (case l2 of
+                                   [] =>
+                                   Coq_errC
+                                     (String.^ "JSON Parsing "
+                                       (String.^ "'"
+                                         (String.^ att_name_constant
+                                           "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; term])")))
+                                 | term' :: l3 =>
+                                   (case l3 of
+                                      [] =>
+                                      (case l0 of
+                                         [] =>
+                                         res_bind
+                                           (let val Build_Stringifiable _
+                                              from_string =
+                                              coq_Stringifiable_ID_Type
+                                            in
+                                            from_string plc end)
+                                           (fn plc_val =>
+                                           res_bind
+                                             (coq_Term_from_JSON h h0 term')
+                                             (fn term_val => Coq_resultC
+                                             (Coq_att plc_val term_val)))
+                                       | _ :: _ =>
+                                         Coq_errC
+                                           (String.^ "JSON Parsing "
+                                             (String.^ "'"
+                                               (String.^ att_name_constant
+                                                 "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; term])"))))
+                                    | _ :: _ =>
+                                      Coq_errC
+                                        (String.^ "JSON Parsing "
+                                          (String.^ "'"
+                                            (String.^ att_name_constant
+                                              "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; term])")))))
+                              | _ =>
+                                Coq_errC
+                                  (String.^ "JSON Parsing "
+                                    (String.^ "'"
+                                      (String.^ att_name_constant
+                                        "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; term])")))))
+                        | _ =>
+                          Coq_errC
+                            (String.^ "JSON Parsing "
+                              (String.^ "'"
+                                (String.^ att_name_constant
+                                  "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; term])")))) end))
+               | _ =>
+                 Coq_errC
+                   (String.^ "JSON Parsing "
+                     (String.^ "'"
+                       (String.^ att_name_constant
+                         "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; term])"))))
+            | False =>
+              (case eqb coq_Eq_Class_ID_Type cons_name lseq_name_constant of
+                 True =>
+                 (case js of
+                    JSON_Object m =>
+                    (case m of
+                       [] =>
+                       Coq_errC
+                         (String.^ "JSON Parsing "
+                           (String.^ "'"
+                             (String.^ lseq_name_constant
+                               "' ARGS: Incorrect number or wrong type of JSON args (expected [term1; term2])")))
+                     | _ :: l =>
+                       (case l of
+                          [] =>
+                          Coq_errC
+                            (String.^ "JSON Parsing "
+                              (String.^ "'"
+                                (String.^ lseq_name_constant
+                                  "' ARGS: Incorrect number or wrong type of JSON args (expected [term1; term2])")))
+                        | p0 :: l0 =>
+                          let val (_, j0) = p0 in
+                          (case j0 of
+                             JSON_Array l1 =>
+                             (case l1 of
+                                [] =>
+                                Coq_errC
+                                  (String.^ "JSON Parsing "
+                                    (String.^ "'"
+                                      (String.^ lseq_name_constant
+                                        "' ARGS: Incorrect number or wrong type of JSON args (expected [term1; term2])")))
+                              | term1 :: l2 =>
+                                (case l2 of
+                                   [] =>
+                                   Coq_errC
+                                     (String.^ "JSON Parsing "
+                                       (String.^ "'"
+                                         (String.^ lseq_name_constant
+                                           "' ARGS: Incorrect number or wrong type of JSON args (expected [term1; term2])")))
+                                 | term2 :: l3 =>
+                                   (case l3 of
+                                      [] =>
+                                      (case l0 of
+                                         [] =>
+                                         res_bind
+                                           (coq_Term_from_JSON h h0 term1)
+                                           (fn term1_val =>
+                                           res_bind
+                                             (coq_Term_from_JSON h h0 term2)
+                                             (fn term2_val => Coq_resultC
+                                             (Coq_lseq term1_val term2_val)))
+                                       | _ :: _ =>
+                                         Coq_errC
+                                           (String.^ "JSON Parsing "
+                                             (String.^ "'"
+                                               (String.^ lseq_name_constant
+                                                 "' ARGS: Incorrect number or wrong type of JSON args (expected [term1; term2])"))))
+                                    | _ :: _ =>
+                                      Coq_errC
+                                        (String.^ "JSON Parsing "
+                                          (String.^ "'"
+                                            (String.^ lseq_name_constant
+                                              "' ARGS: Incorrect number or wrong type of JSON args (expected [term1; term2])"))))))
+                           | _ =>
+                             Coq_errC
+                               (String.^ "JSON Parsing "
+                                 (String.^ "'"
+                                   (String.^ lseq_name_constant
+                                     "' ARGS: Incorrect number or wrong type of JSON args (expected [term1; term2])")))) end))
+                  | _ =>
+                    Coq_errC
+                      (String.^ "JSON Parsing "
+                        (String.^ "'"
+                          (String.^ lseq_name_constant
+                            "' ARGS: Incorrect number or wrong type of JSON args (expected [term1; term2])"))))
+               | False =>
+                 (case eqb coq_Eq_Class_ID_Type cons_name bseq_name_constant of
+                    True =>
+                    (case js of
+                       JSON_Object m =>
+                       (case m of
+                          [] =>
+                          Coq_errC
+                            (String.^ "JSON Parsing "
+                              (String.^ "'"
+                                (String.^ bseq_name_constant
+                                  "' ARGS: Incorrect number or wrong type of JSON args (expected [sp; term1; term2])")))
+                        | _ :: l =>
+                          (case l of
+                             [] =>
+                             Coq_errC
+                               (String.^ "JSON Parsing "
+                                 (String.^ "'"
+                                   (String.^ bseq_name_constant
+                                     "' ARGS: Incorrect number or wrong type of JSON args (expected [sp; term1; term2])")))
+                           | p0 :: l0 =>
+                             let val (_, j0) = p0 in
+                             (case j0 of
+                                JSON_Array l1 =>
+                                (case l1 of
+                                   [] =>
+                                   Coq_errC
+                                     (String.^ "JSON Parsing "
+                                       (String.^ "'"
+                                         (String.^ bseq_name_constant
+                                           "' ARGS: Incorrect number or wrong type of JSON args (expected [sp; term1; term2])")))
+                                 | sp :: l2 =>
+                                   (case l2 of
+                                      [] =>
+                                      Coq_errC
+                                        (String.^ "JSON Parsing "
+                                          (String.^ "'"
+                                            (String.^ bseq_name_constant
+                                              "' ARGS: Incorrect number or wrong type of JSON args (expected [sp; term1; term2])")))
+                                    | term1 :: l3 =>
+                                      (case l3 of
+                                         [] =>
+                                         Coq_errC
+                                           (String.^ "JSON Parsing "
+                                             (String.^ "'"
+                                               (String.^ bseq_name_constant
+                                                 "' ARGS: Incorrect number or wrong type of JSON args (expected [sp; term1; term2])")))
+                                       | term2 :: l4 =>
+                                         (case l4 of
+                                            [] =>
+                                            (case l0 of
+                                               [] =>
+                                               res_bind
+                                                 (let val Build_Jsonifiable _
+                                                    from_JSON = h0
+                                                  in
+                                                  from_JSON sp end)
+                                                 (fn sp_val =>
+                                                 res_bind
+                                                   (coq_Term_from_JSON h h0
+                                                     term1) (fn term1_val =>
+                                                   res_bind
+                                                     (coq_Term_from_JSON h h0
+                                                       term2)
+                                                     (fn term2_val =>
+                                                     Coq_resultC (Coq_bseq
+                                                     sp_val term1_val
+                                                     term2_val))))
+                                             | _ :: _ =>
+                                               Coq_errC
+                                                 (String.^ "JSON Parsing "
+                                                   (String.^ "'"
+                                                     (String.^
+                                                       bseq_name_constant
+                                                       "' ARGS: Incorrect number or wrong type of JSON args (expected [sp; term1; term2])"))))
+                                          | _ :: _ =>
+                                            Coq_errC
+                                              (String.^ "JSON Parsing "
+                                                (String.^ "'"
+                                                  (String.^
+                                                    bseq_name_constant
+                                                    "' ARGS: Incorrect number or wrong type of JSON args (expected [sp; term1; term2])")))))))
+                              | _ =>
+                                Coq_errC
+                                  (String.^ "JSON Parsing "
+                                    (String.^ "'"
+                                      (String.^ bseq_name_constant
+                                        "' ARGS: Incorrect number or wrong type of JSON args (expected [sp; term1; term2])")))) end))
+                     | _ =>
+                       Coq_errC
+                         (String.^ "JSON Parsing "
+                           (String.^ "'"
+                             (String.^ bseq_name_constant
+                               "' ARGS: Incorrect number or wrong type of JSON args (expected [sp; term1; term2])"))))
+                  | False =>
+                    (case eqb coq_Eq_Class_ID_Type cons_name
+                            bpar_name_constant of
+                       True =>
+                       (case js of
+                          JSON_Object m =>
+                          (case m of
+                             [] =>
+                             Coq_errC
+                               (String.^ "JSON Parsing "
+                                 (String.^ "'"
+                                   (String.^ bpar_name_constant
+                                     "' ARGS: Incorrect number or wrong type of JSON args (expected [sp; term1; term2])")))
+                           | _ :: l =>
+                             (case l of
+                                [] =>
+                                Coq_errC
+                                  (String.^ "JSON Parsing "
+                                    (String.^ "'"
+                                      (String.^ bpar_name_constant
+                                        "' ARGS: Incorrect number or wrong type of JSON args (expected [sp; term1; term2])")))
+                              | p0 :: l0 =>
+                                let val (_, j0) = p0 in
+                                (case j0 of
+                                   JSON_Array l1 =>
+                                   (case l1 of
+                                      [] =>
+                                      Coq_errC
+                                        (String.^ "JSON Parsing "
+                                          (String.^ "'"
+                                            (String.^ bpar_name_constant
+                                              "' ARGS: Incorrect number or wrong type of JSON args (expected [sp; term1; term2])")))
+                                    | sp :: l2 =>
+                                      (case l2 of
+                                         [] =>
+                                         Coq_errC
+                                           (String.^ "JSON Parsing "
+                                             (String.^ "'"
+                                               (String.^ bpar_name_constant
+                                                 "' ARGS: Incorrect number or wrong type of JSON args (expected [sp; term1; term2])")))
+                                       | term1 :: l3 =>
+                                         (case l3 of
+                                            [] =>
+                                            Coq_errC
+                                              (String.^ "JSON Parsing "
+                                                (String.^ "'"
+                                                  (String.^
+                                                    bpar_name_constant
+                                                    "' ARGS: Incorrect number or wrong type of JSON args (expected [sp; term1; term2])")))
+                                          | term2 :: l4 =>
+                                            (case l4 of
+                                               [] =>
+                                               (case l0 of
+                                                  [] =>
+                                                  res_bind
+                                                    (let val Build_Jsonifiable _
+                                                       from_JSON = h0
+                                                     in
+                                                     from_JSON sp end)
+                                                    (fn sp_val =>
+                                                    res_bind
+                                                      (coq_Term_from_JSON h
+                                                        h0 term1)
+                                                      (fn term1_val =>
+                                                      res_bind
+                                                        (coq_Term_from_JSON h
+                                                          h0 term2)
+                                                        (fn term2_val =>
+                                                        Coq_resultC (Coq_bpar
+                                                        sp_val term1_val
+                                                        term2_val))))
+                                                | _ :: _ =>
+                                                  Coq_errC
+                                                    (String.^ "JSON Parsing "
+                                                      (String.^ "'"
+                                                        (String.^
+                                                          bpar_name_constant
+                                                          "' ARGS: Incorrect number or wrong type of JSON args (expected [sp; term1; term2])"))))
+                                             | _ :: _ =>
+                                               Coq_errC
+                                                 (String.^ "JSON Parsing "
+                                                   (String.^ "'"
+                                                     (String.^
+                                                       bpar_name_constant
+                                                       "' ARGS: Incorrect number or wrong type of JSON args (expected [sp; term1; term2])")))))))
+                                 | _ =>
+                                   Coq_errC
+                                     (String.^ "JSON Parsing "
+                                       (String.^ "'"
+                                         (String.^ bpar_name_constant
+                                           "' ARGS: Incorrect number or wrong type of JSON args (expected [sp; term1; term2])")))) end))
+                        | _ =>
+                          Coq_errC
+                            (String.^ "JSON Parsing "
+                              (String.^ "'"
+                                (String.^ bpar_name_constant
+                                  "' ARGS: Incorrect number or wrong type of JSON args (expected [sp; term1; term2])"))))
+                     | False =>
+                       Coq_errC
+                         (String.^ "Invalid "
+                           (String.^ coq_STR_TERM " JSON constructor name")))))))
+      | _ =>
+        Coq_errC (String.^ "Invalid " (String.^ coq_STR_TERM " JSON type")))) end end
+
+(** val coq_Jsonifiable_Term :
+    coq_ASP coq_Jsonifiable -> coq_Split coq_Jsonifiable -> coq_Term
+    coq_Jsonifiable **)
+
+fun coq_Jsonifiable_Term h h0 =
+  Build_Jsonifiable (coq_Term_to_JSON h h0) (coq_Term_from_JSON h h0)
+
+(** val coq_Jsonifiable_RawEv : coq_RawEv coq_Jsonifiable **)
+
+val coq_Jsonifiable_RawEv : coq_RawEv coq_Jsonifiable =
+  Build_Jsonifiable (fn ev => JSON_Object ((rawev_name_constant, (JSON_Array
+    (map (fn bs => JSON_String
+      (let val Build_Stringifiable to_string _ = coq_Stringifiable_BS in
+       to_string bs end)) ev))) :: [])) (fn js =>
+    case coq_JSON_get_Array rawev_name_constant js of
+      Coq_errC e => Coq_errC e
+    | Coq_resultC js' =>
+      result_map (fn js'0 =>
+        case js'0 of
+          JSON_String s =>
+          let val Build_Stringifiable _ from_string = coq_Stringifiable_BS in
+          from_string s end
+        | _ =>
+          Coq_errC
+            (String.^ "Invalid " (String.^ rawev_name_constant " JSON"))) js')
+
+(** val coq_AppResultC_to_JSON :
+    coq_ASP_PARAMS coq_Jsonifiable -> coq_Split coq_Jsonifiable -> coq_RawEv
+    coq_Jsonifiable -> coq_AppResultC -> coq_JSON **)
+
+fun coq_AppResultC_to_JSON h h0 h1 a = case a of
+  Coq_mtc_app =>
+  constructor_to_JSON appresult_name_constant mtc_app_name_constant []
+| Coq_nnc_app n bs =>
+  constructor_to_JSON appresult_name_constant nnc_app_name_constant
+    ((JSON_String
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_nat in
+     to_string n end)) :: ((JSON_String
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_BS in
+     to_string bs end)) :: []))
+| Coq_ggc_app plc ps rawev res =>
+  constructor_to_JSON appresult_name_constant ggc_app_name_constant
+    ((JSON_String
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_ID_Type in
+     to_string plc end)) :: ((let val Build_Jsonifiable to_JSON _ = h in
+                              to_JSON ps end) :: ((let val Build_Jsonifiable to_JSON
+                                                     _ = h1
+                                                   in
+                                                   to_JSON rawev end) :: (
+    (coq_AppResultC_to_JSON h h0 h1 res) :: []))))
+| Coq_hhc_app plc ps bs res =>
+  constructor_to_JSON appresult_name_constant hhc_app_name_constant
+    ((JSON_String
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_ID_Type in
+     to_string plc end)) :: ((let val Build_Jsonifiable to_JSON _ = h in
+                              to_JSON ps end) :: ((JSON_String
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_BS in
+     to_string bs end)) :: ((coq_AppResultC_to_JSON h h0 h1 res) :: []))))
+| Coq_eec_app plc ps bs res =>
+  constructor_to_JSON appresult_name_constant eec_app_name_constant
+    ((JSON_String
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_ID_Type in
+     to_string plc end)) :: ((let val Build_Jsonifiable to_JSON _ = h in
+                              to_JSON ps end) :: ((JSON_String
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_BS in
+     to_string bs end)) :: ((coq_AppResultC_to_JSON h h0 h1 res) :: []))))
+| Coq_ssc_app res1 res2 =>
+  constructor_to_JSON appresult_name_constant ssc_app_name_constant
+    ((coq_AppResultC_to_JSON h h0 h1 res1) :: ((coq_AppResultC_to_JSON h h0
+                                                 h1 res2) :: []))
+
+(** val coq_AppResultC_from_JSON :
+    coq_ASP_PARAMS coq_Jsonifiable -> coq_Split coq_Jsonifiable -> coq_RawEv
+    coq_Jsonifiable -> coq_JSON -> (coq_AppResultC, string) coq_ResultT **)
+
+fun coq_AppResultC_from_JSON h h0 h1 js =
+  let val type_str =
+    String.^ appresult_name_constant (String.^ "_" type_string_constant)
+  in
+  (case coq_JSON_get_Object type_str js of
+     Coq_errC e => Coq_errC e
+   | Coq_resultC j =>
+     (case j of
+        JSON_String cons_name =>
+        (case eqb coq_Eq_Class_ID_Type cons_name mtc_app_name_constant of
+           True => Coq_resultC Coq_mtc_app
+         | False =>
+           (case eqb coq_Eq_Class_ID_Type cons_name nnc_app_name_constant of
+              True =>
+              (case js of
+                 JSON_Object m =>
+                 (case m of
+                    [] =>
+                    Coq_errC
+                      (String.^ "JSON Parsing "
+                        (String.^ "'"
+                          (String.^ nnc_app_name_constant
+                            "' ARGS: Incorrect number or wrong type of JSON args (expected [n; bs])")))
+                  | _ :: l =>
+                    (case l of
+                       [] =>
+                       Coq_errC
+                         (String.^ "JSON Parsing "
+                           (String.^ "'"
+                             (String.^ nnc_app_name_constant
+                               "' ARGS: Incorrect number or wrong type of JSON args (expected [n; bs])")))
+                     | p0 :: l0 =>
+                       let val (_, j0) = p0 in
+                       (case j0 of
+                          JSON_Array l1 =>
+                          (case l1 of
+                             [] =>
+                             Coq_errC
+                               (String.^ "JSON Parsing "
+                                 (String.^ "'"
+                                   (String.^ nnc_app_name_constant
+                                     "' ARGS: Incorrect number or wrong type of JSON args (expected [n; bs])")))
+                           | j1 :: l2 =>
+                             (case j1 of
+                                JSON_String n =>
+                                (case l2 of
+                                   [] =>
+                                   Coq_errC
+                                     (String.^ "JSON Parsing "
+                                       (String.^ "'"
+                                         (String.^ nnc_app_name_constant
+                                           "' ARGS: Incorrect number or wrong type of JSON args (expected [n; bs])")))
+                                 | j2 :: l3 =>
+                                   (case j2 of
+                                      JSON_String bs =>
+                                      (case l3 of
+                                         [] =>
+                                         (case l0 of
+                                            [] =>
+                                            res_bind
+                                              (let val Build_Stringifiable _
+                                                 from_string =
+                                                 coq_Stringifiable_nat
+                                               in
+                                               from_string n end)
+                                              (fn n_val =>
+                                              res_bind
+                                                (let val Build_Stringifiable _
+                                                   from_string =
+                                                   coq_Stringifiable_BS
+                                                 in
+                                                 from_string bs end)
+                                                (fn bs_val => Coq_resultC
+                                                (Coq_nnc_app n_val bs_val)))
+                                          | _ :: _ =>
+                                            Coq_errC
+                                              (String.^ "JSON Parsing "
+                                                (String.^ "'"
+                                                  (String.^
+                                                    nnc_app_name_constant
+                                                    "' ARGS: Incorrect number or wrong type of JSON args (expected [n; bs])"))))
+                                       | _ :: _ =>
+                                         Coq_errC
+                                           (String.^ "JSON Parsing "
+                                             (String.^ "'"
+                                               (String.^
+                                                 nnc_app_name_constant
+                                                 "' ARGS: Incorrect number or wrong type of JSON args (expected [n; bs])"))))
+                                    | _ =>
+                                      Coq_errC
+                                        (String.^ "JSON Parsing "
+                                          (String.^ "'"
+                                            (String.^ nnc_app_name_constant
+                                              "' ARGS: Incorrect number or wrong type of JSON args (expected [n; bs])")))))
+                              | _ =>
+                                Coq_errC
+                                  (String.^ "JSON Parsing "
+                                    (String.^ "'"
+                                      (String.^ nnc_app_name_constant
+                                        "' ARGS: Incorrect number or wrong type of JSON args (expected [n; bs])")))))
+                        | _ =>
+                          Coq_errC
+                            (String.^ "JSON Parsing "
+                              (String.^ "'"
+                                (String.^ nnc_app_name_constant
+                                  "' ARGS: Incorrect number or wrong type of JSON args (expected [n; bs])")))) end))
+               | _ =>
+                 Coq_errC
+                   (String.^ "JSON Parsing "
+                     (String.^ "'"
+                       (String.^ nnc_app_name_constant
+                         "' ARGS: Incorrect number or wrong type of JSON args (expected [n; bs])"))))
+            | False =>
+              (case eqb coq_Eq_Class_ID_Type cons_name ggc_app_name_constant of
+                 True =>
+                 (case js of
+                    JSON_Object m =>
+                    (case m of
+                       [] =>
+                       Coq_errC
+                         (String.^ "JSON Parsing "
+                           (String.^ "'"
+                             (String.^ ggc_app_name_constant
+                               "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; ps; rawev; res])")))
+                     | _ :: l =>
+                       (case l of
+                          [] =>
+                          Coq_errC
+                            (String.^ "JSON Parsing "
+                              (String.^ "'"
+                                (String.^ ggc_app_name_constant
+                                  "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; ps; rawev; res])")))
+                        | p0 :: l0 =>
+                          let val (_, j0) = p0 in
+                          (case j0 of
+                             JSON_Array l1 =>
+                             (case l1 of
+                                [] =>
+                                Coq_errC
+                                  (String.^ "JSON Parsing "
+                                    (String.^ "'"
+                                      (String.^ ggc_app_name_constant
+                                        "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; ps; rawev; res])")))
+                              | j1 :: l2 =>
+                                (case j1 of
+                                   JSON_String plc =>
+                                   (case l2 of
+                                      [] =>
+                                      Coq_errC
+                                        (String.^ "JSON Parsing "
+                                          (String.^ "'"
+                                            (String.^ ggc_app_name_constant
+                                              "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; ps; rawev; res])")))
+                                    | ps :: l3 =>
+                                      (case l3 of
+                                         [] =>
+                                         Coq_errC
+                                           (String.^ "JSON Parsing "
+                                             (String.^ "'"
+                                               (String.^
+                                                 ggc_app_name_constant
+                                                 "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; ps; rawev; res])")))
+                                       | rawev :: l4 =>
+                                         (case l4 of
+                                            [] =>
+                                            Coq_errC
+                                              (String.^ "JSON Parsing "
+                                                (String.^ "'"
+                                                  (String.^
+                                                    ggc_app_name_constant
+                                                    "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; ps; rawev; res])")))
+                                          | res :: l5 =>
+                                            (case l5 of
+                                               [] =>
+                                               (case l0 of
+                                                  [] =>
+                                                  res_bind
+                                                    (let val Build_Stringifiable _
+                                                       from_string =
+                                                       coq_Stringifiable_ID_Type
+                                                     in
+                                                     from_string plc end)
+                                                    (fn plc_val =>
+                                                    res_bind
+                                                      (let val Build_Jsonifiable _
+                                                         from_JSON = h
+                                                       in
+                                                       from_JSON ps end)
+                                                      (fn ps_val =>
+                                                      res_bind
+                                                        (let val Build_Jsonifiable _
+                                                           from_JSON = h1
+                                                         in
+                                                         from_JSON rawev end)
+                                                        (fn rawev_val =>
+                                                        res_bind
+                                                          (coq_AppResultC_from_JSON
+                                                            h h0 h1 res)
+                                                          (fn res_val =>
+                                                          Coq_resultC
+                                                          (Coq_ggc_app
+                                                          plc_val ps_val
+                                                          rawev_val res_val)))))
+                                                | _ :: _ =>
+                                                  Coq_errC
+                                                    (String.^ "JSON Parsing "
+                                                      (String.^ "'"
+                                                        (String.^
+                                                          ggc_app_name_constant
+                                                          "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; ps; rawev; res])"))))
+                                             | _ :: _ =>
+                                               Coq_errC
+                                                 (String.^ "JSON Parsing "
+                                                   (String.^ "'"
+                                                     (String.^
+                                                       ggc_app_name_constant
+                                                       "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; ps; rawev; res])")))))))
+                                 | _ =>
+                                   Coq_errC
+                                     (String.^ "JSON Parsing "
+                                       (String.^ "'"
+                                         (String.^ ggc_app_name_constant
+                                           "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; ps; rawev; res])")))))
+                           | _ =>
+                             Coq_errC
+                               (String.^ "JSON Parsing "
+                                 (String.^ "'"
+                                   (String.^ ggc_app_name_constant
+                                     "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; ps; rawev; res])")))) end))
+                  | _ =>
+                    Coq_errC
+                      (String.^ "JSON Parsing "
+                        (String.^ "'"
+                          (String.^ ggc_app_name_constant
+                            "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; ps; rawev; res])"))))
+               | False =>
+                 (case eqb coq_Eq_Class_ID_Type cons_name
+                         hhc_app_name_constant of
+                    True =>
+                    (case js of
+                       JSON_Object m =>
+                       (case m of
+                          [] =>
+                          Coq_errC
+                            (String.^ "JSON Parsing "
+                              (String.^ "'"
+                                (String.^ hhc_app_name_constant
+                                  "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; ps; bs; res])")))
+                        | _ :: l =>
+                          (case l of
+                             [] =>
+                             Coq_errC
+                               (String.^ "JSON Parsing "
+                                 (String.^ "'"
+                                   (String.^ hhc_app_name_constant
+                                     "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; ps; bs; res])")))
+                           | p0 :: l0 =>
+                             let val (_, j0) = p0 in
+                             (case j0 of
+                                JSON_Array l1 =>
+                                (case l1 of
+                                   [] =>
+                                   Coq_errC
+                                     (String.^ "JSON Parsing "
+                                       (String.^ "'"
+                                         (String.^ hhc_app_name_constant
+                                           "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; ps; bs; res])")))
+                                 | j1 :: l2 =>
+                                   (case j1 of
+                                      JSON_String plc =>
+                                      (case l2 of
+                                         [] =>
+                                         Coq_errC
+                                           (String.^ "JSON Parsing "
+                                             (String.^ "'"
+                                               (String.^
+                                                 hhc_app_name_constant
+                                                 "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; ps; bs; res])")))
+                                       | ps :: l3 =>
+                                         (case l3 of
+                                            [] =>
+                                            Coq_errC
+                                              (String.^ "JSON Parsing "
+                                                (String.^ "'"
+                                                  (String.^
+                                                    hhc_app_name_constant
+                                                    "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; ps; bs; res])")))
+                                          | j2 :: l4 =>
+                                            (case j2 of
+                                               JSON_String bs =>
+                                               (case l4 of
+                                                  [] =>
+                                                  Coq_errC
+                                                    (String.^ "JSON Parsing "
+                                                      (String.^ "'"
+                                                        (String.^
+                                                          hhc_app_name_constant
+                                                          "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; ps; bs; res])")))
+                                                | res :: l5 =>
+                                                  (case l5 of
+                                                     [] =>
+                                                     (case l0 of
+                                                        [] =>
+                                                        res_bind
+                                                          (let val Build_Stringifiable _
+                                                             from_string =
+                                                             coq_Stringifiable_ID_Type
+                                                           in
+                                                           from_string plc end)
+                                                          (fn plc_val =>
+                                                          res_bind
+                                                            (let val Build_Jsonifiable _
+                                                               from_JSON = h
+                                                             in
+                                                             from_JSON ps end)
+                                                            (fn ps_val =>
+                                                            res_bind
+                                                              (let val Build_Stringifiable _
+                                                                 from_string =
+                                                                 coq_Stringifiable_BS
+                                                               in
+                                                               from_string bs end)
+                                                              (fn bs_val =>
+                                                              res_bind
+                                                                (coq_AppResultC_from_JSON
+                                                                  h h0 h1 res)
+                                                                (fn res_val =>
+                                                                Coq_resultC
+                                                                (Coq_hhc_app
+                                                                plc_val
+                                                                ps_val bs_val
+                                                                res_val)))))
+                                                      | _ :: _ =>
+                                                        Coq_errC
+                                                          (String.^
+                                                            "JSON Parsing "
+                                                            (String.^ "'"
+                                                              (String.^
+                                                                hhc_app_name_constant
+                                                                "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; ps; bs; res])"))))
+                                                   | _ :: _ =>
+                                                     Coq_errC
+                                                       (String.^
+                                                         "JSON Parsing "
+                                                         (String.^ "'"
+                                                           (String.^
+                                                             hhc_app_name_constant
+                                                             "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; ps; bs; res])")))))
+                                             | _ =>
+                                               Coq_errC
+                                                 (String.^ "JSON Parsing "
+                                                   (String.^ "'"
+                                                     (String.^
+                                                       hhc_app_name_constant
+                                                       "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; ps; bs; res])"))))))
+                                    | _ =>
+                                      Coq_errC
+                                        (String.^ "JSON Parsing "
+                                          (String.^ "'"
+                                            (String.^ hhc_app_name_constant
+                                              "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; ps; bs; res])")))))
+                              | _ =>
+                                Coq_errC
+                                  (String.^ "JSON Parsing "
+                                    (String.^ "'"
+                                      (String.^ hhc_app_name_constant
+                                        "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; ps; bs; res])")))) end))
+                     | _ =>
+                       Coq_errC
+                         (String.^ "JSON Parsing "
+                           (String.^ "'"
+                             (String.^ hhc_app_name_constant
+                               "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; ps; bs; res])"))))
+                  | False =>
+                    (case eqb coq_Eq_Class_ID_Type cons_name
+                            eec_app_name_constant of
+                       True =>
+                       (case js of
+                          JSON_Object m =>
+                          (case m of
+                             [] =>
+                             Coq_errC
+                               (String.^ "JSON Parsing "
+                                 (String.^ "'"
+                                   (String.^ eec_app_name_constant
+                                     "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; ps; bs; res])")))
+                           | _ :: l =>
+                             (case l of
+                                [] =>
+                                Coq_errC
+                                  (String.^ "JSON Parsing "
+                                    (String.^ "'"
+                                      (String.^ eec_app_name_constant
+                                        "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; ps; bs; res])")))
+                              | p0 :: l0 =>
+                                let val (_, j0) = p0 in
+                                (case j0 of
+                                   JSON_Array l1 =>
+                                   (case l1 of
+                                      [] =>
+                                      Coq_errC
+                                        (String.^ "JSON Parsing "
+                                          (String.^ "'"
+                                            (String.^ eec_app_name_constant
+                                              "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; ps; bs; res])")))
+                                    | j1 :: l2 =>
+                                      (case j1 of
+                                         JSON_String plc =>
+                                         (case l2 of
+                                            [] =>
+                                            Coq_errC
+                                              (String.^ "JSON Parsing "
+                                                (String.^ "'"
+                                                  (String.^
+                                                    eec_app_name_constant
+                                                    "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; ps; bs; res])")))
+                                          | ps :: l3 =>
+                                            (case l3 of
+                                               [] =>
+                                               Coq_errC
+                                                 (String.^ "JSON Parsing "
+                                                   (String.^ "'"
+                                                     (String.^
+                                                       eec_app_name_constant
+                                                       "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; ps; bs; res])")))
+                                             | j2 :: l4 =>
+                                               (case j2 of
+                                                  JSON_String bs =>
+                                                  (case l4 of
+                                                     [] =>
+                                                     Coq_errC
+                                                       (String.^
+                                                         "JSON Parsing "
+                                                         (String.^ "'"
+                                                           (String.^
+                                                             eec_app_name_constant
+                                                             "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; ps; bs; res])")))
+                                                   | res :: l5 =>
+                                                     (case l5 of
+                                                        [] =>
+                                                        (case l0 of
+                                                           [] =>
+                                                           res_bind
+                                                             (let val Build_Stringifiable _
+                                                                from_string =
+                                                                coq_Stringifiable_ID_Type
+                                                              in
+                                                              from_string plc end)
+                                                             (fn plc_val =>
+                                                             res_bind
+                                                               (let val Build_Jsonifiable _
+                                                                  from_JSON =
+                                                                  h
+                                                                in
+                                                                from_JSON ps end)
+                                                               (fn ps_val =>
+                                                               res_bind
+                                                                 (let val Build_Stringifiable _
+                                                                    from_string =
+                                                                    coq_Stringifiable_BS
+                                                                  in
+                                                                  from_string
+                                                                    bs end)
+                                                                 (fn bs_val =>
+                                                                 res_bind
+                                                                   (coq_AppResultC_from_JSON
+                                                                    h h0 h1
+                                                                    res)
+                                                                   (fn res_val =>
+                                                                   Coq_resultC
+                                                                   (Coq_eec_app
+                                                                   plc_val
+                                                                   ps_val
+                                                                   bs_val
+                                                                   res_val)))))
+                                                         | _ :: _ =>
+                                                           Coq_errC
+                                                             (String.^
+                                                               "JSON Parsing "
+                                                               (String.^ "'"
+                                                                 (String.^
+                                                                   eec_app_name_constant
+                                                                   "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; ps; bs; res])"))))
+                                                      | _ :: _ =>
+                                                        Coq_errC
+                                                          (String.^
+                                                            "JSON Parsing "
+                                                            (String.^ "'"
+                                                              (String.^
+                                                                eec_app_name_constant
+                                                                "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; ps; bs; res])")))))
+                                                | _ =>
+                                                  Coq_errC
+                                                    (String.^ "JSON Parsing "
+                                                      (String.^ "'"
+                                                        (String.^
+                                                          eec_app_name_constant
+                                                          "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; ps; bs; res])"))))))
+                                       | _ =>
+                                         Coq_errC
+                                           (String.^ "JSON Parsing "
+                                             (String.^ "'"
+                                               (String.^
+                                                 eec_app_name_constant
+                                                 "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; ps; bs; res])")))))
+                                 | _ =>
+                                   Coq_errC
+                                     (String.^ "JSON Parsing "
+                                       (String.^ "'"
+                                         (String.^ eec_app_name_constant
+                                           "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; ps; bs; res])")))) end))
+                        | _ =>
+                          Coq_errC
+                            (String.^ "JSON Parsing "
+                              (String.^ "'"
+                                (String.^ eec_app_name_constant
+                                  "' ARGS: Incorrect number or wrong type of JSON args (expected [plc; ps; bs; res])"))))
+                     | False =>
+                       (case eqb coq_Eq_Class_ID_Type cons_name
+                               ssc_app_name_constant of
+                          True =>
+                          (case js of
+                             JSON_Object m =>
+                             (case m of
+                                [] =>
+                                Coq_errC
+                                  (String.^ "JSON Parsing "
+                                    (String.^ "'"
+                                      (String.^ ssc_app_name_constant
+                                        "' ARGS: Incorrect number or wrong type of JSON args (expected [ res1 ; res2 ])")))
+                              | _ :: l =>
+                                (case l of
+                                   [] =>
+                                   Coq_errC
+                                     (String.^ "JSON Parsing "
+                                       (String.^ "'"
+                                         (String.^ ssc_app_name_constant
+                                           "' ARGS: Incorrect number or wrong type of JSON args (expected [ res1 ; res2 ])")))
+                                 | p0 :: l0 =>
+                                   let val (_, j0) = p0 in
+                                   (case j0 of
+                                      JSON_Array l1 =>
+                                      (case l1 of
+                                         [] =>
+                                         Coq_errC
+                                           (String.^ "JSON Parsing "
+                                             (String.^ "'"
+                                               (String.^
+                                                 ssc_app_name_constant
+                                                 "' ARGS: Incorrect number or wrong type of JSON args (expected [ res1 ; res2 ])")))
+                                       | res1 :: l2 =>
+                                         (case l2 of
+                                            [] =>
+                                            Coq_errC
+                                              (String.^ "JSON Parsing "
+                                                (String.^ "'"
+                                                  (String.^
+                                                    ssc_app_name_constant
+                                                    "' ARGS: Incorrect number or wrong type of JSON args (expected [ res1 ; res2 ])")))
+                                          | res2 :: l3 =>
+                                            (case l3 of
+                                               [] =>
+                                               (case l0 of
+                                                  [] =>
+                                                  res_bind
+                                                    (coq_AppResultC_from_JSON
+                                                      h h0 h1 res1)
+                                                    (fn res1_val =>
+                                                    res_bind
+                                                      (coq_AppResultC_from_JSON
+                                                        h h0 h1 res2)
+                                                      (fn res2_val =>
+                                                      Coq_resultC
+                                                      (Coq_ssc_app res1_val
+                                                      res2_val)))
+                                                | _ :: _ =>
+                                                  Coq_errC
+                                                    (String.^ "JSON Parsing "
+                                                      (String.^ "'"
+                                                        (String.^
+                                                          ssc_app_name_constant
+                                                          "' ARGS: Incorrect number or wrong type of JSON args (expected [ res1 ; res2 ])"))))
+                                             | _ :: _ =>
+                                               Coq_errC
+                                                 (String.^ "JSON Parsing "
+                                                   (String.^ "'"
+                                                     (String.^
+                                                       ssc_app_name_constant
+                                                       "' ARGS: Incorrect number or wrong type of JSON args (expected [ res1 ; res2 ])"))))))
+                                    | _ =>
+                                      Coq_errC
+                                        (String.^ "JSON Parsing "
+                                          (String.^ "'"
+                                            (String.^ ssc_app_name_constant
+                                              "' ARGS: Incorrect number or wrong type of JSON args (expected [ res1 ; res2 ])")))) end))
+                           | _ =>
+                             Coq_errC
+                               (String.^ "JSON Parsing "
+                                 (String.^ "'"
+                                   (String.^ ssc_app_name_constant
+                                     "' ARGS: Incorrect number or wrong type of JSON args (expected [ res1 ; res2 ])"))))
+                        | False =>
+                          Coq_errC
+                            (String.^ "Invalid "
+                              (String.^ appresult_name_constant
+                                " JSON constructor name"))))))))
+      | _ =>
+        Coq_errC
+          (String.^ "Invalid "
+            (String.^ appresult_name_constant " JSON type")))) end
+
+(** val coq_Jsonifiable_AppResultC :
+    coq_ASP_PARAMS coq_Jsonifiable -> coq_Split coq_Jsonifiable -> coq_RawEv
+    coq_Jsonifiable -> coq_AppResultC coq_Jsonifiable **)
+
+fun coq_Jsonifiable_AppResultC h h0 h1 =
+  Build_Jsonifiable (coq_AppResultC_to_JSON h h0 h1)
+    (coq_AppResultC_from_JSON h h0 h1)

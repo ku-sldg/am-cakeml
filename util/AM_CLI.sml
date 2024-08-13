@@ -17,7 +17,7 @@ structure AM_CLI_Utils = struct
         case (cakeML_JSON_to_coq_JSON js) of
           Coq_errC c => Coq_errC c
         | Coq_resultC js =>
-          let val (Build_Jsonifiable _ from_JSON) = coq_Jsonifiable_Term
+          let val (Build_Jsonifiable _ from_JSON) = concrete_Jsonifiable_Term
           in
             from_JSON js
           end
