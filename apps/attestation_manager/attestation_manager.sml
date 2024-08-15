@@ -59,5 +59,8 @@ fun main () =
   in
     startServer ammconf
   end
+  handle Exception e => TextIO.print_err e 
+          | Word8Extra.InvalidHex => TextIO.print_err "BSTRING UNSHOW ERROR"
+          | _          => TextIO.print_err "Fatal: unknown error!\n"
 
 val () = main ()
