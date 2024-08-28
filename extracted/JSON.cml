@@ -170,3 +170,38 @@ fun map_serial_serial_from_JSON h h0 _ js = case js of
 fun jsonifiable_map_serial_serial h h0 h1 =
   Build_Jsonifiable (map_serial_serial_to_JSON h h1 h0)
     (map_serial_serial_from_JSON h h1 h0)
+
+(** val map_serial_to_JSON :
+    'a1 coq_Stringifiable -> 'a1 coq_EqClass -> 'a2 coq_Jsonifiable -> ('a1,
+    'a2) coq_MapC -> coq_JSON **)
+
+fun map_serial_to_JSON h _ h1 m =
+  JSON_Object
+    (map (fn pat =>
+      let val (k, v) = pat in
+      ((let val Build_Stringifiable to_string _ = h in to_string k end),
+      (let val Build_Jsonifiable to_JSON _ = h1 in to_JSON v end)) end) m)
+
+(** val map_serial_from_JSON :
+    'a1 coq_Stringifiable -> 'a1 coq_EqClass -> 'a2 coq_Jsonifiable ->
+    coq_JSON -> (('a1, 'a2) coq_MapC, string) coq_ResultT **)
+
+fun map_serial_from_JSON h _ h1 js = case js of
+  JSON_Object m =>
+  result_map (fn pat =>
+    let val (k, v) = pat in
+    (case let val Build_Stringifiable _ from_string = h in from_string k end of
+       Coq_errC _ => Coq_errC "Error in jsonifiable_map_serial_json"
+     | Coq_resultC k' =>
+       (case let val Build_Jsonifiable _ from_JSON = h1 in from_JSON v end of
+          Coq_errC _ => Coq_errC "Error in jsonifiable_map_serial_json"
+        | Coq_resultC v' => Coq_resultC (k', v'))) end) m
+| _ => Coq_errC "Error in jsonifiable_map_serial_json"
+
+(** val jsonifiable_map_serial_json :
+    'a1 coq_Stringifiable -> 'a1 coq_EqClass -> 'a2 coq_Jsonifiable -> ('a1,
+    'a2) coq_MapC coq_Jsonifiable **)
+
+fun jsonifiable_map_serial_json h h0 h1 =
+  Build_Jsonifiable (map_serial_to_JSON h h0 h1)
+    (map_serial_from_JSON h h0 h1)

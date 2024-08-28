@@ -1,0 +1,247 @@
+datatype coq_CACL_Permission =
+  CACL_Read 
+| CACL_Write 
+| CACL_Invoke 
+
+(** val eqb_CACL_Permission :
+    coq_CACL_Permission -> coq_CACL_Permission -> bool **)
+
+fun eqb_CACL_Permission a1 a2 =
+  case a1 of
+    CACL_Read => (case a2 of
+                    CACL_Read => True
+                  | _ => False)
+  | CACL_Write => (case a2 of
+                     CACL_Write => True
+                   | _ => False)
+  | CACL_Invoke => (case a2 of
+                      CACL_Invoke => True
+                    | _ => False)
+
+(** val coq_EqClassCACL_Permission :
+    coq_ID_Type coq_EqClass -> coq_CACL_Permission coq_EqClass **)
+
+fun coq_EqClassCACL_Permission _ =
+  eqb_CACL_Permission
+
+type coq_CACL_Access = coq_ID_Type * coq_CACL_Permission
+
+type coq_CACL_Policy = (coq_ID_Type, coq_CACL_Access list) coq_MapC
+
+(** val coq_STR_CACL_Access : string **)
+
+val coq_STR_CACL_Access : string =
+  "CACL_Access"
+
+(** val cacl_read_name_constant : string **)
+
+val cacl_read_name_constant : string =
+  "CACL_Read"
+
+(** val cacl_write_name_constant : string **)
+
+val cacl_write_name_constant : string =
+  "CACL_Write"
+
+(** val cacl_invoke_name_constant : string **)
+
+val cacl_invoke_name_constant : string =
+  "CACL_Invoke"
+
+(** val coq_CACL_Permission_to_JSON : coq_CACL_Permission -> coq_JSON **)
+
+fun coq_CACL_Permission_to_JSON t = case t of
+  CACL_Read =>
+  constructor_to_JSON coq_STR_CACL_Access cacl_read_name_constant []
+| CACL_Write =>
+  constructor_to_JSON coq_STR_CACL_Access cacl_write_name_constant []
+| CACL_Invoke =>
+  constructor_to_JSON coq_STR_CACL_Access cacl_invoke_name_constant []
+
+(** val coq_CACL_Permission_from_JSON_map :
+    (string, coq_JSON -> (coq_CACL_Permission, string) coq_ResultT) coq_MapC **)
+
+val coq_CACL_Permission_from_JSON_map : (string, coq_JSON ->
+                                        (coq_CACL_Permission, string)
+                                        coq_ResultT) coq_MapC =
+  (cacl_read_name_constant,
+    (constructor_from_JSON coq_STR_CACL_Access (fn _ => Coq_resultC
+      CACL_Read))) :: ((cacl_write_name_constant,
+    (constructor_from_JSON coq_STR_CACL_Access (fn _ => Coq_resultC
+      CACL_Write))) :: ((cacl_invoke_name_constant,
+    (constructor_from_JSON coq_STR_CACL_Access (fn _ => Coq_resultC
+      CACL_Invoke))) :: []))
+
+(** val coq_CACL_Permission_from_JSON :
+    coq_JSON -> (coq_CACL_Permission, string) coq_ResultT **)
+
+fun coq_CACL_Permission_from_JSON js =
+  from_JSON_gen coq_STR_CACL_Access coq_CACL_Permission_from_JSON_map js
+
+(** val jsonifiable_CACL_Permission : coq_CACL_Permission coq_Jsonifiable **)
+
+val jsonifiable_CACL_Permission : coq_CACL_Permission coq_Jsonifiable =
+  Build_Jsonifiable coq_CACL_Permission_to_JSON coq_CACL_Permission_from_JSON
+
+(** val coq_Jsonifiable_list_CACL_Access :
+    coq_CACL_Permission coq_Jsonifiable -> coq_CACL_Access list
+    coq_Jsonifiable **)
+
+fun coq_Jsonifiable_list_CACL_Access h =
+  Build_Jsonifiable
+    (map_serial_to_JSON coq_Stringifiable_ID_Type coq_Eq_Class_ID_Type h)
+    (map_serial_from_JSON coq_Stringifiable_ID_Type coq_Eq_Class_ID_Type h)
+
+(** val eqb_CACL_Access :
+    coq_ID_Type coq_EqClass -> coq_CACL_Access -> coq_CACL_Access -> bool **)
+
+fun eqb_CACL_Access h a1 a2 =
+  eqbPair h (coq_EqClassCACL_Permission h) a1 a2
+
+(** val coq_EqClassCACL_Access :
+    coq_ID_Type coq_EqClass -> coq_CACL_Access coq_EqClass **)
+
+val coq_EqClassCACL_Access : (coq_ID_Type coq_EqClass -> coq_CACL_Access
+                             coq_EqClass) =
+  eqb_CACL_Access
+
+(** val coq_CACL_Access_list_union :
+    coq_CACL_Access list -> coq_CACL_Access list -> coq_CACL_Access list **)
+
+fun coq_CACL_Access_list_union l1 l2 =
+  manset_union (coq_EqClassCACL_Access coq_Eq_Class_ID_Type)
+    (list_to_manset (coq_EqClassCACL_Access coq_Eq_Class_ID_Type) l1) l2
+
+(** val coq_CACL_policy_union'' :
+    coq_ID_Type -> coq_CACL_Access list -> coq_CACL_Policy -> coq_CACL_Policy **)
+
+fun coq_CACL_policy_union'' p ls e2 =
+  case map_get coq_Eq_Class_ID_Type e2 p of
+    Some ls' =>
+    let val new_man = coq_CACL_Access_list_union ls ls' in
+    map_set coq_Eq_Class_ID_Type e2 p new_man end
+  | None => map_set coq_Eq_Class_ID_Type e2 p ls
+
+(** val coq_CACL_policy_union_helper :
+    (coq_ID_Type * coq_CACL_Access list) -> coq_CACL_Policy -> coq_CACL_Policy **)
+
+fun coq_CACL_policy_union_helper pr e2 =
+  coq_CACL_policy_union'' (fst pr) (snd pr) e2
+
+(** val coq_CACL_policy_union :
+    coq_CACL_Policy -> coq_CACL_Policy -> coq_CACL_Policy **)
+
+fun coq_CACL_policy_union p1 p2 =
+  fold_right coq_CACL_policy_union_helper p2 p1
+
+(** val default_CACL_Policy : (string * coq_CACL_Access list) list **)
+
+val default_CACL_Policy : (string * coq_CACL_Access list) list =
+  ("", []) :: []
+
+(** val coq_P0 : coq_Plc **)
+
+val coq_P0 : coq_Plc =
+  "P0"
+
+(** val coq_P1 : coq_Plc **)
+
+val coq_P1 : coq_Plc =
+  "P1"
+
+(** val coq_P2 : coq_Plc **)
+
+val coq_P2 : coq_Plc =
+  "P2"
+
+(** val attest_id : coq_ASP_ID **)
+
+val attest_id : coq_ASP_ID =
+  "attest_id"
+
+(** val appraise_id : coq_ASP_ID **)
+
+val appraise_id : coq_ASP_ID =
+  "appraise_id"
+
+(** val certificate_id : coq_ASP_ID **)
+
+val certificate_id : coq_ASP_ID =
+  "certificate_id"
+
+(** val sig_id : coq_ASP_ID **)
+
+val sig_id : coq_ASP_ID =
+  "sig_id"
+
+(** val hsh_id : coq_ASP_ID **)
+
+val hsh_id : coq_ASP_ID =
+  "hsh_id"
+
+(** val enc_id : coq_ASP_ID **)
+
+val enc_id : coq_ASP_ID =
+  "enc_id"
+
+(** val sys_targ : coq_TARG_ID **)
+
+val sys_targ : coq_TARG_ID =
+  "sys_targ"
+
+(** val certificate_style : coq_Term **)
+
+val certificate_style : coq_Term =
+  Coq_att coq_P1 (Coq_lseq (Coq_asp (ASPC ALL (EXTD (S O)) (Coq_asp_paramsC
+    attest_id [] coq_P1 sys_targ))) (Coq_att coq_P2 (Coq_lseq (Coq_asp (ASPC
+    ALL (EXTD (S O)) (Coq_asp_paramsC appraise_id [] coq_P2 sys_targ)))
+    (Coq_asp (ASPC ALL (EXTD (S O)) (Coq_asp_paramsC certificate_id [] coq_P2
+    sys_targ))))))
+
+(** val coq_CACL_policy_generator_ASP :
+    coq_ASP -> coq_Plc -> coq_CACL_Policy **)
+
+fun coq_CACL_policy_generator_ASP a p =
+  case a of
+    ASPC _ _ a0 =>
+    let val Coq_asp_paramsC aid _ _ targid = a0 in
+    (p, ((aid, CACL_Invoke) :: [])) :: ((aid, ((targid,
+    CACL_Read) :: [])) :: []) end
+  | SIG => (p, ((sig_id, CACL_Invoke) :: [])) :: []
+  | HSH => (p, ((hsh_id, CACL_Invoke) :: [])) :: []
+  | ENC _ => (p, ((enc_id, CACL_Invoke) :: [])) :: []
+  | _ => default_CACL_Policy
+
+(** val coq_CACL_policy_generator' :
+    coq_Term -> coq_Plc -> coq_CACL_Policy -> coq_CACL_Policy **)
+
+fun coq_CACL_policy_generator' t p pol =
+  case t of
+    Coq_asp a => coq_CACL_policy_union pol (coq_CACL_policy_generator_ASP a p)
+  | Coq_att q t' => coq_CACL_policy_generator' t' q pol
+  | Coq_lseq t1 t2 =>
+    coq_CACL_policy_generator' t2 p (coq_CACL_policy_generator' t1 p pol)
+  | Coq_bseq _ t1 t2 =>
+    coq_CACL_policy_generator' t2 p (coq_CACL_policy_generator' t1 p pol)
+  | Coq_bpar _ t1 t2 =>
+    coq_CACL_policy_generator' t2 p (coq_CACL_policy_generator' t1 p pol)
+
+(** val coq_CACL_policy_generator : coq_Term -> coq_Plc -> coq_CACL_Policy **)
+
+fun coq_CACL_policy_generator t p =
+  coq_CACL_policy_generator' t p []
+
+(** val test_cacl_compute : coq_CACL_Policy **)
+
+val test_cacl_compute : coq_CACL_Policy =
+  coq_CACL_policy_generator certificate_style coq_P0
+
+(** val test_cacl_compute_json : coq_JSON **)
+
+val test_cacl_compute_json : coq_JSON =
+  let val Build_Jsonifiable to_JSON _ =
+    jsonifiable_map_serial_json coq_Stringifiable_ID_Type
+      coq_Eq_Class_ID_Type
+      (coq_Jsonifiable_list_CACL_Access jsonifiable_CACL_Permission)
+  in
+  to_JSON test_cacl_compute end

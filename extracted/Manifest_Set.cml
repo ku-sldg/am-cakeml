@@ -9,6 +9,17 @@ fun manset_add hA a s = case s of
                True => s
              | False => h :: (manset_add hA a t))
 
+(** val list_to_manset' : 'a1 coq_EqClass -> 'a1 list -> 'a1 manifest_set **)
+
+fun list_to_manset' hA l = case l of
+  [] => []
+| h :: t => manset_add hA h (list_to_manset' hA t)
+
+(** val list_to_manset : 'a1 coq_EqClass -> 'a1 list -> 'a1 manifest_set **)
+
+fun list_to_manset hA l =
+  rev (list_to_manset' hA l)
+
 (** val in_dec_set : 'a1 coq_EqClass -> 'a1 -> 'a1 manifest_set -> bool **)
 
 fun in_dec_set hA a s =

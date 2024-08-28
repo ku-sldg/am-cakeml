@@ -68,9 +68,10 @@ get_files(copland_am_src
 
     stubs/Params_Admits.sml
     stubs/Manifest_Admits.sml
+    extracted/Manifest_Set.cml
 
     extracted/Term_Defs.cml
-    extracted/Manifest_Set.cml
+    extracted/CACL.cml
     extracted/Manifest.cml
     extracted/Attestation_Session.cml
     extracted/Interface_Types.cml

@@ -14,6 +14,13 @@ fun write_term_to_file (term : coq_Term) (filename : string) =
     TextIOExtra.writeFile filename json_str
   end
 
+fun print_coq_CACL_Policy (js:coq_JSON) = 
+      print (coq_JSON_to_string js)
+(*
+  case (p) of 
+    [(a,b);
+  *)
+
 fun main () =
   case (CommandLine.arguments()) of
     argList =>
@@ -37,7 +44,9 @@ fun main () =
               | None => 
                   raise (Exception ("TermToJson Argument Error - Unknown term identifier: \"" ^ termName ^ "\"\n" ^ usage))
         in
-          write_term_to_file outTerm outFile
+          let val _ = (print_coq_CACL_Policy test_cacl_compute_json) in 
+            write_term_to_file outTerm outFile
+          end
         end
     end
     handle Exception e => TextIO.print_err e 
