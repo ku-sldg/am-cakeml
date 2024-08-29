@@ -29,9 +29,9 @@ get_files(termToJson_src
   ../../stubs/Params_Admits.sml
 
   ../../extracted/Term_Defs.cml
+   ../../extracted/Flexible_Mechanisms_Vars.cml
+  ../../extracted/Flexible_Mechanisms.cml
   ../../extracted/Manifest_Set.cml
   ../../extracted/CACL.cml
-  ../../extracted/Flexible_Mechanisms_Vars.cml
-  ../../extracted/Flexible_Mechanisms.cml
   term_to_json.sml)
 build_binary("term_to_json" ${termToJson_src})

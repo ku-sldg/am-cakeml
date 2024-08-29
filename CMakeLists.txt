@@ -71,6 +71,8 @@ get_files(copland_am_src
     extracted/Manifest_Set.cml
 
     extracted/Term_Defs.cml
+    extracted/Flexible_Mechanisms_Vars.cml
+    extracted/Flexible_Mechanisms.cml
     extracted/CACL.cml
     extracted/Manifest.cml
     extracted/Attestation_Session.cml
@@ -105,8 +107,6 @@ get_files(copland_am_src
     extracted/Appraisal_Defs.cml
     extracted/Impl_appraisal.cml
     extracted/AM_Json_Interfaces.cml
-    extracted/Flexible_Mechanisms_Vars.cml
-    extracted/Flexible_Mechanisms.cml
     extracted/Client_AM.cml
     extracted/Server_AM.cml
     extracted/Concrete_Extractables.cml
