@@ -43,30 +43,10 @@ val certificate_id : coq_ASP_ID =
 val hashfile_id : coq_ASP_ID =
   "hashfile_id"
 
-(** val query_kim_id : coq_ASP_ID **)
-
-val query_kim_id : coq_ASP_ID =
-  "query_kim_id"
-
-(** val meas_cds_id : coq_ASP_ID **)
-
-val meas_cds_id : coq_ASP_ID =
-  "meas_cds_id"
-
-(** val appr_cds_id : coq_ASP_ID **)
-
-val appr_cds_id : coq_ASP_ID =
-  "appr_cds_id"
-
 (** val sys_targ : coq_TARG_ID **)
 
 val sys_targ : coq_TARG_ID =
   "sys_targ"
-
-(** val cds_targ : coq_TARG_ID **)
-
-val cds_targ : coq_TARG_ID =
-  "cds_targ"
 
 (** val att_targ : coq_TARG_ID **)
 

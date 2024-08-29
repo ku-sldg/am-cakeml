@@ -139,11 +139,6 @@ fun coq_CACL_policy_union p1 p2 =
 val default_CACL_Policy : (string * coq_CACL_Access list) list =
   ("", []) :: []
 
-(** val coq_P0 : coq_Plc **)
-
-val coq_P0 : coq_Plc =
-  "P0"
-
 (** val sig_id : coq_ASP_ID **)
 
 val sig_id : coq_ASP_ID =
@@ -191,18 +186,3 @@ fun coq_CACL_policy_generator' t p pol =
 
 fun coq_CACL_policy_generator t p =
   coq_CACL_policy_generator' t p []
-
-(** val test_cacl_compute : coq_CACL_Policy **)
-
-val test_cacl_compute : coq_CACL_Policy =
-  coq_CACL_policy_generator cds_demo_phrase coq_P0
-
-(** val test_cacl_compute_json : coq_JSON **)
-
-val test_cacl_compute_json : coq_JSON =
-  let val Build_Jsonifiable to_JSON _ =
-    jsonifiable_map_serial_json coq_Stringifiable_ID_Type
-      coq_Eq_Class_ID_Type
-      (coq_Jsonifiable_list_CACL_Access jsonifiable_CACL_Permission)
-  in
-  to_JSON test_cacl_compute end

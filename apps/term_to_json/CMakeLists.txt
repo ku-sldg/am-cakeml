@@ -33,5 +33,6 @@ get_files(termToJson_src
   ../../extracted/Flexible_Mechanisms.cml
   ../../extracted/Manifest_Set.cml
   ../../extracted/CACL.cml
+  ../../extracted/CACL_Demo.cml
   term_to_json.sml)
 build_binary("term_to_json" ${termToJson_src})
