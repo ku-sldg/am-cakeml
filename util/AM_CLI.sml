@@ -63,12 +63,23 @@ structure AM_CLI_Utils = struct
   
   fun retrieve_Client_AM_CLI_args _ =
     let val name = CommandLine.name ()
-        val usage = ("Usage: " ^ name ^ " -t <term_file>.json -s <att_session.json>\n\ne.g.\t" ^ name ^ " -t cert.json -s my_session.json\n\n")
+        val usage = ("Usage: " ^ name ^ " -t <term_file>.json -s <att_session.json> [-att <IP>:<PORT> (default=localhost:5000)] [-app <IP>:<PORT> (default=localhost:5003)] [-fromPlc <Plc> (default=TOP_PLC)] [-toPlc <Plc> (default=P0)]\n\ne.g.\t" ^ name ^ " -t cert.json -s my_session.json -app localhost:5042\n\n")
         val argList = CommandLine.arguments ()
         val termInd        = ListExtra.find_index argList "-t"
         val sessInd        = ListExtra.find_index argList "-s"
-        val termIndBool   = argIndPresent termInd
-        val sessIndBool   = argIndPresent sessInd
+        val attInd         = ListExtra.find_index argList  "-att"
+        val appInd         = ListExtra.find_index argList  "-app"
+        val fromInd        = ListExtra.find_index argList  "-fromPlc"
+        val toInd          = ListExtra.find_index argList  "-toPlc"
+
+
+        val termIndBool    = argIndPresent termInd
+        val sessIndBool    = argIndPresent sessInd
+        val attIndBool     = argIndPresent attInd
+        val appIndBool     = argIndPresent appInd
+        val fromIndBool    = argIndPresent fromInd
+        val toIndBool      = argIndPresent toInd
+
     in 
     (
     if ((termIndBool = False) orelse (sessIndBool = False))
@@ -82,7 +93,34 @@ structure AM_CLI_Utils = struct
           | Coq_resultC term =>
             (case (parse_att_session_from_file sessFileName) of
               Coq_errC e => raise (Exception ("Could not parse Attestation Session from Json: " ^ e ^ "\n"))
-            | Coq_resultC sess => (term, sess)
+            | Coq_resultC sess => 
+              let val att_UUID = 
+              (
+                if (attIndBool)
+                then List.nth argList (attInd + 1)
+                else "localhost:5000"
+              )
+                  val app_UUID = 
+              (
+                if (appIndBool)
+                then List.nth argList (appInd + 1)
+                else "localhost:5003"
+              ) 
+                  val from_place = 
+              (
+                if (fromIndBool)
+                then List.nth argList (fromInd + 1)
+                else "TOP_PLC"
+              ) 
+                  val to_place = 
+              (
+                if (toIndBool)
+                then List.nth argList (toInd + 1)
+                else "P0"
+              ) in 
+            
+                (term, sess, att_UUID, app_UUID, from_place, to_place)
+              end
             )
           )
       end
