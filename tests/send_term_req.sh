@@ -50,4 +50,4 @@ JSON_TERM_DATA=$(cat "$JSON_TERM_FILE")
 JSON_SESS_DATA=$(cat "$JSON_SESS_FILE")
 
 # Send JSON data to the specified host and port
-echo -e "{ \"TYPE\": \"REQUEST\", \"ACTION\": \"RUN\", \"ATTESTATION_SESSION\": $JSON_SESS_DATA, \"REQ_PLC\": \"TOP_PLC\", \"TERM\": $JSON_TERM_DATA, \"RAWEV\": { \"RawEv\": [] } }" | nc $HOST $PORT
+echo -e "{ \"TYPE\": \"REQUEST\", \"ACTION\": \"RUN\", \"ATTESTATION_SESSION\": $JSON_SESS_DATA, \"REQ_PLC\": \"TOP_PLC\", \"TERM\": $JSON_TERM_DATA, \"EVIDENCE\": [ { \"RawEv\": [] }, { \"EvidenceT_CONSTRUCTOR\": \"mt_evt\" } ] }" | nc $HOST $PORT

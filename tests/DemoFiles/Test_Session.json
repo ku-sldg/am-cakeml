@@ -1,14 +1,64 @@
 {
-	"Session_Plc": "P0",
-	"Plc_Mapping": {
-		"P0": "localhost:5000",
-		"P1": "localhost:5001",
-		"P2": "localhost:5002",
-		"P3": "localhost:5003",
-		"P4": "localhost:5004",
-		"P5": "localhost:5005",
-		"P6": "localhost:5006"
-	},
-	"PubKey_Mapping": {
-	}
+  "Session_Plc": "P0",
+  "Plc_Mapping": {
+    "P0": "localhost:5000",
+    "P1": "localhost:5001",
+    "P2": "localhost:5002",
+    "P3": "localhost:5003",
+    "P4": "localhost:5004",
+    "P5": "localhost:5005",
+    "P6": "localhost:5006"
+  },
+  "PubKey_Mapping": {},
+  "Session_Context": {
+    "ASP_Types": {
+      "sig_id": {
+        "FWD": "EXTEND",
+        "EvInSig": "ALL",
+        "EvOutSig": {
+          "EvOutSig_CONSTRUCTOR": "OutN",
+          "EvOutSig_BODY": "1"
+        }
+      },
+      "hashfile_id": {
+        "FWD": "EXTEND",
+        "EvInSig": "NONE",
+        "EvOutSig": {
+          "EvOutSig_CONSTRUCTOR": "OutN",
+          "EvOutSig_BODY": "1"
+        }
+      },
+      "attest_id": {
+        "FWD": "EXTEND",
+        "EvInSig": "ALL",
+        "EvOutSig": {
+          "EvOutSig_CONSTRUCTOR": "OutN",
+          "EvOutSig_BODY": "1"
+        }
+      },
+      "certificate_id": {
+        "FWD": "EXTEND",
+        "EvInSig": "NONE",
+        "EvOutSig": {
+          "EvOutSig_CONSTRUCTOR": "OutN",
+          "EvOutSig_BODY": "1"
+        }
+      },
+      "appraise_id": {
+        "FWD": "EXTEND",
+        "EvInSig": "ALL",
+        "EvOutSig": {
+          "EvOutSig_CONSTRUCTOR": "OutN",
+          "EvOutSig_BODY": "1"
+        }
+      }
+    },
+    "ASP_Comps": {
+      "sig_id": "certificate_id",
+      "hashfile_id": "appraise_id",
+      "attest_id": "appraise_id",
+      "appraise_id": "appraise_id",
+      "certificate_id": "appraise_id"
+    }
+  }
 }
