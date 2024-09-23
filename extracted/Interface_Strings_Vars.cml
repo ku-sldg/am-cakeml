@@ -48,11 +48,6 @@ val coq_STR_RUN : string =
 val coq_STR_NEGOTIATE : string =
   "NEGOTIATE"
 
-(** val coq_STR_APPRAISE : string **)
-
-val coq_STR_APPRAISE : string =
-  "APPRAISE"
-
 (** val coq_STR_REQUEST : string **)
 
 val coq_STR_REQUEST : string =
@@ -97,3 +92,23 @@ val coq_STR_ASP_PLC : string =
 
 val coq_STR_ASP_TARG_ID : string =
   "ASP_TARG_ID"
+
+(** val coq_STR_Session_Plc : string **)
+
+val coq_STR_Session_Plc : string =
+  "Session_Plc"
+
+(** val coq_STR_Plc_Mapping : string **)
+
+val coq_STR_Plc_Mapping : string =
+  "Plc_Mapping"
+
+(** val coq_STR_PubKey_Mapping : string **)
+
+val coq_STR_PubKey_Mapping : string =
+  "PubKey_Mapping"
+
+(** val coq_STR_Session_Context : string **)
+
+val coq_STR_Session_Context : string =
+  "Session_Context"

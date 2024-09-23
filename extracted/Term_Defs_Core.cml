@@ -6,25 +6,39 @@ type coq_Event_ID = nat
 
 type coq_ASP_ID = coq_ID_Type
 
-type coq_TARG_ID = coq_ID_Type
+type coq_ASP_Compat_MapT = (coq_ASP_ID, coq_ASP_ID) coq_Map
 
-type coq_ASP_ARGS = (string, string) coq_MapC
+type coq_ASP_ARGS = (string, string) coq_Map
+
+type coq_TARG_ID = coq_ID_Type
 
 datatype coq_ASP_PARAMS =
   Coq_asp_paramsC coq_ASP_ID coq_ASP_ARGS coq_Plc coq_TARG_ID
 
 datatype coq_FWD =
-  COMP 
-| ENCR 
-| EXTD nat
-| KILL 
-| KEEP 
+  REPLACE 
+| WRAP 
+| UNWRAP 
+| EXTEND 
 
-datatype coq_Evidence =
-  Coq_mt 
-| Coq_nn coq_N_ID
-| Coq_uu coq_Plc coq_FWD coq_ASP_PARAMS coq_Evidence
-| Coq_ss coq_Evidence coq_Evidence
+datatype coq_EvInSig =
+  InAll 
+| InNone 
+
+datatype coq_EvOutSig =
+  OutN nat
+| OutUnwrap 
+
+datatype coq_EvSig =
+  Coq_ev_arrow coq_FWD coq_EvInSig coq_EvOutSig
+
+datatype coq_EvidenceT =
+  Coq_mt_evt 
+| Coq_nonce_evt coq_N_ID
+| Coq_asp_evt coq_Plc coq_ASP_PARAMS coq_EvidenceT
+| Coq_left_evt coq_EvidenceT
+| Coq_right_evt coq_EvidenceT
+| Coq_split_evt coq_EvidenceT coq_EvidenceT
 
 datatype coq_SP =
   ALL 
@@ -32,11 +46,16 @@ datatype coq_SP =
 
 datatype coq_ASP =
   NULL 
-| CPY 
-| ASPC coq_SP coq_FWD coq_ASP_PARAMS
+| ASPC coq_ASP_PARAMS
 | SIG 
 | HSH 
+| APPR 
 | ENC coq_Plc
+
+type coq_ASP_Type_Env = (coq_ASP_ID, coq_EvSig) coq_Map
+
+datatype coq_GlobalContext =
+  Build_GlobalContext coq_ASP_Type_Env coq_ASP_Compat_MapT
 
 type coq_Split = coq_SP * coq_SP
 
@@ -47,27 +66,245 @@ datatype coq_Term =
 | Coq_bseq coq_Split coq_Term coq_Term
 | Coq_bpar coq_Split coq_Term coq_Term
 
-datatype coq_ASP_Core =
-  NULLC 
-| CLEAR 
-| CPYC 
-| ASPCC coq_FWD coq_ASP_PARAMS
+(** val apply_to_left_evt :
+    coq_GlobalContext -> (coq_EvidenceT -> 'a1) -> coq_EvidenceT -> ('a1,
+    string) coq_ResultT **)
 
-type coq_Loc = nat
+fun apply_to_left_evt g f e = case e of
+  Coq_asp_evt _ a0 e0 =>
+  let val Coq_asp_paramsC a' _ _ _ = a0 in
+  (case e0 of
+     Coq_asp_evt _ a2 e' =>
+     let val Coq_asp_paramsC a _ _ _ = a2 in
+     (case map_get coq_Eq_Class_ID_Type a
+             (let val Build_GlobalContext _ asp_comps = g in asp_comps end) of
+        Some a'' =>
+        (case eqb coq_Eq_Class_ID_Type a' a'' of
+           True =>
+           (case map_get coq_Eq_Class_ID_Type a
+                   (let val Build_GlobalContext asp_types _ = g in
+                    asp_types end) of
+              Some e1 =>
+              let val Coq_ev_arrow f0 _ _ = e1 in
+              (case f0 of
+                 WRAP =>
+                 (case map_get coq_Eq_Class_ID_Type a'
+                         (let val Build_GlobalContext asp_types _ = g in
+                          asp_types end) of
+                    Some e2 =>
+                    let val Coq_ev_arrow f1 _ _ = e2 in
+                    (case f1 of
+                       UNWRAP => apply_to_left_evt g f e'
+                     | _ => Coq_errC err_str_appr_asp_not_unwrap) end
+                  | None => Coq_errC err_str_asp_no_type_sig)
+               | _ => Coq_errC err_str_asp_is_not_wrap) end
+            | None => Coq_errC err_str_asp_no_type_sig)
+         | False => Coq_errC err_str_asps_not_duals)
+      | None => Coq_errC err_str_asp_no_compat_appr_asp) end
+   | _ => Coq_errC err_str_no_possible_left_evt) end
+| Coq_split_evt e1 _ => Coq_resultC (f e1)
+| _ => Coq_errC err_str_no_possible_left_evt
 
-datatype coq_Core_Term =
-  Coq_aspc coq_ASP_Core
-| Coq_attc coq_Plc coq_Term
-| Coq_lseqc coq_Core_Term coq_Core_Term
-| Coq_bseqc coq_Core_Term coq_Core_Term
-| Coq_bparc coq_Loc coq_Core_Term coq_Core_Term
+(** val apply_to_right_evt :
+    coq_GlobalContext -> (coq_EvidenceT -> 'a1) -> coq_EvidenceT -> ('a1,
+    string) coq_ResultT **)
+
+fun apply_to_right_evt g f e = case e of
+  Coq_asp_evt _ a0 e0 =>
+  let val Coq_asp_paramsC a' _ _ _ = a0 in
+  (case e0 of
+     Coq_asp_evt _ a2 e' =>
+     let val Coq_asp_paramsC a _ _ _ = a2 in
+     (case map_get coq_Eq_Class_ID_Type a
+             (let val Build_GlobalContext _ asp_comps = g in asp_comps end) of
+        Some a'' =>
+        (case eqb coq_Eq_Class_ID_Type a' a'' of
+           True =>
+           (case map_get coq_Eq_Class_ID_Type a
+                   (let val Build_GlobalContext asp_types _ = g in
+                    asp_types end) of
+              Some e1 =>
+              let val Coq_ev_arrow f0 _ _ = e1 in
+              (case f0 of
+                 WRAP =>
+                 (case map_get coq_Eq_Class_ID_Type a'
+                         (let val Build_GlobalContext asp_types _ = g in
+                          asp_types end) of
+                    Some e2 =>
+                    let val Coq_ev_arrow f1 _ _ = e2 in
+                    (case f1 of
+                       UNWRAP => apply_to_right_evt g f e'
+                     | _ => Coq_errC err_str_appr_asp_not_unwrap) end
+                  | None => Coq_errC err_str_asp_no_type_sig)
+               | _ => Coq_errC err_str_asp_is_not_wrap) end
+            | None => Coq_errC err_str_asp_no_type_sig)
+         | False => Coq_errC err_str_asps_not_duals)
+      | None => Coq_errC err_str_asp_no_compat_appr_asp) end
+   | _ => Coq_errC err_str_no_possible_right_evt) end
+| Coq_split_evt _ e2 => Coq_resultC (f e2)
+| _ => Coq_errC err_str_no_possible_right_evt
+
+(** val get_asp_under :
+    coq_GlobalContext -> coq_EvidenceT -> (coq_EvidenceT, string) coq_ResultT **)
+
+fun get_asp_under g e = case e of
+  Coq_asp_evt _ a et' =>
+  let val Coq_asp_paramsC top_id _ _ _ = a in
+  (case map_get coq_Eq_Class_ID_Type top_id
+          (let val Build_GlobalContext asp_types _ = g in asp_types end) of
+     Some e0 =>
+     let val Coq_ev_arrow fwd _ _ = e0 in
+     (case fwd of
+        UNWRAP =>
+        (case et' of
+           Coq_asp_evt _ a0 et'' =>
+           let val Coq_asp_paramsC bury_id _ _ _ = a0 in
+           (case map_get coq_Eq_Class_ID_Type bury_id
+                   (let val Build_GlobalContext _ asp_comps = g in
+                    asp_comps end) of
+              Some bury_id' =>
+              (case eqb coq_Eq_Class_ID_Type top_id bury_id' of
+                 True =>
+                 (case map_get coq_Eq_Class_ID_Type bury_id
+                         (let val Build_GlobalContext asp_types _ = g in
+                          asp_types end) of
+                    Some e1 =>
+                    let val Coq_ev_arrow fwd' _ _ = e1 in
+                    (case fwd' of
+                       WRAP => get_asp_under g et''
+                     | _ => Coq_errC err_str_asp_under_unwrap) end
+                  | None => Coq_errC err_str_asp_no_type_sig)
+               | False => Coq_errC err_str_wrap_asp_not_duals)
+            | None => Coq_errC err_str_asp_no_compat_appr_asp) end
+         | _ => Coq_errC err_str_unwrap_only_asp)
+      | _ => Coq_resultC e) end
+   | None => Coq_errC err_str_asp_no_type_sig) end
+| Coq_left_evt et' =>
+  res_bind (apply_to_left_evt g (get_asp_under g) et') (fn r => r)
+| Coq_right_evt et' =>
+  res_bind (apply_to_right_evt g (get_asp_under g) et') (fn r => r)
+| _ => Coq_errC err_str_no_asp_under_evidence
+
+(** val apply_to_asp_under_wrap :
+    coq_GlobalContext -> coq_ASP_ID -> (coq_EvidenceT -> 'a1) ->
+    coq_EvidenceT -> ('a1, string) coq_ResultT **)
+
+fun apply_to_asp_under_wrap g unwrap_id f e = case e of
+  Coq_asp_evt _ a et' =>
+  let val Coq_asp_paramsC top_id _ _ _ = a in
+  (case map_get coq_Eq_Class_ID_Type top_id
+          (let val Build_GlobalContext asp_types _ = g in asp_types end) of
+     Some e0 =>
+     let val Coq_ev_arrow f0 _ _ = e0 in
+     (case f0 of
+        WRAP =>
+        (case map_get coq_Eq_Class_ID_Type top_id
+                (let val Build_GlobalContext _ asp_comps = g in asp_comps end) of
+           Some unwrapper_id =>
+           (case eqb coq_Eq_Class_ID_Type unwrapper_id unwrap_id of
+              True => Coq_resultC (f e)
+            | False => Coq_errC err_str_wrap_asp_not_duals)
+         | None => Coq_errC err_str_asp_no_compat_appr_asp)
+      | UNWRAP =>
+        (case et' of
+           Coq_asp_evt _ a0 et'' =>
+           let val Coq_asp_paramsC bury_id _ _ _ = a0 in
+           (case map_get coq_Eq_Class_ID_Type bury_id
+                   (let val Build_GlobalContext _ asp_comps = g in
+                    asp_comps end) of
+              Some bury_id' =>
+              (case eqb coq_Eq_Class_ID_Type top_id bury_id' of
+                 True =>
+                 (case map_get coq_Eq_Class_ID_Type bury_id
+                         (let val Build_GlobalContext asp_types _ = g in
+                          asp_types end) of
+                    Some e1 =>
+                    let val Coq_ev_arrow f1 _ _ = e1 in
+                    (case f1 of
+                       WRAP => apply_to_asp_under_wrap g unwrap_id f et''
+                     | _ => Coq_errC err_str_asp_under_unwrap) end
+                  | None => Coq_errC err_str_asp_no_type_sig)
+               | False => Coq_errC err_str_wrap_asp_not_duals)
+            | None => Coq_errC err_str_asp_no_compat_appr_asp) end
+         | _ => Coq_errC err_str_unwrap_only_asp)
+      | _ => Coq_errC err_str_asp_at_bottom_not_wrap) end
+   | None => Coq_errC err_str_asp_no_type_sig) end
+| Coq_left_evt et' =>
+  res_bind (apply_to_left_evt g (apply_to_asp_under_wrap g unwrap_id f) et')
+    (fn r => r)
+| Coq_right_evt et' =>
+  res_bind (apply_to_right_evt g (apply_to_asp_under_wrap g unwrap_id f) et')
+    (fn r => r)
+| _ => Coq_errC err_str_no_asp_under_evidence
+
+(** val et_size :
+    coq_GlobalContext -> coq_EvidenceT -> (nat, string) coq_ResultT **)
+
+fun et_size g e = case e of
+  Coq_mt_evt => Coq_resultC O
+| Coq_nonce_evt _ => Coq_resultC (S O)
+| Coq_asp_evt _ par e' =>
+  let val Coq_asp_paramsC asp_id _ _ _ = par in
+  (case map_get coq_Eq_Class_ID_Type asp_id
+          (let val Build_GlobalContext asp_types _ = g in asp_types end) of
+     Some e0 =>
+     let val Coq_ev_arrow fwd _ out_sig = e0 in
+     (case fwd of
+        UNWRAP =>
+        (case out_sig of
+           OutN _ => Coq_errC err_str_unwrap_must_have_outwrap
+         | OutUnwrap =>
+           (case e' of
+              Coq_asp_evt _ a e'' =>
+              let val Coq_asp_paramsC asp_id' _ _ _ = a in
+              (case map_get coq_Eq_Class_ID_Type asp_id'
+                      (let val Build_GlobalContext asp_types _ = g in
+                       asp_types end) of
+                 Some e1 =>
+                 let val Coq_ev_arrow f in_sig' _ = e1 in
+                 (case f of
+                    WRAP =>
+                    (case in_sig' of
+                       InAll =>
+                       res_bind (et_size g e'') (fn n' => Coq_resultC n')
+                     | InNone => Coq_resultC O)
+                  | _ => Coq_errC err_str_unwrap_only_wrap) end
+               | None => Coq_errC err_str_asp_no_type_sig) end
+            | _ => Coq_errC err_str_unwrap_only_asp))
+      | EXTEND =>
+        (case out_sig of
+           OutN n => res_bind (et_size g e') (fn n' => Coq_resultC (add n n'))
+         | OutUnwrap => Coq_errC err_str_cannot_have_outwrap)
+      | _ =>
+        (case out_sig of
+           OutN n => Coq_resultC n
+         | OutUnwrap => Coq_errC err_str_cannot_have_outwrap)) end
+   | None => Coq_errC err_str_asp_no_type_sig) end
+| Coq_left_evt e' => res_bind (apply_to_left_evt g (et_size g) e') (fn r => r)
+| Coq_right_evt e' =>
+  res_bind (apply_to_right_evt g (et_size g) e') (fn r => r)
+| Coq_split_evt e1 e2 =>
+  res_bind (et_size g e1) (fn s1 =>
+    res_bind (et_size g e2) (fn s2 => Coq_resultC (add s1 s2)))
 
 type coq_RawEv = coq_BS list
 
-datatype coq_AppResultC =
-  Coq_mtc_app 
-| Coq_nnc_app coq_N_ID coq_BS
-| Coq_ggc_app coq_Plc coq_ASP_PARAMS coq_RawEv coq_AppResultC
-| Coq_hhc_app coq_Plc coq_ASP_PARAMS coq_BS coq_AppResultC
-| Coq_eec_app coq_Plc coq_ASP_PARAMS coq_BS coq_AppResultC
-| Coq_ssc_app coq_AppResultC coq_AppResultC
+datatype coq_Evidence =
+  Coq_evc coq_RawEv coq_EvidenceT
+
+(** val mt_evc : coq_Evidence **)
+
+val mt_evc : coq_Evidence =
+  Coq_evc [] Coq_mt_evt
+
+(** val get_et : coq_Evidence -> coq_EvidenceT **)
+
+fun get_et e = case e of
+  Coq_evc _ et => et
+
+(** val get_bits : coq_Evidence -> coq_BS list **)
+
+fun get_bits e = case e of
+  Coq_evc ls _ => ls
+
+type coq_Loc = nat

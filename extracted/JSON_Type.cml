@@ -1,5 +1,5 @@
 datatype coq_JSON =
-  JSON_Object ((string, coq_JSON) coq_MapC)
+  JSON_Object ((string, coq_JSON) coq_Map)
 | JSON_Array (coq_JSON list)
 | JSON_String string
 | JSON_Boolean bool

@@ -1,16 +1,8 @@
 
   
-fun write_evidence_to_file (term : coq_Evidence) (filename : string) =
+fun write_evidence_to_file (term : coq_EvidenceT) (filename : string) =
   let
-    val (Build_Jsonifiable to_JSON _) = (coq_Jsonifiable_Evidence
-                         (jsonifiable_map_serial_serial
-                           coq_Stringifiable_ID_Type coq_Eq_Class_ID_Type
-                           coq_Stringifiable_ID_Type) coq_Jsonifiable_FWD
-                         coq_Jsonifiable_nat
-                         (coq_Jsonifiable_ASP_Params
-                           (jsonifiable_map_serial_serial
-                             coq_Stringifiable_ID_Type coq_Eq_Class_ID_Type
-                             coq_Stringifiable_ID_Type)))
+    val (Build_Jsonifiable to_JSON _) = concrete_Jsonifiable_EvidenceT
     val coq_json = to_JSON term
     val json_str = coq_JSON_to_string coq_json
   in
@@ -34,9 +26,15 @@ fun main () =
       else
         let val termName  = List.nth argList (termInd + 1) 
             val outFile   = List.nth argList (outFileInd + 1)
+            val glob_context = Build_GlobalContext [] []
             val outEvid   = 
-            case map_get coq_Eq_Class_ID_Type full_flexible_mechanisms termName of
-              Some term_ev_pair => snd term_ev_pair
+            case map_get coq_Eq_Class_ID_Type termName (full_flexible_mechanisms glob_context) of
+              Some term_ev_pair => 
+              let val ev : (coq_EvidenceT, string) coq_ResultT = (snd term_ev_pair) in
+              case ev of
+                Coq_resultC evs => evs
+              | Coq_errC c => raise (Exception ("Error parsing evidence file: " ^ c))
+              end
             | None => 
               raise (Exception ("EvidToJson Argument Error - Unknown term identifier: \"" ^ termName ^ "\"\n" ^ usage))
         in

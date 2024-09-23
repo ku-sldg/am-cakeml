@@ -92,12 +92,13 @@ fun do_remote t pTo e ac =
       | Coq_resultC v => Coq_resultC v)) end
 *)
 
-(** val parallel_vm_thread : coq_Loc -> coq_EvC **)
+(** val parallel_vm_thread :
+    coq_Loc -> (coq_Evidence, coq_CVM_Error) coq_ResultT **)
 
-fun parallel_vm_thread loc = mt_evc
-  (* failwith "AXIOM TO BE REALIZED" *)
-
-
+val parallel_vm_thread : (coq_Loc -> (coq_Evidence, coq_CVM_Error)
+                         coq_ResultT) =
+  fn loc => 
+  Coq_errC (Coq_dispatch_error (Runtime "PARALLEL VM THREAD NOT IMPLEMENTED"))
 
 (*
 (** val am_sendReq :

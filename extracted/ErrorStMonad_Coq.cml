@@ -1,31 +1,37 @@
-type ('s, 'a, 'e) coq_Err = 's -> ('a, 'e) coq_ResultT * 's
+type ('s, 'c, 'a, 'e) coq_Err = 's -> 'c -> (('a, 'e) coq_ResultT * 's) * 'c
 
-(** val err_ret : 'a2 -> ('a1, 'a2, 'a3) coq_Err **)
+(** val err_ret : 'a3 -> ('a1, 'a2, 'a3, 'a4) coq_Err **)
 
-fun err_ret a s =
-  ((Coq_resultC a), s)
+fun err_ret a s c =
+  (((Coq_resultC a), s), c)
 
 (** val err_bind :
-    ('a1, 'a2, 'a4) coq_Err -> ('a2 -> ('a1, 'a3, 'a4) coq_Err) -> ('a1, 'a3,
-    'a4) coq_Err **)
+    ('a1, 'a2, 'a3, 'a5) coq_Err -> ('a3 -> ('a1, 'a2, 'a4, 'a5) coq_Err) ->
+    ('a1, 'a2, 'a4, 'a5) coq_Err **)
 
-fun err_bind m f s =
-  let val (a, s') = m s in
+fun err_bind m f s c =
+  let val (p, c0) = m s c in
+  let val (a, s') = p in
   (case a of
-     Coq_errC e => ((Coq_errC e), s')
-   | Coq_resultC v => f v s') end
+     Coq_errC e => (((Coq_errC e), s'), c0)
+   | Coq_resultC v => f v s' c0) end end
 
-(** val err_failm : 'a3 -> ('a1, 'a2, 'a3) coq_Err **)
+(** val err_failm : 'a4 -> ('a1, 'a2, 'a3, 'a4) coq_Err **)
 
-fun err_failm e s =
-  ((Coq_errC e), s)
+fun err_failm e s c =
+  (((Coq_errC e), s), c)
 
-(** val err_put : 'a1 -> ('a1, unit, 'a2) coq_Err **)
+(** val err_put_state : 'a1 -> ('a1, 'a2, unit, 'a3) coq_Err **)
 
-fun err_put s _ =
-  ((Coq_resultC ()), s)
+fun err_put_state s' _ c =
+  (((Coq_resultC ()), s'), c)
 
-(** val err_get : ('a1, 'a1, 'a2) coq_Err **)
+(** val err_get_state : ('a1, 'a2, 'a1, 'a3) coq_Err **)
 
-fun err_get s =
-  ((Coq_resultC s), s)
+fun err_get_state s c =
+  (((Coq_resultC s), s), c)
+
+(** val err_get_config : ('a1, 'a2, 'a2, 'a3) coq_Err **)
+
+fun err_get_config s c =
+  (((Coq_resultC c), s), c)

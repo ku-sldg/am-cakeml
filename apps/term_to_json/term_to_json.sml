@@ -2,12 +2,7 @@
   
 fun write_term_to_file (term : coq_Term) (filename : string) =
   let
-    val (Build_Jsonifiable to_JSON _) = (coq_Jsonifiable_Term
-                   (coq_Jsonifiable_ASP coq_Jsonifiable_FWD
-                     (coq_Jsonifiable_ASP_Params
-                       (jsonifiable_map_serial_serial
-                         coq_Stringifiable_ID_Type coq_Eq_Class_ID_Type
-                         coq_Stringifiable_ID_Type))) coq_Jsonifiable_Split)
+    val (Build_Jsonifiable to_JSON _) = concrete_Jsonifiable_Term
     val coq_json = to_JSON term
     val json_str = coq_JSON_to_string coq_json
   in
@@ -31,8 +26,9 @@ fun main () =
       else
         let val termName  = List.nth argList (termInd + 1) 
             val outFile   = List.nth argList (outFileInd + 1)
+            val glob_context = Build_GlobalContext [] []
             val outTerm   = 
-              case map_get coq_Eq_Class_ID_Type full_flexible_mechanisms termName of
+              case map_get coq_Eq_Class_ID_Type termName (full_flexible_mechanisms glob_context) of
                 Some term_ev_pair => fst term_ev_pair
               | None => 
                   raise (Exception ("TermToJson Argument Error - Unknown term identifier: \"" ^ termName ^ "\"\n" ^ usage))

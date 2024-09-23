@@ -52,17 +52,16 @@ get_files(copland_am_src
 
     extracted/EqClass.cml
     extracted/ID_Type.cml
-
-    stubs/BS.sml
-
-    extracted/ErrorStringConstants.cml
-    extracted/Interface_Strings_Vars.cml
     extracted/Maps.cml
     extracted/JSON_Type.cml
 
+    stubs/BS.sml
     stubs/JSON_Admits.sml
 
+    extracted/ErrorStringConstants.cml
+    extracted/Interface_Strings_Vars.cml
     extracted/JSON.cml
+    extracted/JSON_Core_Strings.cml
     extracted/Term_Defs_Core.cml
     extracted/JSON_Core.cml
 
@@ -70,6 +69,7 @@ get_files(copland_am_src
     stubs/Manifest_Admits.sml
 
     extracted/Term_Defs.cml
+    extracted/Term.cml
     extracted/Manifest_Set.cml
     extracted/Manifest.cml
     extracted/Attestation_Session.cml
@@ -84,29 +84,15 @@ get_files(copland_am_src
 
     extracted/AM_Manager.cml
     extracted/Session_Config_Compiler.cml
-    extracted/Anno_Term_Defs.cml
     extracted/EnvironmentM.cml
-    extracted/Manifest_Union.cml
-
-    stubs/Axioms_Io.sml
-
-    extracted/Evidence_Bundlers.cml
     extracted/Cvm_Monad.cml
     extracted/Cvm_Impl.cml
-    extracted/Cvm_Run.cml
     extracted/Manifest_Generator.cml
     extracted/Manifest_Generator_Union.cml
-    extracted/AM_St.cml
-
-    stubs/Appraisal_IO_Stubs.sml
-
-    extracted/AM_Monad.cml
-    extracted/Appraisal_Defs.cml
-    extracted/Impl_appraisal.cml
     extracted/AM_Json_Interfaces.cml
     extracted/Flexible_Mechanisms_Vars.cml
     extracted/Flexible_Mechanisms.cml
-    extracted/Client_AM.cml
+    # extracted/Client_AM.cml
     extracted/Server_AM.cml
     extracted/Concrete_Extractables.cml
     util/AM_CLI.sml

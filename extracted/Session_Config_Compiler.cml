@@ -5,14 +5,14 @@
 
 fun generate_ASP_dispatcher' am _ aspBin par rawEv =
   let val Coq_asp_paramsC aspid args targ_plc targ = par in
-  let val asps = let val Build_Manifest asps _ _ _ = am in asps end in
+  let val asps = let val Build_Manifest asps _ _ = am in asps end in
   let val asp_map =
-    let val Build_Manifest _ _ aSP_Mapping _ = am in aSP_Mapping end
+    let val Build_Manifest _ aSP_Mapping _ = am in aSP_Mapping end
   in
   (case in_dec_set coq_Eq_Class_ID_Type aspid asps of
      True =>
      let val conc_asp_loc =
-       case map_get coq_Eq_Class_ID_Type asp_map aspid of
+       case map_get coq_Eq_Class_ID_Type aspid asp_map of
          Some conc_asp_loc => conc_asp_loc
        | None => aspid_to_fs_location aspid
      in
@@ -53,12 +53,12 @@ fun generate_ASP_dispatcher _ =
 fun session_config_compiler conf ats =
   let val Coq_mkAM_Man_Conf man aspBin _ = conf in
   Build_Session_Config
-  (let val Coq_mkAtt_Sess session_Plc _ _ = ats in session_Plc end)
-  (let val Build_Manifest _ aSP_Compat_Map _ _ = man in aSP_Compat_Map end)
+  (let val Coq_mkAtt_Sess session_Plc _ _ _ = ats in session_Plc end)
+  (let val Coq_mkAtt_Sess _ _ _ ats_context = ats in ats_context end)
   (generate_ASP_dispatcher coq_Eq_Class_ID_Type man ats aspBin)
-  (let val Coq_mkAtt_Sess _ plc_Mapping _ = ats in plc_Mapping end)
-  (let val Coq_mkAtt_Sess _ _ pubKey_Mapping = ats in pubKey_Mapping end)
-  (let val Build_Manifest _ _ _ man_policy = man in man_policy end) end
+  (let val Coq_mkAtt_Sess _ plc_Mapping _ _ = ats in plc_Mapping end)
+  (let val Coq_mkAtt_Sess _ _ pubKey_Mapping _ = ats in pubKey_Mapping end)
+  (let val Build_Manifest _ _ man_policy = man in man_policy end) end
 
 (** val session_config_decompiler :
     coq_Session_Config -> coq_Attestation_Session **)
@@ -69,3 +69,5 @@ fun session_config_decompiler sc =
      session_plc end)
     (let val Build_Session_Config _ _ _ plc_map _ _ = sc in plc_map end)
     (let val Build_Session_Config _ _ _ _ pubkey_map _ = sc in pubkey_map end)
+    (let val Build_Session_Config _ session_context _ _ _ _ = sc in
+     session_context end)

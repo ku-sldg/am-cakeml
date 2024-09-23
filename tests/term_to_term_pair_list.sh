@@ -46,7 +46,7 @@ fi
 JSON_TERM_DATA=$(cat "$JSON_TERM_FILE")
 
 # Build Term_Plc_list JSON structure
-TERM_FILE_JSON="{ \"Term_Plc_list\": [ [$JSON_TERM_DATA, \"$TOP_PLC\" ] ] }" 
+TERM_FILE_JSON="{ \"Term_Plc_List\": [ [$JSON_TERM_DATA, \"$TOP_PLC\" ] ] }" 
 
 # Write to generated temporarily
 echo $TERM_FILE_JSON > $TERM_PAIR_FILE

@@ -7,73 +7,43 @@ datatype 'a coq_Jsonifiable =
 
 fun coq_JSON_get_Object key js = case js of
   JSON_Object m =>
-  (case map_get coq_Eq_Class_ID_Type m key of
+  (case map_get coq_Eq_Class_ID_Type key m of
      Some v => Coq_resultC v
-   | None => Coq_errC (String.^ "JSON_get_Object: KEY NOT FOUND : " key))
-| _ => Coq_errC "JSON_get_Object: NOT AN OBJECT"
+   | None => Coq_errC (errStr_json_key_not_found key js))
+| _ => Coq_errC (errStr_json_wrong_type key js)
 
 (** val coq_JSON_get_Array :
     string -> coq_JSON -> (coq_JSON list, string) coq_ResultT **)
 
 fun coq_JSON_get_Array key js =
   case coq_JSON_get_Object key js of
-    Coq_errC _ =>
-    Coq_errC
-      (String.^ "Could not find key: '"
-        (String.^ key
-          (String.^ "' in Json object: '"
-            (String.^ (coq_JSON_to_string js) "'"))))
-  | Coq_resultC js' =>
-    (case js' of
+    Coq_errC _ => Coq_errC (errStr_json_key_not_found key js)
+  | Coq_resultC j =>
+    (case j of
        JSON_Array v => Coq_resultC v
-     | _ =>
-       Coq_errC
-         (String.^ "Key: '"
-           (String.^ key
-             (String.^ "' yields '"
-               (String.^ (coq_JSON_to_string js') "' which is not an array")))))
+     | _ => Coq_errC (errStr_json_wrong_type key js))
 
 (** val coq_JSON_get_string :
     string -> coq_JSON -> (string, string) coq_ResultT **)
 
 fun coq_JSON_get_string key js =
   case coq_JSON_get_Object key js of
-    Coq_errC _ =>
-    Coq_errC
-      (String.^ "Could not find key: '"
-        (String.^ key
-          (String.^ "' in Json object: '"
-            (String.^ (coq_JSON_to_string js) "'"))))
-  | Coq_resultC js' =>
-    (case js' of
+    Coq_errC _ => Coq_errC (errStr_json_key_not_found key js)
+  | Coq_resultC j =>
+    (case j of
        JSON_String v => Coq_resultC v
-     | _ =>
-       Coq_errC
-         (String.^ "Key: '"
-           (String.^ key
-             (String.^ "' yields '"
-               (String.^ (coq_JSON_to_string js') "' which is not a string")))))
+     | _ => Coq_errC (errStr_json_wrong_type key js))
 
 (** val coq_JSON_get_bool :
     string -> coq_JSON -> (bool, string) coq_ResultT **)
 
 fun coq_JSON_get_bool key js =
   case coq_JSON_get_Object key js of
-    Coq_errC _ =>
-    Coq_errC
-      (String.^ "Could not find key: '"
-        (String.^ key
-          (String.^ "' in Json object: '"
-            (String.^ (coq_JSON_to_string js) "'"))))
-  | Coq_resultC js' =>
-    (case js' of
+    Coq_errC _ => Coq_errC (errStr_json_key_not_found key js)
+  | Coq_resultC j =>
+    (case j of
        JSON_Boolean v => Coq_resultC v
-     | _ =>
-       Coq_errC
-         (String.^ "Key: '"
-           (String.^ key
-             (String.^ "' yields '"
-               (String.^ (coq_JSON_to_string js') "' which is not a bool")))))
+     | _ => Coq_errC (errStr_json_wrong_type key js))
 
 (** val str_pair_to_JSON :
     'a1 coq_Stringifiable -> 'a2 coq_Stringifiable -> ('a1 * 'a2) -> coq_JSON **)
@@ -90,29 +60,27 @@ fun str_pair_to_JSON h h0 v =
 fun str_pair_from_JSON h h0 js = case js of
   JSON_Array l =>
   (case l of
-     [] => Coq_errC errStr_json_to_pair
+     [] => Coq_errC errStr_json_from_pair
    | j :: l0 =>
      (case j of
         JSON_String a =>
         (case l0 of
-           [] => Coq_errC errStr_json_to_pair
+           [] => Coq_errC errStr_json_from_pair
          | j0 :: l1 =>
            (case j0 of
               JSON_String b =>
               (case l1 of
                  [] =>
-                 (case let val Build_Stringifiable _ from_string = h in
-                       from_string a end of
-                    Coq_errC _ => Coq_errC errStr_json_to_pair
-                  | Coq_resultC a0 =>
-                    (case let val Build_Stringifiable _ from_string = h0 in
-                          from_string b end of
-                       Coq_errC _ => Coq_errC errStr_json_to_pair
-                     | Coq_resultC b0 => Coq_resultC (a0, b0)))
-               | _ :: _ => Coq_errC errStr_json_to_pair)
-            | _ => Coq_errC errStr_json_to_pair))
-      | _ => Coq_errC errStr_json_to_pair))
-| _ => Coq_errC errStr_json_to_pair
+                 res_bind
+                   (let val Build_Stringifiable _ from_string = h in
+                    from_string a end) (fn a0 =>
+                   res_bind
+                     (let val Build_Stringifiable _ from_string = h0 in
+                      from_string b end) (fn b0 => Coq_resultC (a0, b0)))
+               | _ :: _ => Coq_errC errStr_json_from_pair)
+            | _ => Coq_errC errStr_json_from_pair))
+      | _ => Coq_errC errStr_json_from_pair))
+| _ => Coq_errC errStr_json_from_pair
 
 (** val coq_Jsonifiable_str_pair :
     'a1 coq_Stringifiable -> 'a2 coq_Stringifiable -> ('a1 * 'a2)
@@ -123,7 +91,7 @@ fun coq_Jsonifiable_str_pair h h0 =
 
 (** val map_serial_serial_to_JSON :
     'a1 coq_Stringifiable -> 'a2 coq_Stringifiable -> 'a1 coq_EqClass ->
-    ('a1, 'a2) coq_MapC -> coq_JSON **)
+    ('a1, 'a2) coq_Map -> coq_JSON **)
 
 fun map_serial_serial_to_JSON h h0 _ m =
   JSON_Object
@@ -136,7 +104,7 @@ fun map_serial_serial_to_JSON h h0 _ m =
 
 (** val map_serial_serial_from_JSON :
     'a1 coq_Stringifiable -> 'a2 coq_Stringifiable -> 'a1 coq_EqClass ->
-    coq_JSON -> (('a1, 'a2) coq_MapC, string) coq_ResultT **)
+    coq_JSON -> (('a1, 'a2) coq_Map, string) coq_ResultT **)
 
 fun map_serial_serial_from_JSON h h0 _ js = case js of
   JSON_Object m =>
@@ -144,29 +112,42 @@ fun map_serial_serial_from_JSON h h0 _ js = case js of
     let val (k, v) = pat in
     (case v of
        JSON_String v' =>
-       (case let val Build_Stringifiable _ from_string = h in
-             from_string k end of
-          Coq_errC _ =>
-          Coq_errC
-            "Error in map_serial_serial_from_JSON:  key/value pair not both Strings"
-        | Coq_resultC k' =>
-          (case let val Build_Stringifiable _ from_string = h0 in
-                from_string v' end of
-             Coq_errC _ =>
-             Coq_errC
-               "Error in map_serial_serial_from_JSON:  key/value pair not both Strings"
-           | Coq_resultC v'0 => Coq_resultC (k', v'0)))
-     | _ =>
-       Coq_errC
-         "Error in map_serial_serial_from_JSON:  value not a JSON String") end)
-    m
-| _ =>
-  Coq_errC "Error in map_serial_serial_from_JSON:  JSON map not a JSON Object"
+       res_bind
+         (let val Build_Stringifiable _ from_string = h in from_string k end)
+         (fn k' =>
+         res_bind
+           (let val Build_Stringifiable _ from_string = h0 in
+            from_string v' end) (fn v'0 => Coq_resultC (k', v'0)))
+     | _ => Coq_errC errStr_map_from_json) end) m
+| _ => Coq_errC errStr_map_from_json
 
 (** val jsonifiable_map_serial_serial :
     'a1 coq_Stringifiable -> 'a1 coq_EqClass -> 'a2 coq_Stringifiable ->
-    ('a1, 'a2) coq_MapC coq_Jsonifiable **)
+    ('a1, 'a2) coq_Map coq_Jsonifiable **)
 
 fun jsonifiable_map_serial_serial h h0 h1 =
   Build_Jsonifiable (map_serial_serial_to_JSON h h1 h0)
     (map_serial_serial_from_JSON h h1 h0)
+
+(** val jsonifiable_map_serial_json :
+    'a1 coq_Stringifiable -> 'a1 coq_EqClass -> 'a2 coq_Jsonifiable -> ('a1,
+    'a2) coq_Map coq_Jsonifiable **)
+
+fun jsonifiable_map_serial_json h _ h1 =
+  Build_Jsonifiable (fn m => JSON_Object
+    (map (fn pat =>
+      let val (k, v) = pat in
+      ((let val Build_Stringifiable to_string _ = h in to_string k end),
+      (let val Build_Jsonifiable to_JSON _ = h1 in to_JSON v end)) end) m))
+    (fn js =>
+    case js of
+      JSON_Object m =>
+      result_map (fn pat =>
+        let val (k, v) = pat in
+        res_bind
+          (let val Build_Stringifiable _ from_string = h in from_string k end)
+          (fn k' =>
+          res_bind
+            (let val Build_Jsonifiable _ from_JSON = h1 in from_JSON v end)
+            (fn v' => Coq_resultC (k', v'))) end) m
+    | _ => Coq_errC errStr_map_from_json)

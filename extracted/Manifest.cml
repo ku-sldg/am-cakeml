@@ -1,12 +1,10 @@
 type coq_PolicyT = (coq_Plc * coq_ASP_ID) list
 
-type coq_ASP_Compat_MapT = (coq_ASP_ID, coq_ASP_ID) coq_MapC
-
 datatype coq_Manifest =
-  Build_Manifest (coq_ASP_ID manifest_set) coq_ASP_Compat_MapT
-   ((coq_ASP_ID, coq_FS_Location) coq_MapC) coq_PolicyT
+  Build_Manifest (coq_ASP_ID manifest_set)
+   ((coq_ASP_ID, coq_FS_Location) coq_Map) coq_PolicyT
 
 (** val empty_Manifest : coq_Manifest **)
 
 val empty_Manifest : coq_Manifest =
-  Build_Manifest [] [] [] []
+  Build_Manifest [] [] []

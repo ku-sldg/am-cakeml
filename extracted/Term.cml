@@ -1,0 +1,44 @@
+(** val events_fix :
+    coq_GlobalContext -> coq_Plc -> coq_EvidenceT -> coq_Term -> nat ->
+    (coq_Ev list, string) coq_ResultT **)
+
+fun events_fix g p e t i =
+  case t of
+    Coq_asp a => asp_events g p e a i
+  | Coq_att q t' =>
+    res_bind (events_fix g q e t' (add i (S O))) (fn evs =>
+      res_bind (eval g q e t') (fn e' => Coq_resultC
+        (app ((Coq_req i p q e t') :: [])
+          (app evs ((Coq_rpy (add (add i (S O)) (length evs)) p q e') :: [])))))
+  | Coq_lseq t1 t2 =>
+    res_bind (events_fix g p e t1 i) (fn evs1 =>
+      res_bind (eval g p e t1) (fn e' =>
+        res_bind (events_fix g p e' t2 (add i (length evs1))) (fn evs2 =>
+          Coq_resultC (app evs1 evs2))))
+  | Coq_bseq s t1 t2 =>
+    res_bind (events_fix g p (splitEv_T_l s e) t1 (add i (S O))) (fn evs1 =>
+      res_bind
+        (events_fix g p (splitEv_T_r s e) t2
+          (add (add i (S O)) (length evs1))) (fn evs2 => Coq_resultC
+        (app ((Coq_split i p) :: [])
+          (app evs1
+            (app evs2 ((Coq_join
+              (add (add (add i (S O)) (length evs1)) (length evs2)) p) :: []))))))
+  | Coq_bpar s t1 t2 =>
+    res_bind (events_fix g p (splitEv_T_l s e) t1 (add i (S (S O))))
+      (fn evs1 =>
+      res_bind
+        (events_fix g p (splitEv_T_r s e) t2
+          (add (add i (S (S O))) (length evs1))) (fn evs2 =>
+        let val loc = add i (S O) in
+        Coq_resultC
+        (app ((Coq_split i p) :: [])
+          (app ((Coq_cvm_thread_start loc loc p (splitEv_T_r s e) t2) :: [])
+            (app evs1
+              (app evs2
+                (app ((Coq_cvm_thread_end
+                  (add (add (add i (S (S O))) (length evs1)) (length evs2))
+                  loc) :: []) ((Coq_join
+                  (add
+                    (add (add (add i (S (S O))) (length evs1)) (length evs2))
+                    (S O)) p) :: [])))))) end))

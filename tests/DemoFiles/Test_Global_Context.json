@@ -1,0 +1,51 @@
+{
+  "ASP_Types": {
+    "sig_id": {
+      "FWD": "EXTEND",
+      "EvInSig": "ALL",
+      "EvOutSig": {
+        "EvOutSig_CONSTRUCTOR": "OutN",
+        "EvOutSig_BODY": "1"
+      }
+    },
+    "hashfile_id": {
+      "FWD": "EXTEND",
+      "EvInSig": "NONE",
+      "EvOutSig": {
+        "EvOutSig_CONSTRUCTOR": "OutN",
+        "EvOutSig_BODY": "1"
+      }
+    },
+    "attest_id": {
+      "FWD": "EXTEND",
+      "EvInSig": "ALL",
+      "EvOutSig": {
+        "EvOutSig_CONSTRUCTOR": "OutN",
+        "EvOutSig_BODY": "1"
+      }
+    },
+    "certificate_id": {
+      "FWD": "EXTEND",
+      "EvInSig": "NONE",
+      "EvOutSig": {
+        "EvOutSig_CONSTRUCTOR": "OutN",
+        "EvOutSig_BODY": "1"
+      }
+    },
+    "appraise_id": {
+      "FWD": "EXTEND",
+      "EvInSig": "ALL",
+      "EvOutSig": {
+        "EvOutSig_CONSTRUCTOR": "OutN",
+        "EvOutSig_BODY": "1"
+      }
+    }
+  },
+  "ASP_Comps": {
+    "sig_id": "certificate_id",
+    "hashfile_id": "appraise_id",
+    "attest_id": "appraise_id",
+    "appraise_id": "appraise_id",
+    "certificate_id": "appraise_id"
+  }
+}

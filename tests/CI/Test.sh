@@ -83,7 +83,7 @@ DEMO_FILES=$TESTS_DIR/DemoFiles
 GENERATED=$DEMO_FILES/Generated
 
 # Reusable Variables
-TEST_COMP_MAP=$DEMO_FILES/ASP_Compat_Map.json
+TEST_COMP_MAP=$DEMO_FILES/Test_Global_Context.json
 TEST_ATT_SESS=$DEMO_FILES/Test_Session.json
 
 # Specific Variables

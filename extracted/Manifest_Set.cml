@@ -14,14 +14,6 @@ fun manset_add hA a s = case s of
 fun in_dec_set hA a s =
   in_dec (coq_EqClass_impl_DecEq hA) a s
 
-(** val manset_union :
-    'a1 coq_EqClass -> 'a1 manifest_set -> 'a1 manifest_set -> 'a1
-    manifest_set **)
-
-fun manset_union hA a b = case b of
-  [] => a
-| h :: t => manset_union hA (manset_add hA h a) t
-
 (** val manifest_set_to_list_JSON :
     'a1 coq_Stringifiable -> 'a1 coq_EqClass -> 'a1 manifest_set -> coq_JSON
     list **)
@@ -49,9 +41,7 @@ fun list_JSON_to_manifest_set h h0 l = case l of
               from_string s end of
            Coq_errC e => Coq_errC e
          | Coq_resultC h' => Coq_resultC (h' :: t')))
-   | _ =>
-     Coq_errC
-       "list_JSON_to_manifest_set: Invalid JSON type in manifest set, only can handle strings.")
+   | _ => Coq_errC err_str_list_json_to_manifest_set)
 
 (** val manifest_set_pairs_to_list_JSON :
     'a1 coq_Stringifiable -> 'a2 coq_Stringifiable -> ('a1 * 'a2)

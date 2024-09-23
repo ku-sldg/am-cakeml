@@ -1,14 +1,8 @@
 datatype coq_ProtocolRunRequest =
-  Coq_mkPRReq coq_Attestation_Session coq_Term coq_Plc coq_RawEv
+  Coq_mkPRReq coq_Attestation_Session coq_Plc coq_Evidence coq_Term
 
 datatype coq_ProtocolRunResponse =
-  Coq_mkPRResp bool coq_RawEv
-
-datatype coq_ProtocolAppraiseRequest =
-  Coq_mkPAReq coq_Attestation_Session coq_Term coq_Plc coq_Evidence coq_RawEv
-
-datatype coq_ProtocolAppraiseResponse =
-  Coq_mkPAResp bool coq_AppResultC
+  Coq_mkPRResp bool coq_Evidence
 
 datatype coq_ASPRunRequest =
   Coq_mkASPRReq coq_ASP_ID coq_ASP_ARGS coq_Plc coq_TARG_ID coq_RawEv

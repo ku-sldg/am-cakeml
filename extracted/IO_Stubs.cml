@@ -19,18 +19,15 @@ val make_JSON_FS_Location_Request : (coq_FS_Location -> coq_FS_Location ->
                                     coq_ResultT) =
   failwith "AXIOM TO BE REALIZED"
 
-(** val parallel_vm_thread : coq_Loc -> coq_EvC **)
+(** val parallel_vm_thread :
+    coq_Loc -> (coq_Evidence, coq_CVM_Error) coq_ResultT **)
 
-val parallel_vm_thread : (coq_Loc -> coq_EvC) =
+val parallel_vm_thread : (coq_Loc -> (coq_Evidence, coq_CVM_Error)
+                         coq_ResultT) =
   failwith "AXIOM TO BE REALIZED"
 
 (** val do_start_par_thread :
-    coq_Loc -> coq_Core_Term -> coq_RawEv -> unit coq_CVM **)
+    coq_Loc -> coq_Evidence -> coq_Term -> unit coq_CVM **)
 
 fun do_start_par_thread _ _ _ =
   err_ret ()
-
-(** val do_wait_par_thread : coq_Loc -> coq_EvC coq_CVM **)
-
-fun do_wait_par_thread loc =
-  err_ret (parallel_vm_thread loc)

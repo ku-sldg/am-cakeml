@@ -1,47 +1,17 @@
-(** val errStr_amNonce : string **)
-
-val errStr_amNonce : string =
-  "errStr_amNonce"
-
-(** val errStr_peel_bs_am : string **)
-
-val errStr_peel_bs_am : string =
-  "errStr_peel_bs_am"
-
 (** val errStr_peel_n_am : string **)
 
 val errStr_peel_n_am : string =
-  "errStr_peel_n_am"
+  "Error peeling 'n' elements; ran out of RawEv"
 
 (** val errStr_disclosePolicy : string **)
 
 val errStr_disclosePolicy : string =
   "errStr_disclosePolicy"
 
-(** val errStr_dispatch_error : string **)
+(** val errStr_raw_EvidenceT_too_long : string **)
 
-val errStr_dispatch_error : string =
-  "errStr_dispatch_error"
-
-(** val errStr_cvm_error : string **)
-
-val errStr_cvm_error : string =
-  "errStr_cvm_error"
-
-(** val errStr_et_size : string **)
-
-val errStr_et_size : string =
-  "errStr_et_size"
-
-(** val errStr_empty_raw_ev : string **)
-
-val errStr_empty_raw_ev : string =
-  "errStr_empty_raw_ev"
-
-(** val errStr_raw_evidence_too_long : string **)
-
-val errStr_raw_evidence_too_long : string =
-  "errStr_raw_evidence_too_long"
+val errStr_raw_EvidenceT_too_long : string =
+  "errStr_raw_EvidenceT_too_long"
 
 (** val errStr_remote_am_failure : string **)
 
@@ -53,17 +23,223 @@ val errStr_remote_am_failure : string =
 val errStr_negotiation_not_implemented : string =
   "errStr_negotiation_not_implemented"
 
-(** val errStr_run_cvm_at_error_dynamic : string **)
+(** val err_str_asp_no_type_sig : string **)
 
-val errStr_run_cvm_at_error_dynamic : string =
-  "errStr_run_cvm_at_error_dynamic"
+val err_str_asp_no_type_sig : string =
+  "ASP Type signature not found in the Global Context"
 
-(** val errStr_run_cvm_at_error_static : string **)
+(** val err_str_asp_no_compat_appr_asp : string **)
 
-val errStr_run_cvm_at_error_static : string =
-  "errStr_run_cvm_at_error_static"
+val err_str_asp_no_compat_appr_asp : string =
+  "Compatible Appraisal ASP not found in Global Context"
 
-(** val errStr_json_to_pair : string **)
+(** val err_str_asps_not_duals : string **)
 
-val errStr_json_to_pair : string =
-  "errStr_json_to_pair"
+val err_str_asps_not_duals : string =
+  "2 nested ASPs are not duals"
+
+(** val err_str_appr_asp_not_unwrap : string **)
+
+val err_str_appr_asp_not_unwrap : string =
+  "Compatible Appraisal ASP is not an UNWRAP ASP"
+
+(** val err_str_asp_is_not_wrap : string **)
+
+val err_str_asp_is_not_wrap : string =
+  "ASP is not a WRAP ASP"
+
+(** val err_str_no_possible_left_evt : string **)
+
+val err_str_no_possible_left_evt : string =
+  "No possible left_evt"
+
+(** val err_str_no_possible_right_evt : string **)
+
+val err_str_no_possible_right_evt : string =
+  "No possible right_evt"
+
+(** val err_str_asp_under_unwrap : string **)
+
+val err_str_asp_under_unwrap : string =
+  "ASP under UNWRAP is not a WRAP"
+
+(** val err_str_wrap_asp_not_duals : string **)
+
+val err_str_wrap_asp_not_duals : string =
+  "A WRAP and UNWRAP ASPs are not duals"
+
+(** val err_str_unwrap_only_asp : string **)
+
+val err_str_unwrap_only_asp : string =
+  "UNWRAP ASPs must be applied to ASPs"
+
+(** val err_str_no_asp_under_evidence : string **)
+
+val err_str_no_asp_under_evidence : string =
+  "No ASP under evidence"
+
+(** val err_str_asp_at_bottom_not_wrap : string **)
+
+val err_str_asp_at_bottom_not_wrap : string =
+  "ASP at bottom of evidence is not a WRAP ASP"
+
+(** val err_str_cannot_have_outwrap : string **)
+
+val err_str_cannot_have_outwrap : string =
+  "Invalid Output Signature of type 'OutUnwrap' on an ASP"
+
+(** val errStr_map_from_json : string **)
+
+val errStr_map_from_json : string =
+  "errStr_map_from_json"
+
+(** val errStr_json_from_pair : string **)
+
+val errStr_json_from_pair : string =
+  "Error converting pair from JSON"
+
+(** val errStr_json_key_not_found : string -> coq_JSON -> string **)
+
+fun errStr_json_key_not_found key js =
+  String.^ "JSON: Key: '"
+    (String.^ key
+      (String.^ "' not found in JSON: '"
+        (String.^ (coq_JSON_to_string js) "'")))
+
+(** val errStr_json_wrong_type : string -> coq_JSON -> string **)
+
+fun errStr_json_wrong_type key js =
+  String.^ "JSON: Key: '"
+    (String.^ key
+      (String.^ "' had the wrong type in JSON: '"
+        (String.^ (coq_JSON_to_string js) "'")))
+
+(** val err_str_01 : string **)
+
+val err_str_01 : string =
+  "Invalid request type"
+
+(** val err_str_fwd_from_string : string **)
+
+val err_str_fwd_from_string : string =
+  "Error parsing FWD from string"
+
+(** val err_str_unwrap_must_have_outwrap : string **)
+
+val err_str_unwrap_must_have_outwrap : string =
+  "UNWRAP ASPs must have an OutWrap output signature"
+
+(** val err_str_only_unwrap_can_be_outwrap : string **)
+
+val err_str_only_unwrap_can_be_outwrap : string =
+  "Only UNWRAP ASPs can have an OutWrap output signature"
+
+(** val err_str_unwrap_of_wrap_same_size : string **)
+
+val err_str_unwrap_of_wrap_same_size : string =
+  "UNWRAP of a WRAP ASP must have the sime size as the WRAPed evidence"
+
+(** val err_str_unwrap_only_wrap : string **)
+
+val err_str_unwrap_only_wrap : string =
+  "UNWRAP ASPs must be appplied to a WRAP ASP"
+
+(** val err_str_appr_wrap_failed : string **)
+
+val err_str_appr_wrap_failed : string =
+  "Appraisal for WRAP ASP failed. Size of input to wrap is not same as output of UNWRAP"
+
+(** val err_str_extend_must_have_outn : string **)
+
+val err_str_extend_must_have_outn : string =
+  "EXTEND ASPs must have OutN"
+
+(** val err_str_ev_split_failed_not_empty : string **)
+
+val err_str_ev_split_failed_not_empty : string =
+  "Evidence splitting failed: rest of evidence not empty"
+
+(** val err_str_json_nat_string : string **)
+
+val err_str_json_nat_string : string =
+  "Error converting JSON to nat: JSON was not a string"
+
+(** val err_str_json_cannot_interp_nat : string **)
+
+val err_str_json_cannot_interp_nat : string =
+  "Error:  cannot interpret nat string in Jsonifiable_nat"
+
+(** val err_str_json_parsing_outn : string **)
+
+val err_str_json_parsing_outn : string =
+  "Error parsing OutN from JSON (wrong number of arguments, expected 1)"
+
+(** val err_str_evoutsig_json_constructor : string **)
+
+val err_str_evoutsig_json_constructor : string =
+  "Invalid EvOutSig JSON constructor name"
+
+(** val err_str_json_no_constructor_name_string : string **)
+
+val err_str_json_no_constructor_name_string : string =
+  "JSON: No constructor name found in JSON"
+
+(** val err_str_invalid_evinsig_json : string **)
+
+val err_str_invalid_evinsig_json : string =
+  "Invalid EvInSig JSON"
+
+(** val err_str_json_parsing_failure_wrong_number_args : string **)
+
+val err_str_json_parsing_failure_wrong_number_args : string =
+  "Error parsing JSON: Wrong number of arguments"
+
+(** val err_str_json_invalid_constructor_name : string **)
+
+val err_str_json_invalid_constructor_name : string =
+  "Error parsing JSON: Invalid constructor name"
+
+(** val err_str_json_parsing_SP : string **)
+
+val err_str_json_parsing_SP : string =
+  "Error parsing SP from JSON (not ALL or NONE)"
+
+(** val err_str_json_parsing_ASPC : string **)
+
+val err_str_json_parsing_ASPC : string =
+  "Error parsing ASPC from JSON"
+
+(** val err_str_invalid_evidence_json : string **)
+
+val err_str_invalid_evidence_json : string =
+  "Invalid Evidence JSON"
+
+(** val err_str_json_unrecognized_constructor : string **)
+
+val err_str_json_unrecognized_constructor : string =
+  "Unrecognized constructor in JSON"
+
+(** val err_str_list_json_to_manifest_set : string **)
+
+val err_str_list_json_to_manifest_set : string =
+  "Error converting list from JSON to Manifest Set"
+
+(** val err_str_appr_compute_evt_neq : string **)
+
+val err_str_appr_compute_evt_neq : string =
+  "Error in appraisal procedure computation, type of evidence passed into an appraisal procedure does not match the expected type (evidence types are not equivalent)"
+
+(** val err_str_appr_not_originally_a_wrap : string **)
+
+val err_str_appr_not_originally_a_wrap : string =
+  "Error in appraisal procedure computation: Attempting to appraise UNWRAPPED evidence but the UNWRAPPED evidence was not originally a WRAP."
+
+(** val err_str_appr_only_allow_on_asp : string **)
+
+val err_str_appr_only_allow_on_asp : string =
+  "Error in appraisal procedure computation: Attempting to appraise UNWRAPPED evidence but evidence that was UNWRAPPED was not an ASP (UNWRAP can only be applied to an ASP input)."
+
+(** val err_str_split_evidence_not_split : string **)
+
+val err_str_split_evidence_not_split : string =
+  "Error in appraisal procedure computation, type of evidence passed into a split appraisal procedure is not a split evidence type"

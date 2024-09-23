@@ -12,4 +12,4 @@ val coq_Stringifiable_ID_Type : coq_ID_Type coq_Stringifiable =
 (** val coq_Eq_Class_ID_Type : coq_ID_Type coq_EqClass **)
 
 val coq_Eq_Class_ID_Type : coq_ID_Type coq_EqClass =
-  eqb str_eq_class
+  eqb str_eq_clasplit_evt
