@@ -49,10 +49,11 @@ val filehash_auth_phrase : coq_Term =
 (** val flexible_mechanisms_map : (string * coq_Term) list **)
 
 val flexible_mechanisms_map : (string * coq_Term) list =
-  ("cert", certificate_style) :: (("bg", background_check) :: (("parmut",
+  ("cert", certificate_style) :: (("cert_appr", (Coq_lseq certificate_style
+    (Coq_asp APPR))) :: (("bg", background_check) :: (("parmut",
     parallel_mutual_1) :: (("parmut2", parallel_mutual_2) :: (("layered_bg",
     layered_background_check) :: (("filehash",
-    filehash_auth_phrase) :: [])))))
+    filehash_auth_phrase) :: []))))))
 
 (** val add_EvidenceT_flexible_mechanisms :
     coq_GlobalContext -> (string, coq_Term * (coq_EvidenceT, string)
