@@ -51,6 +51,38 @@
           "EvOutSig_CONSTRUCTOR": "OutN",
           "EvOutSig_BODY": "1"
         }
+      },
+      "query_kim_id": {
+        "FWD": "EXTEND",
+        "EvInSig": "ALL",
+        "EvOutSig": {
+          "EvOutSig_CONSTRUCTOR": "OutN",
+          "EvOutSig_BODY": "1"
+        }
+      },
+      "gather_file_contents_id": {
+        "FWD": "EXTEND",
+        "EvInSig": "ALL",
+        "EvOutSig": {
+          "EvOutSig_CONSTRUCTOR": "OutN",
+          "EvOutSig_BODY": "1"
+        }
+      },
+      "hash_file_contents_id": {
+        "FWD": "EXTEND",
+        "EvInSig": "ALL",
+        "EvOutSig": {
+          "EvOutSig_CONSTRUCTOR": "OutN",
+          "EvOutSig_BODY": "1"
+        }
+      },
+      "appr_cds_id": {
+        "FWD": "EXTEND",
+        "EvInSig": "ALL",
+        "EvOutSig": {
+          "EvOutSig_CONSTRUCTOR": "OutN",
+          "EvOutSig_BODY": "1"
+        }
       }
     },
     "ASP_Comps": {

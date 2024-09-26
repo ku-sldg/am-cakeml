@@ -53,7 +53,8 @@ val flexible_mechanisms_map : (string * coq_Term) list =
     (Coq_asp APPR))) :: (("bg", background_check) :: (("parmut",
     parallel_mutual_1) :: (("parmut2", parallel_mutual_2) :: (("layered_bg",
     layered_background_check) :: (("filehash",
-    filehash_auth_phrase) :: (("cds", cds_demo_phrase) :: [])))))))
+    filehash_auth_phrase) :: (("cds", cds_demo_phrase) :: (("cds_appr",
+    (Coq_lseq cds_demo_phrase (Coq_asp APPR))) :: []))))))))
 
 (** val add_EvidenceT_flexible_mechanisms :
     coq_GlobalContext -> (string, coq_Term * (coq_EvidenceT, string)
