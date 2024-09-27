@@ -14,3 +14,4 @@ ci_test:
 	./CI/Test.sh -t parmut -h
 	./CI/Test.sh -t filehash -h
 	./CI/Test.sh -t cds -h
+	./CI/Test.sh -t cds_appr -h

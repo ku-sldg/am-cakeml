@@ -78,6 +78,10 @@
     "hashfile_id": "appraise_id",
     "attest_id": "appraise_id",
     "appraise_id": "appraise_id",
-    "certificate_id": "appraise_id"
+    "certificate_id": "appraise_id",
+    "query_kim_id": "appraise_id",
+    "gather_file_contents_id": "appraise_id",
+    "hash_file_contents_id": "appraise_id",
+    "appr_cds_id": "appraise_id"
   }
 }
