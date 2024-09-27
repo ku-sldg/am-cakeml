@@ -116,10 +116,9 @@ val hash_controller_img : coq_Term =
 (** val meas_cds_phrase : coq_Term **)
 
 val meas_cds_phrase : coq_Term =
-  Coq_bseq (ALL, ALL) gather_config_1 (Coq_bseq (ALL, ALL) gather_config_2
-    (Coq_bseq (ALL, ALL) gather_config_3 (Coq_bseq (ALL, ALL)
-    hash_controller_img (Coq_bseq (ALL, ALL) hash_cds_img_1 (Coq_bseq (ALL,
-    ALL) hash_cds_img_2 hash_cds_img_3)))))
+  Coq_lseq gather_config_1 (Coq_lseq gather_config_2 (Coq_lseq
+    gather_config_3 (Coq_lseq hash_controller_img (Coq_lseq hash_cds_img_1
+    (Coq_lseq hash_cds_img_2 hash_cds_img_3)))))
 
 (** val query_kim_asp : coq_Term **)
 
@@ -139,5 +138,5 @@ val sig_asp : coq_Term =
 (** val cds_demo_phrase : coq_Term **)
 
 val cds_demo_phrase : coq_Term =
-  Coq_lseq (Coq_att coq_P1 (Coq_lseq (Coq_bseq (ALL, ALL) query_kim_asp
-    meas_cds_phrase) sig_asp)) (Coq_att coq_P3 appr_cds_asp)
+  Coq_lseq (Coq_att coq_P1 (Coq_lseq (Coq_lseq query_kim_asp meas_cds_phrase)
+    sig_asp)) (Coq_att coq_P3 appr_cds_asp)
