@@ -136,30 +136,16 @@ fun bundle_asp p rwev cur_ev ps = case ps of
               session_context end
             in
             let val Coq_evc _ et = cur_ev in
-            err_bind (hoist_result (get_asp_under g et)) (fn r =>
-              case r of
-                Coq_asp_evt _ a et' =>
-                let val Coq_asp_paramsC wrap_id _ _ _ = a in
-                err_bind (get_asp_type wrap_id) (fn x0 =>
-                  let val Coq_ev_arrow fwd0 _ _ = x0 in
-                  (case fwd0 of
-                     WRAP =>
-                     (case et_size g et' of
-                        Coq_errC e =>
-                        err_failm (Coq_dispatch_error (Runtime e))
-                      | Coq_resultC et'_size =>
-                        (case eqb nat_EqClass (length rwev) et'_size of
-                           True =>
-                           err_ret (Coq_evc rwev (Coq_asp_evt p ps et))
-                         | False =>
-                           err_failm (Coq_dispatch_error (Runtime
-                             err_str_unwrap_of_wrap_same_size))))
-                   | _ =>
-                     err_failm (Coq_dispatch_error (Runtime
-                       err_str_unwrap_only_wrap))) end) end
-              | _ =>
-                err_failm (Coq_dispatch_error (Runtime
-                  err_str_unwrap_only_wrap))) end end)
+            err_bind
+              (hoist_result
+                (apply_to_evidence_below g (et_size g) ((Trail_UNWRAP
+                  asp_id) :: []) et)) (fn size_below_wrap' =>
+              err_bind (hoist_result size_below_wrap') (fn size_below_wrap =>
+                case eqb nat_EqClass (length rwev) size_below_wrap of
+                  True => err_ret (Coq_evc rwev (Coq_asp_evt p ps et))
+                | False =>
+                  err_failm (Coq_dispatch_error (Runtime
+                    err_str_unwrap_of_wrap_same_size)))) end end)
         | _ =>
           err_failm (Coq_dispatch_error (Runtime
             err_str_only_unwrap_can_be_outwrap)))) end)
@@ -245,8 +231,9 @@ fun invoke_APPR' r et out_evt =
                | OutUnwrap =>
                  err_bind
                    (hoist_result
-                     (apply_to_asp_under_wrap g asp_id (fn e =>
-                       invoke_APPR' r e out_evt) et')) (fn e => e))
+                     (apply_to_evidence_below g (fn e =>
+                       invoke_APPR' r e out_evt) ((Trail_UNWRAP
+                       asp_id) :: []) et')) (fn e => e))
             | EXTEND =>
               (case out_sig of
                  OutN n =>
@@ -263,13 +250,13 @@ fun invoke_APPR' r et out_evt =
      | Coq_left_evt et' =>
        err_bind
          (hoist_result
-           (apply_to_left_evt g (fn e => invoke_APPR' r e out_evt) et'))
-         (fn r0 => r0)
+           (apply_to_evidence_below g (fn e => invoke_APPR' r e out_evt)
+             (Trail_LEFT :: []) et')) (fn r0 => r0)
      | Coq_right_evt et' =>
        err_bind
          (hoist_result
-           (apply_to_right_evt g (fn e => invoke_APPR' r e out_evt) et'))
-         (fn r0 => r0)
+           (apply_to_evidence_below g (fn e => invoke_APPR' r e out_evt)
+             (Trail_RIGHT :: []) et')) (fn r0 => r0)
      | Coq_split_evt et1 et2 =>
        (case et_size g et1 of
           Coq_errC e => err_failm (Coq_dispatch_error (Runtime e))
@@ -283,11 +270,23 @@ fun invoke_APPR' r et out_evt =
                  let val (ev_r, rest) = x0 in
                  (case rest of
                     [] =>
-                    err_bind split_ev (fn _ =>
-                      err_bind (invoke_APPR' ev_l et1 (Coq_left_evt et1))
-                        (fn ev1 =>
-                        err_bind (invoke_APPR' ev_r et2 (Coq_right_evt et2))
-                          (fn ev2 => join_seq ev1 ev2)))
+                    (case equiv_EvidenceT g et1 (Coq_left_evt out_evt) of
+                       True =>
+                       (case equiv_EvidenceT g et2 (Coq_right_evt out_evt) of
+                          True =>
+                          err_bind split_ev (fn _ =>
+                            err_bind
+                              (invoke_APPR' ev_l et1 (Coq_left_evt out_evt))
+                              (fn ev1 =>
+                              err_bind
+                                (invoke_APPR' ev_r et2 (Coq_right_evt
+                                  out_evt)) (fn ev2 => join_seq ev1 ev2)))
+                        | False =>
+                          err_failm (Coq_dispatch_error (Runtime
+                            err_str_ev_split_failed_not_empty)))
+                     | False =>
+                       err_failm (Coq_dispatch_error (Runtime
+                         err_str_ev_split_failed_not_empty)))
                   | _ :: _ =>
                     err_failm (Coq_dispatch_error (Runtime
                       err_str_ev_split_failed_not_empty))) end) end)))) end)

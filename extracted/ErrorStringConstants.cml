@@ -33,50 +33,20 @@ val err_str_asp_no_type_sig : string =
 val err_str_asp_no_compat_appr_asp : string =
   "Compatible Appraisal ASP not found in Global Context"
 
-(** val err_str_asps_not_duals : string **)
+(** val err_str_no_evidence_below : string **)
 
-val err_str_asps_not_duals : string =
-  "2 nested ASPs are not duals"
+val err_str_no_evidence_below : string =
+  "No evidence below the trail"
 
-(** val err_str_appr_asp_not_unwrap : string **)
+(** val err_str_trail_mismatch : string **)
 
-val err_str_appr_asp_not_unwrap : string =
-  "Compatible Appraisal ASP is not an UNWRAP ASP"
-
-(** val err_str_asp_is_not_wrap : string **)
-
-val err_str_asp_is_not_wrap : string =
-  "ASP is not a WRAP ASP"
-
-(** val err_str_no_possible_left_evt : string **)
-
-val err_str_no_possible_left_evt : string =
-  "No possible left_evt"
-
-(** val err_str_no_possible_right_evt : string **)
-
-val err_str_no_possible_right_evt : string =
-  "No possible right_evt"
-
-(** val err_str_asp_under_unwrap : string **)
-
-val err_str_asp_under_unwrap : string =
-  "ASP under UNWRAP is not a WRAP"
+val err_str_trail_mismatch : string =
+  "Trail mismatch while trying to get belwo evidence"
 
 (** val err_str_wrap_asp_not_duals : string **)
 
 val err_str_wrap_asp_not_duals : string =
   "A WRAP and UNWRAP ASPs are not duals"
-
-(** val err_str_unwrap_only_asp : string **)
-
-val err_str_unwrap_only_asp : string =
-  "UNWRAP ASPs must be applied to ASPs"
-
-(** val err_str_no_asp_under_evidence : string **)
-
-val err_str_no_asp_under_evidence : string =
-  "No ASP under evidence"
 
 (** val err_str_asp_at_bottom_not_wrap : string **)
 
@@ -138,11 +108,6 @@ val err_str_only_unwrap_can_be_outwrap : string =
 
 val err_str_unwrap_of_wrap_same_size : string =
   "UNWRAP of a WRAP ASP must have the sime size as the WRAPed evidence"
-
-(** val err_str_unwrap_only_wrap : string **)
-
-val err_str_unwrap_only_wrap : string =
-  "UNWRAP ASPs must be appplied to a WRAP ASP"
 
 (** val err_str_appr_wrap_failed : string **)
 
@@ -228,18 +193,3 @@ val err_str_list_json_to_manifest_set : string =
 
 val err_str_appr_compute_evt_neq : string =
   "Error in appraisal procedure computation, type of evidence passed into an appraisal procedure does not match the expected type (evidence types are not equivalent)"
-
-(** val err_str_appr_not_originally_a_wrap : string **)
-
-val err_str_appr_not_originally_a_wrap : string =
-  "Error in appraisal procedure computation: Attempting to appraise UNWRAPPED evidence but the UNWRAPPED evidence was not originally a WRAP."
-
-(** val err_str_appr_only_allow_on_asp : string **)
-
-val err_str_appr_only_allow_on_asp : string =
-  "Error in appraisal procedure computation: Attempting to appraise UNWRAPPED evidence but evidence that was UNWRAPPED was not an ASP (UNWRAP can only be applied to an ASP input)."
-
-(** val err_str_split_evidence_not_split : string **)
-
-val err_str_split_evidence_not_split : string =
-  "Error in appraisal procedure computation, type of evidence passed into a split appraisal procedure is not a split evidence type"
