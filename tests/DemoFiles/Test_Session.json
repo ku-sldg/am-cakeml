@@ -20,6 +20,22 @@
           "EvOutSig_BODY": "1"
         }
       },
+      "attest1_id": {
+        "FWD": "EXTEND",
+        "EvInSig": "ALL",
+        "EvOutSig": {
+          "EvOutSig_CONSTRUCTOR": "OutN",
+          "EvOutSig_BODY": "1"
+        }
+      },
+      "attest2_id": {
+        "FWD": "EXTEND",
+        "EvInSig": "ALL",
+        "EvOutSig": {
+          "EvOutSig_CONSTRUCTOR": "OutN",
+          "EvOutSig_BODY": "1"
+        }
+      },
       "hashfile_id": {
         "FWD": "EXTEND",
         "EvInSig": "NONE",
@@ -57,6 +73,8 @@
       "sig_id": "certificate_id",
       "hashfile_id": "appraise_id",
       "attest_id": "appraise_id",
+      "attest1_id": "appraise_id",
+      "attest2_id": "appraise_id",
       "appraise_id": "appraise_id",
       "certificate_id": "appraise_id"
     }
