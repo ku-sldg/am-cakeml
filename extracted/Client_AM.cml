@@ -69,11 +69,15 @@ fun am_sendReq att_sess req_plc e t toPlc =
 
 (** val am_app_summary_example :
     coq_Attestation_Session -> coq_Plc -> coq_Evidence -> coq_Term -> coq_Plc
-    -> coq_EvidenceT -> (coq_AppraisalSummary, string) coq_ResultT **)
+    -> (coq_AppraisalSummary, string) coq_ResultT **)
 
-fun am_app_summary_example att_sess req_plc e t toPlc summary_et =
+fun am_app_summary_example att_sess req_plc e t toPlc =
   case am_sendReq att_sess req_plc e t toPlc of
     Coq_errC msg => Coq_errC msg
   | Coq_resultC rawev =>
-    do_AppraisalSummary summary_et rawev example_GlobalContext
-      example_RawEvJudgement
+    let val glob_ctx =
+      let val Coq_mkAtt_Sess _ _ _ ats_context = att_sess in ats_context end
+    in
+    let val Coq_evc _ et = e in
+    res_bind (eval glob_ctx toPlc et t) (fn et' =>
+      do_AppraisalSummary et' rawev glob_ctx example_RawEvJudgement) end end

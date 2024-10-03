@@ -71,6 +71,7 @@ get_files(copland_am_src
     extracted/Term_Defs.cml
     extracted/Cvm_Utils.cml
     extracted/Flexible_Mechanisms_Vars.cml
+    stubs/RawEvJudgement_Admits.sml
     extracted/CACL_Demo.cml
     extracted/Flexible_Mechanisms.cml
     extracted/Term.cml

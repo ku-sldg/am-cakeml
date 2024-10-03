@@ -1,0 +1,9 @@
+(** val ex_targJudgement_fun : coq_RawEv -> string **)
+
+fun ex_targJudgement_fun _ =
+  "SAMPLE JUDGEMENT STRING ONE"
+
+(** val ex_targJudgement_fun' : coq_RawEv -> string **)
+
+fun ex_targJudgement_fun' _ =
+  "SAMPLE JUDGEMENT STRING TWO"
