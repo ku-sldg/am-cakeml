@@ -69,6 +69,7 @@ get_files(copland_am_src
     stubs/Manifest_Admits.sml
 
     extracted/Term_Defs.cml
+    extracted/Cvm_Utils.cml
     extracted/Flexible_Mechanisms_Vars.cml
     extracted/CACL_Demo.cml
     extracted/Flexible_Mechanisms.cml
@@ -93,7 +94,7 @@ get_files(copland_am_src
     extracted/Manifest_Generator.cml
     extracted/Manifest_Generator_Union.cml
     extracted/AM_Json_Interfaces.cml
-    # extracted/Client_AM.cml
+    extracted/Client_AM.cml
     extracted/Server_AM.cml
     extracted/Concrete_Extractables.cml
     util/AM_CLI.sml

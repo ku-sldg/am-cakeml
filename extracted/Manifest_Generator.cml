@@ -21,11 +21,13 @@ fun appr_manifest_update g e m =
        Some appr_asp_id => Coq_resultC (aspid_manifest_update appr_asp_id m)
      | None => Coq_errC err_str_asp_no_compat_appr_asp) end
   | Coq_left_evt e' =>
-    res_bind (apply_to_left_evt g (fn e0 => appr_manifest_update g e0 m) e')
-      (fn res => res)
+    res_bind
+      (apply_to_evidence_below g (fn e0 => appr_manifest_update g e0 m)
+        (Trail_LEFT :: []) e') (fn res => res)
   | Coq_right_evt e' =>
-    res_bind (apply_to_right_evt g (fn e0 => appr_manifest_update g e0 m) e')
-      (fn res => res)
+    res_bind
+      (apply_to_evidence_below g (fn e0 => appr_manifest_update g e0 m)
+        (Trail_RIGHT :: []) e') (fn res => res)
   | Coq_split_evt e1 e2 =>
     res_bind (appr_manifest_update g e1 m) (fn m1 =>
       appr_manifest_update g e2 m1)

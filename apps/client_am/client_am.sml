@@ -23,7 +23,11 @@ fun main () =
       (* val app_result = run_demo_client_AM demo_term top_plc att_plc init_et att_sess init_rawev attester_addr appraiser_addr  *)
       (* TODO: Current this will do basically NOTHING *)
   in 
-    ()
+    let val maybe_appsumm = am_app_summary_example att_sess top_plc (Coq_evc [] Coq_mt_evt) example_appTerm att_plc (* Coq_mt_evt *) computed_evidence in 
+      case maybe_appsumm of 
+        Coq_resultC appsumm => print (coq_JSON_to_string (test_app_summary_compute_json appsumm)) 
+      | Coq_errC errStr => print errStr 
+    end
   end
   handle Exception e => TextIO.print_err e 
           | Word8Extra.InvalidHex => TextIO.print_err "BSTRING UNSHOW ERROR"

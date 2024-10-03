@@ -74,19 +74,10 @@ fun appr_procedure' g p e ev_out =
                     | _ => Coq_errC err_str_appr_compute_evt_neq) end
                  | None => Coq_errC err_str_asp_no_type_sig)
               | UNWRAP =>
-                (case e' of
-                   Coq_asp_evt _ a e'' =>
-                   let val Coq_asp_paramsC asp_id' _ _ _ = a in
-                   (case map_get coq_Eq_Class_ID_Type asp_id'
-                           (let val Build_GlobalContext asp_types _ = g in
-                            asp_types end) of
-                      Some e1 =>
-                      let val Coq_ev_arrow f _ _ = e1 in
-                      (case f of
-                         WRAP => appr_procedure' g p e'' ev_out
-                       | _ => Coq_errC err_str_appr_not_originally_a_wrap) end
-                    | None => Coq_errC err_str_asp_no_type_sig) end
-                 | _ => Coq_errC err_str_appr_only_allow_on_asp)
+                res_bind
+                  (apply_to_evidence_below g (fn e1 =>
+                    appr_procedure' g p e1 ev_out) ((Trail_UNWRAP
+                    asp_id) :: []) e') (fn r => r)
               | EXTEND =>
                 res_bind (appr_procedure' g p e' e') (fn ev_under =>
                   Coq_resultC (Coq_split_evt (Coq_asp_evt p dual_par ev_out)
@@ -95,12 +86,12 @@ fun appr_procedure' g p e ev_out =
         | None => Coq_errC err_str_asp_no_type_sig) end
      | Coq_left_evt e' =>
        res_bind
-         (apply_to_left_evt g (fn e'0 => appr_procedure' g p e'0 ev_out) e')
-         (fn r => r)
+         (apply_to_evidence_below g (fn e'0 =>
+           appr_procedure' g p e'0 ev_out) (Trail_LEFT :: []) e') (fn r => r)
      | Coq_right_evt e' =>
        res_bind
-         (apply_to_right_evt g (fn e'0 => appr_procedure' g p e'0 ev_out) e')
-         (fn r => r)
+         (apply_to_evidence_below g (fn e'0 =>
+           appr_procedure' g p e'0 ev_out) (Trail_RIGHT :: []) e') (fn r => r)
      | Coq_split_evt e1 e2 =>
        res_bind (appr_procedure' g p e1 (Coq_left_evt ev_out)) (fn e1' =>
          res_bind (appr_procedure' g p e2 (Coq_right_evt ev_out)) (fn e2' =>
@@ -170,15 +161,22 @@ fun appr_events_size g e = case e of
         REPLACE => Coq_resultC (S O)
       | WRAP =>
         res_bind (appr_events_size g e') (fn n => Coq_resultC (add (S O) n))
-      | UNWRAP => appr_events_size g e'
+      | UNWRAP =>
+        res_bind
+          (apply_to_evidence_below g (appr_events_size g) ((Trail_UNWRAP
+            asp_id) :: []) e') (fn r => r)
       | EXTEND =>
         res_bind (appr_events_size g e') (fn n => Coq_resultC
           (add (S (S (S O))) n))) end
    | None => Coq_errC err_str_asp_no_type_sig) end
 | Coq_left_evt e' =>
-  res_bind (apply_to_left_evt g (appr_events_size g) e') (fn r => r)
+  res_bind
+    (apply_to_evidence_below g (appr_events_size g) (Trail_LEFT :: []) e')
+    (fn r => r)
 | Coq_right_evt e' =>
-  res_bind (apply_to_right_evt g (appr_events_size g) e') (fn r => r)
+  res_bind
+    (apply_to_evidence_below g (appr_events_size g) (Trail_RIGHT :: []) e')
+    (fn r => r)
 | Coq_split_evt e1 e2 =>
   res_bind (appr_events_size g e1) (fn s1 =>
     res_bind (appr_events_size g e2) (fn s2 => Coq_resultC
@@ -234,7 +232,11 @@ fun appr_events' g p e ev_out i =
              let val new_ev_out = Coq_asp_evt p dual_par ev_out in
              res_bind (appr_events' g p e' new_ev_out (add i (S O)))
                (fn ev' => Coq_resultC (unwrap_ev :: ev')) end end
-           | UNWRAP => appr_events' g p e' ev_out i
+           | UNWRAP =>
+             res_bind
+               (apply_to_evidence_below g (fn e'0 =>
+                 appr_events' g p e'0 ev_out i) ((Trail_UNWRAP asp_id) :: [])
+                 e') (fn r => r)
            | EXTEND =>
              res_bind (appr_events' g p e' e' (add i (S (S O)))) (fn ev' =>
                Coq_resultC
@@ -246,23 +248,28 @@ fun appr_events' g p e ev_out i =
      | None => Coq_errC err_str_asp_no_compat_appr_asp) end
   | Coq_left_evt e' =>
     res_bind
-      (apply_to_left_evt g (fn e'0 => appr_events' g p e'0 ev_out i) e')
-      (fn r => r)
+      (apply_to_evidence_below g (fn e'0 => appr_events' g p e'0 ev_out i)
+        (Trail_LEFT :: []) e') (fn r => r)
   | Coq_right_evt e' =>
     res_bind
-      (apply_to_right_evt g (fn e'0 => appr_events' g p e'0 ev_out i) e')
-      (fn r => r)
+      (apply_to_evidence_below g (fn e'0 => appr_events' g p e'0 ev_out i)
+        (Trail_RIGHT :: []) e') (fn r => r)
   | Coq_split_evt e1 e2 =>
-    (case ev_out of
-       Coq_split_evt e1' e2' =>
-       res_bind (appr_events' g p e1 e1' (add i (S O))) (fn e1'0 =>
-         let val next_i = add (add i (S O)) (length e1'0) in
-         res_bind (appr_events' g p e2 e2' next_i) (fn e2'0 =>
-           let val last_i = add next_i (length e2'0) in
-           Coq_resultC
-           (app ((Coq_split i p) :: [])
-             (app e1'0 (app e2'0 ((Coq_join last_i p) :: [])))) end) end)
-     | _ => Coq_errC err_str_split_evidence_not_split)
+    (case equiv_EvidenceT g e1 (Coq_left_evt ev_out) of
+       True =>
+       (case equiv_EvidenceT g e2 (Coq_right_evt ev_out) of
+          True =>
+          res_bind (appr_events' g p e1 (Coq_left_evt ev_out) (add i (S O)))
+            (fn e1' =>
+            let val next_i = add (add i (S O)) (length e1') in
+            res_bind (appr_events' g p e2 (Coq_right_evt ev_out) next_i)
+              (fn e2' =>
+              let val last_i = add next_i (length e2') in
+              Coq_resultC
+              (app ((Coq_split i p) :: [])
+                (app e1' (app e2' ((Coq_join last_i p) :: [])))) end) end)
+        | False => Coq_errC err_str_appr_compute_evt_neq)
+     | False => Coq_errC err_str_appr_compute_evt_neq)
 
 (** val appr_events :
     coq_GlobalContext -> coq_Plc -> coq_EvidenceT -> nat -> (coq_Ev list,

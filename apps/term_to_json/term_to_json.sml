@@ -33,7 +33,8 @@ fun main () =
               | None => 
                   raise (Exception ("TermToJson Argument Error - Unknown term identifier: \"" ^ termName ^ "\"\n" ^ usage))
         in
-          write_term_to_file outTerm outFile
+          write_term_to_file outTerm outFile ; 
+          print (coq_JSON_to_string (test_app_summary_compute_json example_appraisal_summary))
         end
     end
     handle Exception e => TextIO.print_err e 

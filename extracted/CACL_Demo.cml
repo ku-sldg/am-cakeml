@@ -3,140 +3,169 @@
 val cds_config_dir_plc : coq_Plc =
   "cds_config_dir_plc"
 
-(** val kim_evidence_targ : coq_TARG_ID **)
-
-val kim_evidence_targ : coq_TARG_ID =
-  "kim_evidence_targ"
-
-(** val cds_controller_dir_targ : coq_TARG_ID **)
-
-val cds_controller_dir_targ : coq_TARG_ID =
-  "cds_controller_dir_targ"
-
-(** val cds_controller_exe_targ : coq_TARG_ID **)
-
-val cds_controller_exe_targ : coq_TARG_ID =
-  "cds_controller_exe_targ"
-
 (** val cds_config_1_targ : coq_TARG_ID **)
 
 val cds_config_1_targ : coq_TARG_ID =
   "cds_config_1_targ"
-
-(** val cds_config_2_targ : coq_TARG_ID **)
-
-val cds_config_2_targ : coq_TARG_ID =
-  "cds_config_2_targ"
-
-(** val cds_config_3_targ : coq_TARG_ID **)
-
-val cds_config_3_targ : coq_TARG_ID =
-  "cds_config_3_targ"
-
-(** val cds_img_1_targ : coq_TARG_ID **)
-
-val cds_img_1_targ : coq_TARG_ID =
-  "cds_img_1_targ"
-
-(** val cds_img_2_targ : coq_TARG_ID **)
-
-val cds_img_2_targ : coq_TARG_ID =
-  "cds_img_2_targ"
-
-(** val cds_img_3_targ : coq_TARG_ID **)
-
-val cds_img_3_targ : coq_TARG_ID =
-  "cds_img_3_targ"
-
-(** val query_kim_id : coq_ASP_ID **)
-
-val query_kim_id : coq_ASP_ID =
-  "query_kim_id"
-
-(** val hash_file_contents_id : coq_ASP_ID **)
-
-val hash_file_contents_id : coq_ASP_ID =
-  "hash_file_contents_id"
 
 (** val gather_file_contents_id : coq_ASP_ID **)
 
 val gather_file_contents_id : coq_ASP_ID =
   "gather_file_contents_id"
 
-(** val appr_cds_id : coq_ASP_ID **)
-
-val appr_cds_id : coq_ASP_ID =
-  "appr_cds_id"
-
 (** val gather_targ_asp : coq_Plc -> coq_TARG_ID -> coq_Term **)
 
 fun gather_targ_asp targPlc targId =
   Coq_asp (ASPC (Coq_asp_paramsC gather_file_contents_id [] targPlc targId))
-
-(** val hash_targ_asp : coq_Plc -> coq_TARG_ID -> coq_Term **)
-
-fun hash_targ_asp targPlc targId =
-  Coq_asp (ASPC (Coq_asp_paramsC hash_file_contents_id [] targPlc targId))
 
 (** val gather_config_1 : coq_Term **)
 
 val gather_config_1 : coq_Term =
   gather_targ_asp cds_config_dir_plc cds_config_1_targ
 
-(** val gather_config_2 : coq_Term **)
+type coq_AppraisalSummary =
+  (coq_ASP_ID, (coq_TARG_ID, string) coq_Map) coq_Map
 
-val gather_config_2 : coq_Term =
-  gather_targ_asp cds_config_dir_plc cds_config_2_targ
+type coq_RawEvJudgement =
+  (coq_ASP_ID, (coq_TARG_ID, coq_RawEv -> string) coq_Map) coq_Map
 
-(** val gather_config_3 : coq_Term **)
+(** val get_RawEvJudgement :
+    coq_ASP_ID -> coq_TARG_ID -> coq_RawEvJudgement -> coq_RawEv -> string **)
 
-val gather_config_3 : coq_Term =
-  gather_targ_asp cds_config_dir_plc cds_config_3_targ
+fun get_RawEvJudgement i tid m =
+  let val default_fun = fn _ =>
+    String.^ "( "
+      (String.^ i
+        (String.^ ", "
+          (String.^ tid (String.^ " ) " "not found in RawEvJudgement map"))))
+  in
+  (case map_get coq_Eq_Class_ID_Type i m of
+     Some m' =>
+     (case map_get coq_Eq_Class_ID_Type tid m' of
+        Some f => f
+      | None => default_fun)
+   | None => default_fun) end
 
-(** val hash_cds_img_1 : coq_Term **)
+(** val map_get_default :
+    'a1 coq_EqClass -> 'a1 -> 'a2 -> ('a1, 'a2) coq_Map -> 'a2 **)
 
-val hash_cds_img_1 : coq_Term =
-  hash_targ_asp cds_config_dir_plc cds_img_1_targ
+fun map_get_default h x y m =
+  case map_get h x m of
+    Some v => v
+  | None => y
 
-(** val hash_cds_img_2 : coq_Term **)
+(** val set_AppraisalSummary :
+    coq_ASP_ID -> coq_TARG_ID -> string -> coq_AppraisalSummary ->
+    coq_AppraisalSummary **)
 
-val hash_cds_img_2 : coq_Term =
-  hash_targ_asp cds_config_dir_plc cds_img_2_targ
+fun set_AppraisalSummary i tid str s =
+  let val m = map_get_default coq_Eq_Class_ID_Type i [] s in
+  let val m' = map_set coq_Eq_Class_ID_Type tid str m in
+  map_set coq_Eq_Class_ID_Type i m' s end end
 
-(** val hash_cds_img_3 : coq_Term **)
+(** val add_asp_summary :
+    coq_ASP_ID -> coq_TARG_ID -> (coq_RawEv -> string) -> coq_RawEv ->
+    coq_AppraisalSummary -> coq_AppraisalSummary **)
 
-val hash_cds_img_3 : coq_Term =
-  hash_targ_asp cds_config_dir_plc cds_img_3_targ
+fun add_asp_summary i tid f rEv s =
+  let val str = f rEv in set_AppraisalSummary i tid str s end
 
-(** val hash_controller_img : coq_Term **)
+(** val do_AppraisalSummary' :
+    coq_EvidenceT -> coq_RawEv -> coq_GlobalContext -> coq_RawEvJudgement ->
+    coq_AppraisalSummary -> (coq_AppraisalSummary, string) coq_ResultT **)
 
-val hash_controller_img : coq_Term =
-  hash_targ_asp cds_controller_dir_targ cds_controller_exe_targ
+fun do_AppraisalSummary' et r g m s =
+  case et of
+    Coq_asp_evt _ ps et' =>
+    let val Coq_asp_paramsC i _ _ tid = ps in
+    (case map_get coq_Eq_Class_ID_Type i
+            (let val Build_GlobalContext asp_types _ = g in asp_types end) of
+       Some e =>
+       let val Coq_ev_arrow fwd _ out_sig = e in
+       (case fwd of
+          EXTEND =>
+          (case out_sig of
+             OutN n =>
+             let val f = get_RawEvJudgement i tid m in
+             res_bind (peel_n_rawev n r) (fn x =>
+               let val (r1, rest) = x in
+               let val s' = add_asp_summary i tid f r1 s in
+               do_AppraisalSummary' et' rest g m s' end end) end
+           | OutUnwrap => Coq_errC err_str_cannot_have_outwrap)
+        | _ => Coq_resultC s) end
+     | None => Coq_resultC s) end
+  | Coq_left_evt et' => do_AppraisalSummary' et' r g m s
+  | Coq_right_evt et' => do_AppraisalSummary' et' r g m s
+  | Coq_split_evt et1 et2 =>
+    res_bind (et_size g et1) (fn et1_size =>
+      res_bind (et_size g et2) (fn et2_size =>
+        res_bind (peel_n_rawev et1_size r) (fn x =>
+          let val (r1, rest) = x in
+          res_bind (peel_n_rawev et2_size rest) (fn x0 =>
+            let val (r2, _) = x0 in
+            res_bind (do_AppraisalSummary' et1 r1 g m s) (fn s1 =>
+              do_AppraisalSummary' et2 r2 g m s1) end) end)))
+  | _ => Coq_resultC s
 
-(** val meas_cds_phrase : coq_Term **)
+(** val do_AppraisalSummary :
+    coq_EvidenceT -> coq_RawEv -> coq_GlobalContext -> coq_RawEvJudgement ->
+    (coq_AppraisalSummary, string) coq_ResultT **)
 
-val meas_cds_phrase : coq_Term =
-  Coq_lseq gather_config_1 (Coq_lseq gather_config_2 (Coq_lseq
-    gather_config_3 (Coq_lseq hash_controller_img (Coq_lseq hash_cds_img_1
-    (Coq_lseq hash_cds_img_2 hash_cds_img_3)))))
+fun do_AppraisalSummary et r g m =
+  do_AppraisalSummary' et r g m []
 
-(** val query_kim_asp : coq_Term **)
+(** val ex_targMap : (coq_TARG_ID, string) coq_Map **)
 
-val query_kim_asp : coq_Term =
-  Coq_asp (ASPC (Coq_asp_paramsC query_kim_id [] coq_P1 kim_evidence_targ))
+val ex_targMap : (coq_TARG_ID, string) coq_Map =
+  (cds_config_1_targ, "cds_config_1_targ PASSED") :: []
 
-(** val appr_cds_asp : coq_Term **)
+(** val example_appraisal_summary : coq_AppraisalSummary **)
 
-val appr_cds_asp : coq_Term =
-  Coq_asp (ASPC (Coq_asp_paramsC appr_cds_id [] coq_P1 sys_targ))
+val example_appraisal_summary : coq_AppraisalSummary =
+  (gather_file_contents_id, ex_targMap) :: ((appraise_id, ex_targMap) :: [])
 
-(** val sig_asp : coq_Term **)
+(** val gather_contents_evsig : coq_EvSig **)
 
-val sig_asp : coq_Term =
-  Coq_asp SIG
+val gather_contents_evsig : coq_EvSig =
+  Coq_ev_arrow EXTEND InAll (OutN (S O))
 
-(** val cds_demo_phrase : coq_Term **)
+(** val example_GlobalContext : coq_GlobalContext **)
 
-val cds_demo_phrase : coq_Term =
-  Coq_lseq (Coq_att coq_P1 (Coq_lseq (Coq_lseq query_kim_asp meas_cds_phrase)
-    sig_asp)) (Coq_att coq_P3 appr_cds_asp)
+val example_GlobalContext : coq_GlobalContext =
+  Build_GlobalContext ((gather_file_contents_id,
+    gather_contents_evsig) :: ((appraise_id, gather_contents_evsig) :: []))
+    ((gather_file_contents_id, appraise_id) :: [])
+
+(** val example_appTerm : coq_Term **)
+
+val example_appTerm : coq_Term =
+  Coq_lseq gather_config_1 (Coq_asp APPR)
+
+(** val computed_evidence : coq_EvidenceT **)
+
+val computed_evidence : coq_EvidenceT =
+  case eval example_GlobalContext coq_P0 Coq_mt_evt example_appTerm of
+    Coq_errC _ => Coq_mt_evt
+  | Coq_resultC et => et
+
+(** val ex_targJudgement : (coq_TARG_ID, coq_RawEv -> string) coq_Map **)
+
+val ex_targJudgement : (coq_TARG_ID, coq_RawEv -> string) coq_Map =
+  (cds_config_1_targ, (fn _ => "SAMPLE JUDGEMENT STRING")) :: []
+
+(** val example_RawEvJudgement : coq_RawEvJudgement **)
+
+val example_RawEvJudgement : coq_RawEvJudgement =
+  (gather_file_contents_id, ex_targJudgement) :: ((appraise_id,
+    ex_targJudgement) :: [])
+
+(** val test_app_summary_compute_json : coq_AppraisalSummary -> coq_JSON **)
+
+fun test_app_summary_compute_json x =
+  let val Build_Jsonifiable to_JSON _ =
+    jsonifiable_map_serial_json coq_Stringifiable_ID_Type
+      coq_Eq_Class_ID_Type
+      (jsonifiable_map_serial_serial coq_Stringifiable_ID_Type
+        coq_Eq_Class_ID_Type coq_Stringifiable_ID_Type)
+  in
+  to_JSON x end

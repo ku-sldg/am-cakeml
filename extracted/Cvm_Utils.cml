@@ -1,0 +1,14 @@
+(** val peel_n_rawev :
+    nat -> coq_RawEv -> (coq_RawEv * coq_RawEv, string) coq_ResultT **)
+
+fun peel_n_rawev n ls =
+  case n of
+    O => Coq_resultC ([], ls)
+  | S n' =>
+    (case ls of
+       [] => Coq_errC errStr_peel_n_am
+     | x :: ls' =>
+       (case peel_n_rawev n' ls' of
+          Coq_errC e => Coq_errC e
+        | Coq_resultC p =>
+          let val (ls1, ls2) = p in Coq_resultC ((x :: ls1), ls2) end))
