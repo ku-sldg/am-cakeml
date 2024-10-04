@@ -26,13 +26,12 @@ fun main () =
        ; print (coq_JSON_to_string (test_app_summary_compute_json example_appraisal_summary))
       *)
   in 
-    let val maybe_appsumm = am_app_summary_example 
+    let val maybe_appsumm = am_client_app_summary
                               att_sess 
                               top_plc 
                               (Coq_evc [] Coq_mt_evt) 
                               example_appTerm 
-                              att_plc 
-                              (* computed_evidence *) (* Coq_mt_evt *) in 
+                              att_plc in 
       case maybe_appsumm of 
         Coq_resultC appsumm => print (coq_JSON_to_string (test_app_summary_compute_json appsumm)) 
       | Coq_errC errStr => print errStr 

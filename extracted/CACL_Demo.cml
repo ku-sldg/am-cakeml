@@ -11,12 +11,19 @@ val cds_config_1_targ : coq_TARG_ID =
 (** val gather_file_contents_id : coq_ASP_ID **)
 
 val gather_file_contents_id : coq_ASP_ID =
-  "gather_file_contents_id"
+  "r_readfile_id"
+
+(** val appr_gather_file_contents_id : coq_ASP_ID **)
+
+val appr_gather_file_contents_id : coq_ASP_ID =
+  "appraise_r_readfile_id"
 
 (** val gather_targ_asp : coq_Plc -> coq_TARG_ID -> coq_Term **)
 
 fun gather_targ_asp targPlc targId =
-  Coq_asp (ASPC (Coq_asp_paramsC gather_file_contents_id [] targPlc targId))
+  Coq_asp (ASPC (Coq_asp_paramsC gather_file_contents_id (("filepath",
+    "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/targFile.txt") :: [])
+    targPlc targId))
 
 (** val gather_config_1 : coq_Term **)
 
@@ -127,39 +134,10 @@ fun do_AppraisalSummary' et r g m s =
 fun do_AppraisalSummary et r g m =
   do_AppraisalSummary' et r g m []
 
-(** val ex_targMap : (coq_TARG_ID, string) coq_Map **)
-
-val ex_targMap : (coq_TARG_ID, string) coq_Map =
-  (cds_config_1_targ, "cds_config_1_targ PASSED") :: []
-
-(** val example_appraisal_summary : coq_AppraisalSummary **)
-
-val example_appraisal_summary : coq_AppraisalSummary =
-  (gather_file_contents_id, ex_targMap) :: ((appraise_id, ex_targMap) :: [])
-
-(** val gather_contents_evsig : coq_EvSig **)
-
-val gather_contents_evsig : coq_EvSig =
-  Coq_ev_arrow EXTEND InAll (OutN (S O))
-
-(** val example_GlobalContext : coq_GlobalContext **)
-
-val example_GlobalContext : coq_GlobalContext =
-  Build_GlobalContext ((gather_file_contents_id,
-    gather_contents_evsig) :: ((appraise_id, gather_contents_evsig) :: []))
-    ((gather_file_contents_id, appraise_id) :: [])
-
 (** val example_appTerm : coq_Term **)
 
 val example_appTerm : coq_Term =
   Coq_lseq gather_config_1 (Coq_asp APPR)
-
-(** val computed_evidence : coq_EvidenceT **)
-
-val computed_evidence : coq_EvidenceT =
-  case eval example_GlobalContext coq_P0 Coq_mt_evt example_appTerm of
-    Coq_errC _ => Coq_mt_evt
-  | Coq_resultC et => et
 
 (** val example_RawEvJudgement : coq_RawEvJudgement **)
 
@@ -168,7 +146,8 @@ val example_RawEvJudgement : coq_RawEvJudgement =
     add_RawEvJudgement gather_file_contents_id cds_config_1_targ
       ex_targJudgement_fun []
   in
-  add_RawEvJudgement appraise_id cds_config_1_targ ex_targJudgement_fun' j' end
+  add_RawEvJudgement appr_gather_file_contents_id cds_config_1_targ
+    ex_targJudgement_fun' j' end
 
 (** val test_app_summary_compute_json : coq_AppraisalSummary -> coq_JSON **)
 

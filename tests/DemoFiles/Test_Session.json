@@ -52,7 +52,23 @@
           "EvOutSig_BODY": "1"
         }
       },
+      "appraise_r_readfile_id": {
+        "FWD": "EXTEND",
+        "EvInSig": "ALL",
+        "EvOutSig": {
+          "EvOutSig_CONSTRUCTOR": "OutN",
+          "EvOutSig_BODY": "1"
+        }
+      },
       "query_kim_id": {
+        "FWD": "EXTEND",
+        "EvInSig": "ALL",
+        "EvOutSig": {
+          "EvOutSig_CONSTRUCTOR": "OutN",
+          "EvOutSig_BODY": "1"
+        }
+      },
+      "r_readfile_id": {
         "FWD": "EXTEND",
         "EvInSig": "ALL",
         "EvOutSig": {
@@ -93,6 +109,7 @@
       "certificate_id": "appraise_id",
       "query_kim_id": "appraise_id",
       "gather_file_contents_id": "appraise_id",
+      "r_readfile_id": "appraise_r_readfile_id",
       "hash_file_contents_id": "appraise_id",
       "appr_cds_id": "appraise_id"
     }
