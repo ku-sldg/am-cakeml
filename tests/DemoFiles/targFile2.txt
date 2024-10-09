@@ -1,2 +1,1 @@
 targFileContents
-bad1

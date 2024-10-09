@@ -1,2 +1,2 @@
 targFileContents
-bad1
+bad3

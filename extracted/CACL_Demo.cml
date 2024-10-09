@@ -8,6 +8,16 @@ val cds_config_dir_plc : coq_Plc =
 val cds_config_1_targ : coq_TARG_ID =
   "cds_config_1_targ"
 
+(** val cds_config_2_targ : coq_TARG_ID **)
+
+val cds_config_2_targ : coq_TARG_ID =
+  "cds_config_2_targ"
+
+(** val cds_config_3_targ : coq_TARG_ID **)
+
+val cds_config_3_targ : coq_TARG_ID =
+  "cds_config_3_targ"
+
 (** val gather_file_contents_id : coq_ASP_ID **)
 
 val gather_file_contents_id : coq_ASP_ID =
@@ -18,17 +28,41 @@ val gather_file_contents_id : coq_ASP_ID =
 val appr_gather_file_contents_id : coq_ASP_ID =
   "appraise_r_readfile_id"
 
-(** val gather_targ_asp : coq_Plc -> coq_TARG_ID -> coq_Term **)
+(** val gather_targ_asp : coq_Plc -> coq_TARG_ID -> string -> coq_Term **)
 
-fun gather_targ_asp targPlc targId =
+fun gather_targ_asp targPlc targId path =
   Coq_asp (ASPC (Coq_asp_paramsC gather_file_contents_id (("filepath",
-    "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/targFile.txt") :: [])
-    targPlc targId))
+    path) :: []) targPlc targId))
+
+(** val path_targ1 : string **)
+
+val path_targ1 : string =
+  "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/targFile.txt"
+
+(** val path_targ2 : string **)
+
+val path_targ2 : string =
+  "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/targFile2.txt"
+
+(** val path_targ3 : string **)
+
+val path_targ3 : string =
+  "/Users/adampetz/Documents/Spring_2023/am-cakeml/tests/DemoFiles/targFile3.txt"
 
 (** val gather_config_1 : coq_Term **)
 
 val gather_config_1 : coq_Term =
-  gather_targ_asp cds_config_dir_plc cds_config_1_targ
+  gather_targ_asp cds_config_dir_plc cds_config_1_targ path_targ1
+
+(** val gather_config_2 : coq_Term **)
+
+val gather_config_2 : coq_Term =
+  gather_targ_asp cds_config_dir_plc cds_config_2_targ path_targ2
+
+(** val gather_config_3 : coq_Term **)
+
+val gather_config_3 : coq_Term =
+  gather_targ_asp cds_config_dir_plc cds_config_3_targ path_targ3
 
 type coq_AppraisalSummary =
   (coq_ASP_ID, (coq_TARG_ID, string) coq_Map) coq_Map
@@ -137,7 +171,8 @@ fun do_AppraisalSummary et r g m =
 (** val example_appTerm : coq_Term **)
 
 val example_appTerm : coq_Term =
-  Coq_lseq gather_config_1 (Coq_asp APPR)
+  Coq_lseq gather_config_1 (Coq_lseq gather_config_2 (Coq_lseq
+    gather_config_3 (Coq_asp APPR)))
 
 (** val example_RawEvJudgement : coq_RawEvJudgement **)
 
@@ -146,8 +181,24 @@ val example_RawEvJudgement : coq_RawEvJudgement =
     add_RawEvJudgement gather_file_contents_id cds_config_1_targ
       ex_targJudgement_fun []
   in
-  add_RawEvJudgement appr_gather_file_contents_id cds_config_1_targ
-    ex_targJudgement_fun' j' end
+  let val j'' =
+    add_RawEvJudgement appr_gather_file_contents_id cds_config_1_targ
+      ex_targJudgement_fun' j'
+  in
+  let val j''' =
+    add_RawEvJudgement appr_gather_file_contents_id cds_config_2_targ
+      ex_targJudgement_fun' j''
+  in
+  let val j'''' =
+    add_RawEvJudgement appr_gather_file_contents_id cds_config_3_targ
+      ex_targJudgement_fun' j'''
+  in
+  let val j''''' =
+    add_RawEvJudgement gather_file_contents_id cds_config_3_targ
+      ex_targJudgement_fun j''''
+  in
+  add_RawEvJudgement gather_file_contents_id cds_config_2_targ
+    ex_targJudgement_fun j''''' end end end end end
 
 (** val test_app_summary_compute_json : coq_AppraisalSummary -> coq_JSON **)
 
