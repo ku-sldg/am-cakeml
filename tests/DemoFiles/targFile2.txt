@@ -1,1 +1,2 @@
 targFileContents
+bad2

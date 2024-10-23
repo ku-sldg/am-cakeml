@@ -174,31 +174,38 @@ val example_appTerm : coq_Term =
   Coq_lseq gather_config_1 (Coq_lseq gather_config_2 (Coq_lseq
     gather_config_3 (Coq_asp APPR)))
 
+type single_add_type = coq_ASP_ID * (coq_TARG_ID * (coq_RawEv -> string))
+
+(** val addOne_rawEvJudgement :
+    coq_RawEvJudgement -> single_add_type -> coq_RawEvJudgement **)
+
+fun addOne_rawEvJudgement a b =
+  let val aid = fst b in
+  let val tid = fst (snd b) in
+  let val f = snd (snd b) in add_RawEvJudgement aid tid f a end end end
+
+(** val gen_rawEvJudgement : single_add_type list -> coq_RawEvJudgement **)
+
+fun gen_rawEvJudgement ls =
+  fold_left addOne_rawEvJudgement ls []
+
+(** val example_RawEvJudgement_ls : single_add_type list **)
+
+val example_RawEvJudgement_ls : single_add_type list =
+  (gather_file_contents_id, (cds_config_1_targ,
+    ex_targJudgement_fun)) :: ((gather_file_contents_id, (cds_config_2_targ,
+    ex_targJudgement_fun)) :: ((gather_file_contents_id, (cds_config_3_targ,
+    ex_targJudgement_fun)) :: ((appr_gather_file_contents_id,
+    (cds_config_1_targ,
+    ex_targJudgement_fun')) :: ((appr_gather_file_contents_id,
+    (cds_config_2_targ,
+    ex_targJudgement_fun')) :: ((appr_gather_file_contents_id,
+    (cds_config_3_targ, ex_targJudgement_fun')) :: [])))))
+
 (** val example_RawEvJudgement : coq_RawEvJudgement **)
 
 val example_RawEvJudgement : coq_RawEvJudgement =
-  let val j' =
-    add_RawEvJudgement gather_file_contents_id cds_config_1_targ
-      ex_targJudgement_fun []
-  in
-  let val j'' =
-    add_RawEvJudgement appr_gather_file_contents_id cds_config_1_targ
-      ex_targJudgement_fun' j'
-  in
-  let val j''' =
-    add_RawEvJudgement appr_gather_file_contents_id cds_config_2_targ
-      ex_targJudgement_fun' j''
-  in
-  let val j'''' =
-    add_RawEvJudgement appr_gather_file_contents_id cds_config_3_targ
-      ex_targJudgement_fun' j'''
-  in
-  let val j''''' =
-    add_RawEvJudgement gather_file_contents_id cds_config_3_targ
-      ex_targJudgement_fun j''''
-  in
-  add_RawEvJudgement gather_file_contents_id cds_config_2_targ
-    ex_targJudgement_fun j''''' end end end end end
+  gen_rawEvJudgement example_RawEvJudgement_ls
 
 (** val test_app_summary_compute_json : coq_AppraisalSummary -> coq_JSON **)
 
