@@ -2,27 +2,50 @@
     coq_ASP_ID -> coq_Manifest -> coq_Manifest **)
 
 fun aspid_manifest_update i m =
-  let val Build_Manifest oldasps oldCompatMap oldFSMap oldPolicy = m in
-  Build_Manifest (manset_add coq_Eq_Class_ID_Type i oldasps) oldCompatMap
-  oldFSMap oldPolicy end
+  let val Build_Manifest oldasps oldFSMap oldPolicy = m in
+  Build_Manifest (manset_add coq_Eq_Class_ID_Type i oldasps) oldFSMap
+  oldPolicy end
 
-(** val add_compat_map_manifest :
-    coq_Manifest -> coq_ASP_Compat_MapT -> coq_Manifest **)
+(** val appr_manifest_update :
+    coq_GlobalContext -> coq_EvidenceT -> coq_Manifest -> (coq_Manifest,
+    string) coq_ResultT **)
 
-fun add_compat_map_manifest m cm =
-  let val Build_Manifest oldasps _ oldFSMap oldPolicy = m in
-  Build_Manifest oldasps cm oldFSMap oldPolicy end
+fun appr_manifest_update g e m =
+  case e of
+    Coq_mt_evt => Coq_resultC m
+  | Coq_nonce_evt _ => Coq_resultC (aspid_manifest_update check_nonce_aspid m)
+  | Coq_asp_evt _ ps _ =>
+    let val Coq_asp_paramsC asp_id _ _ _ = ps in
+    (case map_get coq_Eq_Class_ID_Type asp_id
+            (let val Build_GlobalContext _ asp_comps = g in asp_comps end) of
+       Some appr_asp_id => Coq_resultC (aspid_manifest_update appr_asp_id m)
+     | None => Coq_errC err_str_asp_no_compat_appr_asp) end
+  | Coq_left_evt e' =>
+    res_bind
+      (apply_to_evidence_below g (fn e0 => appr_manifest_update g e0 m)
+        (Trail_LEFT :: []) e') (fn res => res)
+  | Coq_right_evt e' =>
+    res_bind
+      (apply_to_evidence_below g (fn e0 => appr_manifest_update g e0 m)
+        (Trail_RIGHT :: []) e') (fn res => res)
+  | Coq_split_evt e1 e2 =>
+    res_bind (appr_manifest_update g e1 m) (fn m1 =>
+      appr_manifest_update g e2 m1)
 
-(** val asp_manifest_update : coq_ASP -> coq_Manifest -> coq_Manifest **)
+(** val asp_manifest_update :
+    coq_GlobalContext -> coq_EvidenceT -> coq_ASP -> coq_Manifest ->
+    (coq_Manifest, string) coq_ResultT **)
 
-fun asp_manifest_update a m =
+fun asp_manifest_update g e a m =
   case a of
-    ASPC _ _ params =>
-    let val Coq_asp_paramsC i _ _ _ = params in aspid_manifest_update i m end
-  | SIG => aspid_manifest_update sig_aspid m
-  | HSH => aspid_manifest_update hsh_aspid m
-  | ENC _ => aspid_manifest_update enc_aspid m
-  | _ => m
+    NULL => Coq_resultC m
+  | ASPC a0 =>
+    let val Coq_asp_paramsC i _ _ _ = a0 in
+    Coq_resultC (aspid_manifest_update i m) end
+  | SIG => Coq_resultC (aspid_manifest_update sig_aspid m)
+  | HSH => Coq_resultC (aspid_manifest_update hsh_aspid m)
+  | APPR => appr_manifest_update g e m
+  | ENC _ => Coq_resultC (aspid_manifest_update enc_aspid m)
 
 (** val manifest_update_env_res :
     coq_Plc -> coq_EnvironmentM -> (coq_Manifest -> (coq_Manifest, string)
@@ -30,92 +53,39 @@ fun asp_manifest_update a m =
 
 fun manifest_update_env_res p e f =
   let val m =
-    case map_get coq_Eq_Class_ID_Type e p of
+    case map_get coq_Eq_Class_ID_Type p e of
       Some mm => mm
     | None => empty_Manifest
   in
   (case f m of
      Coq_errC e0 => Coq_errC e0
-   | Coq_resultC m' => Coq_resultC (map_set coq_Eq_Class_ID_Type e p m')) end
-
-(** val manifest_update_env :
-    coq_Plc -> coq_EnvironmentM -> (coq_Manifest -> coq_Manifest) ->
-    coq_EnvironmentM **)
-
-fun manifest_update_env p e f =
-  let val m =
-    case map_get coq_Eq_Class_ID_Type e p of
-      Some mm => mm
-    | None => empty_Manifest
-  in
-  let val m' = f m in map_set coq_Eq_Class_ID_Type e p m' end end
+   | Coq_resultC m' => Coq_resultC (map_set coq_Eq_Class_ID_Type p m' e)) end
 
 (** val manifest_generator' :
-    coq_Plc -> coq_Term -> coq_EnvironmentM -> coq_EnvironmentM **)
+    coq_GlobalContext -> coq_Plc -> coq_EvidenceT -> coq_Term ->
+    coq_EnvironmentM -> (coq_EnvironmentM, string) coq_ResultT **)
 
-fun manifest_generator' p t e =
+fun manifest_generator' g p et t e =
   case t of
-    Coq_asp a => manifest_update_env p e (asp_manifest_update a)
+    Coq_asp a => manifest_update_env_res p e (asp_manifest_update g et a)
   | Coq_att q t' =>
-    (case map_get coq_Eq_Class_ID_Type e p of
-       Some _ => manifest_generator' q t' e
-     | None => manifest_generator' q t' ((p, empty_Manifest) :: e))
-  | Coq_lseq t1 t2 => manifest_generator' p t2 (manifest_generator' p t1 e)
-  | Coq_bseq _ t1 t2 => manifest_generator' p t2 (manifest_generator' p t1 e)
-  | Coq_bpar _ t1 t2 => manifest_generator' p t2 (manifest_generator' p t1 e)
+    (case map_get coq_Eq_Class_ID_Type p e of
+       Some _ => manifest_generator' g q et t' e
+     | None => manifest_generator' g q et t' ((p, empty_Manifest) :: e))
+  | Coq_lseq t1 t2 =>
+    res_bind (manifest_generator' g p et t1 e) (fn e' =>
+      res_bind (eval g p et t1) (fn et' => manifest_generator' g p et' t2 e'))
+  | Coq_bseq _ t1 t2 =>
+    res_bind (manifest_generator' g p et t1 e) (fn e' =>
+      manifest_generator' g p et t2 e')
+  | Coq_bpar _ t1 t2 =>
+    res_bind (manifest_generator' g p et t1 e) (fn e' =>
+      manifest_generator' g p et t2 e')
 
-(** val manifest_generator : coq_Term -> coq_Plc -> coq_EnvironmentM **)
+(** val manifest_generator :
+    coq_GlobalContext -> coq_Plc -> coq_Term -> (coq_EnvironmentM, string)
+    coq_ResultT **)
 
-fun manifest_generator t p =
-  manifest_generator' p t e_empty
-
-(** val environment_to_manifest_list :
-    coq_EnvironmentM -> coq_Manifest list **)
-
-fun environment_to_manifest_list e =
-  map_vals coq_Eq_Class_ID_Type e
-
-(** val manifest_generator_app' :
-    coq_ASP_Compat_MapT -> coq_Evidence -> coq_Manifest -> (coq_Manifest,
-    string) coq_ResultT **)
-
-fun manifest_generator_app' comp_map et m =
-  case et of
-    Coq_uu _ fwd ps e' =>
-    (case fwd of
-       ENCR =>
-       let val Coq_asp_paramsC a _ _ _ = ps in
-       (case map_get coq_Eq_Class_ID_Type comp_map a of
-          Some a' =>
-          manifest_generator_app' comp_map e' (aspid_manifest_update a' m)
-        | None => Coq_errC "Compatible Appraisal ASP not found in AM Library") end
-     | EXTD _ =>
-       let val Coq_asp_paramsC a _ _ _ = ps in
-       (case map_get coq_Eq_Class_ID_Type comp_map a of
-          Some a' =>
-          manifest_generator_app' comp_map e' (aspid_manifest_update a' m)
-        | None => Coq_errC "Compatible Appraisal ASP not found in AM Library") end
-     | KEEP =>
-       let val Coq_asp_paramsC a _ _ _ = ps in
-       (case map_get coq_Eq_Class_ID_Type comp_map a of
-          Some a' =>
-          manifest_generator_app' comp_map e' (aspid_manifest_update a' m)
-        | None => Coq_errC "Compatible Appraisal ASP not found in AM Library") end
-     | _ => Coq_resultC m)
-  | Coq_ss e1 e2 =>
-    (case manifest_generator_app' comp_map e1 m of
-       Coq_errC e => Coq_errC e
-     | Coq_resultC m' => manifest_generator_app' comp_map e2 m')
-  | _ => Coq_resultC m
-
-(** val manifest_generator_app :
-    coq_ASP_Compat_MapT -> coq_Evidence -> coq_Plc -> (coq_EnvironmentM,
-    string) coq_ResultT **)
-
-fun manifest_generator_app comp_map et p =
-  res_bind
-    (manifest_update_env_res p e_empty (manifest_generator_app' comp_map et))
-    (fn env =>
-    result_map (fn pat =>
-      let val (p0, m) = pat in
-      Coq_resultC (p0, (add_compat_map_manifest m comp_map)) end) env)
+fun manifest_generator g p t =
+  res_bind (eval g p Coq_mt_evt t) (fn et =>
+    manifest_generator' g p et t e_empty)

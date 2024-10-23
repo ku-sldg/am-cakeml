@@ -1,107 +1,10 @@
-(** val manifest_generator_plcTerm_list :
-    (coq_Term * coq_Plc) list -> coq_EnvironmentM list **)
-
-fun manifest_generator_plcTerm_list ls =
-  map (fn pat => let val (t, p) = pat in manifest_generator t p end) ls
-
-(** val env_list_union : coq_EnvironmentM list -> coq_EnvironmentM **)
-
-fun env_list_union ls =
-  fold_right environment_union e_empty ls
-
-(** val mangen_plcTerm_list_union :
-    (coq_Term * coq_Plc) list -> coq_EnvironmentM **)
-
-fun mangen_plcTerm_list_union ls =
-  env_list_union (manifest_generator_plcTerm_list ls)
-
-(** val manifest_generator_plcEvidence_list :
-    coq_ASP_Compat_MapT -> (coq_Evidence * coq_Plc) list -> (coq_EnvironmentM
-    list, string) coq_ResultT **)
-
-fun manifest_generator_plcEvidence_list comp_map ls =
-  result_map (fn pat =>
-    let val (et, p) = pat in manifest_generator_app comp_map et p end) ls
-
-(** val mangen_plcEvidence_list_union :
-    coq_ASP_Compat_MapT -> (coq_Evidence * coq_Plc) list ->
-    (coq_EnvironmentM, string) coq_ResultT **)
-
-fun mangen_plcEvidence_list_union comp_map ls =
-  case manifest_generator_plcEvidence_list comp_map ls of
-    Coq_errC e => Coq_errC e
-  | Coq_resultC ls' => Coq_resultC (env_list_union ls')
-
-type coq_Evidence_Plc_list = (coq_Evidence * coq_Plc) list
-
-(** val coq_Evidence_Plc_list_to_JSON :
-    coq_Evidence coq_Jsonifiable -> coq_Evidence_Plc_list -> coq_JSON **)
-
-fun coq_Evidence_Plc_list_to_JSON h ls =
-  JSON_Object (("Evidence_Plc_list", (JSON_Array
-    (map (fn pat =>
-      let val (et, p) = pat in
-      JSON_Array
-      ((let val Build_Jsonifiable to_JSON _ = h in to_JSON et end) :: ((JSON_String
-      (let val Build_Stringifiable to_string _ = coq_Stringifiable_ID_Type in
-       to_string p end)) :: [])) end) ls))) :: [])
-
-(** val coq_Evidence_Plc_list_from_JSON :
-    coq_Evidence coq_Jsonifiable -> coq_ASP_Compat_MapT coq_Jsonifiable ->
-    coq_JSON -> (coq_Evidence_Plc_list, string) coq_ResultT **)
-
-fun coq_Evidence_Plc_list_from_JSON h _ js =
-  case coq_JSON_get_Array "Evidence_Plc_list" js of
-    Coq_errC e => Coq_errC e
-  | Coq_resultC jsArr =>
-    result_map (fn js0 =>
-      case js0 of
-        JSON_Object _ => Coq_errC "Not a pair"
-      | JSON_Array l =>
-        (case l of
-           [] => Coq_errC "Not a pair"
-         | jsEt :: l0 =>
-           (case l0 of
-              [] => Coq_errC "Not a pair"
-            | j :: l1 =>
-              (case j of
-                 JSON_Object _ => Coq_errC "Not a pair"
-               | JSON_Array _ => Coq_errC "Not a pair"
-               | JSON_String jsP =>
-                 (case l1 of
-                    [] =>
-                    (case let val Build_Jsonifiable _ from_JSON = h in
-                          from_JSON jsEt end of
-                       Coq_errC _ =>
-                       Coq_errC "Error in parsing Evidence_Plc_list"
-                     | Coq_resultC et =>
-                       (case let val Build_Stringifiable _ from_string =
-                               coq_Stringifiable_ID_Type
-                             in
-                             from_string jsP end of
-                          Coq_errC _ =>
-                          Coq_errC "Error in parsing Evidence_Plc_list"
-                        | Coq_resultC p => Coq_resultC (et, p)))
-                  | _ :: _ => Coq_errC "Not a pair")
-               | JSON_Boolean _ => Coq_errC "Not a pair")))
-      | _ => Coq_errC "Not a pair") jsArr
-
-(** val coq_Jsonifiable_Evidence_Plc_list :
-    coq_Evidence coq_Jsonifiable -> coq_Evidence_Plc_list coq_Jsonifiable **)
-
-fun coq_Jsonifiable_Evidence_Plc_list h =
-  Build_Jsonifiable (coq_Evidence_Plc_list_to_JSON h)
-    (coq_Evidence_Plc_list_from_JSON h
-      (jsonifiable_map_serial_serial coq_Stringifiable_ID_Type
-        coq_Eq_Class_ID_Type coq_Stringifiable_ID_Type))
-
 type coq_Term_Plc_list = (coq_Term * coq_Plc) list
 
 (** val coq_Term_Plc_list_to_JSON :
     coq_Term coq_Jsonifiable -> coq_Term_Plc_list -> coq_JSON **)
 
 fun coq_Term_Plc_list_to_JSON h ls =
-  JSON_Object (("Term_Plc_list", (JSON_Array
+  JSON_Object ((term_plc_list_name_constant, (JSON_Array
     (map (fn pat =>
       let val (et, p) = pat in
       JSON_Array
@@ -114,39 +17,41 @@ fun coq_Term_Plc_list_to_JSON h ls =
     coq_ResultT **)
 
 fun coq_Term_Plc_list_from_JSON h js =
-  case coq_JSON_get_Array "Term_Plc_list" js of
+  case coq_JSON_get_Array term_plc_list_name_constant js of
     Coq_errC e => Coq_errC e
   | Coq_resultC jsArr =>
     result_map (fn js0 =>
       case js0 of
-        JSON_Object _ => Coq_errC "Not a pair"
+        JSON_Object _ =>
+        Coq_errC err_str_json_parsing_failure_wrong_number_args
       | JSON_Array l =>
         (case l of
-           [] => Coq_errC "Not a pair"
+           [] => Coq_errC err_str_json_parsing_failure_wrong_number_args
          | jsTerm :: l0 =>
            (case l0 of
-              [] => Coq_errC "Not a pair"
+              [] => Coq_errC err_str_json_parsing_failure_wrong_number_args
             | j :: l1 =>
               (case j of
-                 JSON_Object _ => Coq_errC "Not a pair"
-               | JSON_Array _ => Coq_errC "Not a pair"
+                 JSON_Object _ =>
+                 Coq_errC err_str_json_parsing_failure_wrong_number_args
+               | JSON_Array _ =>
+                 Coq_errC err_str_json_parsing_failure_wrong_number_args
                | JSON_String jsP =>
                  (case l1 of
                     [] =>
-                    (case let val Build_Jsonifiable _ from_JSON = h in
-                          from_JSON jsTerm end of
-                       Coq_errC _ => Coq_errC "Error in parsing Term_Plc_list"
-                     | Coq_resultC et =>
-                       (case let val Build_Stringifiable _ from_string =
-                               coq_Stringifiable_ID_Type
-                             in
-                             from_string jsP end of
-                          Coq_errC _ =>
-                          Coq_errC "Error in parsing Term_Plc_list"
-                        | Coq_resultC p => Coq_resultC (et, p)))
-                  | _ :: _ => Coq_errC "Not a pair")
-               | JSON_Boolean _ => Coq_errC "Not a pair")))
-      | _ => Coq_errC "Not a pair") jsArr
+                    res_bind
+                      (let val Build_Jsonifiable _ from_JSON = h in
+                       from_JSON jsTerm end) (fn et =>
+                      res_bind
+                        (let val Build_Stringifiable _ from_string =
+                           coq_Stringifiable_ID_Type
+                         in
+                         from_string jsP end) (fn p => Coq_resultC (et, p)))
+                  | _ :: _ =>
+                    Coq_errC err_str_json_parsing_failure_wrong_number_args)
+               | JSON_Boolean _ =>
+                 Coq_errC err_str_json_parsing_failure_wrong_number_args)))
+      | _ => Coq_errC err_str_json_parsing_failure_wrong_number_args) jsArr
 
 (** val coq_Jsonifiable_Term_Plc_list :
     coq_Term coq_Jsonifiable -> coq_Term_Plc_list coq_Jsonifiable **)
@@ -156,25 +61,9 @@ fun coq_Jsonifiable_Term_Plc_list h =
     (coq_Term_Plc_list_from_JSON h)
 
 (** val end_to_end_mangen :
-    coq_ASP_Compat_MapT -> coq_Evidence_Plc_list -> coq_Term_Plc_list ->
-    (coq_EnvironmentM, string) coq_ResultT **)
+    coq_GlobalContext -> coq_Term_Plc_list -> (coq_EnvironmentM, string)
+    coq_ResultT **)
 
-fun end_to_end_mangen comp_map ls ts =
-  let val app_env = mangen_plcEvidence_list_union comp_map ls in
-  let val att_env = mangen_plcTerm_list_union ts in
-  (case app_env of
-     Coq_errC e => Coq_errC e
-   | Coq_resultC app_env0 =>
-     Coq_resultC
-       (environment_union app_env0
-         (map_map coq_Eq_Class_ID_Type (fn m =>
-           add_compat_map_manifest m comp_map) att_env))) end end
-
-(** val end_to_end_mangen_final :
-    coq_ASP_Compat_MapT -> coq_Evidence_Plc_list -> coq_Term_Plc_list ->
-    (coq_Manifest list, string) coq_ResultT **)
-
-fun end_to_end_mangen_final comp_map ls ts =
-  case end_to_end_mangen comp_map ls ts of
-    Coq_errC e => Coq_errC e
-  | Coq_resultC env => Coq_resultC (environment_to_manifest_list env)
+fun end_to_end_mangen g ts =
+  result_fold (fn pat => fn _ =>
+    let val (t, p) = pat in manifest_generator g p t end) e_empty ts

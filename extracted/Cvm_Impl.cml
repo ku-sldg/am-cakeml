@@ -1,21 +1,16 @@
-(** val build_cvm : coq_Core_Term -> unit coq_CVM **)
+(** val build_cvm : coq_Evidence -> coq_Term -> coq_Evidence coq_CVM **)
 
-fun build_cvm t = case t of
-  Coq_aspc a => err_bind (do_prim a) put_ev
-| Coq_attc q t' => err_bind get_ev (fn e => err_bind (doRemote t' q e) put_ev)
-| Coq_lseqc t1 t2 => err_bind (build_cvm t1) (fn _ => build_cvm t2)
-| Coq_bseqc t1 t2 =>
+fun build_cvm e t = case t of
+  Coq_asp a => do_prim e a
+| Coq_att q t' => doRemote q e t'
+| Coq_lseq t1 t2 => err_bind (build_cvm e t1) (fn e1 => build_cvm e1 t2)
+| Coq_bseq s t1 t2 =>
   err_bind split_ev (fn _ =>
-    err_bind get_ev (fn e =>
-      err_bind (build_cvm t1) (fn _ =>
-        err_bind get_ev (fn e1r =>
-          err_bind (put_ev e) (fn _ =>
-            err_bind (build_cvm t2) (fn _ =>
-              err_bind get_ev (fn e2r => join_seq e1r e2r)))))))
-| Coq_bparc loc t1 t2 =>
+    err_bind (build_cvm (splitEv_l s e) t1) (fn e1r =>
+      err_bind (build_cvm (splitEv_r s e) t2) (fn e2r => join_seq e1r e2r)))
+| Coq_bpar s t1 t2 =>
   err_bind split_ev (fn _ =>
-    err_bind get_ev (fn e =>
-      err_bind (start_par_thread loc t2 e) (fn _ =>
-        err_bind (build_cvm t1) (fn _ =>
-          err_bind get_ev (fn e1r =>
-            err_bind (wait_par_thread loc t2 e) (fn e2r => join_seq e1r e2r))))))
+    err_bind (start_par_thread (splitEv_r s e) t2) (fn loc =>
+      err_bind (build_cvm (splitEv_l s e) t1) (fn e1r =>
+        err_bind (wait_par_thread loc (splitEv_r s e) t2) (fn e2r =>
+          join_seq e1r e2r))))

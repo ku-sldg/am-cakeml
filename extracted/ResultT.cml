@@ -19,3 +19,11 @@ fun result_map f l = case l of
 | h :: t =>
   res_bind (f h) (fn v =>
     res_bind (result_map f t) (fn vs => Coq_resultC (v :: vs)))
+
+(** val result_fold :
+    ('a1 -> 'a2 -> ('a2, 'a3) coq_ResultT) -> 'a2 -> 'a1 list -> ('a2, 'a3)
+    coq_ResultT **)
+
+fun result_fold f acc l = case l of
+  [] => Coq_resultC acc
+| h :: t => res_bind (f h acc) (fn acc' => result_fold f acc' t)

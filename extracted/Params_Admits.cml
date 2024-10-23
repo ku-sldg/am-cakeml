@@ -7,6 +7,32 @@ val sig_aspid : coq_ASP_ID =
 
 val sig_params : coq_ASP_PARAMS = ( undefined () )
 
+(** val check_nonce_aspid : coq_ASP_ID **)
+
+val check_nonce_aspid : coq_ASP_ID =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val check_nonce_aspargs : coq_ASP_ARGS **)
+
+val check_nonce_aspargs : coq_ASP_ARGS =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val check_nonce_targid : coq_ASP_ID **)
+
+val check_nonce_targid : coq_ASP_ID =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val check_nonce_targplc : coq_Plc **)
+
+val check_nonce_targplc : coq_Plc =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val check_nonce_params : coq_ASP_PARAMS **)
+
+val check_nonce_params : coq_ASP_PARAMS =
+  Coq_asp_paramsC check_nonce_aspid check_nonce_aspargs check_nonce_targplc
+    check_nonce_targid
+
 (** val hsh_aspid : coq_ASP_ID **)
 
 val hsh_aspid : coq_ASP_ID =
@@ -37,9 +63,9 @@ fun enc_params enc_targplc =
   Coq_asp_paramsC enc_aspid enc_aspargs enc_targplc enc_targid
 
 (** val term_discloses_aspid_to_remote_enc_bool :
-    coq_Term -> coq_Plc -> coq_Evidence -> coq_ASP_ID -> coq_Plc -> bool **)
+    coq_Term -> coq_Plc -> coq_EvidenceT -> coq_ASP_ID -> coq_Plc -> bool **)
 
 val term_discloses_aspid_to_remote_enc_bool : (coq_Term -> coq_Plc ->
-                                              coq_Evidence -> coq_ASP_ID ->
+                                              coq_EvidenceT -> coq_ASP_ID ->
                                               coq_Plc -> bool) =
   failwith "AXIOM TO BE REALIZED"

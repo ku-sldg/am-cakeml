@@ -12,6 +12,23 @@ val sig_targplc = "sigP"
 
 val sig_params = Coq_asp_paramsC sig_aspid sig_aspargs sig_targplc sig_targid
 
+(** val check_nonce_aspid : coq_ASP_ID **)
+val check_nonce_aspid : coq_ASP_ID = "check_nonce_id"
+
+(** val check_nonce_aspargs : coq_ASP_ARGS **)
+val check_nonce_aspargs : coq_ASP_ARGS = []
+
+(** val check_nonce_targid : coq_ASP_ID **)
+val check_nonce_targid : coq_ASP_ID = "check_nonce_targid"
+
+(** val check_nonce_targplc : coq_Plc **)
+val check_nonce_targplc : coq_Plc = "check_nonce_targPlc"
+
+(** val check_nonce_params : coq_ASP_PARAMS **)
+val check_nonce_params : coq_ASP_PARAMS =
+  Coq_asp_paramsC check_nonce_aspid check_nonce_aspargs check_nonce_targplc
+    check_nonce_targid
+
 (** val hsh_params : coq_ASP_PARAMS **)
 
 val hsh_aspid = "hsh_id"

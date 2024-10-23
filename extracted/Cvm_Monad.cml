@@ -1,47 +1,29 @@
-(** val get_ev : coq_EvC coq_CVM **)
-
-val get_ev : coq_EvC coq_CVM =
-  err_bind err_get (fn st =>
-    err_ret (let val Coq_mk_st st_ev _ _ _ = st in st_ev end))
-
 (** val get_trace : coq_Ev list coq_CVM **)
 
 val get_trace : coq_Ev list coq_CVM =
-  err_bind err_get (fn st =>
-    err_ret (let val Coq_mk_st _ st_trace _ _ = st in st_trace end))
+  err_bind err_get_state (fn st =>
+    err_ret (let val Coq_mk_st st_trace _ = st in st_trace end))
 
 (** val get_evid : coq_Event_ID coq_CVM **)
 
 val get_evid : coq_Event_ID coq_CVM =
-  err_bind err_get (fn st =>
-    err_ret (let val Coq_mk_st _ _ st_evid _ = st in st_evid end))
+  err_bind err_get_state (fn st =>
+    err_ret (let val Coq_mk_st _ st_evid = st in st_evid end))
 
 (** val get_config : coq_Session_Config coq_CVM **)
 
 val get_config : coq_Session_Config coq_CVM =
-  err_bind err_get (fn st =>
-    err_ret (let val Coq_mk_st _ _ _ st_config = st in st_config end))
-
-(** val put_ev : coq_EvC -> unit coq_CVM **)
-
-fun put_ev e' =
-  err_bind get_trace (fn tr =>
-    err_bind get_evid (fn i =>
-      err_bind get_config (fn sc => err_put (Coq_mk_st e' tr i sc))))
+  err_get_config
 
 (** val put_trace : coq_Ev list -> unit coq_CVM **)
 
 fun put_trace tr' =
-  err_bind get_ev (fn e =>
-    err_bind get_evid (fn i =>
-      err_bind get_config (fn sc => err_put (Coq_mk_st e tr' i sc))))
+  err_bind get_evid (fn i => err_put_state (Coq_mk_st tr' i))
 
 (** val put_evid : coq_Event_ID -> unit coq_CVM **)
 
 fun put_evid i' =
-  err_bind get_ev (fn e =>
-    err_bind get_trace (fn tr =>
-      err_bind get_config (fn sc => err_put (Coq_mk_st e tr i' sc))))
+  err_bind get_trace (fn tr => err_put_state (Coq_mk_st tr i'))
 
 (** val get_pl : coq_Plc coq_CVM **)
 
@@ -55,11 +37,9 @@ val get_pl : coq_Plc coq_CVM =
 
 val inc_id : coq_Event_ID coq_CVM =
   err_bind get_trace (fn tr =>
-    err_bind get_ev (fn e =>
-      err_bind get_evid (fn i =>
-        err_bind get_config (fn sc =>
-          err_bind (err_put (Coq_mk_st e tr (add i (S O)) sc)) (fn _ =>
-            err_ret i)))))
+    err_bind get_evid (fn i =>
+      err_bind (err_put_state (Coq_mk_st tr (add i (S O)))) (fn _ =>
+        err_ret i)))
 
 (** val add_trace : coq_Ev list -> unit coq_CVM **)
 
@@ -73,33 +53,102 @@ val split_ev : unit coq_CVM =
     err_bind inc_id (fn i => add_trace ((Coq_split i p) :: [])))
 
 (** val tag_ASP :
-    coq_ASP_PARAMS -> coq_Plc -> coq_EvC -> coq_Event_ID coq_CVM **)
+    coq_ASP_PARAMS -> coq_Plc -> coq_Evidence -> coq_Event_ID coq_CVM **)
 
 fun tag_ASP params mpl e =
   err_bind inc_id (fn x =>
     err_bind (add_trace ((Coq_umeas x mpl params (get_et e)) :: [])) (fn _ =>
       err_ret x))
 
-(** val fwd_asp :
-    coq_FWD -> coq_RawEv -> coq_EvC -> coq_Plc -> coq_ASP_PARAMS -> coq_EvC
+(** val join_seq : coq_Evidence -> coq_Evidence -> coq_Evidence coq_CVM **)
+
+fun join_seq e1 e2 =
+  err_bind get_pl (fn p =>
+    err_bind inc_id (fn n =>
+      let val Coq_evc bits1 et1 = e1 in
+      let val Coq_evc bits2 et2 = e2 in
+      err_bind (add_trace ((Coq_join n p) :: [])) (fn _ =>
+        err_ret (Coq_evc (app bits1 bits2) (Coq_split_evt et1 et2))) end end))
+
+(** val hoist_result : ('a1, string) coq_ResultT -> 'a1 coq_CVM **)
+
+fun hoist_result r = case r of
+  Coq_errC e => err_failm (Coq_dispatch_error (Runtime e))
+| Coq_resultC a => err_ret a
+
+(** val get_asp_type : coq_ASP_ID -> coq_EvSig coq_CVM **)
+
+fun get_asp_type a =
+  err_bind get_config (fn sc =>
+    let val g =
+      let val Build_Session_Config _ session_context _ _ _ _ = sc in
+      session_context end
+    in
+    (case map_get coq_Eq_Class_ID_Type a
+            (let val Build_GlobalContext asp_types _ = g in asp_types end) of
+       Some ev => err_ret ev
+     | None =>
+       err_failm (Coq_dispatch_error (Runtime err_str_asp_no_type_sig))) end)
+
+(** val get_asp_dual : coq_ASP_ID -> coq_ASP_ID coq_CVM **)
+
+fun get_asp_dual a =
+  err_bind get_config (fn sc =>
+    let val g =
+      let val Build_Session_Config _ session_context _ _ _ _ = sc in
+      session_context end
+    in
+    (case map_get coq_Eq_Class_ID_Type a
+            (let val Build_GlobalContext _ asp_comps = g in asp_comps end) of
+       Some appr_asp_id => err_ret appr_asp_id
+     | None =>
+       err_failm (Coq_dispatch_error (Runtime err_str_asp_no_compat_appr_asp))) end)
+
+(** val bundle_asp :
+    coq_Plc -> coq_RawEv -> coq_Evidence -> coq_ASP_PARAMS -> coq_Evidence
     coq_CVM **)
 
-fun fwd_asp fwd rwev e p ps =
-  case fwd of
-    COMP =>
-    (case comp_bundle rwev e p ps of
-       Coq_errC e0 => err_failm (Coq_dispatch_error (Runtime e0))
-     | Coq_resultC e' => err_ret e')
-  | ENCR =>
-    (case encr_bundle rwev e p ps of
-       Coq_errC e0 => err_failm (Coq_dispatch_error (Runtime e0))
-     | Coq_resultC e' => err_ret e')
-  | EXTD n =>
-    (case extd_bundle rwev e p n ps of
-       Coq_errC e0 => err_failm (Coq_dispatch_error (Runtime e0))
-     | Coq_resultC e' => err_ret e')
-  | KILL => err_ret mt_evc
-  | KEEP => err_ret e
+fun bundle_asp p rwev cur_ev ps = case ps of
+  Coq_asp_paramsC asp_id _ _ _ =>
+  err_bind (get_asp_type asp_id) (fn x =>
+    let val Coq_ev_arrow fwd _ out_sig = x in
+    (case out_sig of
+       OutN n =>
+       (case eqb nat_EqClass (length rwev) n of
+          True =>
+          (case fwd of
+             UNWRAP =>
+             err_failm (Coq_dispatch_error (Runtime
+               err_str_unwrap_must_have_outwrap))
+           | EXTEND =>
+             let val Coq_evc bits et = cur_ev in
+             err_ret (Coq_evc (app rwev bits) (Coq_asp_evt p ps et)) end
+           | _ => err_ret (Coq_evc rwev (Coq_asp_evt p ps (get_et cur_ev))))
+        | False =>
+          err_failm (Coq_dispatch_error (Runtime
+            errStr_raw_EvidenceT_too_long)))
+     | OutUnwrap =>
+       (case fwd of
+          UNWRAP =>
+          err_bind get_config (fn sc =>
+            let val g =
+              let val Build_Session_Config _ session_context _ _ _ _ = sc in
+              session_context end
+            in
+            let val Coq_evc _ et = cur_ev in
+            err_bind
+              (hoist_result
+                (apply_to_evidence_below g (et_size g) ((Trail_UNWRAP
+                  asp_id) :: []) et)) (fn size_below_wrap' =>
+              err_bind (hoist_result size_below_wrap') (fn size_below_wrap =>
+                case eqb nat_EqClass (length rwev) size_below_wrap of
+                  True => err_ret (Coq_evc rwev (Coq_asp_evt p ps et))
+                | False =>
+                  err_failm (Coq_dispatch_error (Runtime
+                    err_str_unwrap_of_wrap_same_size)))) end end)
+        | _ =>
+          err_failm (Coq_dispatch_error (Runtime
+            err_str_only_unwrap_can_be_outwrap)))) end)
 
 (** val do_asp :
     coq_ASP_PARAMS -> coq_RawEv -> coq_Event_ID -> coq_RawEv coq_CVM **)
@@ -111,60 +160,191 @@ fun do_asp params e _ =
       Coq_errC e0 => err_failm (Coq_dispatch_error e0)
     | Coq_resultC r => err_ret r)
 
-(** val invoke_ASP : coq_FWD -> coq_ASP_PARAMS -> coq_EvC coq_CVM **)
+(** val invoke_ASP :
+    coq_Evidence -> coq_ASP_PARAMS -> coq_Evidence coq_CVM **)
 
-fun invoke_ASP fwd params =
-  err_bind get_ev (fn e =>
-    err_bind get_pl (fn p =>
-      err_bind (tag_ASP params p e) (fn x =>
-        err_bind (do_asp params (get_bits e) x) (fn rawev =>
-          err_bind (fwd_asp fwd rawev e p params) err_ret))))
-
-(** val copyEv : coq_EvC coq_CVM **)
-
-val copyEv : coq_EvC coq_CVM =
+fun invoke_ASP e params =
   err_bind get_pl (fn p =>
-    err_bind inc_id (fn x =>
-      err_bind (add_trace ((Coq_copy x p) :: [])) (fn _ => get_ev)))
+    err_bind (tag_ASP params p e) (fn x =>
+      err_bind (do_asp params (get_bits e) x) (fn rawev =>
+        err_bind (bundle_asp p rawev e params) err_ret)))
 
-(** val nullEv : coq_EvC coq_CVM **)
+(** val peel_n_rawev :
+    nat -> coq_RawEv -> (coq_RawEv * coq_RawEv, string) coq_ResultT **)
 
-val nullEv : coq_EvC coq_CVM =
+fun peel_n_rawev n ls =
+  case n of
+    O => Coq_resultC ([], ls)
+  | S n' =>
+    (case ls of
+       [] => Coq_errC errStr_peel_n_am
+     | x :: ls' =>
+       (case peel_n_rawev n' ls' of
+          Coq_errC e => Coq_errC e
+        | Coq_resultC p =>
+          let val (ls1, ls2) = p in Coq_resultC ((x :: ls1), ls2) end))
+
+(** val invoke_APPR' :
+    coq_RawEv -> coq_EvidenceT -> coq_EvidenceT -> coq_Evidence coq_CVM **)
+
+fun invoke_APPR' r et out_evt =
+  err_bind get_config (fn sc =>
+    let val g =
+      let val Build_Session_Config _ session_context _ _ _ _ = sc in
+      session_context end
+    in
+    (case et of
+       Coq_mt_evt => err_ret mt_evc
+     | Coq_nonce_evt _ => invoke_ASP (Coq_evc r out_evt) check_nonce_params
+     | Coq_asp_evt _ par et' =>
+       let val Coq_asp_paramsC asp_id args targ_plc targ = par in
+       err_bind (get_asp_dual asp_id) (fn appr_asp_id =>
+         let val dual_par = Coq_asp_paramsC appr_asp_id args targ_plc targ in
+         err_bind (get_asp_type asp_id) (fn x =>
+           let val Coq_ev_arrow fwd _ out_sig = x in
+           (case fwd of
+              REPLACE => invoke_ASP (Coq_evc r out_evt) dual_par
+            | WRAP =>
+              err_bind (invoke_ASP (Coq_evc r out_evt) dual_par) (fn x0 =>
+                let val Coq_evc r'' et'' = x0 in
+                (case et_size g et'' of
+                   Coq_errC e => err_failm (Coq_dispatch_error (Runtime e))
+                 | Coq_resultC n' =>
+                   (case et_size g et' of
+                      Coq_errC e => err_failm (Coq_dispatch_error (Runtime e))
+                    | Coq_resultC n'' =>
+                      (case eqb nat_EqClass n' n'' of
+                         True =>
+                         invoke_APPR' r'' et' (Coq_asp_evt
+                           (let val Build_Session_Config session_plc _ _ _ _
+                              _ = sc
+                            in
+                            session_plc end) dual_par out_evt)
+                       | False =>
+                         err_failm (Coq_dispatch_error (Runtime
+                           err_str_appr_wrap_failed))))) end)
+            | UNWRAP =>
+              (case out_sig of
+                 OutN _ =>
+                 err_failm (Coq_dispatch_error (Runtime
+                   err_str_unwrap_must_have_outwrap))
+               | OutUnwrap =>
+                 err_bind
+                   (hoist_result
+                     (apply_to_evidence_below g (fn e =>
+                       invoke_APPR' r e out_evt) ((Trail_UNWRAP
+                       asp_id) :: []) et')) (fn e => e))
+            | EXTEND =>
+              (case out_sig of
+                 OutN n =>
+                 err_bind split_ev (fn _ =>
+                   err_bind (hoist_result (peel_n_rawev n r)) (fn x0 =>
+                     let val (_, r_ev) = x0 in
+                     err_bind (invoke_ASP (Coq_evc r out_evt) dual_par)
+                       (fn ev1 =>
+                       err_bind (invoke_APPR' r_ev et' et') (fn ev2 =>
+                         join_seq ev1 ev2)) end))
+               | OutUnwrap =>
+                 err_failm (Coq_dispatch_error (Runtime
+                   err_str_extend_must_have_outn)))) end) end) end
+     | Coq_left_evt et' =>
+       err_bind
+         (hoist_result
+           (apply_to_evidence_below g (fn e => invoke_APPR' r e out_evt)
+             (Trail_LEFT :: []) et')) (fn r0 => r0)
+     | Coq_right_evt et' =>
+       err_bind
+         (hoist_result
+           (apply_to_evidence_below g (fn e => invoke_APPR' r e out_evt)
+             (Trail_RIGHT :: []) et')) (fn r0 => r0)
+     | Coq_split_evt et1 et2 =>
+       (case et_size g et1 of
+          Coq_errC e => err_failm (Coq_dispatch_error (Runtime e))
+        | Coq_resultC n1 =>
+          (case et_size g et2 of
+             Coq_errC e => err_failm (Coq_dispatch_error (Runtime e))
+           | Coq_resultC n2 =>
+             err_bind (hoist_result (peel_n_rawev n1 r)) (fn x =>
+               let val (ev_l, r_ev) = x in
+               err_bind (hoist_result (peel_n_rawev n2 r_ev)) (fn x0 =>
+                 let val (ev_r, rest) = x0 in
+                 (case rest of
+                    [] =>
+                    (case equiv_EvidenceT g et1 (Coq_left_evt out_evt) of
+                       True =>
+                       (case equiv_EvidenceT g et2 (Coq_right_evt out_evt) of
+                          True =>
+                          err_bind split_ev (fn _ =>
+                            err_bind
+                              (invoke_APPR' ev_l et1 (Coq_left_evt out_evt))
+                              (fn ev1 =>
+                              err_bind
+                                (invoke_APPR' ev_r et2 (Coq_right_evt
+                                  out_evt)) (fn ev2 => join_seq ev1 ev2)))
+                        | False =>
+                          err_failm (Coq_dispatch_error (Runtime
+                            err_str_ev_split_failed_not_empty)))
+                     | False =>
+                       err_failm (Coq_dispatch_error (Runtime
+                         err_str_ev_split_failed_not_empty)))
+                  | _ :: _ =>
+                    err_failm (Coq_dispatch_error (Runtime
+                      err_str_ev_split_failed_not_empty))) end) end)))) end)
+
+(** val invoke_APPR : coq_Evidence -> coq_Evidence coq_CVM **)
+
+fun invoke_APPR e =
+  invoke_APPR' (get_bits e) (get_et e) (get_et e)
+
+(** val nullEv : coq_Evidence coq_CVM **)
+
+val nullEv : coq_Evidence coq_CVM =
   err_bind get_pl (fn p =>
     err_bind inc_id (fn x =>
       err_bind (add_trace ((Coq_null x p) :: [])) (fn _ => err_ret mt_evc)))
 
-(** val clearEv : unit -> coq_EvC coq_CVM **)
+(** val do_prim : coq_Evidence -> coq_ASP -> coq_Evidence coq_CVM **)
 
-fun clearEv _ =
-  err_ret mt_evc
+fun do_prim e a = case a of
+  NULL => nullEv
+| ASPC params => invoke_ASP e params
+| SIG => invoke_ASP e sig_params
+| HSH => invoke_ASP e hsh_params
+| APPR => invoke_APPR e
+| ENC q => invoke_ASP e (enc_params q)
 
-(** val do_prim : coq_ASP_Core -> coq_EvC coq_CVM **)
+(** val inc_remote_event_ids : coq_Evidence -> coq_Term -> unit coq_CVM **)
 
-fun do_prim a = case a of
-  NULLC => nullEv
-| CLEAR => clearEv ()
-| CPYC => copyEv
-| ASPCC fwd params => invoke_ASP fwd params
+fun inc_remote_event_ids e t =
+  err_bind get_evid (fn i =>
+    err_bind get_config (fn sc =>
+      err_bind get_pl (fn p =>
+        case events_size
+               (let val Build_Session_Config _ session_context _ _ _ _ = sc in
+                session_context end) p (get_et e) t of
+          Coq_errC e0 => err_failm (Coq_dispatch_error (Runtime e0))
+        | Coq_resultC n => put_evid (add i n))))
 
-(** val inc_remote_event_ids : coq_Term -> unit coq_CVM **)
+(** val inc_par_event_ids : coq_Evidence -> coq_Term -> unit coq_CVM **)
 
-fun inc_remote_event_ids t =
-  err_bind get_evid (fn i => put_evid (add i (event_id_span' t)))
-
-(** val inc_par_event_ids : coq_Core_Term -> unit coq_CVM **)
-
-fun inc_par_event_ids t =
-  err_bind get_evid (fn i => put_evid (add i (event_id_span t)))
+fun inc_par_event_ids e t =
+  err_bind get_evid (fn i =>
+    err_bind get_config (fn sc =>
+      err_bind get_pl (fn p =>
+        case events_size
+               (let val Build_Session_Config _ session_context _ _ _ _ = sc in
+                session_context end) p (get_et e) t of
+          Coq_errC e0 => err_failm (Coq_dispatch_error (Runtime e0))
+        | Coq_resultC n => put_evid (add i n))))
 
 (** val tag_REQ :
-    coq_Term -> coq_Plc -> coq_Plc -> coq_EvC -> unit coq_CVM **)
+    coq_Term -> coq_Plc -> coq_Plc -> coq_Evidence -> unit coq_CVM **)
 
 fun tag_REQ t p q e =
   err_bind inc_id (fn reqi =>
-    add_trace ((Coq_req reqi p q t (get_et e)) :: []))
+    add_trace ((Coq_req reqi p q (get_et e) t) :: []))
 
-(** val tag_RPY : coq_Plc -> coq_Plc -> coq_EvC -> unit coq_CVM **)
+(** val tag_RPY : coq_Plc -> coq_Plc -> coq_Evidence -> unit coq_CVM **)
 
 fun tag_RPY p q e =
   err_bind inc_id (fn rpyi => add_trace ((Coq_rpy rpyi p q (get_et e)) :: []))
@@ -176,14 +356,15 @@ val get_cvm_policy : coq_PolicyT coq_CVM =
     err_ret (let val Build_Session_Config _ _ _ _ _ policy = sc in policy end))
 
 (** val policy_list_not_disclosed :
-    coq_Term -> coq_Plc -> coq_Evidence -> (coq_Plc * coq_ASP_ID) list -> bool **)
+    coq_Term -> coq_Plc -> coq_EvidenceT -> (coq_Plc * coq_ASP_ID) list ->
+    bool **)
 
 fun policy_list_not_disclosed t p e ls =
   forallb (fn pr =>
     negb (term_discloses_aspid_to_remote_enc_bool t p e (fst pr) (snd pr))) ls
 
 (** val check_cvm_policy :
-    coq_Term -> coq_Plc -> coq_Evidence -> unit coq_CVM **)
+    coq_Term -> coq_Plc -> coq_EvidenceT -> unit coq_CVM **)
 
 fun check_cvm_policy t pTo et =
   err_bind get_cvm_policy (fn pol =>
@@ -192,96 +373,147 @@ fun check_cvm_policy t pTo et =
     | False => err_failm (Coq_dispatch_error (Runtime errStr_disclosePolicy)))
 
 (** val do_remote :
-    coq_Term -> coq_Plc -> coq_EvC -> coq_Session_Config -> (coq_RawEv,
-    coq_DispatcherErrors) coq_ResultT **)
+    coq_Session_Config -> coq_Plc -> coq_Evidence -> coq_Term ->
+    (coq_Evidence, coq_CVM_Error) coq_ResultT **)
 
-fun do_remote t pTo e sc =
-  let val Coq_mkAtt_Sess my_plc plc_map pk_map = session_config_decompiler sc
+fun do_remote sc pTo e t =
+  let val Coq_mkAtt_Sess my_plc plc_map pk_map g =
+    session_config_decompiler sc
   in
-  let val new_att_sess = Coq_mkAtt_Sess pTo plc_map pk_map in
-  (case map_get coq_Eq_Class_ID_Type plc_map pTo of
+  let val new_att_sess = Coq_mkAtt_Sess pTo plc_map pk_map g in
+  (case map_get coq_Eq_Class_ID_Type pTo plc_map of
      Some uuid =>
-     let val remote_req = Coq_mkPRReq new_att_sess t my_plc (get_bits e) in
+     let val remote_req = Coq_mkPRReq new_att_sess my_plc e t in
      let val js_req =
        let val Build_Jsonifiable to_JSON _ =
          coq_Jsonifiable_ProtocolRunRequest
            (coq_Jsonifiable_Term
-             (coq_Jsonifiable_ASP coq_Jsonifiable_FWD
+             (coq_Jsonifiable_ASP
+               (jsonifiable_map_serial_serial coq_Stringifiable_ID_Type
+                 coq_Eq_Class_ID_Type coq_Stringifiable_ID_Type))
+             coq_Jsonifiable_Split)
+           (coq_Jsonifiable_Evidence coq_Jsonifiable_RawEv
+             (coq_Jsonifiable_EvidenceT
+               (jsonifiable_map_serial_serial coq_Stringifiable_ID_Type
+                 coq_Eq_Class_ID_Type coq_Stringifiable_ID_Type)
+               coq_Jsonifiable_nat
                (coq_Jsonifiable_ASP_Params
                  (jsonifiable_map_serial_serial coq_Stringifiable_ID_Type
-                   coq_Eq_Class_ID_Type coq_Stringifiable_ID_Type)))
-             coq_Jsonifiable_Split) coq_Jsonifiable_RawEv
+                   coq_Eq_Class_ID_Type coq_Stringifiable_ID_Type))))
            (coq_Jsonifiable_Attestation_Session
              (jsonifiable_map_serial_serial coq_Stringifiable_ID_Type
                coq_Eq_Class_ID_Type coq_Stringifiable_UUUID)
              (jsonifiable_map_serial_serial coq_Stringifiable_ID_Type
-               coq_Eq_Class_ID_Type coq_Stringifiable_PublicKey))
+               coq_Eq_Class_ID_Type coq_Stringifiable_PublicKey)
+             (coq_Jsonifiable_GlobalContext coq_Stringifiable_ID_Type
+               (jsonifiable_map_serial_serial coq_Stringifiable_ID_Type
+                 coq_Eq_Class_ID_Type coq_Stringifiable_ID_Type)
+               (jsonifiable_map_serial_json coq_Stringifiable_ID_Type
+                 coq_Eq_Class_ID_Type
+                 (coq_Jsonifiable_EvSig
+                   (coq_Jsonifiable_EvOutSig coq_Jsonifiable_nat)
+                   coq_Stringifiable_FWD))))
        in
        to_JSON remote_req end
      in
      let val resp_res = make_JSON_Network_Request uuid js_req in
      (case resp_res of
-        Coq_errC msg => Coq_errC (Runtime msg)
+        Coq_errC msg => Coq_errC (Coq_dispatch_error (Runtime msg))
       | Coq_resultC js_resp =>
         (case let val Build_Jsonifiable _ from_JSON =
-                coq_Jsonifiable_ProtocolRunResponse coq_Jsonifiable_RawEv
+                coq_Jsonifiable_ProtocolRunResponse
+                  (coq_Jsonifiable_Evidence coq_Jsonifiable_RawEv
+                    (coq_Jsonifiable_EvidenceT
+                      (jsonifiable_map_serial_serial
+                        coq_Stringifiable_ID_Type coq_Eq_Class_ID_Type
+                        coq_Stringifiable_ID_Type) coq_Jsonifiable_nat
+                      (coq_Jsonifiable_ASP_Params
+                        (jsonifiable_map_serial_serial
+                          coq_Stringifiable_ID_Type coq_Eq_Class_ID_Type
+                          coq_Stringifiable_ID_Type))))
               in
               from_JSON js_resp end of
-           Coq_errC msg => Coq_errC (Runtime msg)
+           Coq_errC msg => Coq_errC (Coq_dispatch_error (Runtime msg))
          | Coq_resultC resp =>
            let val Coq_mkPRResp success ev = resp in
            (case success of
               True => Coq_resultC ev
-            | False => Coq_errC (Runtime errStr_remote_am_failure)) end)) end end end
-   | None => Coq_errC Unavailable) end end
+            | False =>
+              Coq_errC (Coq_dispatch_error (Runtime errStr_remote_am_failure))) end)) end end end
+   | None => Coq_errC (Coq_dispatch_error Unavailable)) end end
 
 (** val doRemote_session' :
-    coq_Term -> coq_Plc -> coq_EvC -> coq_EvC coq_CVM **)
+    coq_Plc -> coq_Evidence -> coq_Term -> coq_Evidence coq_CVM **)
 
-fun doRemote_session' t pTo e =
+fun doRemote_session' pTo e t =
   err_bind (check_cvm_policy t pTo (get_et e)) (fn _ =>
     err_bind get_config (fn sc =>
-      case do_remote t pTo e sc of
-        Coq_errC e0 => err_failm (Coq_dispatch_error e0)
-      | Coq_resultC ev => err_ret (Coq_evc ev (eval t pTo (get_et e)))))
+      case do_remote sc pTo e t of
+        Coq_errC s => err_failm s
+      | Coq_resultC e' => err_ret e'))
 
 (** val remote_session :
-    coq_Term -> coq_Plc -> coq_Plc -> coq_EvC -> coq_EvC coq_CVM **)
+    coq_Plc -> coq_Plc -> coq_Evidence -> coq_Term -> coq_Evidence coq_CVM **)
 
-fun remote_session t p q e =
+fun remote_session p q e t =
   err_bind (tag_REQ t p q e) (fn _ =>
-    err_bind (doRemote_session' t q e) (fn e' =>
-      err_bind (add_trace (cvm_events t q (get_et e))) (fn _ =>
-        err_bind (inc_remote_event_ids t) (fn _ => err_ret e'))))
+    err_bind (doRemote_session' q e t) (fn e' =>
+      err_bind get_config (fn sc =>
+        err_bind get_evid (fn i =>
+          err_bind
+            (case events_fix
+                    (let val Build_Session_Config _ session_context _ _ _ _ =
+                       sc
+                     in
+                     session_context end) q (get_et e) t i of
+               Coq_errC e0 => err_failm (Coq_dispatch_error (Runtime e0))
+             | Coq_resultC evs => err_ret evs) (fn rem_evs =>
+            err_bind (add_trace rem_evs) (fn _ =>
+              err_bind (inc_remote_event_ids e t) (fn _ => err_ret e')))))))
 
-(** val doRemote : coq_Term -> coq_Plc -> coq_EvC -> coq_EvC coq_CVM **)
+(** val doRemote :
+    coq_Plc -> coq_Evidence -> coq_Term -> coq_Evidence coq_CVM **)
 
-fun doRemote t q e =
+fun doRemote q e t =
   err_bind get_pl (fn p =>
-    err_bind (remote_session t p q e) (fn e' =>
+    err_bind (remote_session p q e t) (fn e' =>
       err_bind (tag_RPY p q e') (fn _ => err_ret e')))
 
-(** val join_seq : coq_EvC -> coq_EvC -> unit coq_CVM **)
+(** val start_par_thread : coq_Evidence -> coq_Term -> nat coq_CVM **)
 
-fun join_seq e1 e2 =
+fun start_par_thread e t =
   err_bind get_pl (fn p =>
-    err_bind inc_id (fn n =>
-      err_bind (put_ev (ss_cons e1 e2)) (fn _ =>
-        add_trace ((Coq_join n p) :: []))))
+    err_bind inc_id (fn i =>
+      err_bind (do_start_par_thread i e t) (fn _ =>
+        err_bind
+          (add_trace ((Coq_cvm_thread_start i i p (get_et e) t) :: []))
+          (fn _ => err_ret i))))
 
-(** val start_par_thread :
-    coq_Loc -> coq_Core_Term -> coq_EvC -> unit coq_CVM **)
+(** val do_wait_par_thread : coq_Loc -> coq_Evidence coq_CVM **)
 
-fun start_par_thread loc t e =
-  err_bind get_pl (fn p =>
-    err_bind (do_start_par_thread loc t (get_bits e)) (fn _ =>
-      add_trace ((Coq_cvm_thread_start loc p t (get_et e)) :: [])))
+fun do_wait_par_thread loc =
+  case parallel_vm_thread loc of
+    Coq_errC s => err_failm s
+  | Coq_resultC e' => err_ret e'
 
 (** val wait_par_thread :
-    coq_Loc -> coq_Core_Term -> coq_EvC -> coq_EvC coq_CVM **)
+    coq_Loc -> coq_Evidence -> coq_Term -> coq_Evidence coq_CVM **)
 
-fun wait_par_thread loc t _ =
-  err_bind get_pl (fn _ =>
+fun wait_par_thread loc e t =
+  err_bind get_pl (fn p =>
     err_bind (do_wait_par_thread loc) (fn e' =>
-      err_bind (add_trace ((Coq_cvm_thread_end loc) :: [])) (fn _ =>
-        err_bind (inc_par_event_ids t) (fn _ => err_ret e'))))
+      err_bind get_evid (fn i =>
+        err_bind get_config (fn sc =>
+          err_bind
+            (case events_fix
+                    (let val Build_Session_Config _ session_context _ _ _ _ =
+                       sc
+                     in
+                     session_context end) p (get_et e) t i of
+               Coq_errC e0 => err_failm (Coq_dispatch_error (Runtime e0))
+             | Coq_resultC evs => err_ret evs) (fn rem_evs =>
+            err_bind (add_trace rem_evs) (fn _ =>
+              err_bind (inc_par_event_ids e t) (fn _ =>
+                err_bind inc_id (fn i0 =>
+                  err_bind (add_trace ((Coq_cvm_thread_end i0 loc) :: []))
+                    (fn _ => err_ret e')))))))))

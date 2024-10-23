@@ -3,11 +3,6 @@
 val coq_MAN_ASPS : string =
   "ASPS"
 
-(** val coq_MAN_ASP_COMPAT_MAP : string **)
-
-val coq_MAN_ASP_COMPAT_MAP : string =
-  "ASP_COMPAT_MAP"
-
 (** val coq_MAN_ASP_FS_MAP : string **)
 
 val coq_MAN_ASP_FS_MAP : string =

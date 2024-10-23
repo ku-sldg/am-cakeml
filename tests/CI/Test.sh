@@ -12,7 +12,7 @@ BUILD_BIN="$BUILD_DIR/bin"
 
 # Function to display usage instructions
 usage() {
-  echo "Usage: $0 -t [cert|bg|parmut|filehash] (-h (headless)) [-a <path-to-asps>]"
+  echo "Usage: $0 -t [cert|cert_appr|bg|parmut|filehash] (-h (headless)) [-a <path-to-asps>]"
   exit 1
 }
 
@@ -83,7 +83,7 @@ DEMO_FILES=$TESTS_DIR/DemoFiles
 GENERATED=$DEMO_FILES/Generated
 
 # Reusable Variables
-TEST_COMP_MAP=$DEMO_FILES/ASP_Compat_Map.json
+TEST_GLOBAL_CONTEXT=$DEMO_FILES/Test_Global_Context.json
 TEST_ATT_SESS=$DEMO_FILES/Test_Session.json
 
 # Specific Variables
@@ -109,13 +109,13 @@ if [[ "$REPO_ROOT" == */am-cakeml ]]; then
   $TESTS_DIR/term_to_term_pair_list.sh -f $TERM_FILE -o $TERM_PAIR_LIST
 
   # Generate the evidence file
-  $EV_GEN -t $TERM_TYPE -o $EV_FILE
+  $EV_GEN -t $TERM_TYPE -o $EV_FILE -g $TEST_GLOBAL_CONTEXT
 
   # Generate the evidence pair list
   $TESTS_DIR/evidence_to_evidence_pair_list.sh -f $EV_FILE -o $EVID_PAIR_LIST
 
   # First, generate the manifests
-  $MAN_GEN -cm $TEST_COMP_MAP -t $TERM_PAIR_LIST -e $EVID_PAIR_LIST -o $GENERATED
+  $MAN_GEN -cm $TEST_GLOBAL_CONTEXT -t $TERM_PAIR_LIST -e $EVID_PAIR_LIST -o $GENERATED
 
   PIDS=()
 

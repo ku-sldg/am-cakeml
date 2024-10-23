@@ -1,143 +1,292 @@
-(** val asp_term_to_core : coq_ASP -> coq_Core_Term **)
-
-fun asp_term_to_core a = case a of
-  NULL => Coq_aspc NULLC
-| CPY => Coq_aspc CPYC
-| ASPC sp fwd params =>
-  (case sp of
-     ALL => Coq_aspc (ASPCC fwd params)
-   | NONE => Coq_lseqc (Coq_aspc CLEAR) (Coq_aspc (ASPCC fwd params)))
-| SIG => Coq_aspc (ASPCC (EXTD (S O)) sig_params)
-| HSH => Coq_aspc (ASPCC COMP hsh_params)
-| ENC q => Coq_aspc (ASPCC ENCR (enc_params q))
-
-(** val copland_compile : coq_Term -> coq_Core_Term **)
-
-fun copland_compile t = case t of
-  Coq_asp a => asp_term_to_core a
-| Coq_att q t' => Coq_attc q t'
-| Coq_lseq t1 t2 => Coq_lseqc (copland_compile t1) (copland_compile t2)
-| Coq_bseq s t1 t2 =>
-  let val (s0, s1) = s in
-  (case s0 of
-     ALL =>
-     (case s1 of
-        ALL => Coq_bseqc (copland_compile t1) (copland_compile t2)
-      | NONE =>
-        Coq_bseqc (copland_compile t1) (Coq_lseqc (Coq_aspc CLEAR)
-          (copland_compile t2)))
-   | NONE =>
-     (case s1 of
-        ALL =>
-        Coq_bseqc (Coq_lseqc (Coq_aspc CLEAR) (copland_compile t1))
-          (copland_compile t2)
-      | NONE =>
-        Coq_bseqc (Coq_lseqc (Coq_aspc CLEAR) (copland_compile t1))
-          (Coq_lseqc (Coq_aspc CLEAR) (copland_compile t2)))) end
-| Coq_bpar s t1 t2 =>
-  let val (s0, s1) = s in
-  (case s0 of
-     ALL =>
-     (case s1 of
-        ALL => Coq_bparc O (copland_compile t1) (copland_compile t2)
-      | NONE =>
-        Coq_bparc O (copland_compile t1) (Coq_lseqc (Coq_aspc CLEAR)
-          (copland_compile t2)))
-   | NONE =>
-     (case s1 of
-        ALL =>
-        Coq_bparc O (Coq_lseqc (Coq_aspc CLEAR) (copland_compile t1))
-          (copland_compile t2)
-      | NONE =>
-        Coq_bparc O (Coq_lseqc (Coq_aspc CLEAR) (copland_compile t1))
-          (Coq_lseqc (Coq_aspc CLEAR) (copland_compile t2)))) end
-
-(** val et_size : coq_Evidence -> nat **)
-
-fun et_size e = case e of
-  Coq_mt => O
-| Coq_nn _ => S O
-| Coq_uu _ fwd _ e' =>
-  (case fwd of
-     EXTD n => add n (et_size e')
-   | KILL => O
-   | KEEP => et_size e'
-   | _ => S O)
-| Coq_ss e1 e2 => add (et_size e1) (et_size e2)
-
-datatype coq_EvC =
-  Coq_evc coq_RawEv coq_Evidence
-
-(** val mt_evc : coq_EvC **)
-
-val mt_evc : coq_EvC =
-  Coq_evc [] Coq_mt
-
-(** val get_et : coq_EvC -> coq_Evidence **)
-
-fun get_et e = case e of
-  Coq_evc _ et => et
-
-(** val get_bits : coq_EvC -> coq_BS list **)
-
-fun get_bits e = case e of
-  Coq_evc ls _ => ls
-
-(** val splitEv_T_l : coq_Split -> coq_Evidence -> coq_Evidence **)
+(** val splitEv_T_l : coq_Split -> coq_EvidenceT -> coq_EvidenceT **)
 
 fun splitEv_T_l sp e =
   let val (s, _) = sp in (case s of
                             ALL => e
-                          | NONE => Coq_mt) end
+                          | NONE => Coq_mt_evt) end
 
-(** val splitEv_T_r : coq_Split -> coq_Evidence -> coq_Evidence **)
+(** val splitEv_T_r : coq_Split -> coq_EvidenceT -> coq_EvidenceT **)
 
 fun splitEv_T_r sp e =
   let val (_, s0) = sp in (case s0 of
                              ALL => e
-                           | NONE => Coq_mt) end
+                           | NONE => Coq_mt_evt) end
 
-(** val sp_ev : coq_SP -> coq_Evidence -> coq_Evidence **)
+(** val splitEv_l : coq_Split -> coq_Evidence -> coq_Evidence **)
 
-fun sp_ev sp e =
-  case sp of
-    ALL => e
-  | NONE => Coq_mt
+fun splitEv_l sp e =
+  let val (s, _) = sp in (case s of
+                            ALL => e
+                          | NONE => mt_evc) end
 
-(** val eval_asp : coq_ASP -> coq_Plc -> coq_Evidence -> coq_Evidence **)
+(** val splitEv_r : coq_Split -> coq_Evidence -> coq_Evidence **)
 
-fun eval_asp t p e =
-  case t of
-    NULL => Coq_mt
-  | CPY => e
-  | ASPC sp fwd params =>
-    (case fwd of
-       KILL => Coq_mt
-     | KEEP => sp_ev sp e
-     | _ => Coq_uu p fwd params (sp_ev sp e))
-  | SIG => Coq_uu p (EXTD (S O)) sig_params e
-  | HSH => Coq_uu p COMP hsh_params e
-  | ENC q => Coq_uu p ENCR (enc_params q) e
+fun splitEv_r sp e =
+  let val (_, s0) = sp in (case s0 of
+                             ALL => e
+                           | NONE => mt_evc) end
 
-(** val eval : coq_Term -> coq_Plc -> coq_Evidence -> coq_Evidence **)
+(** val equiv_EvidenceT :
+    coq_GlobalContext -> coq_EvidenceT -> coq_EvidenceT -> bool **)
 
-fun eval t p e =
-  case t of
-    Coq_asp a => eval_asp a p e
-  | Coq_att q t1 => eval t1 q e
-  | Coq_lseq t1 t2 => eval t2 p (eval t1 p e)
-  | Coq_bseq s t1 t2 =>
-    Coq_ss (eval t1 p (splitEv_T_l s e)) (eval t2 p (splitEv_T_r s e))
-  | Coq_bpar s t1 t2 =>
-    Coq_ss (eval t1 p (splitEv_T_l s e)) (eval t2 p (splitEv_T_r s e))
+fun equiv_EvidenceT g e1 e2 =
+  case et_size g e1 of
+    Coq_errC _ => False
+  | Coq_resultC n1 =>
+    (case et_size g e2 of
+       Coq_errC _ => False
+     | Coq_resultC n2 => eqb nat_EqClass n1 n2)
+
+(** val appr_procedure' :
+    coq_GlobalContext -> coq_Plc -> coq_EvidenceT -> coq_EvidenceT ->
+    (coq_EvidenceT, string) coq_ResultT **)
+
+fun appr_procedure' g p e ev_out =
+  case equiv_EvidenceT g e ev_out of
+    True =>
+    (case e of
+       Coq_mt_evt => Coq_resultC Coq_mt_evt
+     | Coq_nonce_evt _ =>
+       Coq_resultC (Coq_asp_evt p check_nonce_params ev_out)
+     | Coq_asp_evt _ ps e' =>
+       let val Coq_asp_paramsC asp_id args targ_plc targ = ps in
+       (case map_get coq_Eq_Class_ID_Type asp_id
+               (let val Build_GlobalContext asp_types _ = g in asp_types end) of
+          Some e0 =>
+          let val Coq_ev_arrow fwd _ _ = e0 in
+          (case map_get coq_Eq_Class_ID_Type asp_id
+                  (let val Build_GlobalContext _ asp_comps = g in
+                   asp_comps end) of
+             Some appr_id =>
+             let val dual_par = Coq_asp_paramsC appr_id args targ_plc targ in
+             (case fwd of
+                REPLACE => Coq_resultC (Coq_asp_evt p dual_par ev_out)
+              | WRAP =>
+                (case map_get coq_Eq_Class_ID_Type appr_id
+                        (let val Build_GlobalContext asp_types _ = g in
+                         asp_types end) of
+                   Some e1 =>
+                   let val Coq_ev_arrow f _ _ = e1 in
+                   (case f of
+                      UNWRAP =>
+                      let val ev_out' = Coq_asp_evt p dual_par ev_out in
+                      appr_procedure' g p e' ev_out' end
+                    | _ => Coq_errC err_str_appr_compute_evt_neq) end
+                 | None => Coq_errC err_str_asp_no_type_sig)
+              | UNWRAP =>
+                res_bind
+                  (apply_to_evidence_below g (fn e1 =>
+                    appr_procedure' g p e1 ev_out) ((Trail_UNWRAP
+                    asp_id) :: []) e') (fn r => r)
+              | EXTEND =>
+                res_bind (appr_procedure' g p e' e') (fn ev_under =>
+                  Coq_resultC (Coq_split_evt (Coq_asp_evt p dual_par ev_out)
+                  ev_under))) end
+           | None => Coq_errC err_str_asp_no_compat_appr_asp) end
+        | None => Coq_errC err_str_asp_no_type_sig) end
+     | Coq_left_evt e' =>
+       res_bind
+         (apply_to_evidence_below g (fn e'0 =>
+           appr_procedure' g p e'0 ev_out) (Trail_LEFT :: []) e') (fn r => r)
+     | Coq_right_evt e' =>
+       res_bind
+         (apply_to_evidence_below g (fn e'0 =>
+           appr_procedure' g p e'0 ev_out) (Trail_RIGHT :: []) e') (fn r => r)
+     | Coq_split_evt e1 e2 =>
+       res_bind (appr_procedure' g p e1 (Coq_left_evt ev_out)) (fn e1' =>
+         res_bind (appr_procedure' g p e2 (Coq_right_evt ev_out)) (fn e2' =>
+           Coq_resultC (Coq_split_evt e1' e2'))))
+  | False => Coq_errC err_str_appr_compute_evt_neq
+
+(** val appr_procedure :
+    coq_GlobalContext -> coq_Plc -> coq_EvidenceT -> (coq_EvidenceT, string)
+    coq_ResultT **)
+
+fun appr_procedure g p e =
+  appr_procedure' g p e e
+
+(** val eval_asp :
+    coq_GlobalContext -> coq_ASP -> coq_Plc -> coq_EvidenceT ->
+    (coq_EvidenceT, string) coq_ResultT **)
+
+fun eval_asp g a p e =
+  case a of
+    NULL => Coq_resultC Coq_mt_evt
+  | ASPC params => Coq_resultC (Coq_asp_evt p params e)
+  | SIG => Coq_resultC (Coq_asp_evt p sig_params e)
+  | HSH => Coq_resultC (Coq_asp_evt p hsh_params e)
+  | APPR => appr_procedure g p e
+  | ENC q => Coq_resultC (Coq_asp_evt p (enc_params q) e)
+
+(** val eval :
+    coq_GlobalContext -> coq_Plc -> coq_EvidenceT -> coq_Term ->
+    (coq_EvidenceT, string) coq_ResultT **)
+
+fun eval g p e t = case t of
+  Coq_asp a => eval_asp g a p e
+| Coq_att q t1 => eval g q e t1
+| Coq_lseq t1 t2 => res_bind (eval g p e t1) (fn e1 => eval g p e1 t2)
+| Coq_bseq s t1 t2 =>
+  res_bind (eval g p (splitEv_T_l s e) t1) (fn e1 =>
+    res_bind (eval g p (splitEv_T_r s e) t2) (fn e2 => Coq_resultC
+      (Coq_split_evt e1 e2)))
+| Coq_bpar s t1 t2 =>
+  res_bind (eval g p (splitEv_T_l s e) t1) (fn e1 =>
+    res_bind (eval g p (splitEv_T_r s e) t2) (fn e2 => Coq_resultC
+      (Coq_split_evt e1 e2)))
 
 datatype coq_Ev =
   Coq_null nat coq_Plc
-| Coq_copy nat coq_Plc
-| Coq_umeas nat coq_Plc coq_ASP_PARAMS coq_Evidence
-| Coq_req nat coq_Plc coq_Plc coq_Term coq_Evidence
-| Coq_rpy nat coq_Plc coq_Plc coq_Evidence
+| Coq_umeas nat coq_Plc coq_ASP_PARAMS coq_EvidenceT
+| Coq_req nat coq_Plc coq_Plc coq_EvidenceT coq_Term
+| Coq_rpy nat coq_Plc coq_Plc coq_EvidenceT
 | Coq_split nat coq_Plc
 | Coq_join nat coq_Plc
-| Coq_cvm_thread_start coq_Loc coq_Plc coq_Core_Term coq_Evidence
-| Coq_cvm_thread_end coq_Loc
+| Coq_cvm_thread_start nat coq_Loc coq_Plc coq_EvidenceT coq_Term
+| Coq_cvm_thread_end nat coq_Loc
+
+(** val appr_events_size :
+    coq_GlobalContext -> coq_EvidenceT -> (nat, string) coq_ResultT **)
+
+fun appr_events_size g e = case e of
+  Coq_mt_evt => Coq_resultC O
+| Coq_nonce_evt _ => Coq_resultC (S O)
+| Coq_asp_evt _ par e' =>
+  let val Coq_asp_paramsC asp_id _ _ _ = par in
+  (case map_get coq_Eq_Class_ID_Type asp_id
+          (let val Build_GlobalContext asp_types _ = g in asp_types end) of
+     Some e0 =>
+     let val Coq_ev_arrow asp_fwd _ _ = e0 in
+     (case asp_fwd of
+        REPLACE => Coq_resultC (S O)
+      | WRAP =>
+        res_bind (appr_events_size g e') (fn n => Coq_resultC (add (S O) n))
+      | UNWRAP =>
+        res_bind
+          (apply_to_evidence_below g (appr_events_size g) ((Trail_UNWRAP
+            asp_id) :: []) e') (fn r => r)
+      | EXTEND =>
+        res_bind (appr_events_size g e') (fn n => Coq_resultC
+          (add (S (S (S O))) n))) end
+   | None => Coq_errC err_str_asp_no_type_sig) end
+| Coq_left_evt e' =>
+  res_bind
+    (apply_to_evidence_below g (appr_events_size g) (Trail_LEFT :: []) e')
+    (fn r => r)
+| Coq_right_evt e' =>
+  res_bind
+    (apply_to_evidence_below g (appr_events_size g) (Trail_RIGHT :: []) e')
+    (fn r => r)
+| Coq_split_evt e1 e2 =>
+  res_bind (appr_events_size g e1) (fn s1 =>
+    res_bind (appr_events_size g e2) (fn s2 => Coq_resultC
+      (add (add (S (S O)) s1) s2)))
+
+(** val events_size :
+    coq_GlobalContext -> coq_Plc -> coq_EvidenceT -> coq_Term -> (nat,
+    string) coq_ResultT **)
+
+fun events_size g p e t = case t of
+  Coq_asp a =>
+  (case a of
+     APPR => appr_events_size g e
+   | _ => Coq_resultC (S O))
+| Coq_att p' t1 =>
+  res_bind (events_size g p' e t1) (fn e' => Coq_resultC (add (S (S O)) e'))
+| Coq_lseq t1 t2 =>
+  res_bind (events_size g p e t1) (fn e1 =>
+    res_bind (eval g p e t1) (fn e' =>
+      res_bind (events_size g p e' t2) (fn e2 => Coq_resultC (add e1 e2))))
+| Coq_bseq s t1 t2 =>
+  res_bind (events_size g p (splitEv_T_l s e) t1) (fn e1 =>
+    res_bind (events_size g p (splitEv_T_r s e) t2) (fn e2 => Coq_resultC
+      (add (add (S (S O)) e1) e2)))
+| Coq_bpar s t1 t2 =>
+  res_bind (events_size g p (splitEv_T_l s e) t1) (fn e1 =>
+    res_bind (events_size g p (splitEv_T_r s e) t2) (fn e2 => Coq_resultC
+      (add (add (S (S (S (S O)))) e1) e2)))
+
+(** val appr_events' :
+    coq_GlobalContext -> coq_Plc -> coq_EvidenceT -> coq_EvidenceT -> nat ->
+    (coq_Ev list, string) coq_ResultT **)
+
+fun appr_events' g p e ev_out i =
+  case e of
+    Coq_mt_evt => Coq_resultC []
+  | Coq_nonce_evt _ =>
+    Coq_resultC ((Coq_umeas i p check_nonce_params ev_out) :: [])
+  | Coq_asp_evt _ ps e' =>
+    let val Coq_asp_paramsC asp_id args targ_plc targ = ps in
+    (case map_get coq_Eq_Class_ID_Type asp_id
+            (let val Build_GlobalContext _ asp_comps = g in asp_comps end) of
+       Some appr_id =>
+       let val dual_par = Coq_asp_paramsC appr_id args targ_plc targ in
+       (case map_get coq_Eq_Class_ID_Type asp_id
+               (let val Build_GlobalContext asp_types _ = g in asp_types end) of
+          Some e0 =>
+          let val Coq_ev_arrow fwd _ _ = e0 in
+          (case fwd of
+             REPLACE => Coq_resultC ((Coq_umeas i p dual_par ev_out) :: [])
+           | WRAP =>
+             let val unwrap_ev = Coq_umeas i p dual_par ev_out in
+             let val new_ev_out = Coq_asp_evt p dual_par ev_out in
+             res_bind (appr_events' g p e' new_ev_out (add i (S O)))
+               (fn ev' => Coq_resultC (unwrap_ev :: ev')) end end
+           | UNWRAP =>
+             res_bind
+               (apply_to_evidence_below g (fn e'0 =>
+                 appr_events' g p e'0 ev_out i) ((Trail_UNWRAP asp_id) :: [])
+                 e') (fn r => r)
+           | EXTEND =>
+             res_bind (appr_events' g p e' e' (add i (S (S O)))) (fn ev' =>
+               Coq_resultC
+               (app ((Coq_split i p) :: [])
+                 (app ((Coq_umeas (add i (S O)) p dual_par ev_out) :: [])
+                   (app ev' ((Coq_join (add (add i (S (S O))) (length ev'))
+                     p) :: [])))))) end
+        | None => Coq_errC err_str_asp_no_type_sig) end
+     | None => Coq_errC err_str_asp_no_compat_appr_asp) end
+  | Coq_left_evt e' =>
+    res_bind
+      (apply_to_evidence_below g (fn e'0 => appr_events' g p e'0 ev_out i)
+        (Trail_LEFT :: []) e') (fn r => r)
+  | Coq_right_evt e' =>
+    res_bind
+      (apply_to_evidence_below g (fn e'0 => appr_events' g p e'0 ev_out i)
+        (Trail_RIGHT :: []) e') (fn r => r)
+  | Coq_split_evt e1 e2 =>
+    (case equiv_EvidenceT g e1 (Coq_left_evt ev_out) of
+       True =>
+       (case equiv_EvidenceT g e2 (Coq_right_evt ev_out) of
+          True =>
+          res_bind (appr_events' g p e1 (Coq_left_evt ev_out) (add i (S O)))
+            (fn e1' =>
+            let val next_i = add (add i (S O)) (length e1') in
+            res_bind (appr_events' g p e2 (Coq_right_evt ev_out) next_i)
+              (fn e2' =>
+              let val last_i = add next_i (length e2') in
+              Coq_resultC
+              (app ((Coq_split i p) :: [])
+                (app e1' (app e2' ((Coq_join last_i p) :: [])))) end) end)
+        | False => Coq_errC err_str_appr_compute_evt_neq)
+     | False => Coq_errC err_str_appr_compute_evt_neq)
+
+(** val appr_events :
+    coq_GlobalContext -> coq_Plc -> coq_EvidenceT -> nat -> (coq_Ev list,
+    string) coq_ResultT **)
+
+fun appr_events g p e i =
+  appr_events' g p e e i
+
+(** val asp_events :
+    coq_GlobalContext -> coq_Plc -> coq_EvidenceT -> coq_ASP -> nat ->
+    (coq_Ev list, string) coq_ResultT **)
+
+fun asp_events g p e a i =
+  case a of
+    NULL => Coq_resultC ((Coq_null i p) :: [])
+  | ASPC ps => Coq_resultC ((Coq_umeas i p ps e) :: [])
+  | SIG => Coq_resultC ((Coq_umeas i p sig_params e) :: [])
+  | HSH => Coq_resultC ((Coq_umeas i p hsh_params e) :: [])
+  | APPR => appr_events g p e i
+  | ENC q => Coq_resultC ((Coq_umeas i p (enc_params q) e) :: [])

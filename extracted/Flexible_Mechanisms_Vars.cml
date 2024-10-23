@@ -28,6 +28,16 @@ val coq_P4 : coq_Plc =
 val attest_id : coq_ASP_ID =
   "attest_id"
 
+(** val attest1_id : coq_ASP_ID **)
+
+val attest1_id : coq_ASP_ID =
+  "attest1_id"
+
+(** val attest2_id : coq_ASP_ID **)
+
+val attest2_id : coq_ASP_ID =
+  "attest2_id"
+
 (** val appraise_id : coq_ASP_ID **)
 
 val appraise_id : coq_ASP_ID =

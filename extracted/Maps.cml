@@ -1,39 +1,30 @@
-type ('a, 'b) coq_MapC = ('a * 'b) list
+type ('a, 'b) coq_Map = ('a * 'b) list
 
 (** val map_get :
-    'a1 coq_EqClass -> ('a1, 'a2) coq_MapC -> 'a1 -> 'a2 option **)
+    'a1 coq_EqClass -> 'a1 -> ('a1, 'a2) coq_Map -> 'a2 option **)
 
-fun map_get h m x =
-  case m of
-    [] => None
-  | p :: m' =>
-    let val (k, v) = p in
-    (case eqb h k x of
-       True => Some v
-     | False => map_get h m' x) end
+fun map_get h x m = case m of
+  [] => None
+| p :: m' =>
+  let val (k, v) = p in
+  (case eqb h k x of
+     True => Some v
+   | False => map_get h x m') end
 
 (** val map_set :
-    'a1 coq_EqClass -> ('a1, 'a2) coq_MapC -> 'a1 -> 'a2 -> ('a1, 'a2)
-    coq_MapC **)
+    'a1 coq_EqClass -> 'a1 -> 'a2 -> ('a1, 'a2) coq_Map -> ('a1, 'a2) coq_Map **)
 
-fun map_set h m x v =
-  case m of
-    [] => (x, v) :: []
-  | p :: t =>
-    let val (hk, hv) = p in
-    (case eqb h hk x of
-       True => (hk, v) :: t
-     | False => (hk, hv) :: (map_set h t x v)) end
-
-(** val map_vals : 'a1 coq_EqClass -> ('a1, 'a2) coq_MapC -> 'a2 list **)
-
-fun map_vals h m = case m of
-  [] => []
-| p :: m' => let val (_, v) = p in v :: (map_vals h m') end
+fun map_set h x v m = case m of
+  [] => (x, v) :: []
+| p :: t =>
+  let val (hk, hv) = p in
+  (case eqb h hk x of
+     True => (hk, v) :: t
+   | False => (hk, hv) :: (map_set h x v t)) end
 
 (** val map_map :
-    'a1 coq_EqClass -> ('a2 -> 'a3) -> ('a1, 'a2) coq_MapC -> ('a1, 'a3)
-    coq_MapC **)
+    'a1 coq_EqClass -> ('a2 -> 'a3) -> ('a1, 'a2) coq_Map -> ('a1, 'a3)
+    coq_Map **)
 
 fun map_map hA f m = case m of
   [] => []
