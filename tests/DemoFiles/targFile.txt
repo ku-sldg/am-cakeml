@@ -1,0 +1,2 @@
+targFile contents
+good1

@@ -1,0 +1,9 @@
+(** val ex_targJudgement_fun : coq_RawEv -> string **)
+
+val ex_targJudgement_fun : (coq_RawEv -> string) =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val ex_targJudgement_fun' : coq_RawEv -> string **)
+
+val ex_targJudgement_fun' : (coq_RawEv -> string) =
+  failwith "AXIOM TO BE REALIZED"

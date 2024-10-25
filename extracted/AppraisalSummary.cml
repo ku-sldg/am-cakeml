@@ -1,0 +1,147 @@
+type coq_AppraisalSummary =
+  (coq_ASP_ID, (coq_TARG_ID, string) coq_Map) coq_Map
+
+type coq_RawEvJudgement =
+  (coq_ASP_ID, (coq_TARG_ID, coq_RawEv -> string) coq_Map) coq_Map
+
+(** val add_RawEvJudgement :
+    coq_ASP_ID -> coq_TARG_ID -> (coq_RawEv -> string) -> coq_RawEvJudgement
+    -> coq_RawEvJudgement **)
+
+fun add_RawEvJudgement i tid f m =
+  let val m' =
+    case map_get coq_Eq_Class_ID_Type i m of
+      Some tm => tm
+    | None => []
+  in
+  let val m'' = map_set coq_Eq_Class_ID_Type tid f m' in
+  map_set coq_Eq_Class_ID_Type i m'' m end end
+
+(** val get_RawEvJudgement :
+    coq_ASP_ID -> coq_TARG_ID -> coq_RawEvJudgement -> coq_RawEv -> string **)
+
+fun get_RawEvJudgement i tid m =
+  let val default_fun = fn _ =>
+    String.^ "( "
+      (String.^ i
+        (String.^ ", "
+          (String.^ tid (String.^ " ) " "not found in RawEvJudgement map"))))
+  in
+  (case map_get coq_Eq_Class_ID_Type i m of
+     Some m' =>
+     (case map_get coq_Eq_Class_ID_Type tid m' of
+        Some f => f
+      | None => default_fun)
+   | None => default_fun) end
+
+(** val map_get_default :
+    'a1 coq_EqClass -> 'a1 -> 'a2 -> ('a1, 'a2) coq_Map -> 'a2 **)
+
+fun map_get_default h x y m =
+  case map_get h x m of
+    Some v => v
+  | None => y
+
+(** val set_AppraisalSummary :
+    coq_ASP_ID -> coq_TARG_ID -> string -> coq_AppraisalSummary ->
+    coq_AppraisalSummary **)
+
+fun set_AppraisalSummary i tid str s =
+  let val m = map_get_default coq_Eq_Class_ID_Type i [] s in
+  let val m' = map_set coq_Eq_Class_ID_Type tid str m in
+  map_set coq_Eq_Class_ID_Type i m' s end end
+
+(** val add_asp_summary :
+    coq_ASP_ID -> coq_TARG_ID -> (coq_RawEv -> string) -> coq_RawEv ->
+    coq_AppraisalSummary -> coq_AppraisalSummary **)
+
+fun add_asp_summary i tid f rEv s =
+  let val str = f rEv in set_AppraisalSummary i tid str s end
+
+(** val do_AppraisalSummary' :
+    coq_EvidenceT -> coq_RawEv -> coq_GlobalContext -> coq_RawEvJudgement ->
+    coq_AppraisalSummary -> (coq_AppraisalSummary, string) coq_ResultT **)
+
+fun do_AppraisalSummary' et r g m s =
+  case et of
+    Coq_asp_evt _ ps et' =>
+    let val Coq_asp_paramsC i _ _ tid = ps in
+    (case map_get coq_Eq_Class_ID_Type i
+            (let val Build_GlobalContext asp_types _ = g in asp_types end) of
+       Some e =>
+       let val Coq_ev_arrow fwd _ out_sig = e in
+       (case fwd of
+          EXTEND =>
+          (case out_sig of
+             OutN n =>
+             let val f = get_RawEvJudgement i tid m in
+             res_bind (peel_n_rawev n r) (fn x =>
+               let val (r1, rest) = x in
+               let val s' = add_asp_summary i tid f r1 s in
+               do_AppraisalSummary' et' rest g m s' end end) end
+           | OutUnwrap => Coq_errC err_str_cannot_have_outwrap)
+        | _ => Coq_resultC s) end
+     | None => Coq_resultC s) end
+  | Coq_left_evt et' => do_AppraisalSummary' et' r g m s
+  | Coq_right_evt et' => do_AppraisalSummary' et' r g m s
+  | Coq_split_evt et1 et2 =>
+    res_bind (et_size g et1) (fn et1_size =>
+      res_bind (et_size g et2) (fn et2_size =>
+        res_bind (peel_n_rawev et1_size r) (fn x =>
+          let val (r1, rest) = x in
+          res_bind (peel_n_rawev et2_size rest) (fn x0 =>
+            let val (r2, _) = x0 in
+            res_bind (do_AppraisalSummary' et1 r1 g m s) (fn s1 =>
+              do_AppraisalSummary' et2 r2 g m s1) end) end)))
+  | _ => Coq_resultC s
+
+(** val do_AppraisalSummary :
+    coq_EvidenceT -> coq_RawEv -> coq_GlobalContext -> coq_RawEvJudgement ->
+    (coq_AppraisalSummary, string) coq_ResultT **)
+
+fun do_AppraisalSummary et r g m =
+  do_AppraisalSummary' et r g m []
+
+type single_add_type = coq_ASP_ID * (coq_TARG_ID * (coq_RawEv -> string))
+
+(** val addOne_rawEvJudgement :
+    coq_RawEvJudgement -> single_add_type -> coq_RawEvJudgement **)
+
+fun addOne_rawEvJudgement a b =
+  let val aid = fst b in
+  let val tid = fst (snd b) in
+  let val f = snd (snd b) in add_RawEvJudgement aid tid f a end end end
+
+(** val gen_rawEvJudgement : single_add_type list -> coq_RawEvJudgement **)
+
+fun gen_rawEvJudgement ls =
+  fold_left addOne_rawEvJudgement ls []
+
+(** val example_RawEvJudgement_ls : single_add_type list **)
+
+val example_RawEvJudgement_ls : single_add_type list =
+  (gather_file_contents_id, (cds_config_1_targ,
+    ex_targJudgement_fun)) :: ((gather_file_contents_id, (cds_config_2_targ,
+    ex_targJudgement_fun)) :: ((gather_file_contents_id, (cds_config_3_targ,
+    ex_targJudgement_fun)) :: ((appr_gather_file_contents_id,
+    (cds_config_1_targ,
+    ex_targJudgement_fun')) :: ((appr_gather_file_contents_id,
+    (cds_config_2_targ,
+    ex_targJudgement_fun')) :: ((appr_gather_file_contents_id,
+    (cds_config_3_targ, ex_targJudgement_fun')) :: [])))))
+
+(** val example_RawEvJudgement : coq_RawEvJudgement **)
+
+val example_RawEvJudgement : coq_RawEvJudgement =
+  gen_rawEvJudgement example_RawEvJudgement_ls
+
+(** val test_app_summary_compute_json : coq_AppraisalSummary -> coq_JSON **)
+
+fun test_app_summary_compute_json x =
+  let val Build_Jsonifiable to_JSON _ =
+    jsonifiable_map_serial_json coq_Stringifiable_ID_Type
+      coq_Eq_Class_ID_Type
+      (jsonifiable_map_serial_serial coq_Stringifiable_ID_Type
+        coq_Eq_Class_ID_Type coq_Stringifiable_ID_Type)
+  in
+  to_JSON x end

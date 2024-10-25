@@ -63,12 +63,19 @@ get_files(copland_am_src
     extracted/JSON.cml
     extracted/JSON_Core_Strings.cml
     extracted/Term_Defs_Core.cml
+    extracted/Term_Defs_Core_Ops.cml
     extracted/JSON_Core.cml
 
     stubs/Params_Admits.sml
     stubs/Manifest_Admits.sml
 
     extracted/Term_Defs.cml
+    extracted/Cvm_Utils.cml
+    stubs/RawEvJudgement_Admits.sml 
+
+    extracted/CACL_Demo.cml
+    extracted/AppraisalSummary.cml
+
     extracted/Term.cml
     extracted/Manifest_Set.cml
     extracted/Manifest.cml
@@ -92,7 +99,7 @@ get_files(copland_am_src
     extracted/AM_Json_Interfaces.cml
     extracted/Flexible_Mechanisms_Vars.cml
     extracted/Flexible_Mechanisms.cml
-    # extracted/Client_AM.cml
+    extracted/Client_AM.cml
     extracted/Server_AM.cml
     extracted/Concrete_Extractables.cml
     util/AM_CLI.sml

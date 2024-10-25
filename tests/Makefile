@@ -15,3 +15,4 @@ ci_test:
 	./CI/Test.sh -t bg -h
 	./CI/Test.sh -t parmut -h
 	./CI/Test.sh -t filehash -h
+	./CI/Test.sh -t cds_simple -h

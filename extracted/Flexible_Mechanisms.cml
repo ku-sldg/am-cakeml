@@ -53,6 +53,17 @@ val split_phrase : coq_Term =
     attest1_id [] coq_P1 sys_targ))) (Coq_asp (ASPC (Coq_asp_paramsC
     attest2_id [] coq_P1 sys_targ))))
 
+(** val appr_term : coq_Term **)
+
+val appr_term : coq_Term =
+  Coq_asp APPR
+
+(** val example_appTerm : coq_Term **)
+
+val example_appTerm : coq_Term =
+  Coq_lseq gather_config_1 (Coq_lseq gather_config_2 (Coq_lseq
+    gather_config_3 appr_term))
+
 (** val flexible_mechanisms_map : (string * coq_Term) list **)
 
 val flexible_mechanisms_map : (string * coq_Term) list =
@@ -62,7 +73,7 @@ val flexible_mechanisms_map : (string * coq_Term) list =
     APPR))) :: (("parmut", parallel_mutual_1) :: (("parmut2",
     parallel_mutual_2) :: (("layered_bg",
     layered_background_check) :: (("filehash",
-    filehash_auth_phrase) :: []))))))))
+    filehash_auth_phrase) :: (("cds_simple", example_appTerm) :: [])))))))))
 
 (** val add_EvidenceT_flexible_mechanisms :
     coq_GlobalContext -> (string, coq_Term * (coq_EvidenceT, string)
