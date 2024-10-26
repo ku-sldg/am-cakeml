@@ -91,14 +91,16 @@ structure BString = struct
         fun tokens f = List.map fromString o applyStr (String.tokens (f o charToWord8))
 
         (* bstring -> string *)
-        val show = String.concat o List.map Word8Extra.toHex o explode
+        (* val show = String.concat o List.map Word8Extra.toHex o explode *)
+        val show = toString
 
         (* string -> bstring *)
-        fun unshow s = case String.size s of 
+        (* fun unshow s = case String.size s of 
               0 => empty
             | 1 => raise Word8Extra.InvalidHex
             | _ => case StringExtra.splitAt 2 s of 
-                  (hexByte, s') => concat (singleton (Word8Extra.fromHex hexByte)) (unshow s')
+                  (hexByte, s') => concat (singleton (Word8Extra.fromHex hexByte)) (unshow s') *)
+        val unshow = fromString
 
         (* (word8 -> word8) -> bstring -> bstring *)
         fun map f = mapStr (StringExtra.map (word8ToChar o f o charToWord8))
