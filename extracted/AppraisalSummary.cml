@@ -144,7 +144,9 @@ val example_RawEvJudgement_ls : single_add_type list =
     ex_targJudgement_fun')) :: ((appr_gather_file_contents_id,
     (cds_config_2_targ,
     ex_targJudgement_fun')) :: ((appr_gather_file_contents_id,
-    (cds_config_3_targ, ex_targJudgement_fun')) :: [])))))
+    (cds_config_3_targ,
+    ex_targJudgement_fun')) :: ((appr_hash_file_contents_id, (cds_img_1_targ,
+    ex_targJudgement_fun')) :: []))))))
 
 (** val example_RawEvJudgement : coq_RawEvJudgement **)
 
