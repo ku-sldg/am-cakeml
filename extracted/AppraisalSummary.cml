@@ -71,7 +71,15 @@ fun do_AppraisalSummary' et r g m s =
        Some e =>
        let val Coq_ev_arrow fwd _ out_sig = e in
        (case fwd of
-          EXTEND =>
+          REPLACE =>
+          (case out_sig of
+             OutN n =>
+             let val f = get_RawEvJudgement i tid m in
+             res_bind (peel_n_rawev n r) (fn x =>
+               let val (r1, _) = x in
+               let val s' = add_asp_summary i tid f r1 s in Coq_resultC s' end end) end
+           | OutUnwrap => Coq_errC err_str_cannot_have_outwrap)
+        | EXTEND =>
           (case out_sig of
              OutN n =>
              let val f = get_RawEvJudgement i tid m in
@@ -82,8 +90,16 @@ fun do_AppraisalSummary' et r g m s =
            | OutUnwrap => Coq_errC err_str_cannot_have_outwrap)
         | _ => Coq_resultC s) end
      | None => Coq_resultC s) end
-  | Coq_left_evt et' => do_AppraisalSummary' et' r g m s
-  | Coq_right_evt et' => do_AppraisalSummary' et' r g m s
+  | Coq_left_evt et' =>
+    res_bind
+      (apply_to_evidence_below g (fn et'' =>
+        do_AppraisalSummary' et'' r g m s) (Trail_LEFT :: []) et') (fn r0 =>
+      r0)
+  | Coq_right_evt et' =>
+    res_bind
+      (apply_to_evidence_below g (fn et'' =>
+        do_AppraisalSummary' et'' r g m s) (Trail_RIGHT :: []) et') (fn r0 =>
+      r0)
   | Coq_split_evt et1 et2 =>
     res_bind (et_size g et1) (fn et1_size =>
       res_bind (et_size g et2) (fn et2_size =>

@@ -69,7 +69,7 @@
         }
       },
       "appraise_r_readfile_id": {
-        "FWD": "EXTEND",
+        "FWD": "REPLACE",
         "EvInSig": "ALL",
         "EvOutSig": {
           "EvOutSig_CONSTRUCTOR": "OutN",
