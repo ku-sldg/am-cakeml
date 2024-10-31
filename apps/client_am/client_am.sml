@@ -27,7 +27,8 @@ fun main () =
                               att_sess 
                               top_plc 
                               (Coq_evc [] Coq_mt_evt) 
-                              example_appTerm 
+                              demo_term
+                              (* example_appTerm  *)
                               att_plc in 
       case maybe_appsumm of 
         Coq_resultC appsumm => print (coq_JSON_to_string (test_app_summary_compute_json appsumm)) 

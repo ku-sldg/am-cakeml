@@ -65,6 +65,14 @@ val example_appTerm : coq_Term =
     gather_config_2 (Coq_bseq (ALL, ALL) gather_config_3 hash_cds_img_1)))
     appr_term
 
+(** val example_appTerm_provision : coq_Term **)
+
+val example_appTerm_provision : coq_Term =
+  Coq_bseq (ALL, ALL) (Coq_lseq gather_config_1 provision_config_1) (Coq_bseq
+    (ALL, ALL) (Coq_lseq gather_config_2 provision_config_2) (Coq_bseq (ALL,
+    ALL) (Coq_lseq gather_config_3 provision_config_3) (Coq_lseq
+    hash_cds_img_1 provision_img_1)))
+
 (** val flexible_mechanisms_map : (string * coq_Term) list **)
 
 val flexible_mechanisms_map : (string * coq_Term) list =
@@ -74,7 +82,9 @@ val flexible_mechanisms_map : (string * coq_Term) list =
     APPR))) :: (("parmut", parallel_mutual_1) :: (("parmut2",
     parallel_mutual_2) :: (("layered_bg",
     layered_background_check) :: (("filehash",
-    filehash_auth_phrase) :: (("cds_simple", example_appTerm) :: [])))))))))
+    filehash_auth_phrase) :: (("cds_simple",
+    example_appTerm) :: (("cds_provision",
+    example_appTerm_provision) :: []))))))))))
 
 (** val add_EvidenceT_flexible_mechanisms :
     coq_GlobalContext -> (string, coq_Term * (coq_EvidenceT, string)
