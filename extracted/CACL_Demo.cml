@@ -59,7 +59,7 @@ fun provision_targ_asp targPlc targId path =
 (** val path_targ1 : string **)
 
 val path_targ1 : string =
-  "tests/DemoFiles/targFiles/targFile1.txt"
+  "/tests/DemoFiles/targFiles/targFile1.txt"
 
 (** val path_targ1_golden : string **)
 
