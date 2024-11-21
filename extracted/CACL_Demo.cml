@@ -3,6 +3,16 @@
 val cds_config_dir_plc : coq_Plc =
   "cds_config_dir_plc"
 
+(** val cds_query_kim_plc : coq_Plc **)
+
+val cds_query_kim_plc : coq_Plc =
+  "cds_query_kim_plc"
+
+(** val kim_evidence_targ : coq_TARG_ID **)
+
+val kim_evidence_targ : coq_TARG_ID =
+  "kim_evidence_targ"
+
 (** val cds_config_1_targ : coq_TARG_ID **)
 
 val cds_config_1_targ : coq_TARG_ID =
@@ -22,6 +32,11 @@ val cds_config_3_targ : coq_TARG_ID =
 
 val cds_img_1_targ : coq_TARG_ID =
   "cds_img_1_targ"
+
+(** val query_kim_id : coq_ASP_ID **)
+
+val query_kim_id : coq_ASP_ID =
+  "r_invaryGetMeasurement_id"
 
 (** val gather_file_contents_id : coq_ASP_ID **)
 
@@ -66,13 +81,61 @@ val path_targ1 : string =
 val path_targ1_golden : string =
   "/tests/DemoFiles/goldenFiles/targFile1.txt"
 
+(** val path_targ2 : string **)
+
+val path_targ2 : string =
+  "/tests/DemoFiles/targFiles/targFile2.txt"
+
+(** val path_targ3 : string **)
+
+val path_targ3 : string =
+  "/tests/DemoFiles/targFiles/targFile3.txt"
+
+(** val path_targ2_golden : string **)
+
+val path_targ2_golden : string =
+  "/tests/DemoFiles/goldenFiles/targFile2.txt"
+
+(** val path_targ3_golden : string **)
+
+val path_targ3_golden : string =
+  "/tests/DemoFiles/goldenFiles/targFile3.txt"
+
 (** val gather_config_1 : coq_Term **)
 
 val gather_config_1 : coq_Term =
   gather_targ_asp cds_config_dir_plc cds_config_1_targ path_targ1
     path_targ1_golden
 
+(** val gather_config_2 : coq_Term **)
+
+val gather_config_2 : coq_Term =
+  gather_targ_asp cds_config_dir_plc cds_config_2_targ path_targ2
+    path_targ2_golden
+
+(** val gather_config_3 : coq_Term **)
+
+val gather_config_3 : coq_Term =
+  gather_targ_asp cds_config_dir_plc cds_config_3_targ path_targ3
+    path_targ3_golden
+
 (** val provision_config_1 : coq_Term **)
 
 val provision_config_1 : coq_Term =
   provision_targ_asp cds_config_dir_plc cds_config_1_targ path_targ1_golden
+
+(** val provision_config_2 : coq_Term **)
+
+val provision_config_2 : coq_Term =
+  provision_targ_asp cds_config_dir_plc cds_config_2_targ path_targ2_golden
+
+(** val provision_config_3 : coq_Term **)
+
+val provision_config_3 : coq_Term =
+  provision_targ_asp cds_config_dir_plc cds_config_3_targ path_targ3_golden
+
+(** val query_kim_asp : coq_Term **)
+
+val query_kim_asp : coq_Term =
+  Coq_asp (ASPC (Coq_asp_paramsC query_kim_id [] cds_query_kim_plc
+    kim_evidence_targ))

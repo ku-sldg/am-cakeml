@@ -49,7 +49,7 @@
       }
     },
     "appraise_id": {
-      "FWD": "EXTEND",
+      "FWD": "REPLACE",
       "EvInSig": "ALL",
       "EvOutSig": {
         "EvOutSig_CONSTRUCTOR": "OutN",
@@ -72,7 +72,7 @@
         "EvOutSig_BODY": "1"
       }
     },
-    "query_kim_id": {
+    "r_invaryGetMeasurement_id": {
       "FWD": "EXTEND",
       "EvInSig": "ALL",
       "EvOutSig": {
@@ -129,7 +129,7 @@
     "attest2_id": "appraise_id",
     "appraise_id": "appraise_id",
     "certificate_id": "appraise_id",
-    "query_kim_id": "appraise_id",
+    "r_invaryGetMeasurement_id": "appraise_id",
     "gather_file_contents_id": "appraise_id",
     "r_readfile_id": "appraise_r_readfile_id",
     "r_hashfile_id": "appraise_r_hashfile_id",

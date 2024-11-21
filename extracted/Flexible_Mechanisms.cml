@@ -61,12 +61,14 @@ val appr_term : coq_Term =
 (** val example_appTerm : coq_Term **)
 
 val example_appTerm : coq_Term =
-  Coq_lseq gather_config_1 appr_term
+  Coq_lseq (Coq_bseq (ALL, ALL) gather_config_1 query_kim_asp) appr_term
 
 (** val example_appTerm_provision : coq_Term **)
 
 val example_appTerm_provision : coq_Term =
-  Coq_lseq gather_config_1 provision_config_1
+  Coq_bseq (ALL, ALL) (Coq_lseq gather_config_1 provision_config_1) (Coq_bseq
+    (ALL, ALL) (Coq_lseq gather_config_2 provision_config_2) (Coq_lseq
+    gather_config_3 provision_config_3))
 
 (** val flexible_mechanisms_map : (string * coq_Term) list **)
 
