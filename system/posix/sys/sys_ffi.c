@@ -63,7 +63,7 @@ uint8_t read_until_eof(FILE *file, size_t INITIAL_BUFFER_SIZE, char **buffer, si
     *total_read += bytes_read;
 
     // Check if we need to resize the buffer
-    if (*total_read > buffer_size)
+    if (*total_read + 1 > buffer_size)
     {
       // This should never happen, but just in case
       perror("read_until_eof: Buffer overflow");
@@ -99,7 +99,7 @@ uint8_t read_until_eof(FILE *file, size_t INITIAL_BUFFER_SIZE, char **buffer, si
   }
 
   // Null-terminate the buffer
-  buffer[*total_read] = '\0';
+  (*buffer)[*total_read] = '\0';
 
   return SUCCESS;
 }
