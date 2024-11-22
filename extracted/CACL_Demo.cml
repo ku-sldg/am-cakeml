@@ -58,6 +58,11 @@ val appr_hash_file_contents_id : coq_ASP_ID =
 val provision_id : coq_ASP_ID =
   "r_provision_id"
 
+(** val appr_query_kim_id : coq_ASP_ID **)
+
+val appr_query_kim_id : coq_ASP_ID =
+  "appraise_r_invaryGetMeasurement_id"
+
 (** val gather_targ_asp :
     coq_Plc -> coq_TARG_ID -> string -> string -> coq_Term **)
 
