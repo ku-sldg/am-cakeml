@@ -13,6 +13,11 @@ val cds_query_kim_plc : coq_Plc =
 val kim_evidence_targ : coq_TARG_ID =
   "kim_evidence_targ"
 
+(** val ssl_sig_targ : coq_TARG_ID **)
+
+val ssl_sig_targ : coq_TARG_ID =
+  "ssl_sig_targ"
+
 (** val cds_config_1_targ : coq_TARG_ID **)
 
 val cds_config_1_targ : coq_TARG_ID =
@@ -38,6 +43,11 @@ val cds_img_1_targ : coq_TARG_ID =
 val query_kim_id : coq_ASP_ID =
   "r_invaryGetMeasurement_id"
 
+(** val query_kim_stub_id : coq_ASP_ID **)
+
+val query_kim_stub_id : coq_ASP_ID =
+  "r_invaryGetMeasurement_stub_id"
+
 (** val gather_file_contents_id : coq_ASP_ID **)
 
 val gather_file_contents_id : coq_ASP_ID =
@@ -62,6 +72,11 @@ val provision_id : coq_ASP_ID =
 
 val appr_query_kim_id : coq_ASP_ID =
   "appraise_r_invaryGetMeasurement_id"
+
+(** val ssl_sig_id : coq_ASP_ID **)
+
+val ssl_sig_id : coq_ASP_ID =
+  "ssl_sig_id"
 
 (** val gather_targ_asp :
     coq_Plc -> coq_TARG_ID -> string -> string -> coq_Term **)
@@ -143,4 +158,16 @@ val provision_config_3 : coq_Term =
 
 val query_kim_asp : coq_Term =
   Coq_asp (ASPC (Coq_asp_paramsC query_kim_id [] cds_query_kim_plc
+    kim_evidence_targ))
+
+(** val ssl_sig_asp : coq_Term **)
+
+val ssl_sig_asp : coq_Term =
+  Coq_asp (ASPC (Coq_asp_paramsC ssl_sig_id [] cds_query_kim_plc
+    ssl_sig_targ))
+
+(** val query_kim_asp_stub : coq_Term **)
+
+val query_kim_asp_stub : coq_Term =
+  Coq_asp (ASPC (Coq_asp_paramsC query_kim_stub_id [] cds_query_kim_plc
     kim_evidence_targ))
