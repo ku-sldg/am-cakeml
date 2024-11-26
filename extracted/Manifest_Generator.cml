@@ -111,5 +111,4 @@ fun manifest_generator' g p et t e =
     coq_ResultT **)
 
 fun manifest_generator g p t =
-  res_bind (eval g p Coq_mt_evt t) (fn et =>
-    manifest_generator' g p et t e_empty)
+  manifest_generator' g p Coq_mt_evt t e_empty

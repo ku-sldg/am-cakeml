@@ -73,7 +73,7 @@ val example_appTerm : coq_Term =
 
 val example_appTerm_stub : coq_Term =
   Coq_lseq (Coq_bseq (ALL, ALL) gather_config_1 query_kim_asp_stub) (Coq_lseq
-    ssl_sig_asp appr_term)
+    r_ssl_sig_asp appr_term)
 
 (** val example_appTerm_provision : coq_Term **)
 
@@ -86,7 +86,7 @@ val example_appTerm_provision : coq_Term =
 
 val simple_sig : coq_Term =
   Coq_lseq (Coq_lseq (Coq_asp (ASPC (Coq_asp_paramsC attest_id [] coq_P1
-    sys_targ))) ssl_sig_asp) appr_term
+    sys_targ))) r_ssl_sig_asp) appr_term
 
 (** val flexible_mechanisms_map : (string * coq_Term) list **)
 

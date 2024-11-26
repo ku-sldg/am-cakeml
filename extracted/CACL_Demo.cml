@@ -68,10 +68,20 @@ val provision_id : coq_ASP_ID =
 val appr_query_kim_id : coq_ASP_ID =
   "appraise_r_invaryGetMeasurement_id"
 
-(** val ssl_sig_id : coq_ASP_ID **)
+(** val appr_query_kim_stub_id : coq_ASP_ID **)
 
-val ssl_sig_id : coq_ASP_ID =
-  "ssl_sig_id"
+val appr_query_kim_stub_id : coq_ASP_ID =
+  "appraise_r_invaryGetMeasurement_stub_id"
+
+(** val r_ssl_sig_id : coq_ASP_ID **)
+
+val r_ssl_sig_id : coq_ASP_ID =
+  "r_sig"
+
+(** val r_ssl_sig_appr_id : coq_ASP_ID **)
+
+val r_ssl_sig_appr_id : coq_ASP_ID =
+  "appraise_r_sig"
 
 (** val gather_targ_asp :
     coq_Plc -> coq_TARG_ID -> string -> string -> coq_Term **)
@@ -149,10 +159,10 @@ val provision_config_2 : coq_Term =
 val provision_config_3 : coq_Term =
   provision_targ_asp cds_config_dir_plc cds_config_3_targ path_targ3_golden
 
-(** val ssl_sig_asp : coq_Term **)
+(** val r_ssl_sig_asp : coq_Term **)
 
-val ssl_sig_asp : coq_Term =
-  Coq_asp (ASPC (Coq_asp_paramsC ssl_sig_id [] cds_query_kim_plc
+val r_ssl_sig_asp : coq_Term =
+  Coq_asp (ASPC (Coq_asp_paramsC r_ssl_sig_id [] cds_query_kim_plc
     ssl_sig_targ))
 
 (** val query_kim_asp_stub : coq_Term **)
