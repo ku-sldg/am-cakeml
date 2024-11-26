@@ -15,8 +15,8 @@ fun main () =
       (* TODO: Maybe someday we refactor args *)
       val top_plc   : coq_Plc = "TOP_PLC"
       val att_plc   : coq_Plc = "P0" 
-      val init_et        : coq_EvidenceT = Coq_nonce_evt O 
-      val init_rawev : coq_RawEv = [passed_bs]
+      val init_et        : coq_EvidenceT = Coq_mt_evt (* Coq_nonce_evt O  *)
+      val init_rawev : coq_RawEv = [] (* [passed_bs] *)
       val attester_addr : coq_UUID = "localhost:5000"
       val appraiser_addr : coq_UUID = "localhost:5003" 
       

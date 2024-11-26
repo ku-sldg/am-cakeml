@@ -12,30 +12,6 @@
   "PubKey_Mapping": {},
   "Session_Context": {
     "ASP_Types": {
-      "sig_id": {
-        "FWD": "EXTEND",
-        "EvInSig": "ALL",
-        "EvOutSig": {
-          "EvOutSig_CONSTRUCTOR": "OutN",
-          "EvOutSig_BODY": "1"
-        }
-      },
-      "ssl_sig_id": {
-        "FWD": "EXTEND",
-        "EvInSig": "ALL",
-        "EvOutSig": {
-          "EvOutSig_CONSTRUCTOR": "OutN",
-          "EvOutSig_BODY": "1"
-        }
-      },
-      "ssl_sig_appr_id": {
-        "FWD": "EXTEND",
-        "EvInSig": "ALL",
-        "EvOutSig": {
-          "EvOutSig_CONSTRUCTOR": "OutN",
-          "EvOutSig_BODY": "1"
-        }
-      },
       "attest1_id": {
         "FWD": "EXTEND",
         "EvInSig": "ALL",
@@ -52,14 +28,6 @@
           "EvOutSig_BODY": "1"
         }
       },
-      "hashfile_id": {
-        "FWD": "EXTEND",
-        "EvInSig": "NONE",
-        "EvOutSig": {
-          "EvOutSig_CONSTRUCTOR": "OutN",
-          "EvOutSig_BODY": "1"
-        }
-      },
       "attest_id": {
         "FWD": "EXTEND",
         "EvInSig": "ALL",
@@ -70,53 +38,13 @@
       },
       "certificate_id": {
         "FWD": "EXTEND",
-        "EvInSig": "NONE",
-        "EvOutSig": {
-          "EvOutSig_CONSTRUCTOR": "OutN",
-          "EvOutSig_BODY": "1"
-        }
-      },
-      "appraise_id": {
-        "FWD": "REPLACE",
         "EvInSig": "ALL",
         "EvOutSig": {
           "EvOutSig_CONSTRUCTOR": "OutN",
           "EvOutSig_BODY": "1"
         }
       },
-      "appraise_r_invaryGetMeasurement_id": {
-        "FWD": "REPLACE",
-        "EvInSig": "ALL",
-        "EvOutSig": {
-          "EvOutSig_CONSTRUCTOR": "OutN",
-          "EvOutSig_BODY": "1"
-        }
-      },
-      "appraise_r_invaryGetMeasurement_stub_id": {
-        "FWD": "REPLACE",
-        "EvInSig": "ALL",
-        "EvOutSig": {
-          "EvOutSig_CONSTRUCTOR": "OutN",
-          "EvOutSig_BODY": "1"
-        }
-      },
-      "appraise_r_readfile_id": {
-        "FWD": "REPLACE",
-        "EvInSig": "ALL",
-        "EvOutSig": {
-          "EvOutSig_CONSTRUCTOR": "OutN",
-          "EvOutSig_BODY": "1"
-        }
-      },
-      "appraise_r_hashfile_id": {
-        "FWD": "REPLACE",
-        "EvInSig": "ALL",
-        "EvOutSig": {
-          "EvOutSig_CONSTRUCTOR": "OutN",
-          "EvOutSig_BODY": "1"
-        }
-      },
-      "r_invaryGetMeasurement_id": {
+      "hashfile_id": {
         "FWD": "EXTEND",
         "EvInSig": "ALL",
         "EvOutSig": {
@@ -124,7 +52,7 @@
           "EvOutSig_BODY": "1"
         }
       },
-      "r_invaryGetMeasurement_stub_id": {
+      "sig_id": {
         "FWD": "EXTEND",
         "EvInSig": "ALL",
         "EvOutSig": {
@@ -140,22 +68,6 @@
           "EvOutSig_BODY": "1"
         }
       },
-      "gather_file_contents_id": {
-        "FWD": "EXTEND",
-        "EvInSig": "ALL",
-        "EvOutSig": {
-          "EvOutSig_CONSTRUCTOR": "OutN",
-          "EvOutSig_BODY": "1"
-        }
-      },
-      "r_hashfile_id": {
-        "FWD": "EXTEND",
-        "EvInSig": "ALL",
-        "EvOutSig": {
-          "EvOutSig_CONSTRUCTOR": "OutN",
-          "EvOutSig_BODY": "1"
-        }
-      },
       "r_provision_id": {
         "FWD": "EXTEND",
         "EvInSig": "ALL",
@@ -164,8 +76,16 @@
           "EvOutSig_BODY": "0"
         }
       },
-      "appr_cds_id": {
-        "FWD": "EXTEND",
+      "appraise_r_readfile_id": {
+        "FWD": "REPLACE",
+        "EvInSig": "ALL",
+        "EvOutSig": {
+          "EvOutSig_CONSTRUCTOR": "OutN",
+          "EvOutSig_BODY": "1"
+        }
+      },
+      "appraise_id": {
+        "FWD": "REPLACE",
         "EvInSig": "ALL",
         "EvOutSig": {
           "EvOutSig_CONSTRUCTOR": "OutN",
@@ -174,22 +94,16 @@
       }
     },
     "ASP_Comps": {
-      "sig_id": "certificate_id",
-      "ssl_sig_id": "ssl_sig_appr_id",
-      "hashfile_id": "appraise_id",
-      "attest_id": "appraise_id",
       "attest1_id": "appraise_id",
       "attest2_id": "appraise_id",
-      "appraise_id": "appraise_id",
+      "attest_id": "appraise_id",
       "certificate_id": "appraise_id",
-      "r_invaryGetMeasurement_id": "appraise_r_invaryGetMeasurement_id",
-      "r_invaryGetMeasurement_stub_id": "appraise_r_invaryGetMeasurement_stub_id",
-      "gather_file_contents_id": "appraise_id",
+      "hashfile_id": "appraise_id",
+      "sig_id": "appraise_id",
       "r_readfile_id": "appraise_r_readfile_id",
-      "r_hashfile_id": "appraise_r_hashfile_id",
       "r_provision_id": "appraise_id",
-      "hash_file_contents_id": "appraise_id",
-      "appr_cds_id": "appraise_id"
+      "appraise_id": "appraise_id",
+      "appraise_r_readfile_id": "appraise_id"
     }
   }
 }

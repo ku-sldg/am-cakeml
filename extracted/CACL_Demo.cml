@@ -38,11 +38,6 @@ val cds_config_3_targ : coq_TARG_ID =
 val cds_img_1_targ : coq_TARG_ID =
   "cds_img_1_targ"
 
-(** val query_kim_id : coq_ASP_ID **)
-
-val query_kim_id : coq_ASP_ID =
-  "r_invaryGetMeasurement_id"
-
 (** val query_kim_stub_id : coq_ASP_ID **)
 
 val query_kim_stub_id : coq_ASP_ID =
@@ -153,12 +148,6 @@ val provision_config_2 : coq_Term =
 
 val provision_config_3 : coq_Term =
   provision_targ_asp cds_config_dir_plc cds_config_3_targ path_targ3_golden
-
-(** val query_kim_asp : coq_Term **)
-
-val query_kim_asp : coq_Term =
-  Coq_asp (ASPC (Coq_asp_paramsC query_kim_id [] cds_query_kim_plc
-    kim_evidence_targ))
 
 (** val ssl_sig_asp : coq_Term **)
 
