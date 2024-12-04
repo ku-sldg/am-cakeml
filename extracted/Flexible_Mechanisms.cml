@@ -53,11 +53,6 @@ val split_phrase : coq_Term =
     attest1_id [] coq_P1 sys_targ))) (Coq_asp (ASPC (Coq_asp_paramsC
     attest2_id [] coq_P1 sys_targ))))
 
-(** val large_output_asp_test : coq_Term **)
-
-val large_output_asp_test : coq_Term =
-  Coq_asp (ASPC (Coq_asp_paramsC large_output_id [] coq_P1 sys_targ))
-
 (** val appr_term : coq_Term **)
 
 val appr_term : coq_Term =
@@ -67,32 +62,21 @@ val appr_term : coq_Term =
 
 val example_appTerm : coq_Term =
   Coq_lseq (Coq_bseq (ALL, ALL) gather_config_1 (Coq_bseq (ALL, ALL)
-    gather_config_2 gather_config_3)) appr_term
-
-(** val cds_ssl : coq_Term **)
-
-val cds_ssl : coq_Term =
-  Coq_lseq (Coq_bseq (ALL, ALL) gather_config_1 query_kim_asp) (Coq_lseq
-    r_ssl_sig_asp appr_term)
-
-(** val example_appTerm_stub : coq_Term **)
-
-val example_appTerm_stub : coq_Term =
-  Coq_lseq (Coq_bseq (ALL, ALL) gather_config_1 query_kim_asp_stub) (Coq_lseq
-    r_ssl_sig_asp appr_term)
+    gather_config_2 (Coq_bseq (ALL, ALL) gather_config_3 hash_cds_img_1)))
+    appr_term
 
 (** val example_appTerm_provision : coq_Term **)
 
 val example_appTerm_provision : coq_Term =
   Coq_bseq (ALL, ALL) (Coq_lseq gather_config_1 provision_config_1) (Coq_bseq
-    (ALL, ALL) (Coq_lseq gather_config_2 provision_config_2) (Coq_lseq
-    gather_config_3 provision_config_3))
+    (ALL, ALL) (Coq_lseq gather_config_2 provision_config_2) (Coq_bseq (ALL,
+    ALL) (Coq_lseq gather_config_3 provision_config_3) (Coq_lseq
+    hash_cds_img_1 provision_img_1)))
 
-(** val simple_sig : coq_Term **)
+(** val cert_resolute_phrase : coq_Term **)
 
-val simple_sig : coq_Term =
-  Coq_lseq (Coq_lseq (Coq_asp (ASPC (Coq_asp_paramsC attest_id [] coq_P1
-    sys_targ))) r_ssl_sig_asp) appr_term
+val cert_resolute_phrase : coq_Term =
+  Coq_asp (ASPC (Coq_asp_paramsC certificate_id [] coq_P1 cert_resolute_targ))
 
 (** val flexible_mechanisms_map : (string * coq_Term) list **)
 
@@ -103,12 +87,10 @@ val flexible_mechanisms_map : (string * coq_Term) list =
     APPR))) :: (("parmut", parallel_mutual_1) :: (("parmut2",
     parallel_mutual_2) :: (("layered_bg",
     layered_background_check) :: (("filehash",
-    filehash_auth_phrase) :: (("large_output",
-    large_output_asp_test) :: (("cds_simple",
-    example_appTerm) :: (("cds_stub", example_appTerm_stub) :: (("cds_ssl",
-    cds_ssl) :: (("cds_provision",
-    example_appTerm_provision) :: (("simple_sig",
-    simple_sig) :: []))))))))))))))
+    filehash_auth_phrase) :: (("cds_simple",
+    example_appTerm) :: (("cds_provision",
+    example_appTerm_provision) :: (("cert_resolute_app", (Coq_lseq
+    cert_resolute_phrase (Coq_asp APPR))) :: [])))))))))))
 
 (** val add_EvidenceT_flexible_mechanisms :
     coq_GlobalContext -> (string, coq_Term * (coq_EvidenceT, string)

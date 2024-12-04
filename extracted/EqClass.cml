@@ -14,9 +14,9 @@ fun coq_EqClass_impl_DecEq h x y =
                           True => True
                         | False => False) end
 
-(** val str_eq_class : string coq_EqClass **)
+(** val str_eq_clasplit_evt : string coq_EqClass **)
 
-val str_eq_class : string coq_EqClass =
+val str_eq_clasplit_evt : string coq_EqClass =
   (op=)
 
 (** val nat_EqClass : nat coq_EqClass **)

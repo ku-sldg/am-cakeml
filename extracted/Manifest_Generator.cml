@@ -14,35 +14,11 @@ fun appr_manifest_update g e m =
   case e of
     Coq_mt_evt => Coq_resultC m
   | Coq_nonce_evt _ => Coq_resultC (aspid_manifest_update check_nonce_aspid m)
-  | Coq_asp_evt _ par e' =>
-    let val Coq_asp_paramsC asp_id _ _ _ = par in
+  | Coq_asp_evt _ ps _ =>
+    let val Coq_asp_paramsC asp_id _ _ _ = ps in
     (case map_get coq_Eq_Class_ID_Type asp_id
             (let val Build_GlobalContext _ asp_comps = g in asp_comps end) of
-       Some appr_asp_id =>
-       (case map_get coq_Eq_Class_ID_Type asp_id
-               (let val Build_GlobalContext asp_types _ = g in asp_types end) of
-          Some e0 =>
-          let val Coq_ev_arrow fwd _ out_sig = e0 in
-          (case fwd of
-             REPLACE => Coq_resultC (aspid_manifest_update appr_asp_id m)
-           | WRAP =>
-             let val m' = aspid_manifest_update appr_asp_id m in
-             appr_manifest_update g e' m' end
-           | UNWRAP =>
-             (case out_sig of
-                OutN _ => Coq_errC err_str_unwrap_must_have_outwrap
-              | OutUnwrap =>
-                res_bind
-                  (apply_to_evidence_below g (fn e1 =>
-                    appr_manifest_update g e1 m) ((Trail_UNWRAP
-                    asp_id) :: []) e') (fn m' => m'))
-           | EXTEND =>
-             (case out_sig of
-                OutN _ =>
-                let val m' = aspid_manifest_update appr_asp_id m in
-                appr_manifest_update g e' m' end
-              | OutUnwrap => Coq_errC err_str_extend_must_have_outn)) end
-        | None => Coq_errC err_str_asp_no_type_sig)
+       Some appr_asp_id => Coq_resultC (aspid_manifest_update appr_asp_id m)
      | None => Coq_errC err_str_asp_no_compat_appr_asp) end
   | Coq_left_evt e' =>
     res_bind
@@ -111,4 +87,5 @@ fun manifest_generator' g p et t e =
     coq_ResultT **)
 
 fun manifest_generator g p t =
-  manifest_generator' g p Coq_mt_evt t e_empty
+  res_bind (eval g p Coq_mt_evt t) (fn et =>
+    manifest_generator' g p et t e_empty)

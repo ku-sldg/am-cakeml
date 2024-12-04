@@ -1,0 +1,109 @@
+type coq_TargetT = coq_ID_Type
+
+datatype coq_Resolute =
+  R_False 
+| R_True 
+| R_Goal coq_TargetT
+| R_And coq_Resolute coq_Resolute
+| R_Or coq_Resolute coq_Resolute
+| R_Imp coq_Resolute coq_Resolute
+
+(** val mt_ASP_ID : coq_ASP_ID **)
+
+val mt_ASP_ID : coq_ASP_ID =
+  "mtTerm"
+
+(** val mt_Plc : coq_Plc **)
+
+val mt_Plc : coq_Plc =
+  "mtPlc"
+
+(** val mt_TARG_ID : coq_Plc **)
+
+val mt_TARG_ID : coq_Plc =
+  "mtTarg"
+
+(** val mtTerm : coq_Term **)
+
+val mtTerm : coq_Term =
+  Coq_asp (ASPC (Coq_asp_paramsC mt_ASP_ID [] mt_Plc mt_TARG_ID))
+
+datatype coq_Model =
+  Build_Model ((coq_TargetT -> coq_Term))
+   ((coq_TargetT -> coq_Evidence -> bool)) coq_GlobalContext
+
+(** val err_str_split_evidence_not_split' : string **)
+
+val err_str_split_evidence_not_split' : string =
+  "Error in split_t*, type of evidence passed into a split is not a split evidence type"
+
+(** val split_t1 :
+    coq_Model -> coq_Evidence -> (coq_Evidence, string) coq_ResultT **)
+
+fun split_t1 m e = case e of
+  Coq_evc rawEv et =>
+  (case et of
+     Coq_split_evt et1 _ =>
+     res_bind
+       (et_size (let val Build_Model _ _ context = m in context end) et1)
+       (fn n =>
+       res_bind (peel_n_rawev n rawEv) (fn x =>
+         let val (rawEv1, _) = x in Coq_resultC (Coq_evc rawEv1 et1) end))
+   | _ => Coq_errC err_str_split_evidence_not_split')
+
+(** val split_t2 :
+    coq_Model -> coq_Evidence -> (coq_Evidence, string) coq_ResultT **)
+
+fun split_t2 m e = case e of
+  Coq_evc rawEv et =>
+  (case et of
+     Coq_split_evt et1 et2 =>
+     res_bind
+       (et_size (let val Build_Model _ _ context = m in context end) et1)
+       (fn n =>
+       res_bind (peel_n_rawev n rawEv) (fn x =>
+         let val (_, rawEv2) = x in Coq_resultC (Coq_evc rawEv2 et2) end))
+   | _ => Coq_errC err_str_split_evidence_not_split')
+
+(** val split_t1_default : coq_Model -> coq_Evidence -> coq_Evidence **)
+
+fun split_t1_default m e =
+  case split_t1 m e of
+    Coq_errC _ => Coq_evc [] (get_et e)
+  | Coq_resultC e' => e'
+
+(** val split_t2_default : coq_Model -> coq_Evidence -> coq_Evidence **)
+
+fun split_t2_default m e =
+  case split_t2 m e of
+    Coq_errC _ => Coq_evc [] (get_et e)
+  | Coq_resultC e' => e'
+
+(** val res_to_copland :
+    coq_Model -> coq_Resolute -> (coq_TargetT, coq_Evidence) coq_Map ->
+    coq_Term * (coq_Evidence -> bool) **)
+
+fun res_to_copland m r m0 =
+  case r of
+    R_False => (mtTerm, (fn _ => False))
+  | R_True => (mtTerm, (fn _ => True))
+  | R_Goal tid =>
+    (case map_get coq_Eq_Class_ID_Type tid m0 of
+       Some e =>
+       (mtTerm, (fn _ => let val Build_Model _ spec _ = m in spec tid e end))
+     | None =>
+       ((let val Build_Model conc _ _ = m in conc tid end), (fn e =>
+         let val Build_Model _ spec _ = m in spec tid e end)))
+  | R_And r1 r2 =>
+    let val (t1, pol1) = res_to_copland m r1 m0 in
+    let val (t2, pol2) = res_to_copland m r2 m0 in
+    ((Coq_bseq (NONE, NONE) t1 t2), (fn e =>
+    (fn x => fn y => x andalso y) (pol1 (split_t1_default m e))
+      (pol2 (split_t2_default m e)))) end end
+  | R_Or r1 r2 =>
+    let val (t1, pol1) = res_to_copland m r1 m0 in
+    let val (t2, pol2) = res_to_copland m r2 m0 in
+    ((Coq_bseq (NONE, NONE) t1 t2), (fn e =>
+    (fn x => fn y => x orelse y) (pol1 (split_t1_default m e))
+      (pol2 (split_t2_default m e)))) end end
+  | R_Imp r1 _ => res_to_copland m r1 m0

@@ -23,6 +23,7 @@ fun main () =
       (* val app_result = run_demo_client_AM demo_term top_plc att_plc init_et att_sess init_rawev attester_addr appraiser_addr  *)
       (* TODO: Current this will do basically NOTHING *)
   in 
+  (*
       let val maybe_appsumm = am_client_app_summary
                               att_sess 
                               top_plc 
@@ -30,8 +31,21 @@ fun main () =
                               demo_term
                               (* example_appTerm  *)
                               att_plc in 
-      case maybe_appsumm of 
-        Coq_resultC appsumm => print (coq_JSON_to_string (test_app_summary_compute_json appsumm)) 
+    *)
+      let val maybe_bool = am_client_do_res 
+                            att_sess 
+                            top_plc 
+                            att_plc 
+                            cert_resolute_model 
+                            cert_resolute_statement 
+                            [] in
+
+      (*
+      (att_sess : Attestation_Session) (req_plc:Plc) 
+  (toPlc:Plc) (M : Model) (r:Resolute) (m:Map TargetT Evidence)
+  *)
+      case maybe_bool of 
+        Coq_resultC b => print ("Resolute Policy check:  " ^ (if(b) then "SUCCESS" else "FAILED")) (* (coq_JSON_to_string (test_app_summary_compute_json appsumm)) *)
       | Coq_errC errStr => print errStr 
     end
   end

@@ -99,6 +99,7 @@ get_files(copland_am_src
     extracted/AM_Json_Interfaces.cml
     extracted/Flexible_Mechanisms_Vars.cml
     extracted/Flexible_Mechanisms.cml
+    extracted/Resolute_Logic.cml
     extracted/Client_AM.cml
     extracted/Server_AM.cml
     extracted/Concrete_Extractables.cml

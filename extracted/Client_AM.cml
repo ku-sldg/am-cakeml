@@ -81,3 +81,40 @@ fun am_client_app_summary att_sess req_plc e t toPlc =
     let val Coq_evc _ et = e in
     res_bind (eval glob_ctx toPlc et t) (fn et' =>
       do_AppraisalSummary et' rawev glob_ctx example_RawEvJudgement) end end
+
+(** val am_client_do_res :
+    coq_Attestation_Session -> coq_Plc -> coq_Plc -> coq_Model ->
+    coq_Resolute -> (coq_TargetT, coq_Evidence) coq_Map -> (bool, string)
+    coq_ResultT **)
+
+fun am_client_do_res att_sess req_plc toPlc m r m0 =
+  let val (t, pol) = res_to_copland m r m0 in
+  let val appr_t = Coq_lseq t (Coq_asp APPR) in
+  res_bind (am_sendReq att_sess req_plc mt_evc appr_t toPlc) (fn rawev =>
+    let val glob_ctx =
+      let val Coq_mkAtt_Sess _ _ _ ats_context = att_sess in ats_context end
+    in
+    res_bind (eval glob_ctx toPlc Coq_mt_evt appr_t) (fn et' => Coq_resultC
+      (pol (Coq_evc rawev et'))) end) end end
+
+(** val cert_res_asp_type_env : coq_ASP_Type_Env **)
+
+val cert_res_asp_type_env : coq_ASP_Type_Env =
+  (certificate_id, (Coq_ev_arrow EXTEND InAll (OutN (S
+    O)))) :: ((appraise_id, (Coq_ev_arrow REPLACE InAll (OutN (S O)))) :: [])
+
+(** val cert_res_asp_compat_mapt : coq_ASP_Compat_MapT **)
+
+val cert_res_asp_compat_mapt : coq_ASP_Compat_MapT =
+  (certificate_id, appraise_id) :: []
+
+(** val cert_resolute_model : coq_Model **)
+
+val cert_resolute_model : coq_Model =
+  Build_Model (fn _ => cert_resolute_phrase) (fn _ => fn _ => True)
+    (Build_GlobalContext cert_res_asp_type_env cert_res_asp_compat_mapt)
+
+(** val cert_resolute_statement : coq_Resolute **)
+
+val cert_resolute_statement : coq_Resolute =
+  R_Goal cert_resolute_targ
