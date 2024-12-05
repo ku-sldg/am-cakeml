@@ -108,10 +108,15 @@ val cert_res_asp_type_env : coq_ASP_Type_Env =
 val cert_res_asp_compat_mapt : coq_ASP_Compat_MapT =
   (certificate_id, appraise_id) :: []
 
+(** val cert_res_policy : coq_Evidence -> bool **)
+
+fun cert_res_policy _ =
+  True
+
 (** val cert_resolute_model : coq_Model **)
 
 val cert_resolute_model : coq_Model =
-  Build_Model (fn _ => cert_resolute_phrase) (fn _ => fn _ => True)
+  Build_Model (fn _ => cert_resolute_phrase) (fn _ => cert_res_policy)
     (Build_GlobalContext cert_res_asp_type_env cert_res_asp_compat_mapt)
 
 (** val cert_resolute_statement : coq_Resolute **)
