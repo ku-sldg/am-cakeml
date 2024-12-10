@@ -41,12 +41,12 @@ val cds_img_1_targ : coq_TARG_ID =
 (** val query_kim_id : coq_ASP_ID **)
 
 val query_kim_id : coq_ASP_ID =
-  "r_invaryGetMeasurement_id"
+  "r_invary_get_measurement_id"
 
 (** val query_kim_stub_id : coq_ASP_ID **)
 
 val query_kim_stub_id : coq_ASP_ID =
-  "r_invaryGetMeasurement_stub_id"
+  "r_invary_get_measurement_stub_id"
 
 (** val gather_file_contents_id : coq_ASP_ID **)
 
@@ -71,12 +71,12 @@ val provision_id : coq_ASP_ID =
 (** val appr_query_kim_id : coq_ASP_ID **)
 
 val appr_query_kim_id : coq_ASP_ID =
-  "appraise_r_invaryGetMeasurement_id"
+  "appraise_r_invary_get_measurement_id"
 
 (** val appr_query_kim_stub_id : coq_ASP_ID **)
 
 val appr_query_kim_stub_id : coq_ASP_ID =
-  "appraise_r_invaryGetMeasurement_stub_id"
+  "appraise_r_invary_get_measurement_stub_id"
 
 (** val tpm_sig_id : coq_ASP_ID **)
 
