@@ -172,7 +172,8 @@
       "ssl_sig_appr_id": "appraise_id",
       "r_sig": "appraise_r_sig",
       "r_sig_tpm": "appraise_r_sig_tpm",
+      "appraise_r_sig_tpm": "appraise_id",
       "r_invary_get_measurement_id": "appraise_r_invary_get_measurement_id"
     }
-  }  
+  }    
 }
