@@ -164,11 +164,26 @@ val gather_config_3 : coq_Term =
 val provision_config_1 : coq_Term =
   provision_targ_asp cds_config_dir_plc cds_config_1_targ path_targ1_golden
 
+(** val query_kim_dynammic_arg_id : string **)
+
+val query_kim_dynammic_arg_id : string =
+  "dynamic"
+
+(** val query_kim_dynammic_arg_val : string **)
+
+val query_kim_dynammic_arg_val : string =
+  "true"
+
+(** val query_kim_args : coq_ASP_ARGS **)
+
+val query_kim_args : coq_ASP_ARGS =
+  (query_kim_dynammic_arg_id, query_kim_dynammic_arg_val) :: []
+
 (** val query_kim_asp : coq_Term **)
 
 val query_kim_asp : coq_Term =
-  Coq_asp (ASPC (Coq_asp_paramsC query_kim_id [] cds_query_kim_plc
-    kim_evidence_targ))
+  Coq_asp (ASPC (Coq_asp_paramsC query_kim_id query_kim_args
+    cds_query_kim_plc kim_evidence_targ))
 
 (** val r_ssl_sig_asp : coq_Term **)
 
