@@ -1,4 +1,4 @@
-asdfff
+
 
 
 
@@ -73,5 +73,10 @@ asdfff
  "outcome" : {"from" : "comrade",
 	      "to"   : "scoundrel"}}
 
+// Uncomment this to force all msgs to fail 
 
+// {"locale" : "X-Bad-Header",
+//  "outcome" : "require"}
 
+{"locale" : "Subject",
+ "outcome" : "classicize"}
