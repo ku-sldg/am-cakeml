@@ -73,6 +73,7 @@ get_files(copland_am_src
     extracted/Cvm_Utils.cml
     stubs/RawEvJudgement_Admits.sml 
 
+    stubs/CACL_Demo_Args.sml
     extracted/CACL_Demo.cml
     extracted/AppraisalSummary.cml
 

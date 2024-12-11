@@ -29,5 +29,8 @@ CMakeCache.txt
 tests/DemoFiles/Generated
 tests/DemoFiles/targFiles/*
 
+stubs/CACL_Demo_Args.sml
+extracted/CACL_Demo_Args.cml
+
 # Backup files
 *backup.*

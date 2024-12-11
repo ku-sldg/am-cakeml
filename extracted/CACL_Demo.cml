@@ -164,20 +164,12 @@ val gather_config_3 : coq_Term =
 val provision_config_1 : coq_Term =
   provision_targ_asp cds_config_dir_plc cds_config_1_targ path_targ1_golden
 
-(** val query_kim_dynammic_arg_id : string **)
-
-val query_kim_dynammic_arg_id : string =
-  "dynamic"
-
-(** val query_kim_dynammic_arg_val : string **)
-
-val query_kim_dynammic_arg_val : string =
-  "true"
-
 (** val query_kim_args : coq_ASP_ARGS **)
 
 val query_kim_args : coq_ASP_ARGS =
-  (query_kim_dynammic_arg_id, query_kim_dynammic_arg_val) :: []
+  (query_kim_dynammic_arg_id,
+    query_kim_dynammic_arg_val) :: ((query_kim_appraisal_dir_arg_id,
+    query_kim_appraisal_dir_arg_val) :: [])
 
 (** val query_kim_asp : coq_Term **)
 
