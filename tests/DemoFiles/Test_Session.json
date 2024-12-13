@@ -52,6 +52,14 @@
           "EvOutSig_BODY": "1"
         }
       },
+      "r_hashfile_id": {
+        "FWD": "EXTEND",
+        "EvInSig": "ALL",
+        "EvOutSig": {
+          "EvOutSig_CONSTRUCTOR": "OutN",
+          "EvOutSig_BODY": "1"
+        }
+      },
       "sig_id": {
         "FWD": "EXTEND",
         "EvInSig": "ALL",
@@ -116,6 +124,14 @@
           "EvOutSig_BODY": "1"
         }
       },
+      "appraise_r_hashfile_id": {
+        "FWD": "REPLACE",
+        "EvInSig": "ALL",
+        "EvOutSig": {
+          "EvOutSig_CONSTRUCTOR": "OutN",
+          "EvOutSig_BODY": "1"
+        }
+      },
       "ssl_sig_appr_id": {
         "FWD": "REPLACE",
         "EvInSig": "ALL",
@@ -166,8 +182,10 @@
       "sig_id": "appraise_id",
       "r_readfile_id": "appraise_r_readfile_id",
       "r_provision_id": "appraise_id",
+      "r_hashfile_id": "appraise_r_hashfile_id",
       "appraise_id": "appraise_id",
       "appraise_r_readfile_id": "appraise_id",
+      "appraise_r_hashfile_id": "appraise_id",
       "ssl_sig_id": "ssl_sig_appr_id",
       "ssl_sig_appr_id": "appraise_id",
       "r_sig": "appraise_r_sig",

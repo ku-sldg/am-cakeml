@@ -68,6 +68,28 @@ val appr_term : coq_Term =
 val meas_cds : coq_Term =
   Coq_bseq (ALL, ALL) gather_config_1 gather_config_2
 
+(** val hash_micro_config_1 : coq_Term **)
+
+val hash_micro_config_1 : coq_Term =
+  hash_targ_asp cds_config_dir_plc cds_img_1_targ path_micro_targ1
+    path_micro_targ1_golden
+
+(** val hash_micro_config_2 : coq_Term **)
+
+val hash_micro_config_2 : coq_Term =
+  hash_targ_asp cds_config_dir_plc cds_img_2_targ path_micro_targ2
+    path_micro_targ2_golden
+
+(** val meas_micro : coq_Term **)
+
+val meas_micro : coq_Term =
+  Coq_bseq (ALL, ALL) hash_micro_config_1 hash_micro_config_2
+
+(** val micro_appTerm : coq_Term **)
+
+val micro_appTerm : coq_Term =
+  Coq_lseq meas_micro appr_term
+
 (** val example_appTerm : coq_Term **)
 
 val example_appTerm : coq_Term =
@@ -84,6 +106,24 @@ val cds_ssl : coq_Term =
 val cds_tpm : coq_Term =
   Coq_lseq (Coq_bseq (ALL, ALL) meas_cds query_kim_asp) (Coq_lseq
     r_tpm_sig_asp appr_term)
+
+(** val provision_micro_hash_1 : coq_Term **)
+
+val provision_micro_hash_1 : coq_Term =
+  provision_targ_asp cds_config_dir_plc cds_config_1_targ
+    path_micro_targ1_golden
+
+(** val provision_micro_hash_2 : coq_Term **)
+
+val provision_micro_hash_2 : coq_Term =
+  provision_targ_asp cds_config_dir_plc cds_config_1_targ
+    path_micro_targ2_golden
+
+(** val micro_appTerm_provision : coq_Term **)
+
+val micro_appTerm_provision : coq_Term =
+  Coq_bseq (ALL, ALL) (Coq_lseq hash_micro_config_1 provision_micro_hash_1)
+    (Coq_lseq hash_micro_config_2 provision_micro_hash_2)
 
 (** val example_appTerm_provision : coq_Term **)
 
@@ -110,8 +150,9 @@ val flexible_mechanisms_map : (string * coq_Term) list =
     large_output_asp_test) :: (("cds_simple",
     example_appTerm) :: (("cds_ssl", cds_ssl) :: (("cds_tpm",
     cds_tpm) :: (("cds_provision",
-    example_appTerm_provision) :: (("simple_sig",
-    simple_sig) :: []))))))))))))))
+    example_appTerm_provision) :: (("simple_sig", simple_sig) :: (("micro",
+    micro_appTerm) :: (("micro_provision",
+    micro_appTerm_provision) :: []))))))))))))))))
 
 (** val add_EvidenceT_flexible_mechanisms :
     coq_GlobalContext -> (string, coq_Term * (coq_EvidenceT, string)
