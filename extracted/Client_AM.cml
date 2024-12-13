@@ -108,16 +108,40 @@ val cert_res_asp_type_env : coq_ASP_Type_Env =
 val cert_res_asp_compat_mapt : coq_ASP_Compat_MapT =
   (certificate_id, appraise_id) :: []
 
-(** val cert_res_policy : coq_Evidence -> bool **)
+(** val cert_res_policy_resultT :
+    coq_Evidence -> coq_GlobalContext -> coq_RawEvJudgement -> (bool, string)
+    coq_ResultT **)
 
-fun cert_res_policy _ =
-  True
+fun cert_res_policy_resultT e g m =
+  let val Coq_evc rawEv et = e in
+  res_bind (do_AppraisalSummary et rawEv g m) (fn app_summary =>
+    let val ls = get_all_summary_strings app_summary in
+    let val b = check_strings_list_bool ls (fn _ => True) in Coq_resultC b end end) end
+
+(** val cert_res_policy :
+    coq_Evidence -> coq_GlobalContext -> coq_RawEvJudgement -> bool **)
+
+fun cert_res_policy e g m =
+  case cert_res_policy_resultT e g m of
+    Coq_errC _ => False
+  | Coq_resultC b => b
+
+(** val resolute_example_context : coq_GlobalContext **)
+
+val resolute_example_context : coq_GlobalContext =
+  Build_GlobalContext cert_res_asp_type_env cert_res_asp_compat_mapt
+
+(** val resolute_example_rawev_judgement : coq_RawEvJudgement **)
+
+val resolute_example_rawev_judgement : coq_RawEvJudgement =
+  (certificate_id, ((cert_resolute_targ, ex_targJudgement_fun') :: [])) :: []
 
 (** val cert_resolute_model : coq_Model **)
 
 val cert_resolute_model : coq_Model =
-  Build_Model (fn _ => cert_resolute_phrase) (fn _ => cert_res_policy)
-    (Build_GlobalContext cert_res_asp_type_env cert_res_asp_compat_mapt)
+  Build_Model (fn _ => cert_resolute_phrase) (fn _ => fn e =>
+    cert_res_policy e resolute_example_context
+      resolute_example_rawev_judgement) resolute_example_context
 
 (** val cert_resolute_statement : coq_Resolute **)
 

@@ -1,6 +1,17 @@
 type coq_AppraisalSummary =
   (coq_ASP_ID, (coq_TARG_ID, string) coq_Map) coq_Map
 
+(** val get_all_summary_strings : coq_AppraisalSummary -> string list **)
+
+fun get_all_summary_strings s =
+  concat
+    (map (map_vals coq_Eq_Class_ID_Type) (map_vals coq_Eq_Class_ID_Type s))
+
+(** val check_strings_list_bool : string list -> (string -> bool) -> bool **)
+
+fun check_strings_list_bool ls f =
+  forallb f ls
+
 type coq_RawEvJudgement =
   (coq_ASP_ID, (coq_TARG_ID, coq_RawEv -> string) coq_Map) coq_Map
 
@@ -144,9 +155,15 @@ val example_RawEvJudgement_ls : single_add_type list =
     ex_targJudgement_fun')) :: ((appr_gather_file_contents_id,
     (cds_config_2_targ,
     ex_targJudgement_fun')) :: ((appr_gather_file_contents_id,
-    (cds_config_3_targ,
+    (cds_config_3_targ, ex_targJudgement_fun')) :: ((appr_query_kim_id,
+    (kim_evidence_targ,
     ex_targJudgement_fun')) :: ((appr_hash_file_contents_id, (cds_img_1_targ,
-    ex_targJudgement_fun')) :: []))))))
+    ex_targJudgement_fun')) :: ((appr_hash_file_contents_id, (cds_img_2_targ,
+    ex_targJudgement_fun')) :: ((appr_hash_file_contents_id, (cds_img_3_targ,
+    ex_targJudgement_fun')) :: ((appr_query_kim_stub_id, (kim_evidence_targ,
+    ex_targJudgement_fun')) :: ((r_ssl_sig_appr_id, (ssl_sig_targ,
+    ex_targJudgement_fun')) :: ((tpm_sig_appr_id, (ssl_sig_targ,
+    ex_targJudgement_fun')) :: []))))))))))))
 
 (** val example_RawEvJudgement : coq_RawEvJudgement **)
 
