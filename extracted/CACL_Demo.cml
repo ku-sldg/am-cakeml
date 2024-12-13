@@ -53,6 +53,11 @@ val query_kim_id : coq_ASP_ID =
 val hash_file_contents_id : coq_ASP_ID =
   "r_hashfile_id"
 
+(** val hash_evidence_id : coq_ASP_ID **)
+
+val hash_evidence_id : coq_ASP_ID =
+  "r_hashevidence_id"
+
 (** val gather_file_contents_id : coq_ASP_ID **)
 
 val gather_file_contents_id : coq_ASP_ID =
@@ -123,6 +128,12 @@ fun provision_targ_asp targPlc targId path =
   Coq_asp (ASPC (Coq_asp_paramsC provision_id (("filepath", path) :: [])
     targPlc targId))
 
+(** val hash_evidence_asp : coq_Plc -> coq_TARG_ID -> string -> coq_Term **)
+
+fun hash_evidence_asp targPlc targId appr_path =
+  Coq_asp (ASPC (Coq_asp_paramsC hash_evidence_id (("filepath-golden",
+    appr_path) :: []) targPlc targId))
+
 (** val path_targ1 : string **)
 
 val path_targ1 : string =
@@ -152,6 +163,11 @@ val path_micro_targ2 : string =
 
 val path_micro_targ2_golden : string =
   "/am-cakeml/tests/DemoFiles/goldenFiles/filter_one_config_hash.json"
+
+(** val path_micro_composite_golden : string **)
+
+val path_micro_composite_golden : string =
+  "/am-cakeml/tests/DemoFiles/goldenFiles/micro_composite.txt"
 
 (** val path_targ2 : string **)
 
