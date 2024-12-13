@@ -36,8 +36,8 @@ fun main () =
                             att_sess 
                             top_plc 
                             att_plc 
-                            cert_resolute_model 
-                            cert_resolute_statement 
+                            micro_resolute_model 
+                            micro_resolute_statement 
                             [] in
 
       (*

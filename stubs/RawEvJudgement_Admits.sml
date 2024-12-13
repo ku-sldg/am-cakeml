@@ -1,6 +1,6 @@
 
-val passed_string = "504153534544" (* "PASSED" in hex encoding *)  (* TODO:  move this to base64 *)
-val failed_string = "4641494C4544" (* "FAILED" in hex encoding *)  (* TODO:  move this to base64 *)
+val passed_string = "UEFTU0VE" (* "PASSED" in hex encoding *)  (* TODO:  move this to base64 *)
+val failed_string = "RkFJTEVE" (* "FAILED" in hex encoding *)  (* TODO:  move this to base64 *)
 
 (** val ex_targJudgement_fun : coq_RawEv -> string **)
 fun ex_targJudgement_fun rev =

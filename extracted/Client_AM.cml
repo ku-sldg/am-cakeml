@@ -103,10 +103,29 @@ val cert_res_asp_type_env : coq_ASP_Type_Env =
   (certificate_id, (Coq_ev_arrow EXTEND InAll (OutN (S
     O)))) :: ((appraise_id, (Coq_ev_arrow REPLACE InAll (OutN (S O)))) :: [])
 
+(** val micro_res_asp_type_env : coq_ASP_Type_Env **)
+
+val micro_res_asp_type_env : coq_ASP_Type_Env =
+  (hash_file_contents_id, (Coq_ev_arrow EXTEND InAll (OutN (S
+    O)))) :: ((appr_hash_file_contents_id, (Coq_ev_arrow REPLACE InAll (OutN
+    (S O)))) :: ((hash_evidence_id, (Coq_ev_arrow EXTEND InAll (OutN (S
+    O)))) :: []))
+
 (** val cert_res_asp_compat_mapt : coq_ASP_Compat_MapT **)
 
 val cert_res_asp_compat_mapt : coq_ASP_Compat_MapT =
   (certificate_id, appraise_id) :: []
+
+(** val micro_res_asp_compat_mapt : coq_ASP_Compat_MapT **)
+
+val micro_res_asp_compat_mapt : coq_ASP_Compat_MapT =
+  (hash_file_contents_id, appr_hash_file_contents_id) :: ((hash_evidence_id,
+    appr_hash_file_contents_id) :: [])
+
+(** val res_policy_passed_string : string -> bool **)
+
+fun res_policy_passed_string s =
+  eqb coq_Eq_Class_ID_Type s "I JUDGE YOU GOLDEN !!!!!"
 
 (** val cert_res_policy_resultT :
     coq_Evidence -> coq_GlobalContext -> coq_RawEvJudgement -> (bool, string)
@@ -116,7 +135,8 @@ fun cert_res_policy_resultT e g m =
   let val Coq_evc rawEv et = e in
   res_bind (do_AppraisalSummary et rawEv g m) (fn app_summary =>
     let val ls = get_all_summary_strings app_summary in
-    let val b = check_strings_list_bool ls (fn _ => True) in Coq_resultC b end end) end
+    let val b = check_strings_list_bool ls res_policy_passed_string in
+    Coq_resultC b end end) end
 
 (** val cert_res_policy :
     coq_Evidence -> coq_GlobalContext -> coq_RawEvJudgement -> bool **)
@@ -131,6 +151,11 @@ fun cert_res_policy e g m =
 val resolute_example_context : coq_GlobalContext =
   Build_GlobalContext cert_res_asp_type_env cert_res_asp_compat_mapt
 
+(** val micro_resolute_example_context : coq_GlobalContext **)
+
+val micro_resolute_example_context : coq_GlobalContext =
+  Build_GlobalContext micro_res_asp_type_env micro_res_asp_compat_mapt
+
 (** val resolute_example_rawev_judgement : coq_RawEvJudgement **)
 
 val resolute_example_rawev_judgement : coq_RawEvJudgement =
@@ -143,7 +168,19 @@ val cert_resolute_model : coq_Model =
     cert_res_policy e resolute_example_context
       resolute_example_rawev_judgement) resolute_example_context
 
+(** val micro_resolute_model : coq_Model **)
+
+val micro_resolute_model : coq_Model =
+  Build_Model (fn _ => meas_micro) (fn _ => fn e =>
+    cert_res_policy e micro_resolute_example_context example_RawEvJudgement)
+    micro_resolute_example_context
+
 (** val cert_resolute_statement : coq_Resolute **)
 
 val cert_resolute_statement : coq_Resolute =
+  R_Goal cert_resolute_targ
+
+(** val micro_resolute_statement : coq_Resolute **)
+
+val micro_resolute_statement : coq_Resolute =
   R_Goal cert_resolute_targ

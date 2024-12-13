@@ -52,6 +52,22 @@
           "EvOutSig_BODY": "1"
         }
       },
+      "r_hashfile_id": {
+        "FWD": "EXTEND",
+        "EvInSig": "ALL",
+        "EvOutSig": {
+          "EvOutSig_CONSTRUCTOR": "OutN",
+          "EvOutSig_BODY": "1"
+        }
+      },
+      "r_hashevidence_id": {
+        "FWD": "EXTEND",
+        "EvInSig": "ALL",
+        "EvOutSig": {
+          "EvOutSig_CONSTRUCTOR": "OutN",
+          "EvOutSig_BODY": "1"
+        }
+      },
       "sig_id": {
         "FWD": "EXTEND",
         "EvInSig": "ALL",
@@ -69,6 +85,14 @@
         }
       },
       "r_sig": {
+        "FWD": "EXTEND",
+        "EvInSig": "ALL",
+        "EvOutSig": {
+          "EvOutSig_CONSTRUCTOR": "OutN",
+          "EvOutSig_BODY": "1"
+        }
+      },
+      "r_sig_tpm": {
         "FWD": "EXTEND",
         "EvInSig": "ALL",
         "EvOutSig": {
@@ -108,7 +132,23 @@
           "EvOutSig_BODY": "1"
         }
       },
+      "appraise_r_hashfile_id": {
+        "FWD": "REPLACE",
+        "EvInSig": "ALL",
+        "EvOutSig": {
+          "EvOutSig_CONSTRUCTOR": "OutN",
+          "EvOutSig_BODY": "1"
+        }
+      },
       "ssl_sig_appr_id": {
+        "FWD": "REPLACE",
+        "EvInSig": "ALL",
+        "EvOutSig": {
+          "EvOutSig_CONSTRUCTOR": "OutN",
+          "EvOutSig_BODY": "1"
+        }
+      },
+      "appraise_r_sig_tpm": {
         "FWD": "REPLACE",
         "EvInSig": "ALL",
         "EvOutSig": {
@@ -124,7 +164,7 @@
           "EvOutSig_BODY": "1"
         }
       },
-      "r_invaryGetMeasurement_stub_id": {
+      "r_invary_get_measurement_id": {
         "FWD": "EXTEND",
         "EvInSig": "ALL",
         "EvOutSig": {
@@ -132,23 +172,7 @@
           "EvOutSig_BODY": "1"
         }
       },
-      "r_invaryGetMeasurement_id": {
-        "FWD": "EXTEND",
-        "EvInSig": "ALL",
-        "EvOutSig": {
-          "EvOutSig_CONSTRUCTOR": "OutN",
-          "EvOutSig_BODY": "1"
-        }
-      },
-      "appraise_r_invaryGetMeasurement_stub_id": {
-        "FWD": "REPLACE",
-        "EvInSig": "ALL",
-        "EvOutSig": {
-          "EvOutSig_CONSTRUCTOR": "OutN",
-          "EvOutSig_BODY": "1"
-        }
-      },
-      "appraise_r_invaryGetMeasurement_id": {
+      "appraise_r_invary_get_measurement_id": {
         "FWD": "REPLACE",
         "EvInSig": "ALL",
         "EvOutSig": {
@@ -166,13 +190,19 @@
       "sig_id": "appraise_id",
       "r_readfile_id": "appraise_r_readfile_id",
       "r_provision_id": "appraise_id",
+      "r_hashfile_id": "appraise_r_hashfile_id",
+      "r_hashevidence_id": "appraise_r_hashfile_id",
       "appraise_id": "appraise_id",
       "appraise_r_readfile_id": "appraise_id",
+      "appraise_r_hashfile_id": "appraise_id",
       "ssl_sig_id": "ssl_sig_appr_id",
       "ssl_sig_appr_id": "appraise_id",
       "r_sig": "appraise_r_sig",
-      "r_invaryGetMeasurement_stub_id": "appraise_r_invaryGetMeasurement_stub_id",
-      "r_invaryGetMeasurement_id": "appraise_r_invaryGetMeasurement_id"
+      "r_sig_tpm": "appraise_r_sig_tpm",
+      "r_invary_get_measurement_id": "appraise_r_invary_get_measurement_id"
     }
   }
+  
+  
+  
 }
