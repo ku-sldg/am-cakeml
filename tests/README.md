@@ -24,6 +24,30 @@ To subsequently run these test protocols, do:
 
 Successful output from `make ci_test` will show a handful of protocol output logs, likely followed by text like:  "Killing background processes..." if no errors came up during execution.  Note that `make ci_test` will run each example protocol in "headless" mode (-h) so that all nodes (attestation manager executables) in the protocol will execute in the same terminal.  For the non-headless version using tmux, see details about [Demo.sh](./Demo.sh) below.
 
+## INSPECTA Micro-example
+
+First, set the `DEMO_ROOT` environment variable to point to a common source directory that contains both the am-cakeml repository (this repo) and the INSPECTA-models repo (https://github.com/loonwerks/INSPECTA-models).
+
+Then run:  
+&nbsp;&nbsp;&nbsp;&nbsp;`make ci_build`, 
+
+And finally:  
+
+&nbsp;&nbsp;&nbsp;&nbsp;`./Demo.sh -t micro`
+
+
+Successful output should look like:  "Resolute Policy check:  SUCCESS".
+
+To demonstrate a failed appraisal (with output "Resolute Policy check:  FAILED"), make a local modification to one or both of the target micro example files ([addl file](https://github.com/loonwerks/INSPECTA-models/blob/main/micro-examples/microkit/aadl_port_types/data/base_type/aadl/data_1_prod_2_cons.aadl) , [microkit file](https://github.com/loonwerks/INSPECTA-models/blob/main/micro-examples/microkit/aadl_port_types/data/base_type/hamr/microkit/microkit.system)), then re-run `./Demo.sh -t micro`.
+
+### Prerequisities
+- `tmux` 
+- `nc` (netcat) 
+- POSIX Shell
+
+To close the tmux script, make sure you close all `tmux` panes using `PREFIX + x` where the prefix is typically (Ctrl + b)
+(To kill all tmux panes at once, type 'tmux kill-server' in one of the open panes)
+
 ## [Demo.sh](./Demo.sh)
 
 This script will run a demo script (where one of the example protocols can be chosen) to run via the `-t` option:
