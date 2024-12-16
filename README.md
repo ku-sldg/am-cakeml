@@ -33,7 +33,7 @@ To build another target, type `make <target>`. Refer to the `apps` directory for
 The resulting binaries are found in the relevant subdirectory of `build/apps`.
 
 ### Testing 
-To test this repository, refers to `./tests` folder and its corresponding README.
+To test this repository, refer to `./tests` folder and its corresponding README.
 
 ### Configuration
 From the build directory, type `ccmake ..` to bring up the configuration GUI. Hovering over a variable displays some documentation at the bottom of the screen. After you make changes, press `c` then `g` to save your changes.
