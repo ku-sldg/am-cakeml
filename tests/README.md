@@ -26,7 +26,7 @@ Successful output from `make ci_test` will show a handful of protocol output log
 
 ## INSPECTA Micro-example
 
-First, set the `DEMO_ROOT` environment variable to point to a common source directory that contains both the am-cakeml repository (this repo) and the INSPECTA-models repo (https://github.com/loonwerks/INSPECTA-models).
+First, set the `DEMO_ROOT` environment variable to point to a common directory that contains cloned sources of both the am-cakeml repository (this repo) and the INSPECTA-models repo (https://github.com/loonwerks/INSPECTA-models).
 
 Then run:  
 &nbsp;&nbsp;&nbsp;&nbsp;`make ci_build`, 
