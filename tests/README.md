@@ -26,7 +26,21 @@ Successful output from `make ci_test` will show a handful of protocol output log
 
 ## INSPECTA Micro-example
 
-First, set the `DEMO_ROOT` environment variable to point to a common directory that contains cloned sources of both the am-cakeml repository (this repo) and the INSPECTA-models repo (https://github.com/loonwerks/INSPECTA-models).
+First, set the `DEMO_ROOT` environment variable to point to a common directory that contains cloned sources of both the am-cakeml repository (this repo) and the INSPECTA-models repo (https://github.com/loonwerks/INSPECTA-models). 
+
+&nbsp;&nbsp;&nbsp;&nbsp;i.e.:  `export DEMO_ROOT=<common_path>`
+
+The directory structure should look like:
+
+|----  <common_path>
+
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|---- am-cakeml/...
+
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|---- INSPECTA-models/...
+
+Also make sure the environment variable `ASP_BIN` is set to point to the asp-libs repo as in the build instructions above:
+
+&nbsp;&nbsp;&nbsp;&nbsp;i.e.:  `export ASP_BIN=<some_path>/asp-libs/bin`
 
 Then run:  
 &nbsp;&nbsp;&nbsp;&nbsp;`make ci_build`, 
@@ -36,7 +50,7 @@ And finally:
 &nbsp;&nbsp;&nbsp;&nbsp;`./Demo.sh -t micro`
 
 
-Successful output should look like:  "Resolute Policy check:  SUCCESS".
+Successful output should look like:  "Resolute Policy check:  SUCCESS" in the top-level tmux pane.
 
 To demonstrate a failed appraisal (with output "Resolute Policy check:  FAILED"), make a local modification to one or both of the target micro example files ([addl file](https://github.com/loonwerks/INSPECTA-models/blob/main/micro-examples/microkit/aadl_port_types/data/base_type/aadl/data_1_prod_2_cons.aadl) , [microkit file](https://github.com/loonwerks/INSPECTA-models/blob/main/micro-examples/microkit/aadl_port_types/data/base_type/hamr/microkit/microkit.system)), then re-run `./Demo.sh -t micro`.
 
