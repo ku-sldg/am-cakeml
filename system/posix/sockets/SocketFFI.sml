@@ -48,51 +48,51 @@ structure Socket = struct
     (* sockfd -> string *)
     val showFd = BString.show o getFd
 
-(* The following code is adaptped from the TextIO implementation in the
-    basis library. It is stripped of the instream/outstream constructors.
-    The input functions are changed to not make redundant read calls that
-    end up blocking when used on sockets.
+  (* The following code is adaptped from the TextIO implementation in the
+      basis library. It is stripped of the instream/outstream constructors.
+      The input functions are changed to not make redundant read calls that
+      end up blocking when used on sockets.
 
-    Specifically, the code is adapted from the following commit:
-https://github.com/CakeML/cakeml/commit/b2076e74977d96b0734bd1ab2ae59ef1f91c3004
-    The following licensing information applies to the rest of the code in
-    this file: *)
-(*
-CakeML Copyright Notice, License, and Disclaimer.
+      Specifically, the code is adapted from the following commit:
+  https://github.com/CakeML/cakeml/commit/b2076e74977d96b0734bd1ab2ae59ef1f91c3004
+      The following licensing information applies to the rest of the code in
+      this file: *)
+  (*
+  CakeML Copyright Notice, License, and Disclaimer.
 
-Copyright 2013, 2014, 2015, 2016, 2017, 2018 by
-Anthony Fox, Google LLC, Ramana Kumar, Magnus Myreen,
-Michael Norrish, Scott Owens, Yong Kiam Tan, and
-other contributors listed at https://cakeml.org
+  Copyright 2013, 2014, 2015, 2016, 2017, 2018 by
+  Anthony Fox, Google LLC, Ramana Kumar, Magnus Myreen,
+  Michael Norrish, Scott Owens, Yong Kiam Tan, and
+  other contributors listed at https://cakeml.org
 
-All rights reserved.
+  All rights reserved.
 
-CakeML is free software. Redistribution and use in source and binary forms,
-with or without modification, are permitted provided that the following
-conditions are met:
+  CakeML is free software. Redistribution and use in source and binary forms,
+  with or without modification, are permitted provided that the following
+  conditions are met:
 
-* Redistributions of source code must retain the above copyright
-  notice, this list of conditions and the following disclaimer.
+  * Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
 
-* Redistributions in binary form must reproduce the above copyright
-  notice, this list of conditions and the following disclaimer in the
-  documentation and/or other materials provided with the distribution.
+  * Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
 
-* The names of the copyright holders and contributors may not be
-  used to endorse or promote products derived from this software without
-  specific prior written permission.
+  * The names of the copyright holders and contributors may not be
+    used to endorse or promote products derived from this software without
+    specific prior written permission.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS''
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*)
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS''
+  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE
+  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  *)
 
     exception InvalidFD
 
@@ -109,8 +109,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             if Word8Array.sub iobuff 0 = Word8.fromInt 1
             then raise InvalidFD
             else
-              let val nw = Marshalling.w22n iobuff 1 in
-                if nw = 0 then writei fd n i
+              let val nw = Marshalling.w22n iobuff 1 
+              in
+                if nw = 0 
+                then writei fd n i
                 else nw
               end
           end
@@ -119,7 +121,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           if n = 0 then () else
           let val nw = writei fd n i 
           in
-            if nw < n then write fd (n-nw) (i+nw) else () '
+            if nw < n then write fd (n-nw) (i+nw) else ()
           end
       in
         fun output fd s =
@@ -158,7 +160,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                     else input0 (off + nread) (len - nread) (count + nread)
                   )
               end
-            in input0 off len 0 end
+            in input0 off len 0 
+            end
 
           fun extend_array arr =
               let val len = Word8Array.length arr
