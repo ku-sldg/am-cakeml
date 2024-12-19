@@ -173,16 +173,16 @@ structure Socket = struct
         fun inputAll fd =
           let fun inputAll_aux arr i =
             let val len = Word8Array.length arr 
-                val _ = print ("in inputAll_aux with i = " ^ (Int.toString i) ^ "\n")
+                val _ = print ("Listening for bytes (in inputAll_aux) with i = " ^ (Int.toString i) ^ "\n")
             in
               if i < len then
-                let val _ = print ("in inputAll_aux with i < len\n")
+                let val _ = print ("Listening for bytes (in inputAll_aux) with i < len\n")
                     val nwant = len - i
                     val nread = input (getFdString fd) arr i nwant
                 in
                   if nread < nwant 
                   then 
-                    let val _ = print ("in inputAll_aux with nread < nwant\n")
+                    let val _ = print ("Listening for bytes (in inputAll_aux) with nread < nwant\n")
                     in
                       Word8Array.substring arr 0 (i+nread)
                     end
