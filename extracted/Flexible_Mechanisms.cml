@@ -66,7 +66,8 @@ val appr_term : coq_Term =
 (** val meas_cds : coq_Term **)
 
 val meas_cds : coq_Term =
-  Coq_bseq (ALL, ALL) gather_config_1 gather_config_2
+  Coq_bseq (ALL, ALL) hash_cds_img_1 (Coq_bseq (ALL, ALL) hash_cds_img_2
+    (Coq_bseq (ALL, ALL) gather_config_1 gather_config_2))
 
 (** val hash_micro_config_1 : coq_Term **)
 
@@ -105,7 +106,7 @@ val example_appTerm : coq_Term =
 (** val cds_ssl : coq_Term **)
 
 val cds_ssl : coq_Term =
-  Coq_lseq (Coq_bseq (ALL, ALL) meas_cds query_kim_asp) (Coq_lseq
+  Coq_lseq (Coq_bseq (ALL, ALL) query_kim_asp meas_cds) (Coq_lseq
     r_ssl_sig_asp appr_term)
 
 (** val cds_tpm : coq_Term **)
@@ -143,8 +144,10 @@ val micro_appTerm_provision : coq_Term =
 (** val example_appTerm_provision : coq_Term **)
 
 val example_appTerm_provision : coq_Term =
-  Coq_bseq (ALL, ALL) (Coq_lseq gather_config_1 provision_config_1) (Coq_lseq
-    gather_config_2 provision_config_2)
+  Coq_bseq (ALL, ALL) (Coq_lseq gather_config_1 provision_config_1) (Coq_bseq
+    (ALL, ALL) (Coq_lseq gather_config_2 provision_config_2) (Coq_bseq (ALL,
+    ALL) (Coq_lseq hash_cds_img_1 provision_img_1) (Coq_lseq hash_cds_img_2
+    provision_img_2)))
 
 (** val simple_sig : coq_Term **)
 

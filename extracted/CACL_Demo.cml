@@ -184,6 +184,26 @@ val path_targ2 : string =
 val path_targ2_golden : string =
   "/tests/DemoFiles/goldenFiles/filter_one_config.json"
 
+(** val path_exe_targ1 : string **)
+
+val path_exe_targ1 : string =
+  "/../asp-libs/bin/attest_id"
+
+(** val path_exe_targ1_golden : string **)
+
+val path_exe_targ1_golden : string =
+  "/tests/DemoFiles/goldenFiles/targExe1.exe"
+
+(** val path_exe_targ2 : string **)
+
+val path_exe_targ2 : string =
+  "/../asp-libs/bin/appraise_id"
+
+(** val path_exe_targ2_golden : string **)
+
+val path_exe_targ2_golden : string =
+  "/tests/DemoFiles/goldenFiles/targExe2.exe"
+
 (** val gather_config_1 : coq_Term **)
 
 val gather_config_1 : coq_Term =
@@ -196,6 +216,18 @@ val gather_config_2 : coq_Term =
   gather_targ_asp cds_config_dir_plc cds_config_2_targ path_targ2
     path_targ2_golden
 
+(** val hash_cds_img_1 : coq_Term **)
+
+val hash_cds_img_1 : coq_Term =
+  hash_targ_asp cds_config_dir_plc cds_img_1_targ path_exe_targ1
+    path_exe_targ1_golden
+
+(** val hash_cds_img_2 : coq_Term **)
+
+val hash_cds_img_2 : coq_Term =
+  hash_targ_asp cds_config_dir_plc cds_img_2_targ path_exe_targ2
+    path_exe_targ2_golden
+
 (** val provision_config_1 : coq_Term **)
 
 val provision_config_1 : coq_Term =
@@ -205,6 +237,16 @@ val provision_config_1 : coq_Term =
 
 val provision_config_2 : coq_Term =
   provision_targ_asp cds_config_dir_plc cds_config_2_targ path_targ2_golden
+
+(** val provision_img_1 : coq_Term **)
+
+val provision_img_1 : coq_Term =
+  provision_targ_asp cds_config_dir_plc cds_img_1_targ path_exe_targ1_golden
+
+(** val provision_img_2 : coq_Term **)
+
+val provision_img_2 : coq_Term =
+  provision_targ_asp cds_config_dir_plc cds_img_2_targ path_exe_targ2_golden
 
 (** val query_kim_args : coq_ASP_ARGS **)
 
