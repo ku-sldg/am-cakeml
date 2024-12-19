@@ -25,6 +25,11 @@ CMakeCache.txt
 *src-pub.pem
 *src-parentkey-handle.txt
 *client_data.txt
+*.cil
+*.pub
+*.priv
+*.pem
+policy/*
 
 tests/DemoFiles/Generated
 tests/DemoFiles/targFiles/*
