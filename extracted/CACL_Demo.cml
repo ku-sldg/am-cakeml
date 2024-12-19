@@ -187,22 +187,22 @@ val path_targ2_golden : string =
 (** val path_exe_targ1 : string **)
 
 val path_exe_targ1 : string =
-  "/../asp-libs/bin/attest_id"
+  "/../LayeredAttestation/src/demo_layered_attestation/installed_dir/bin/rewrite_one"
 
 (** val path_exe_targ1_golden : string **)
 
 val path_exe_targ1_golden : string =
-  "/tests/DemoFiles/goldenFiles/targExe1.exe"
+  "/tests/DemoFiles/goldenFiles/rewrite_one"
 
 (** val path_exe_targ2 : string **)
 
 val path_exe_targ2 : string =
-  "/../asp-libs/bin/appraise_id"
+  "/../LayeredAttestation/src/demo_layered_attestation/installed_dir/bin/filter_one"
 
 (** val path_exe_targ2_golden : string **)
 
 val path_exe_targ2_golden : string =
-  "/tests/DemoFiles/goldenFiles/targExe2.exe"
+  "/tests/DemoFiles/goldenFiles/filter_one"
 
 (** val gather_config_1 : coq_Term **)
 
