@@ -66,9 +66,9 @@ val appr_term : coq_Term =
 (** val meas_cds : coq_Term **)
 
 val meas_cds : coq_Term =
-  Coq_bseq (ALL, ALL) gather_config_1 (Coq_bseq (ALL, ALL) selinux_hash_pol
-    (Coq_bseq (ALL, ALL) hash_cds_img_1 (Coq_bseq (ALL, ALL) hash_cds_img_2
-    (Coq_bseq (ALL, ALL) gather_config_1 gather_config_2))))
+  Coq_bseq (ALL, ALL) selinux_hash_pol (Coq_bseq (ALL, ALL) hash_cds_img_1
+    (Coq_bseq (ALL, ALL) hash_cds_img_2 (Coq_bseq (ALL, ALL) gather_config_1
+    gather_config_2)))
 
 (** val hash_micro_config_1 : coq_Term **)
 
