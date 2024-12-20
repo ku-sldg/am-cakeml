@@ -152,7 +152,8 @@ val example_RawEvJudgement_ls : single_add_type list =
     ex_targJudgement_fun')) :: ((appr_query_kim_stub_id, (kim_evidence_targ,
     ex_targJudgement_fun')) :: ((r_ssl_sig_appr_id, (ssl_sig_targ,
     ex_targJudgement_fun')) :: ((tpm_sig_appr_id, (ssl_sig_targ,
-    ex_targJudgement_fun')) :: []))))))))))))
+    ex_targJudgement_fun')) :: ((appr_selinux_pol_dump_id, (cds_img_2_targ,
+    ex_targJudgement_fun')) :: [])))))))))))))
 
 (** val example_RawEvJudgement : coq_RawEvJudgement **)
 
