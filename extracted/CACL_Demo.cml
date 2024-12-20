@@ -103,6 +103,11 @@ val tpm_sig_id : coq_ASP_ID =
 val tpm_sig_appr_id : coq_ASP_ID =
   "appraise_r_sig_tpm"
 
+(** val selinux_pol_dump_id : coq_ASP_ID **)
+
+val selinux_pol_dump_id : coq_ASP_ID =
+  "r_selinux_pol_dump"
+
 (** val appr_selinux_pol_dump_id : coq_ASP_ID **)
 
 val appr_selinux_pol_dump_id : coq_ASP_ID =
@@ -143,6 +148,11 @@ fun provision_targ_asp targPlc targId path =
 fun hash_evidence_asp targPlc targId appr_path =
   Coq_asp (ASPC (Coq_asp_paramsC hash_evidence_id (("filepath-golden",
     appr_path) :: []) targPlc targId))
+
+(** val selinux_hash_asp : coq_Plc -> coq_TARG_ID -> coq_Term **)
+
+fun selinux_hash_asp targPlc targId =
+  Coq_asp (ASPC (Coq_asp_paramsC selinux_pol_dump_id [] targPlc targId))
 
 (** val path_targ1 : string **)
 
@@ -232,6 +242,11 @@ val hash_cds_img_1 : coq_Term =
 val hash_cds_img_2 : coq_Term =
   hash_targ_asp cds_config_dir_plc cds_img_2_targ path_exe_targ2
     path_exe_targ2_golden
+
+(** val selinux_hash_pol : coq_Term **)
+
+val selinux_hash_pol : coq_Term =
+  selinux_hash_asp cds_config_dir_plc cds_img_2_targ
 
 (** val provision_config_1 : coq_Term **)
 
