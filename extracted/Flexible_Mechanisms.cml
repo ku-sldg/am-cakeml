@@ -167,8 +167,8 @@ val flexible_mechanisms_map : (string * coq_Term) list =
     layered_background_check) :: (("filehash",
     filehash_auth_phrase) :: (("large_output",
     large_output_asp_test) :: (("cds_simple",
-    example_appTerm) :: (("cds_ssl", cds_ssl) :: (("cds_tpm",
-    cds_tpm) :: (("cds_provision",
+    example_appTerm) :: (("cds_ssl", (Coq_att coq_P1
+    cds_ssl)) :: (("cds_tpm", cds_tpm) :: (("cds_provision",
     example_appTerm_provision) :: (("simple_sig", simple_sig) :: (("micro",
     micro_appTerm) :: (("micro_provision",
     micro_appTerm_provision) :: []))))))))))))))))
