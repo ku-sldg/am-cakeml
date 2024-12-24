@@ -63,17 +63,15 @@ val appr_term : coq_Term =
 val meas_cds : coq_Term =
   Coq_bseq (ALL, ALL) gather_config_1 gather_config_2
 
-(** val hash_micro_config_1 : coq_Term **)
+(** val hash_micro_config_1 : coq_ASP_ARGS -> coq_Term **)
 
-val hash_micro_config_1 : coq_Term =
-  hash_targ_asp cds_config_dir_plc cds_img_1_targ path_micro_targ1
-    path_micro_targ1_golden
+fun hash_micro_config_1 args =
+  hash_dir_asp cds_config_dir_plc cds_img_1_targ args
 
-(** val hash_micro_config_2 : coq_Term **)
+(** val hash_micro_config_2 : coq_ASP_ARGS -> coq_Term **)
 
-val hash_micro_config_2 : coq_Term =
-  hash_targ_asp cds_config_dir_plc cds_img_2_targ path_micro_targ2
-    path_micro_targ2_golden
+fun hash_micro_config_2 args =
+  hash_dir_asp cds_config_dir_plc cds_img_2_targ args
 
 (** val hash_micro_evidence : coq_Term **)
 
@@ -81,16 +79,11 @@ val hash_micro_evidence : coq_Term =
   hash_evidence_asp cds_config_dir_plc cds_img_3_targ
     path_micro_composite_golden
 
-(** val meas_micro : coq_Term **)
+(** val meas_micro : coq_ASP_ARGS -> coq_ASP_ARGS -> coq_Term **)
 
-val meas_micro : coq_Term =
-  Coq_lseq (Coq_bseq (ALL, ALL) hash_micro_config_1 hash_micro_config_2)
-    hash_micro_evidence
-
-(** val micro_appTerm : coq_Term **)
-
-val micro_appTerm : coq_Term =
-  Coq_lseq meas_micro appr_term
+fun meas_micro model_args system_args =
+  Coq_lseq (Coq_bseq (ALL, ALL) (hash_micro_config_1 model_args)
+    (hash_micro_config_2 system_args)) hash_micro_evidence
 
 (** val example_appTerm : coq_Term **)
 
@@ -109,30 +102,24 @@ val cds_tpm : coq_Term =
   Coq_lseq (Coq_bseq (ALL, ALL) meas_cds query_kim_asp) (Coq_lseq
     r_tpm_sig_asp appr_term)
 
-(** val provision_micro_hash_1 : coq_Term **)
+(** val provision_micro_hash_1 : coq_ASP_ARGS -> coq_Term **)
 
-val provision_micro_hash_1 : coq_Term =
-  provision_targ_asp cds_config_dir_plc cds_config_1_targ
-    path_micro_targ1_golden
-
-(** val provision_micro_hash_2 : coq_Term **)
-
-val provision_micro_hash_2 : coq_Term =
-  provision_targ_asp cds_config_dir_plc cds_config_1_targ
-    path_micro_targ2_golden
+fun provision_micro_hash_1 args =
+  provision_dir_asp cds_config_dir_plc cds_config_1_targ args
 
 (** val provision_micro_hash_composite : coq_Term **)
 
 val provision_micro_hash_composite : coq_Term =
-  provision_targ_asp cds_config_dir_plc cds_config_1_targ
-    path_micro_composite_golden
+  provision_dir_asp cds_config_dir_plc cds_config_1_targ (("filepath-golden",
+    path_micro_composite_golden) :: [])
 
-(** val micro_appTerm_provision : coq_Term **)
+(** val micro_appTerm_provision : coq_ASP_ARGS -> coq_ASP_ARGS -> coq_Term **)
 
-val micro_appTerm_provision : coq_Term =
-  Coq_bseq (ALL, ALL) (Coq_lseq hash_micro_config_1 provision_micro_hash_1)
-    (Coq_bseq (ALL, ALL) (Coq_lseq hash_micro_config_2
-    provision_micro_hash_2) (Coq_lseq meas_micro
+fun micro_appTerm_provision model_args system_args =
+  Coq_bseq (ALL, ALL) (Coq_lseq (hash_micro_config_1 model_args)
+    (provision_micro_hash_1 model_args)) (Coq_bseq (ALL, ALL) (Coq_lseq
+    (hash_micro_config_2 system_args) (provision_micro_hash_1 system_args))
+    (Coq_lseq (meas_micro model_args system_args)
     provision_micro_hash_composite))
 
 (** val example_appTerm_provision : coq_Term **)
@@ -146,11 +133,6 @@ val example_appTerm_provision : coq_Term =
 val simple_sig : coq_Term =
   Coq_lseq (Coq_lseq (Coq_asp (ASPC (Coq_asp_paramsC attest_id [] coq_P1
     sys_targ))) r_ssl_sig_asp) appr_term
-
-(** val cert_resolute_phrase : coq_Term **)
-
-val cert_resolute_phrase : coq_Term =
-  Coq_asp (ASPC (Coq_asp_paramsC certificate_id [] coq_P1 cert_resolute_targ))
 
 (** val large_output_asp_test : coq_Term **)
 
@@ -168,14 +150,13 @@ val flexible_mechanisms_map : (string * coq_Term) list =
     layered_background_check) :: (("filehash",
     filehash_auth_phrase) :: (("cds_simple",
     example_appTerm) :: (("cds_provision",
-    example_appTerm_provision) :: (("cert_resolute_app", (Coq_lseq
-    cert_resolute_phrase (Coq_asp APPR))) :: (("cds_ssl",
-    cds_ssl) :: (("cds_tpm", cds_tpm) :: (("cds_provision",
+    example_appTerm_provision) :: (("cds_ssl", cds_ssl) :: (("cds_tpm",
+    cds_tpm) :: (("cds_provision",
     example_appTerm_provision) :: (("simple_sig", simple_sig) :: (("micro",
-    micro_appTerm) :: (("micro_provision",
-    micro_appTerm_provision) :: (("cert_resolute_app", (Coq_lseq
-    cert_resolute_phrase (Coq_asp APPR))) :: (("large_output",
-    large_output_asp_test) :: [])))))))))))))))))))
+    (Coq_lseq (micro_appTerm_provision [] []) (Coq_asp
+    APPR))) :: (("micro_provision",
+    (micro_appTerm_provision [] [])) :: (("large_output",
+    large_output_asp_test) :: [])))))))))))))))))
 
 (** val add_EvidenceT_flexible_mechanisms :
     coq_GlobalContext -> (string, coq_Term * (coq_EvidenceT, string)

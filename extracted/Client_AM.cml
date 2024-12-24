@@ -97,12 +97,6 @@ fun am_client_do_res att_sess req_plc toPlc m r m0 =
     res_bind (eval glob_ctx toPlc Coq_mt_evt appr_t) (fn et' => Coq_resultC
       (pol (Coq_evc rawev et'))) end) end end
 
-(** val cert_res_asp_type_env : coq_ASP_Type_Env **)
-
-val cert_res_asp_type_env : coq_ASP_Type_Env =
-  (certificate_id, (Coq_ev_arrow EXTEND InAll (OutN (S
-    O)))) :: ((appraise_id, (Coq_ev_arrow REPLACE InAll (OutN (S O)))) :: [])
-
 (** val micro_res_asp_type_env : coq_ASP_Type_Env **)
 
 val micro_res_asp_type_env : coq_ASP_Type_Env =
@@ -110,11 +104,6 @@ val micro_res_asp_type_env : coq_ASP_Type_Env =
     O)))) :: ((appr_hash_file_contents_id, (Coq_ev_arrow REPLACE InAll (OutN
     (S O)))) :: ((hash_evidence_id, (Coq_ev_arrow EXTEND InAll (OutN (S
     O)))) :: []))
-
-(** val cert_res_asp_compat_mapt : coq_ASP_Compat_MapT **)
-
-val cert_res_asp_compat_mapt : coq_ASP_Compat_MapT =
-  (certificate_id, appraise_id) :: []
 
 (** val micro_res_asp_compat_mapt : coq_ASP_Compat_MapT **)
 
@@ -127,60 +116,38 @@ val micro_res_asp_compat_mapt : coq_ASP_Compat_MapT =
 fun res_policy_passed_string s =
   eqb coq_Eq_Class_ID_Type s "I JUDGE YOU GOLDEN !!!!!"
 
-(** val cert_res_policy_resultT :
+(** val res_policy_appSummary :
     coq_Evidence -> coq_GlobalContext -> coq_RawEvJudgement -> (bool, string)
     coq_ResultT **)
 
-fun cert_res_policy_resultT e g m =
+fun res_policy_appSummary e g m =
   let val Coq_evc rawEv et = e in
   res_bind (do_AppraisalSummary et rawEv g m) (fn app_summary =>
     let val ls = get_all_summary_strings app_summary in
     let val b = check_strings_list_bool ls res_policy_passed_string in
     Coq_resultC b end end) end
 
-(** val cert_res_policy :
+(** val micro_res_policy :
     coq_Evidence -> coq_GlobalContext -> coq_RawEvJudgement -> bool **)
 
-fun cert_res_policy e g m =
-  case cert_res_policy_resultT e g m of
+fun micro_res_policy e g m =
+  case res_policy_appSummary e g m of
     Coq_errC _ => False
   | Coq_resultC b => b
-
-(** val resolute_example_context : coq_GlobalContext **)
-
-val resolute_example_context : coq_GlobalContext =
-  Build_GlobalContext cert_res_asp_type_env cert_res_asp_compat_mapt
 
 (** val micro_resolute_example_context : coq_GlobalContext **)
 
 val micro_resolute_example_context : coq_GlobalContext =
   Build_GlobalContext micro_res_asp_type_env micro_res_asp_compat_mapt
 
-(** val resolute_example_rawev_judgement : coq_RawEvJudgement **)
+(** val micro_resolute_model : coq_ASP_ARGS -> coq_ASP_ARGS -> coq_Model **)
 
-val resolute_example_rawev_judgement : coq_RawEvJudgement =
-  (certificate_id, ((cert_resolute_targ, ex_targJudgement_fun') :: [])) :: []
-
-(** val cert_resolute_model : coq_Model **)
-
-val cert_resolute_model : coq_Model =
-  Build_Model (fn _ => cert_resolute_phrase) (fn _ => fn e =>
-    cert_res_policy e resolute_example_context
-      resolute_example_rawev_judgement) resolute_example_context
-
-(** val micro_resolute_model : coq_Model **)
-
-val micro_resolute_model : coq_Model =
-  Build_Model (fn _ => meas_micro) (fn _ => fn e =>
-    cert_res_policy e micro_resolute_example_context example_RawEvJudgement)
+fun micro_resolute_model model_args system_args =
+  Build_Model (fn _ => meas_micro model_args system_args) (fn _ => fn e =>
+    micro_res_policy e micro_resolute_example_context example_RawEvJudgement)
     micro_resolute_example_context
-
-(** val cert_resolute_statement : coq_Resolute **)
-
-val cert_resolute_statement : coq_Resolute =
-  R_Goal cert_resolute_targ
 
 (** val micro_resolute_statement : coq_Resolute **)
 
 val micro_resolute_statement : coq_Resolute =
-  R_Goal cert_resolute_targ
+  R_Goal micro_resolute_targ

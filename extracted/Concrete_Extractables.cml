@@ -61,3 +61,9 @@ val concrete_Jsonifiable_GlobalContext : coq_GlobalContext coq_Jsonifiable =
       coq_Eq_Class_ID_Type
       (coq_Jsonifiable_EvSig (coq_Jsonifiable_EvOutSig coq_Jsonifiable_nat)
         coq_Stringifiable_FWD))
+
+(** val concrete_Jsonifiable_ASP_ARGS : coq_ASP_ARGS coq_Jsonifiable **)
+
+val concrete_Jsonifiable_ASP_ARGS : coq_ASP_ARGS coq_Jsonifiable =
+  jsonifiable_map_serial_serial coq_Stringifiable_ID_Type
+    coq_Eq_Class_ID_Type coq_Stringifiable_ID_Type

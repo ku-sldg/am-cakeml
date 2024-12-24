@@ -12,21 +12,33 @@ BUILD_BIN="$BUILD_DIR/bin"
 
 # Function to display usage instructions
 usage() {
-  echo "Usage: $0 -t [cert|cert_appr|bg|parmut|filehash] (-h (headless)) [-a <path-to-asps>]"
+  echo "Usage: $0 -t [micro] (-h (headless)) -m <path-to-model_args.json> -s <path-to-system_args.json> [-a <path-to-asps>]"
   exit 1
 }
 
 TERM_TYPE=""
+MODEL_ARGS_FILE=""
+SYSTEM_ARGS_FILE=""
 HEADLESS=0
+PROVISION=0
 
 # Parse command-line arguments
-while getopts "t:ha:" opt; do
+while getopts "t:m:s:ha:p" opt; do
   case ${opt} in
     t )
       TERM_TYPE=$OPTARG
       ;;
+    m )
+      MODEL_ARGS_FILE=$OPTARG
+      ;;
+    s )
+      SYSTEM_ARGS_FILE=$OPTARG
+      ;;
     h )
       HEADLESS=1
+      ;;
+    p )
+      PROVISION=1
       ;;
     a )
       ASP_BIN=$OPTARG
@@ -47,6 +59,16 @@ if [[ "$TERM_TYPE" == "layered_bg" ]]; then
   echo "Layered BG is not yet supported..."
   usage
   exit 0
+fi
+
+if [[ -z "$MODEL_ARGS_FILE" ]]; then
+  usage
+  exit 1
+fi
+
+if [[ -z "$SYSTEM_ARGS_FILE" ]]; then
+  usage
+  exit 1
 fi
 
 PIDS=()
@@ -162,7 +184,12 @@ if [[ "$REPO_ROOT" == */am-cakeml ]]; then
     tmux attach-session -d -t ServerProcess
   else
     sleep 1 
-    $TESTS_DIR/send_term_req.sh -h $IP -p $PORT -f $TERM_FILE -s $TEST_ATT_SESS > $GENERATED/output_resp.json
+    echo "Running Resolute Client AM"
+    if [[ $PROVISION -eq 0 ]]; then PROVISION_ARG=""
+    else PROVISION_ARG="-p"
+    fi
+    $CLIENT_AM_EXEC -t $TERM_FILE -s $TEST_ATT_SESS -a $MODEL_ARGS_FILE -m $SYSTEM_ARGS_FILE $PROVISION_ARG  > $GENERATED/output_resp.json
+    #$TESTS_DIR/send_term_req.sh -h $IP -p $PORT -f $TERM_FILE -s $TEST_ATT_SESS > $GENERATED/output_resp.json
     # We need this to be the last line so that the exit code is whether or not we found success
     grep "\"SUCCESS\":true" $GENERATED/output_resp.json
   fi

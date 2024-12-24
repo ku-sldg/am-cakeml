@@ -23,6 +23,11 @@ val errStr_remote_am_failure : string =
 val errStr_negotiation_not_implemented : string =
   "errStr_negotiation_not_implemented"
 
+(** val errStr_appsumm_not_implemented : string **)
+
+val errStr_appsumm_not_implemented : string =
+  "errStr_appraisal_summary_not_implemented"
+
 (** val err_str_asp_no_type_sig : string **)
 
 val err_str_asp_no_type_sig : string =

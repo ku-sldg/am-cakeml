@@ -43,6 +43,11 @@ val coq_STR_TYPE : string =
 val coq_STR_RUN : string =
   "RUN"
 
+(** val coq_STR_APPSUMM : string **)
+
+val coq_STR_APPSUMM : string =
+  "APPSUMM"
+
 (** val coq_STR_NEGOTIATE : string **)
 
 val coq_STR_NEGOTIATE : string =

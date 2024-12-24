@@ -78,7 +78,7 @@ val it_targ : coq_TARG_ID =
 val hashfile_targ : coq_TARG_ID =
   "hashfile_targ"
 
-(** val cert_resolute_targ : coq_TARG_ID **)
+(** val micro_resolute_targ : coq_TARG_ID **)
 
-val cert_resolute_targ : coq_TARG_ID =
-  "cert_resolute_targ"
+val micro_resolute_targ : coq_TARG_ID =
+  "micro_resolute_targ"

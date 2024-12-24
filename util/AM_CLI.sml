@@ -63,26 +63,34 @@ structure AM_CLI_Utils = struct
   
   fun retrieve_Client_AM_CLI_args _ =
     let val name = CommandLine.name ()
-        val usage = ("Usage: " ^ name ^ " -t <term_file>.json -s <att_session.json>\n\ne.g.\t" ^ name ^ " -t cert.json -s my_session.json\n\n")
+        val usage = ("Usage: " ^ name ^ " -t <term_file>.json -s <att_session.json> -a model_args.json -m system_args.json\n\ne.g.\t" ^ name ^ " -t cert.json -s my_session.json\n\n")
         val argList = CommandLine.arguments ()
         val termInd        = ListExtra.find_index argList "-t"
         val sessInd        = ListExtra.find_index argList "-s"
+        val modelArgsInd       = ListExtra.find_index argList "-a"
+        val systemArgsInd       = ListExtra.find_index argList "-m"
+        val provisionInd       = ListExtra.find_index argList "-p"
         val termIndBool   = argIndPresent termInd
         val sessIndBool   = argIndPresent sessInd
+        val modelArgsIndBool   = argIndPresent modelArgsInd
+        val systemArgsIndBool   = argIndPresent systemArgsInd
+        val provisionIndBool   = argIndPresent provisionInd 
     in 
     (
-    if ((termIndBool = False) orelse (sessIndBool = False))
+    if ((termIndBool = False) orelse (sessIndBool = False) orelse (modelArgsIndBool = False) orelse (systemArgsIndBool = False))
     then raise (Exception ("Invalid Arguments\n" ^ usage))
     else (
       let val termFileName  = List.nth argList (termInd + 1)
           val sessFileName  = List.nth argList (sessInd + 1)
+          val modelArgsFileName = List.nth argList (modelArgsInd + 1)
+          val systemArgsFileName = List.nth argList (systemArgsInd + 1)
       in
           (case (parse_term_from_file termFileName) of
             Coq_errC e => raise (Exception ("Could not parse Term file: " ^ e ^ "\n"))
           | Coq_resultC term =>
             (case (parse_att_session_from_file sessFileName) of
               Coq_errC e => raise (Exception ("Could not parse Attestation Session from Json: " ^ e ^ "\n"))
-            | Coq_resultC sess => (term, sess)
+            | Coq_resultC sess => (term, sess, modelArgsFileName, systemArgsFileName, provisionIndBool)
             )
           )
       end
