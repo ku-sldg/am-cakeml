@@ -57,7 +57,7 @@ And finally:
 
 `-p` specifies "provisioning" mode
 
-Example JSON config files for model and system paths can be found [here](./DemoFiles/goldenFiles/) (`model_args.json`, `system_args.json`).  The paths specified in these JSON configrs are assumed to be relative (relative to `DEMO_ROOT`).
+Example JSON config files for model and system paths can be found [here](./DemoFiles/goldenFiles/) (`model_args.json`, `system_args.json`).  The paths specified in these JSON configs are assumed to be relative (relative to `DEMO_ROOT`).
 
 Successful output of provisionig mode (-p) should end with:  "Killing background processes...".  Provisioning mode will also modify some golden files in `./DemoFiles/goldenFiles/` (including a file -- whose path is for now hardcoded in Coq -- for the golden hash composite). 
 
