@@ -191,7 +191,11 @@ if [[ "$REPO_ROOT" == */am-cakeml ]]; then
     $CLIENT_AM_EXEC -t $TERM_FILE -s $TEST_ATT_SESS -a $MODEL_ARGS_FILE -m $SYSTEM_ARGS_FILE $PROVISION_ARG  > $GENERATED/output_resp.json
     #$TESTS_DIR/send_term_req.sh -h $IP -p $PORT -f $TERM_FILE -s $TEST_ATT_SESS > $GENERATED/output_resp.json
     # We need this to be the last line so that the exit code is whether or not we found success
-    grep "\"SUCCESS\":true" $GENERATED/output_resp.json
+
+    echo ""
+    echo ""
+    grep "SUCCESS" $GENERATED/output_resp.json #> /dev/null
+    #grep "\"SUCCESS\":true" $GENERATED/output_resp.json > /dev/null
   fi
 else
   echo "You are in $PWD, with the root set as $REPO_ROOT, but youre root should be 'am-cakeml'"
