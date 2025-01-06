@@ -194,7 +194,7 @@ if [[ "$REPO_ROOT" == */am-cakeml ]]; then
 
     echo ""
     echo ""
-    grep "SUCCESS" $GENERATED/output_resp.json #> /dev/null
+    grep "\"RESOLUTE_POLICY_CHECK\":true" $GENERATED/output_resp.json #> /dev/null
     #grep "\"SUCCESS\":true" $GENERATED/output_resp.json > /dev/null
   fi
 else

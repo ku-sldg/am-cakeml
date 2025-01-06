@@ -1,0 +1,2 @@
+datatype coq_ResoluteResponse =
+  Coq_mkResoluteResp bool coq_Resolute coq_Term

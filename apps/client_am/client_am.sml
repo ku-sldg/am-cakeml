@@ -92,7 +92,7 @@ fun main () =
       )
     | _ => 
     (
-      let val maybe_bool = am_client_do_res 
+      let val maybe_resolute_resp = am_client_do_res 
                             att_sess 
                             top_plc 
                             att_plc 
@@ -104,8 +104,10 @@ fun main () =
       (att_sess : Attestation_Session) (req_plc:Plc) 
   (toPlc:Plc) (M : Model) (r:Resolute) (m:Map TargetT Evidence)
   *)
-      case maybe_bool of 
-        Coq_resultC b => print ("Resolute Policy check:  " ^ (if(b) then "SUCCESS" else "FAILED")) 
+      case maybe_resolute_resp of 
+        Coq_resultC resp => print (coq_JSON_to_string (test_resolute_resp_compute_json resp))
+        
+         (* ("Resolute Policy check:  " ^ (if(b) then "SUCCESS" else "FAILED"))  *)
       | Coq_errC errStr => print errStr 
     end (* end let val maybe_bool ... *)
 

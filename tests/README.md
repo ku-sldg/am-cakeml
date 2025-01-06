@@ -63,9 +63,9 @@ Successful output of provisionig mode (-p) should end with:  "Killing background
 
 Removing `-p` from the above will run in normal mode.  Output to the terminal will be similar, but output of the Resolute policy check pipes to here:  `./DemoFiles/Generated/output_resp.json`.
 
-Successful output there (for now) looks like:  "Resolute Policy check:  <SUCCESS | FAILED>".
+Successful output there (for now) looks like the following JSON structure:  `{"RESOLUTE_POLICY_CHECK":true,"RESOLUTE_FORMULA": ...`
 
-To demonstrate a failed appraisal (with output "Resolute Policy check:  FAILED"), make a local modification to one or both of the target micro example files ([addl file](https://github.com/loonwerks/INSPECTA-models/blob/main/micro-examples/microkit/aadl_port_types/data/base_type/aadl/data_1_prod_2_cons.aadl) , [microkit file](https://github.com/loonwerks/INSPECTA-models/blob/main/micro-examples/microkit/aadl_port_types/data/base_type/hamr/microkit/microkit.system)), then re-run the above command in normal mode (WITHOUT `-p`).
+To demonstrate a failed appraisal (with output `{"RESOLUTE_POLICY_CHECK":false ...`), make a local modification to one or both of the target micro example files ([addl file](https://github.com/loonwerks/INSPECTA-models/blob/main/micro-examples/microkit/aadl_port_types/data/base_type/aadl/data_1_prod_2_cons.aadl) , [microkit file](https://github.com/loonwerks/INSPECTA-models/blob/main/micro-examples/microkit/aadl_port_types/data/base_type/hamr/microkit/microkit.system)), then re-run the above command in normal mode (WITHOUT `-p`).
 
 ### Prerequisities
 - `nc` (netcat) 

@@ -84,8 +84,8 @@ fun am_client_app_summary att_sess req_plc e t toPlc =
 
 (** val am_client_do_res :
     coq_Attestation_Session -> coq_Plc -> coq_Plc -> coq_Model ->
-    coq_Resolute -> (coq_TargetT, coq_Evidence) coq_Map -> (bool, string)
-    coq_ResultT **)
+    coq_Resolute -> (coq_TargetT, coq_Evidence) coq_Map ->
+    (coq_ResoluteResponse, string) coq_ResultT **)
 
 fun am_client_do_res att_sess req_plc toPlc m r m0 =
   let val (t, pol) = res_to_copland m r m0 in
@@ -94,8 +94,9 @@ fun am_client_do_res att_sess req_plc toPlc m r m0 =
     let val glob_ctx =
       let val Coq_mkAtt_Sess _ _ _ ats_context = att_sess in ats_context end
     in
-    res_bind (eval glob_ctx toPlc Coq_mt_evt appr_t) (fn et' => Coq_resultC
-      (pol (Coq_evc rawev et'))) end) end end
+    res_bind (eval glob_ctx toPlc Coq_mt_evt appr_t) (fn et' =>
+      let val b = pol (Coq_evc rawev et') in
+      Coq_resultC (Coq_mkResoluteResp b r t) end) end) end end
 
 (** val micro_res_asp_type_env : coq_ASP_Type_Env **)
 
