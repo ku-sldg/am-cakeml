@@ -48,6 +48,14 @@
         "EvOutSig_BODY": "1"
       }
     },
+    "r_hashdir_id": {
+      "FWD": "EXTEND",
+      "EvInSig": "ALL",
+      "EvOutSig": {
+        "EvOutSig_CONSTRUCTOR": "OutN",
+        "EvOutSig_BODY": "1"
+      }
+    },
     "r_hashevidence_id": {
       "FWD": "EXTEND",
       "EvInSig": "ALL",
@@ -180,6 +188,7 @@
     "r_provision_id": "appraise_id",
     "r_hashfile_id": "appraise_r_hashfile_id",
     "r_hashevidence_id": "appraise_r_hashfile_id",
+    "r_hashdir_id": "appraise_r_hashfile_id",
     "appraise_id": "appraise_id",
     "appraise_r_readfile_id": "appraise_id",
     "appraise_r_hashfile_id": "appraise_id",

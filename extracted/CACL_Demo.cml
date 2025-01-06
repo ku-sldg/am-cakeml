@@ -58,6 +58,11 @@ val query_kim_id : coq_ASP_ID =
 val hash_file_contents_id : coq_ASP_ID =
   "r_hashfile_id"
 
+(** val hash_dir_contents_id : coq_ASP_ID **)
+
+val hash_dir_contents_id : coq_ASP_ID =
+  "r_hashdir_id"
+
 (** val hash_evidence_id : coq_ASP_ID **)
 
 val hash_evidence_id : coq_ASP_ID =
@@ -123,7 +128,7 @@ fun gather_targ_asp targPlc targId path appr_path =
 (** val hash_dir_asp : coq_Plc -> coq_TARG_ID -> coq_ASP_ARGS -> coq_Term **)
 
 fun hash_dir_asp targPlc targId args =
-  Coq_asp (ASPC (Coq_asp_paramsC hash_file_contents_id args targPlc targId))
+  Coq_asp (ASPC (Coq_asp_paramsC hash_dir_contents_id args targPlc targId))
 
 (** val provision_targ_asp : coq_Plc -> coq_TARG_ID -> string -> coq_Term **)
 
