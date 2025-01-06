@@ -17,3 +17,4 @@ ci_test:
 	./CI/Test.sh -t filehash -h
 	./CI/Test.sh -t cds_simple -h
 	./CI/Test.sh -t cds_provision -h
+	./CI/Test.sh -t large_output -h

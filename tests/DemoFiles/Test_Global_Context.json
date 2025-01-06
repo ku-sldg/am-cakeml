@@ -176,6 +176,14 @@
         "EvOutSig_BODY": "1"
       }
     },
+    "large_output_id": {
+      "FWD": "EXTEND",
+      "EvInSig": "ALL",
+      "EvOutSig": {
+        "EvOutSig_CONSTRUCTOR": "OutN",
+        "EvOutSig_BODY": "1"
+      }
+    },
     "appraise_r_invary_get_measurement_id": {
       "FWD": "REPLACE",
       "EvInSig": "ALL",

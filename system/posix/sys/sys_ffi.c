@@ -3,6 +3,14 @@
 #include <stdio.h>
 #include <assert.h>
 
+// A macro for printing debugging info
+#define DEBUG_MODE 0
+#if DEBUG_MODE
+#define DEBUG_PRINTF(...) fprintf(stderr, __VA_ARGS__)
+#else
+#define DEBUG_PRINTF(...)
+#endif
+
 #define SUCCESS 0x00
 #define BUFFER_OVERFLOW 0xe0
 #define PATH_ERROR 0xe1
@@ -125,8 +133,12 @@ void ffipopen_string(const char *commandIn, const long clen, uint8_t *a, const l
   const uint8_t OUTPUT_LENGTH_LENGTH = 4;
   const uint8_t HEADER_LENGTH = RESPONSE_CODE_LENGTH + OUTPUT_LENGTH_LENGTH;
 
+  // Print debugging info
+  DEBUG_PRINTF("ffipopen_string: Command: %s\n", commandIn);
+  DEBUG_PRINTF("ffipopen_string: Command Length: %ld\n", clen);
+  DEBUG_PRINTF("ffipopen_string: Output Length: %ld\n", alen);
+
   // Try to expand the ~ to the full home directory path
-  long newComLength;
   if (commandIn[0] != '/')
   {
     perror("ffipopen_string: Found ~ in path, this is not allowed and only absolute paths are going to robustly work.\n");
@@ -138,6 +150,7 @@ void ffipopen_string(const char *commandIn, const long clen, uint8_t *a, const l
   FILE *fp = popen((char *)commandIn, "r");
   if (fp == NULL)
   {
+    DEBUG_PRINTF("ffipopen_string: Failed to open file\n");
     // Error handling
     a[RESPONSE_CODE_START] = FILE_READ_ERROR;
     return;
@@ -147,18 +160,20 @@ void ffipopen_string(const char *commandIn, const long clen, uint8_t *a, const l
   char *buffer = NULL;
   size_t output_length = 0;
   uint8_t out_code = read_until_eof(fp, alen - HEADER_LENGTH, &buffer, &output_length);
+  DEBUG_PRINTF("ffipopen_string: Output Length: %ld\n", output_length);
   int ret = pclose(fp);
   if (ret != 0)
   {
+    DEBUG_PRINTF("ffipopen_string: Failed to close file\n");
     perror("ffipopen_string: Failed to close file");
     // Error handling
     a[RESPONSE_CODE_START] = FILE_CLOSE_ERROR;
     return;
   }
-  // fclose(fp);
   // Cast the output length to a 32-bit integer, with error if too large
   if (output_length > UINT32_MAX)
   {
+    DEBUG_PRINTF("ffipopen_string: Output length too large\n");
     a[RESPONSE_CODE_START] = NEED_MORE_THAN_32_BITS_FOR_LENGTH;
     return;
   }
@@ -177,6 +192,8 @@ void ffipopen_string(const char *commandIn, const long clen, uint8_t *a, const l
 
   if (out_code != SUCCESS)
   {
+    DEBUG_PRINTF("ffipopen_string: Error reading from file\n");
+    DEBUG_PRINTF("ffipopen_string: Setting response code to %d\n", out_code);
     // We had an error in the read_until_eof function
     a[RESPONSE_CODE_START] = out_code;
     return;
@@ -185,9 +202,14 @@ void ffipopen_string(const char *commandIn, const long clen, uint8_t *a, const l
   // Otherwise, we have successfully read the output into the buffer
   if (output_size >= alen)
   {
+    DEBUG_PRINTF("ffipopen_string: Insufficient space for output\n");
+    DEBUG_PRINTF("ffipopen_string: Output: %s\n", buffer);
     // We have insufficient space for the output
     out_code = INSUFFICIENT_OUTPUT;
+    // Print out the hex value of the out_code
+    DEBUG_PRINTF("ffipopen_string: Setting output code to: %d\n", out_code);
     a[RESPONSE_CODE_START] = out_code;
+    DEBUG_PRINTF("ffipopen_string: Current 'return/a' buffer: %s\n", a);
     return;
   }
 
@@ -196,10 +218,13 @@ void ffipopen_string(const char *commandIn, const long clen, uint8_t *a, const l
   // in the output array to store the output
   // So we copy the buffer into the output array
   a[RESPONSE_CODE_START] = SUCCESS;
+  DEBUG_PRINTF("ffipopen_string: Setting response code to SUCCESS\n");
+  DEBUG_PRINTF("ffipopen_string: Output: %s\n", buffer);
   for (int i = 0; i < output_length; i++)
   {
     a[HEADER_LENGTH + i] = (uint8_t)buffer[i];
   }
 
+  DEBUG_PRINTF("ffipopen_string: Made it to end of function\n");
   return;
 }
