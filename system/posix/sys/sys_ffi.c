@@ -2,14 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
-
-// A macro for printing debugging info
-#define DEBUG_MODE 0
-#if DEBUG_MODE
-#define DEBUG_PRINTF(...) fprintf(stderr, __VA_ARGS__)
-#else
-#define DEBUG_PRINTF(...)
-#endif
+#include "../../shared_ffi_fns.h"
 
 #define SUCCESS 0x00
 #define BUFFER_OVERFLOW 0xe0
@@ -21,22 +14,6 @@
 #define NEED_MORE_THAN_32_BITS_FOR_LENGTH 0xf1
 #define FILE_READ_ERROR 0xfe
 #define FILE_CLOSE_ERROR 0xff
-
-void ffisystem(const uint8_t *c, const long clen, uint8_t *a, const long alen)
-{
-  int out = system((char *)c);
-  // Cast down to a uint8_t return address
-  uint8_t truncatedErrCode = (out & 0xff);
-  if (truncatedErrCode > 0)
-  {
-    *a = truncatedErrCode;
-  }
-  else if (out > 0)
-  {
-    // We somehow truncated too much and lost the fact that it was an error!
-    *a = 0xff;
-  }
-}
 
 /**
  * Function to read an entire file until EOF

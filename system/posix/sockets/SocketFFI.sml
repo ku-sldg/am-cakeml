@@ -13,15 +13,18 @@ structure Socket = struct
     fun ffi_listen  x y = #(listen)  x y
     fun ffi_accept  x y = #(accept)  x y
     fun ffi_connect x y = #(connect) x y
+    fun ffi_get_message_length x y = #(socket_get_message_length) x y
+    fun ffi_socket_write x y = #(socket_write) x y
+    fun ffi_socket_read x y = #(socket_read) x y
   in
     type sockfd = sockfd
 
     (* int -> int -> sockfd *)
     (* Takes a port number and maximum queue length, and returns the fd of a new actively listening socket *)
     fun listen port qLen = 
-      let val payload = BString.concat (FFI.n2w2 qLen) (BString.fromString (Int.toString port))
+      let val payload = BString.concat (BString.int_to_qword qLen) (BString.int_to_qword port)
       in 
-        case FFI.callOpt ffi_listen 8 payload of 
+        case FFI.callOpt ffi_listen 4 payload of 
           Some bsv => Fd bsv
         | None => raise (Err "Error in listen()")
       end
@@ -30,7 +33,7 @@ structure Socket = struct
     (* Takes the fd of an actively listening socket, returns the fd of a connection *)
     (* Blocks until there is an incoming connection *)
     fun accept sockfd = 
-      case FFI.callOpt ffi_accept 8 (getFd sockfd) of 
+      case FFI.callOpt ffi_accept 4 (getFd sockfd) of 
         Some bsv => Fd bsv
       | None => raise (Err "Error in accept()")
 
@@ -38,15 +41,49 @@ structure Socket = struct
     (* Takes the host in the format of a domain name or IPv4 address,
         and port, an integer corresponding to a port number. Returns a fd. *)
     fun connect host port = 
-      let val payload = FFI.nullSeparated [host, (Int.toString port)]
+      let 
+        val payload = BString.concat (BString.int_to_qword port) (BString.concat (BString.fromString host) BString.nullByte)
       in 
-        case FFI.callOpt ffi_connect 8 payload of 
+        case FFI.callOpt ffi_connect 4 payload of 
           Some bsv => Fd bsv
         | None => raise (Err "Error in connect()")
       end
 
+    (* sockfd -> int *)
+    (* Take in a socket FD and return the size of the message that is pending read in the FD *)
+    fun get_message_length fd = 
+      case FFI.callOpt ffi_get_message_length 4 (getFd fd) of 
+        Some bsv => BString.qword_to_int bsv
+      | None => raise (Err "Error in get_message_length()")
+
+    (* sockfd -> string -> int (# bytes written) *)
+    (* Takes a socket fd and a string to write the socket
+       should always return `n` s.t. `n` = length s
+       Unless an error occured *)
+    fun write fd s = 
+      let 
+        val payload = BString.concat (getFd fd) (BString.fromString s)
+      in
+        case FFI.callOpt ffi_socket_write 4 payload of 
+          Some bsv => BString.qword_to_int bsv
+        | None => raise (Err "Error in write()")
+      end
+
     (* sockfd -> string *)
-    val showFd = BString.show o getFd
+    fun read fd = 
+      let 
+        (* first we want to see the incoming msg size *)
+        val msg_size = get_message_length fd
+        val payload = BString.concat (getFd fd) (BString.int_to_qword msg_size)
+      in
+        case FFI.callOpt ffi_socket_read msg_size payload of
+          Some bsv => 
+          (* bsv contains how much was read, which should = msg_size *)
+          if BString.length bsv = msg_size
+          then (BString.toString bsv)
+          else raise (Err "Error in read(), we did not read all the bytes")
+        | None => raise (Err "Error in read()")
+      end
 
   (* The following code is adaptped from the TextIO implementation in the
       basis library. It is stripped of the instream/outstream constructors.
@@ -94,7 +131,7 @@ structure Socket = struct
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   *)
 
-    exception InvalidFD
+    (* exception InvalidFD
 
     local
       val iobuff = Word8Array.array 2052 (Word8.fromInt 0)
@@ -109,7 +146,8 @@ structure Socket = struct
             if Word8Array.sub iobuff 0 = Word8.fromInt 1
             then raise InvalidFD
             else
-              let val nw = Marshalling.w22n iobuff 1 
+              let 
+                val nw = Marshalling.w22n iobuff 1 
               in
                 if nw = 0 
                 then writei fd n i
@@ -119,7 +157,8 @@ structure Socket = struct
 
         fun write fd n i =
           if n = 0 then () else
-          let val nw = writei fd n i 
+          let 
+            val nw = writei fd n i 
           in
             if nw < n then write fd (n-nw) (i+nw) else ()
           end
@@ -139,66 +178,26 @@ structure Socket = struct
       local
         fun read fd n =
           let 
-            val _ = print ("Listening for bytes (in read) with n = " ^ (Int.toString n) ^ "\n")
-            (* val _ = print ("FD: " ^ (getFdString fd) ^ "\n") *)
-            (* val _ = print ("Read pre marshal: " ^ (Word8Array.substring iobuff 0 n) ^ "\n") *)
             val a = Marshalling.n2w2 n iobuff 0 
-            (* val _ = print ("Read post marshal: " ^ (Word8Array.substring iobuff 0 n) ^ "\n") *)
           in
             (#(read) fd iobuff;
-            (let val _ = print ("Read post read: " ^ (Word8Array.substring iobuff 0 n) ^ "\n")
-            in
             if Word8.toInt (Word8Array.sub iobuff 0) <> 1
-            then 
-              let val _ = print ("Listening for bytes (in read) with non error\n")
-              in
-              Marshalling.w22n iobuff 1
-              end
-            else 
-              let val _ = print ("Listening for bytes (in read) with error\n")
-              in
-                raise InvalidFD
-              end
-            end))
+            then Marshalling.w22n iobuff 1
+            else raise InvalidFD)
           end
 
           fun input fd buff off len =
             let fun input0 off len count =
-              let val _ = print ("Listening for bytes (in input0) with off = " ^ (Int.toString off) ^ "\n")
-                  val nwant = min len 2048
-                  val _ = print ("input0: NWANT: " ^ (Int.toString nwant) ^ "\n")
+              let val nwant = min len 2048
                   val nread = read fd nwant
-                  val _ = print ("input0: NREAD: " ^ (Int.toString nread) ^ "\n")
               in
                 if nread = 0 
-                then 
-                  let val _ = print ("Listening for bytes (in input0) with nread = 0\n")
-                  in
-                  count 
-                  end
+                then count 
                 else
-                  let val _ = print ("Listening for bytes (in input0) with nread > 0\n")
-                  in
                   (Word8Array.copy iobuff 4 nread buff off;
-                    let val _ = print ("Listening for bytes (in input0) with nread > 0 and copied bytes\n")
-                        val _ = print ("BUFF: " ^ (Word8Array.substring buff off nread) ^ "\n")
-                        val _ = print ("OFF: " ^ (Int.toString off) ^ "\n")
-                        val _ = print ("NREAD: " ^ (Int.toString nread) ^ "\n")
-                        val _ = print ("NWANT: " ^ (Int.toString nwant) ^ "\n")
-                    in
-                    if nread < nwant 
-                    then 
-                      let val _ = print ("Listening for bytes (in input0) with nread < nwant\n")
-                      in count+nread 
-                      end
-                    else 
-                      let val _ = print ("Listening for bytes (in input0) with nread >= nwant\n")
-                      in
-                      input0 (off + nread) (len - nread) (count + nread)
-                      end
-                    end
-                  )
-                  end
+                  if nread < nwant 
+                  then count+nread 
+                  else input0 (off + nread) (len - nread) (count + nread))
               end
             in input0 off len 0 
             end
@@ -212,39 +211,17 @@ structure Socket = struct
       in
         fun inputAll fd =
           let fun inputAll_aux arr i =
-            let 
-                val len = Word8Array.length arr 
-                val _ = print ("Current Length of array: " ^ (Int.toString len) ^ "\n")
-                val _ = print ("Listening for bytes (in inputAll_aux) with i = " ^ (Int.toString i) ^ "\n")
+            let val len = Word8Array.length arr 
             in
               if i < len then
-                let val _ = print ("Listening for bytes (in inputAll_aux) with i < len\n")
-                    val nwant = len - i
-                    val _ = print ("NWANT: " ^ (Int.toString nwant) ^ "\n")
-                    val _ = print ("I: " ^ (Int.toString i) ^ "\n")
-                    val _ = print ("LEN: " ^ (Int.toString len) ^ "\n")
-                    val _ = print ("FD: " ^ (getFdString fd) ^ "\n")
-                    val _ = print ("ARR: " ^ (Word8Array.substring arr 0 len) ^ "\n")
+                let val nwant = len - i
                     val nread = input (getFdString fd) arr i nwant
-                    val _ = print ("NREAD: " ^ (Int.toString nread) ^ "\n")
                 in
                   if nread < nwant 
-                  then 
-                    let val _ = print ("Listening for bytes (in inputAll_aux) with nread < nwant\n")
-                    in
-                      Word8Array.substring arr 0 (i+nread)
-                    end
-                  else 
-                    let val _ = print ("Listening for bytes (in inputAll_aux) with nread >= nwant\n")
-                    in 
-                      inputAll_aux arr (i + nread)
-                    end
+                  then Word8Array.substring arr 0 (i+nread)
+                  else inputAll_aux arr (i + nread)
                 end
-              else 
-                let val _ = print ("Listening for bytes (in inputAll_aux) with i >= len\n")
-                in
-                  inputAll_aux (extend_array arr) i
-                end
+              else inputAll_aux (extend_array arr) i
             end
           in 
             inputAll_aux (Word8Array.array 127 (Word8.fromInt 0)) 0 
@@ -259,6 +236,6 @@ structure Socket = struct
             if Word8Array.sub iobuff 0 = Word8.fromInt 0
             then () else raise InvalidFD
           end
-    end
-  end
+    end *)
+  end 
 end

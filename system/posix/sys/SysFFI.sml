@@ -17,13 +17,6 @@ structure SysFFI = struct
     fun shellEscapeString str =
         String.concat (List.map escFn (String.explode str))
 
-    (* () -> int *)
-    fun c_system (com) = 
-      let val bs = BString.fromString com 
-      in
-        BString.toInt BString.LittleEndian (FFI.call ffi_system (BString.length bs) bs)
-      end
-    
     (* () -> string *)
     fun c_popen_string (com) = 
       let val command_bs = BString.fromString com

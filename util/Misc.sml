@@ -85,6 +85,8 @@ structure Result = struct
 end
 
 structure FFI = struct 
+    (* NOTE: This type is 
+      string (input) -> byte_array (output storage) -> unit *)
     type ffi = string -> byte_array -> unit
 
     val success = Word8.fromInt 0
