@@ -135,26 +135,27 @@ structure FFI = struct
     fun callVariableResp ffi defaultLen input = 
       let fun callVarResp_aux len = 
             let val result = call ffi len input
-                val resp_code = (BString.substring result resp_CODE_START resp_CODE_LEN)
+                val resp_code_str = (BString.substring result resp_CODE_START resp_CODE_LEN)
+                val resp_code_int : int = BString.toInt BString.LittleEndian resp_code_str
+                val resp_code : Word8.word = Word8.fromInt resp_code_int
                 val output_len_str = (BString.substring result output_LEN_START output_LEN_LEN)
                 val output_len = BString.toInt BString.LittleEndian output_len_str
             in 
-              case resp_code of
-                resp_code_SUCCESS => 
-                  BString.substring result header_END output_len
-              | resp_code_FAILED_TO_READ_FILE => 
-                  raise (Exception "FAILED_TO_READ_FILE")
-              | resp_code_FAILED_TO_REALLOC_BUFFER => 
-                  raise (Exception "FAILED_TO_REALLOC_BUFFER")
-              | resp_code_FAILED_TO_ALLOCATE_BUFFER => 
-                  raise (Exception "FAILED_TO_ALLOCATE_BUFFER")
-              | resp_code_INSUFFICIENT_OUTPUT => 
-                  callVarResp_aux (2 * output_len)
-              | resp_code_FILE_READ_ERROR => 
-                  raise (Exception "FILE_READ_ERROR")
-              | resp_code_FILE_CLOSE_ERROR => 
-                  raise (Exception "FILE_CLOSE_ERROR")
-              | _ => raise (Exception ("Unknown Response Code returned to FFI callVariableResp during: \"" ^ (BString.toString input) ^ "\"\n"))
+              if resp_code = resp_code_SUCCESS
+              then BString.substring result header_END output_len
+              else if resp_code = resp_code_INSUFFICIENT_OUTPUT
+              then callVarResp_aux (2 * output_len)
+              else if resp_code = resp_code_FAILED_TO_READ_FILE
+              then raise (Exception "FAILED_TO_READ_FILE")
+              else if resp_code = resp_code_FAILED_TO_REALLOC_BUFFER
+              then raise (Exception "FAILED_TO_REALLOC_BUFFER")
+              else if resp_code = resp_code_FAILED_TO_ALLOCATE_BUFFER
+              then raise (Exception "FAILED_TO_ALLOCATE_BUFFER")
+              else if resp_code = resp_code_FILE_READ_ERROR
+              then raise (Exception "FILE_READ_ERROR")
+              else if resp_code = resp_code_FILE_CLOSE_ERROR
+              then raise (Exception "FILE_CLOSE_ERROR")
+              else raise (Exception ("Unknown Response Code returned to FFI callVariableResp during: \"" ^ (BString.toString input) ^ "\"\n"))
             end
       in 
         callVarResp_aux defaultLen

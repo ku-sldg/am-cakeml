@@ -139,6 +139,11 @@ val simple_sig : coq_Term =
 val large_output_asp_test : coq_Term =
   Coq_asp (ASPC (Coq_asp_paramsC large_output_id [] coq_P1 sys_targ))
 
+(** val large_output_asp_test : coq_Term **)
+
+val large_output_asp_test : coq_Term =
+  Coq_asp (ASPC (Coq_asp_paramsC large_output_id [] coq_P1 sys_targ))
+
 (** val flexible_mechanisms_map : (string * coq_Term) list **)
 
 val flexible_mechanisms_map : (string * coq_Term) list =
