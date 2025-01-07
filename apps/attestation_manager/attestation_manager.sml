@@ -11,6 +11,8 @@ When things go wrong, handle_AM_request returns a raw error message string.
 fun respondToMsg ammconf client nonce = 
   let val inString  = Socket.inputAll client 
       val _ = print ("\n\nReceived request string: \n" ^ inString ^ "\n")
+      val time = timestamp ()
+      val _ = TextIOExtra.printLn ("Time: " ^ Int.toString time)
       (* val jsonTest = case string_to_JSON inString of
               Coq_errC msg => raise (Exception ("Error in JSON conversion " ^ msg))
             | Coq_resultC js => coq_JSON_to_string js
@@ -29,9 +31,14 @@ fun handleIncoming (listener_and_ammconf) =
         val client = Socket.accept listener
         val _ = TextIOExtra.printLn "Accepted connection\n"
         val nonceval = passed_bs (* BString.fromString "anonce" *) (* TODO: should this be hardcoded here? *)
+        val _ = respondToMsg ammconf client nonceval
+        val _ = print "Responded to message\n"
+        (* val _ = Socket.close client
+        val _ = print "Closed connection\n" *)
     in 
-      (respondToMsg ammconf client nonceval);
-      Socket.close client
+      ()
+      (* (respondToMsg ammconf client nonceval);
+      Socket.close client *)
     end
     handle Socket.Err s     => TextIOExtra.printLn_err ("Socket failure: " ^ s)
          | Socket.InvalidFD => TextIOExtra.printLn_err "Invalid file descriptor"
