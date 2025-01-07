@@ -63,6 +63,14 @@ int listen_socket(const char *ip, int port, int queueLength)
     return -1;
   }
 
+  int opt = 1;
+  if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
+  {
+    DEBUG_PRINTF("setsockopt(SO_REUSEADDR) failed: %s\n", strerror(errno));
+    close(sock);
+    return -1;
+  }
+
   struct sockaddr_in server_addr;
   server_addr.sin_family = AF_INET;
   server_addr.sin_port = htons(port);
@@ -292,6 +300,28 @@ void ffisocket_get_message_length(uint8_t *c, const long clen, uint8_t *a, const
   DEBUG_PRINTF("Message length: %zu\n", msg_length);
   a[0] = FFI_SUCCESS;
   int_to_qword(msg_length, a + 1);
+}
+
+/**
+ * c: sockfd [0:3]
+ * clen: 4
+ * a: success flag [0]
+ * alen: 1
+ */
+void ffisocket_close(uint8_t *c, const long clen, uint8_t *a, const long alen)
+{
+  DEBUG_PRINTF("In function ffisocket_close\n");
+  assert(clen == 4);
+  int sockfd = qword_to_int(c);
+  DEBUG_PRINTF("Closing socket %d\n", sockfd);
+  assert(alen == 1);
+  if (shutdown(sockfd, SHUT_RDWR) < 0)
+  {
+    DEBUG_PRINTF("Failed to shutdown socket: %s\n", strerror(errno));
+    a[0] = FFI_FAILURE;
+    return;
+  }
+  a[0] = FFI_SUCCESS;
 }
 
 /**

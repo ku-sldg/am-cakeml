@@ -13,14 +13,12 @@ fun respondToMsg ammconf client nonce =
       val _ = print ("\n\nReceived request string: \n" ^ inString ^ "\n")
       val time = timestamp ()
       val _ = TextIOExtra.printLn ("Time: " ^ Int.toString time)
-      (* val jsonTest = case string_to_JSON inString of
-              Coq_errC msg => raise (Exception ("Error in JSON conversion " ^ msg))
-            | Coq_resultC js => coq_JSON_to_string js
-      val _ = print "TEsting json conversion\n"
-      val _ = print ("jsonTest: " ^ jsonTest ^ "\n") *)
       val outString = handle_AM_request ammconf inString nonce
       val _ = print ("\n\nSending response string: \n" ^ outString) 
       val num_written = Socket.write client outString
+      val _ = print ("Closing Socket")
+      val _ = Socket.close client
+      val _ = print ("Closed Socket")
   in 
     ()
   end
@@ -36,11 +34,8 @@ fun handleIncoming (listener_and_ammconf) =
         val _ = print "Responded to message\n"
     in 
       ()
-      (* (respondToMsg ammconf client nonceval);
-      Socket.close client *)
     end
     handle Socket.Err s     => TextIOExtra.printLn_err ("Socket failure: " ^ s)
-         (* | Socket.InvalidFD => TextIOExtra.printLn_err "Invalid file descriptor" *)
 
 
 (* coq_AM_Config -> unit *)
