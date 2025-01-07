@@ -172,17 +172,32 @@ void ffiopen_out(unsigned char *c, long clen, unsigned char *a, long alen)
 
 void ffiread(unsigned char *c, long clen, unsigned char *a, long alen)
 {
+  // print the inputs (on a single line as a string)
+  printf("c: ");
+  for (int i = 0; i < clen; i++)
+  {
+    printf("%c", c[i]);
+  }
+  printf("clen: %ld\n", clen);
+  printf("alen: %ld\n", alen);
+
   assert(clen == 8);
+  printf("ffiread\n");
   int fd = byte8_to_int(c);
+  printf("fd: %d\n", fd);
   int n = byte2_to_int(a);
+  printf("n: %d\n", n);
   assert(alen >= n + 4);
   int nread = read(fd, &a[4], n);
+  printf("nread: %d\n", nread);
   if (nread < 0)
   {
+    printf("nread < 0\n");
     a[0] = 1;
   }
   else
   {
+    printf("nread >= 0\n");
     a[0] = 0;
     int_to_byte2(nread, &a[1]);
   }
