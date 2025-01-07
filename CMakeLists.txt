@@ -116,6 +116,7 @@ get_files (posix_src_cake
 )
 
 get_files(posix_src_c
+    system/shared_ffi_fns.c
     ${BASIS_FILE}
     system/posix/sockets/socket_ffi.c
     system/posix/time/time_ffi.c
