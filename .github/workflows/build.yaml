@@ -2,17 +2,17 @@ name: Build
 
 on:
   workflow_call:
-    
+
 jobs:
   build:
     runs-on: ubuntu-latest
 
     env:
       CAKE_PATH: ~/cake-x64-64
-      CAKE_VERSION: v2419
+      CAKE_VERSION: v2747
 
     steps:
-############### Setup and Caching for CakeML
+      ############### Setup and Caching for CakeML
       - name: Restore Cake Cache
         id: cake-cache-restore
         uses: actions/cache/restore@v4
@@ -28,7 +28,7 @@ jobs:
           tar -xvf cake-x64-64.tar.gz
           cd ${{ env.CAKE_PATH }}
           make cake
-      
+
       - name: Cake Cache Save
         id: cake-cache-install
         if: steps.cake-cache-restore.outputs.cache-hit != 'true'
@@ -36,14 +36,13 @@ jobs:
         with:
           path: ${{ env.CAKE_PATH }}
           key: ${{ runner.OS }}-CAKE-${{ env.CAKE_VERSION }}
-############### 
+      ###############
 
-############### Install Cake
+      ############### Install Cake
       - name: Install Cake
-        run:
-          sudo ln -s ${{ env.CAKE_PATH }}/cake /usr/bin
+        run: sudo ln -s ${{ env.CAKE_PATH }}/cake /usr/bin
 
-############### Checkout and Build AM-CakeML
+      ############### Checkout and Build AM-CakeML
       - name: Checkout code
         uses: actions/checkout@v4
 
