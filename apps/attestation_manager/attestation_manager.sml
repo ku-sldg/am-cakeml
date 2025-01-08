@@ -9,17 +9,18 @@ When things go wrong, handle_AM_request returns a raw error message string.
   In the future, we may want to wrap said error messages in JSON as well to make 
   it easier on the client. *)
 fun respondToMsg ammconf client nonce = 
-  let val inString  = Socket.inputAll client 
+  let val inString  = Socket.read client 
       val _ = print ("\n\nReceived request string: \n" ^ inString ^ "\n")
-      (* val jsonTest = case string_to_JSON inString of
-              Coq_errC msg => raise (Exception ("Error in JSON conversion " ^ msg))
-            | Coq_resultC js => coq_JSON_to_string js
-      val _ = print "TEsting json conversion\n"
-      val _ = print ("jsonTest: " ^ jsonTest ^ "\n") *)
+      val time = timestamp ()
+      val _ = TextIOExtra.printLn ("Time: " ^ Int.toString time)
       val outString = handle_AM_request ammconf inString nonce
       val _ = print ("\n\nSending response string: \n" ^ outString) 
+      val num_written = Socket.write client outString
+      val _ = print ("Closing Socket")
+      val _ = Socket.close client
+      val _ = print ("Closed Socket")
   in 
-    Socket.output client outString
+    ()
   end
   handle Json.Exn s1 s2 =>
           (TextIO.print_err ("JSON error" ^ s1 ^ ": " ^ s2 ^ "\n"); ())
@@ -29,12 +30,12 @@ fun handleIncoming (listener_and_ammconf) =
         val client = Socket.accept listener
         val _ = TextIOExtra.printLn "Accepted connection\n"
         val nonceval = passed_bs (* BString.fromString "anonce" *) (* TODO: should this be hardcoded here? *)
+        val _ = respondToMsg ammconf client nonceval
+        val _ = print "Responded to message\n"
     in 
-      (respondToMsg ammconf client nonceval);
-      Socket.close client
+      ()
     end
     handle Socket.Err s     => TextIOExtra.printLn_err ("Socket failure: " ^ s)
-         | Socket.InvalidFD => TextIOExtra.printLn_err "Invalid file descriptor"
 
 
 (* coq_AM_Config -> unit *)

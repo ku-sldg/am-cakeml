@@ -45,9 +45,18 @@ if [[ ! -f "$JSON_SESS_FILE" ]]; then
   exit 1
 fi
 
-# Read JSON data from the file
+# Read JSON data from the files
 JSON_TERM_DATA=$(cat "$JSON_TERM_FILE")
 JSON_SESS_DATA=$(cat "$JSON_SESS_FILE")
 
-# Send JSON data to the specified host and port
-echo -e "{ \"TYPE\": \"REQUEST\", \"ACTION\": \"RUN\", \"ATTESTATION_SESSION\": $JSON_SESS_DATA, \"REQ_PLC\": \"TOP_PLC\", \"TERM\": $JSON_TERM_DATA, \"EVIDENCE\": [ { \"RawEv\": [] }, { \"EvidenceT_CONSTRUCTOR\": \"mt_evt\" } ] }" | nc $HOST $PORT
+# Craft the JSON message
+JSON_MESSAGE="{ \"TYPE\": \"REQUEST\", \"ACTION\": \"RUN\", \"ATTESTATION_SESSION\": $JSON_SESS_DATA, \"REQ_PLC\": \"TOP_PLC\", \"TERM\": $JSON_TERM_DATA, \"EVIDENCE\": [ { \"RawEv\": [] }, { \"EvidenceT_CONSTRUCTOR\": \"mt_evt\" } ] }"
+
+# Calculate the length of the JSON message
+MESSAGE_LENGTH=$(echo -n "$JSON_MESSAGE" | wc -c) # Length in bytes
+
+# Combine the length prefix and the message and send to the host and port
+
+# NOTE: This is EXTREMELY COMPLEX, but basically we calculate the message length ourselves and send it as a 4-byte prefix before the actual message
+echo -e "\x$(printf "%x" $(((MESSAGE_LENGTH >> 24) & 0xFF)))\x$(printf "%x" $(((MESSAGE_LENGTH >> 16) & 0xFF)))\x$(printf "%x" $(((MESSAGE_LENGTH >> 8) & 0xFF)))\x$(printf "%x" $(((MESSAGE_LENGTH >> 0) & 0xFF)))$JSON_MESSAGE" \
+  | nc $HOST $PORT
