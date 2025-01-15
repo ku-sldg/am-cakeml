@@ -130,7 +130,7 @@ fun provision_micro_hash_1 args =
 (** val provision_micro_hash_composite : coq_Term **)
 
 val provision_micro_hash_composite : coq_Term =
-  provision_dir_asp cds_config_dir_plc cds_config_1_targ micro_args_system
+  provision_dir_asp cds_config_dir_plc cds_config_1_targ micro_args_composite
 
 (** val micro_appTerm_provision : coq_ASP_ARGS -> coq_ASP_ARGS -> coq_Term **)
 
