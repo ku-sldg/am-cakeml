@@ -142,10 +142,19 @@ fun provision_targ_asp targPlc targId _ =
 fun provision_dir_asp targPlc targId args =
   Coq_asp (ASPC (Coq_asp_paramsC provision_id args targPlc targId))
 
+(** val micro_args_system : coq_ASP_ARGS **)
+
+val micro_args_system : coq_ASP_ARGS =
+  JSON_Object (("filepath_golden", (JSON_String
+    "/am-cakeml/tests/DemoFiles/goldenFiles/microkit_composite.txt")) :: (("paths",
+    (JSON_Array ((JSON_String
+    "/INSPECTA-models/micro-examples/microkit/aadl_port_types/data/base_type/aadl/") :: []))) :: (("env_var",
+    (JSON_String "DEMO_ROOT")) :: [])))
+
 (** val hash_evidence_asp : coq_Plc -> coq_TARG_ID -> string -> coq_Term **)
 
 fun hash_evidence_asp targPlc targId _ =
-  Coq_asp (ASPC (Coq_asp_paramsC hash_evidence_id (JSON_Object []) targPlc
+  Coq_asp (ASPC (Coq_asp_paramsC hash_evidence_id micro_args_system targPlc
     targId))
 
 (** val path_targ1 : string **)
