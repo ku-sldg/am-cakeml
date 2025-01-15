@@ -1,0 +1,4 @@
+{"paths":["/INSPECTA-models/micro-examples/microkit/aadl_port_types/data/base_type/aadl/", 
+          "/INSPECTA-models/micro-examples/microkit/aadl_port_types/data/base_type/hamr/microkit/"],
+ "env_var": "DEMO_ROOT",
+ "filepath_golden":"/am-cakeml/tests/DemoFiles/goldenFiles/micro_union_composite.txt"}

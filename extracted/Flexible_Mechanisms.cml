@@ -13,7 +13,24 @@ val micro_args_system : coq_ASP_ARGS =
   JSON_Object (("filepath_golden", (JSON_String
     "/am-cakeml/tests/DemoFiles/goldenFiles/microkit_composite.txt")) :: (("paths",
     (JSON_Array ((JSON_String
-    "/INSPECTA-models/micro-examples/microkit/aadl_port_types/data/base_type/aadl/") :: []))) :: (("env_var",
+    "/INSPECTA-models/micro-examples/microkit/aadl_port_types/data/base_type/hamr/microkit/") :: []))) :: (("env_var",
+    (JSON_String "DEMO_ROOT")) :: [])))
+
+(** val micro_args_composite : coq_ASP_ARGS **)
+
+val micro_args_composite : coq_ASP_ARGS =
+  JSON_Object (("filepath_golden", (JSON_String
+    "/am-cakeml/tests/DemoFiles/goldenFiles/micro_composite.txt")) :: (("paths",
+    (JSON_Array [])) :: (("env_var", (JSON_String "DEMO_ROOT")) :: [])))
+
+(** val micro_args_union : coq_ASP_ARGS **)
+
+val micro_args_union : coq_ASP_ARGS =
+  JSON_Object (("filepath_golden", (JSON_String
+    "/am-cakeml/tests/DemoFiles/goldenFiles/micro_union_composite.txt")) :: (("paths",
+    (JSON_Array ((JSON_String
+    "/INSPECTA-models/micro-examples/microkit/aadl_port_types/data/base_type/aadl/") :: ((JSON_String
+    "/INSPECTA-models/micro-examples/microkit/aadl_port_types/data/base_type/hamr/microkit/") :: [])))) :: (("env_var",
     (JSON_String "DEMO_ROOT")) :: [])))
 
 (** val certificate_style : coq_Term **)
@@ -88,11 +105,6 @@ val meas_cds : coq_Term =
 fun hash_micro_config_1 args =
   hash_dir_asp cds_config_dir_plc cds_img_1_targ args
 
-(** val hash_micro_config_2 : coq_ASP_ARGS -> coq_Term **)
-
-fun hash_micro_config_2 args =
-  hash_dir_asp cds_config_dir_plc cds_img_2_targ args
-
 (** val hash_micro_evidence : coq_Term **)
 
 val hash_micro_evidence : coq_Term =
@@ -101,9 +113,8 @@ val hash_micro_evidence : coq_Term =
 
 (** val meas_micro : coq_ASP_ARGS -> coq_ASP_ARGS -> coq_Term **)
 
-fun meas_micro model_args system_args =
-  Coq_lseq (Coq_bseq (ALL, ALL) (hash_micro_config_1 model_args)
-    (hash_micro_config_2 system_args)) hash_micro_evidence
+fun meas_micro model_args _ =
+  Coq_lseq (hash_micro_config_1 model_args) hash_micro_evidence
 
 (** val example_appTerm : coq_Term **)
 
@@ -134,12 +145,10 @@ val provision_micro_hash_composite : coq_Term =
 
 (** val micro_appTerm_provision : coq_ASP_ARGS -> coq_ASP_ARGS -> coq_Term **)
 
-fun micro_appTerm_provision model_args system_args =
-  Coq_bseq (ALL, ALL) (Coq_lseq (hash_micro_config_1 model_args)
-    (provision_micro_hash_1 model_args)) (Coq_bseq (ALL, ALL) (Coq_lseq
-    (hash_micro_config_2 system_args) (provision_micro_hash_1 system_args))
-    (Coq_lseq (meas_micro model_args system_args)
-    provision_micro_hash_composite))
+fun micro_appTerm_provision _ system_args =
+  Coq_bseq (ALL, ALL) (Coq_lseq (hash_micro_config_1 micro_args_union)
+    (provision_micro_hash_1 micro_args_union)) (Coq_lseq
+    (meas_micro micro_args_union system_args) provision_micro_hash_composite)
 
 (** val example_appTerm_provision : coq_Term **)
 
