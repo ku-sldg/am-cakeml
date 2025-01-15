@@ -1,3 +1,3 @@
-{"dirpath":"/INSPECTA-models/micro-examples/microkit/aadl_port_types/data/base_type/aadl/",
- "suffix": ".aadl",
- "filepath-golden":"/am-cakeml/tests/DemoFiles/goldenFiles/aadl_composite.txt"}
+{"paths":["/INSPECTA-models/micro-examples/microkit/aadl_port_types/data/base_type/aadl/"],
+ "env_var": "DEMO_ROOT",
+ "filepath_golden":"/am-cakeml/tests/DemoFiles/goldenFiles/aadl_composite.txt"}

@@ -313,10 +313,7 @@ fun coq_Jsonifiable_ResoluteResponse h h0 =
 fun test_resolute_resp_compute_json x =
   let val Build_Jsonifiable to_JSON _ =
     coq_Jsonifiable_ResoluteResponse
-      (coq_Jsonifiable_Term
-        (coq_Jsonifiable_ASP
-          (jsonifiable_map_serial_serial coq_Stringifiable_ID_Type
-            coq_Eq_Class_ID_Type coq_Stringifiable_ID_Type))
+      (coq_Jsonifiable_Term (coq_Jsonifiable_ASP coq_Jsonifiable_ASP_ARGS)
         coq_Jsonifiable_Split) coq_Jsonifiable_Resolute
   in
   to_JSON x end

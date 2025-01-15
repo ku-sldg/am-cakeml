@@ -20,8 +20,7 @@ fun generate_ASP_dispatcher' am _ aspBin par rawEv =
      let val js_req =
        let val Build_Jsonifiable to_JSON _ =
          coq_Jsonifiable_ASPRunRequest coq_Jsonifiable_RawEv
-           (jsonifiable_map_serial_serial coq_Stringifiable_ID_Type
-             coq_Eq_Class_ID_Type coq_Stringifiable_ID_Type)
+           coq_Jsonifiable_ASP_ARGS
        in
        to_JSON asp_req end
      in

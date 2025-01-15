@@ -35,20 +35,14 @@ val concrete_Jsonifiable_Attestation_Session : coq_Attestation_Session
 (** val concrete_Jsonifiable_Term : coq_Term coq_Jsonifiable **)
 
 val concrete_Jsonifiable_Term : coq_Term coq_Jsonifiable =
-  coq_Jsonifiable_Term
-    (coq_Jsonifiable_ASP
-      (jsonifiable_map_serial_serial coq_Stringifiable_ID_Type
-        coq_Eq_Class_ID_Type coq_Stringifiable_ID_Type)) coq_Jsonifiable_Split
+  coq_Jsonifiable_Term (coq_Jsonifiable_ASP coq_Jsonifiable_ASP_ARGS)
+    coq_Jsonifiable_Split
 
 (** val concrete_Jsonifiable_EvidenceT : coq_EvidenceT coq_Jsonifiable **)
 
 val concrete_Jsonifiable_EvidenceT : coq_EvidenceT coq_Jsonifiable =
-  coq_Jsonifiable_EvidenceT
-    (jsonifiable_map_serial_serial coq_Stringifiable_ID_Type
-      coq_Eq_Class_ID_Type coq_Stringifiable_ID_Type) coq_Jsonifiable_nat
-    (coq_Jsonifiable_ASP_Params
-      (jsonifiable_map_serial_serial coq_Stringifiable_ID_Type
-        coq_Eq_Class_ID_Type coq_Stringifiable_ID_Type))
+  coq_Jsonifiable_EvidenceT coq_Jsonifiable_ASP_ARGS coq_Jsonifiable_nat
+    (coq_Jsonifiable_ASP_Params coq_Jsonifiable_ASP_ARGS)
 
 (** val concrete_Jsonifiable_GlobalContext :
     coq_GlobalContext coq_Jsonifiable **)
@@ -65,5 +59,4 @@ val concrete_Jsonifiable_GlobalContext : coq_GlobalContext coq_Jsonifiable =
 (** val concrete_Jsonifiable_ASP_ARGS : coq_ASP_ARGS coq_Jsonifiable **)
 
 val concrete_Jsonifiable_ASP_ARGS : coq_ASP_ARGS coq_Jsonifiable =
-  jsonifiable_map_serial_serial coq_Stringifiable_ID_Type
-    coq_Eq_Class_ID_Type coq_Stringifiable_ID_Type
+  coq_Jsonifiable_ASP_ARGS

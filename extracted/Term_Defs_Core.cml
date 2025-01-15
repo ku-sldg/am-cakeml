@@ -8,7 +8,7 @@ type coq_ASP_ID = coq_ID_Type
 
 type coq_ASP_Compat_MapT = (coq_ASP_ID, coq_ASP_ID) coq_Map
 
-type coq_ASP_ARGS = (string, string) coq_Map
+type coq_ASP_ARGS = coq_JSON
 
 type coq_TARG_ID = coq_ID_Type
 

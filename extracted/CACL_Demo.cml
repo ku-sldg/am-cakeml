@@ -121,9 +121,9 @@ val r_ssl_sig_appr_id : coq_ASP_ID =
 (** val gather_targ_asp :
     coq_Plc -> coq_TARG_ID -> string -> string -> coq_Term **)
 
-fun gather_targ_asp targPlc targId path appr_path =
-  Coq_asp (ASPC (Coq_asp_paramsC gather_file_contents_id (("filepath",
-    path) :: (("filepath-golden", appr_path) :: [])) targPlc targId))
+fun gather_targ_asp targPlc targId _ _ =
+  Coq_asp (ASPC (Coq_asp_paramsC gather_file_contents_id (JSON_Object [])
+    targPlc targId))
 
 (** val hash_dir_asp : coq_Plc -> coq_TARG_ID -> coq_ASP_ARGS -> coq_Term **)
 
@@ -132,9 +132,9 @@ fun hash_dir_asp targPlc targId args =
 
 (** val provision_targ_asp : coq_Plc -> coq_TARG_ID -> string -> coq_Term **)
 
-fun provision_targ_asp targPlc targId path =
-  Coq_asp (ASPC (Coq_asp_paramsC provision_id (("filepath", path) :: [])
-    targPlc targId))
+fun provision_targ_asp targPlc targId _ =
+  Coq_asp (ASPC (Coq_asp_paramsC provision_id (JSON_Object []) targPlc
+    targId))
 
 (** val provision_dir_asp :
     coq_Plc -> coq_TARG_ID -> coq_ASP_ARGS -> coq_Term **)
@@ -144,9 +144,9 @@ fun provision_dir_asp targPlc targId args =
 
 (** val hash_evidence_asp : coq_Plc -> coq_TARG_ID -> string -> coq_Term **)
 
-fun hash_evidence_asp targPlc targId appr_path =
-  Coq_asp (ASPC (Coq_asp_paramsC hash_evidence_id (("filepath-golden",
-    appr_path) :: []) targPlc targId))
+fun hash_evidence_asp targPlc targId _ =
+  Coq_asp (ASPC (Coq_asp_paramsC hash_evidence_id (JSON_Object []) targPlc
+    targId))
 
 (** val path_targ1 : string **)
 
@@ -198,9 +198,7 @@ val provision_config_2 : coq_Term =
 (** val query_kim_args : coq_ASP_ARGS **)
 
 val query_kim_args : coq_ASP_ARGS =
-  (query_kim_dynammic_arg_id,
-    query_kim_dynammic_arg_val) :: ((query_kim_appraisal_dir_arg_id,
-    query_kim_appraisal_dir_arg_val) :: [])
+  JSON_Object []
 
 (** val query_kim_asp : coq_Term **)
 
@@ -211,11 +209,11 @@ val query_kim_asp : coq_Term =
 (** val r_ssl_sig_asp : coq_Term **)
 
 val r_ssl_sig_asp : coq_Term =
-  Coq_asp (ASPC (Coq_asp_paramsC r_ssl_sig_id [] cds_query_kim_plc
-    ssl_sig_targ))
+  Coq_asp (ASPC (Coq_asp_paramsC r_ssl_sig_id (JSON_Object [])
+    cds_query_kim_plc ssl_sig_targ))
 
 (** val r_tpm_sig_asp : coq_Term **)
 
 val r_tpm_sig_asp : coq_Term =
-  Coq_asp (ASPC (Coq_asp_paramsC tpm_sig_id [] cds_query_kim_plc
-    ssl_sig_targ))
+  Coq_asp (ASPC (Coq_asp_paramsC tpm_sig_id (JSON_Object [])
+    cds_query_kim_plc ssl_sig_targ))

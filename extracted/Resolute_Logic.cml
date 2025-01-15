@@ -26,7 +26,8 @@ val mt_TARG_ID : coq_Plc =
 (** val mtTerm : coq_Term **)
 
 val mtTerm : coq_Term =
-  Coq_asp (ASPC (Coq_asp_paramsC mt_ASP_ID [] mt_Plc mt_TARG_ID))
+  Coq_asp (ASPC (Coq_asp_paramsC mt_ASP_ID (JSON_Object []) mt_Plc
+    mt_TARG_ID))
 
 datatype coq_Model =
   Build_Model ((coq_TargetT -> coq_Term))
