@@ -111,9 +111,9 @@ val hash_micro_evidence : coq_Term =
   hash_evidence_asp cds_config_dir_plc cds_img_3_targ
     path_micro_composite_golden
 
-(** val meas_micro : coq_ASP_ARGS -> coq_ASP_ARGS -> coq_Term **)
+(** val meas_micro : coq_ASP_ARGS -> coq_Term **)
 
-fun meas_micro model_args _ =
+fun meas_micro model_args =
   Coq_lseq (hash_micro_config_1 model_args) hash_micro_evidence
 
 (** val example_appTerm : coq_Term **)
@@ -143,12 +143,12 @@ fun provision_micro_hash_1 args =
 val provision_micro_hash_composite : coq_Term =
   provision_dir_asp cds_config_dir_plc cds_config_1_targ micro_args_composite
 
-(** val micro_appTerm_provision : coq_ASP_ARGS -> coq_ASP_ARGS -> coq_Term **)
+(** val micro_appTerm_provision : coq_ASP_ARGS -> coq_Term **)
 
-fun micro_appTerm_provision _ system_args =
+fun micro_appTerm_provision _ =
   Coq_bseq (ALL, ALL) (Coq_lseq (hash_micro_config_1 micro_args_union)
     (provision_micro_hash_1 micro_args_union)) (Coq_lseq
-    (meas_micro micro_args_union system_args) provision_micro_hash_composite)
+    (meas_micro micro_args_union) provision_micro_hash_composite)
 
 (** val example_appTerm_provision : coq_Term **)
 
@@ -182,9 +182,9 @@ val flexible_mechanisms_map : (string * coq_Term) list =
     example_appTerm_provision) :: (("cds_ssl", cds_ssl) :: (("cds_tpm",
     cds_tpm) :: (("cds_provision",
     example_appTerm_provision) :: (("simple_sig", simple_sig) :: (("micro",
-    (Coq_lseq (micro_appTerm_provision micro_args_model micro_args_system)
-    (Coq_asp APPR))) :: (("micro_provision",
-    (micro_appTerm_provision micro_args_model micro_args_system)) :: (("large_output",
+    (Coq_lseq (micro_appTerm_provision micro_args_model) (Coq_asp
+    APPR))) :: (("micro_provision",
+    (micro_appTerm_provision micro_args_model)) :: (("large_output",
     large_output_asp_test) :: [])))))))))))))))))
 
 (** val add_EvidenceT_flexible_mechanisms :

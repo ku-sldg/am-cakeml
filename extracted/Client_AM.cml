@@ -130,10 +130,10 @@ fun micro_res_policy e g m =
 val micro_resolute_example_context : coq_GlobalContext =
   Build_GlobalContext micro_res_asp_type_env micro_res_asp_compat_mapt
 
-(** val micro_resolute_model : coq_ASP_ARGS -> coq_ASP_ARGS -> coq_Model **)
+(** val micro_resolute_model : coq_ASP_ARGS -> coq_Model **)
 
-fun micro_resolute_model model_args system_args =
-  Build_Model (fn _ => meas_micro model_args system_args) (fn _ => fn e =>
+fun micro_resolute_model model_args =
+  Build_Model (fn _ => meas_micro model_args) (fn _ => fn e =>
     micro_res_policy e micro_resolute_example_context example_RawEvJudgement)
     micro_resolute_example_context
 

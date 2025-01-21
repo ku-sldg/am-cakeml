@@ -36,7 +36,7 @@ When things go wrong, handle_AM_request returns a raw error message string.
 
 (* () -> () *)
 fun main () =
-  let val (demo_term, att_sess, model_asp_args_file, system_asp_args_file, provision_bool) = AM_CLI_Utils.retrieve_Client_AM_CLI_args ()
+  let val (demo_term, att_sess, model_asp_args_file, (* system_asp_args_file, *) provision_bool) = AM_CLI_Utils.retrieve_Client_AM_CLI_args ()
       (* TODO: Maybe someday we refactor args *)
       (* val provision_bool : bool = False *)
       val top_plc   : coq_Plc = "TOP_PLC"
@@ -47,10 +47,13 @@ fun main () =
               case read_asp_args model_asp_args_file of
                 Coq_resultC v => v
               | Coq_errC c => raise (Exception ("Error parsing ASP_ARGS file: " ^ c))
+      (*
       val system_asp_args_val = 
               case read_asp_args system_asp_args_file of
                 Coq_resultC v => v
               | Coq_errC c => raise (Exception ("Error parsing ASP_ARGS file: " ^ c))
+      *)
+
       (*
       val init_et        : coq_EvidenceT = Coq_mt_evt (* Coq_nonce_evt O  *)
       val init_rawev : coq_RawEv = [] (* [passed_bs] *)
@@ -80,7 +83,7 @@ fun main () =
                               top_plc 
                               (Coq_evc [] Coq_mt_evt) 
                               (* demo_term *)
-                              (micro_appTerm_provision model_asp_args_val system_asp_args_val)
+                              (micro_appTerm_provision model_asp_args_val (* system_asp_args_val *) )
                               (* example_appTerm  *)
                               att_plc in 
 
@@ -96,7 +99,7 @@ fun main () =
                             att_sess 
                             top_plc 
                             att_plc 
-                            (micro_resolute_model model_asp_args_val system_asp_args_val)
+                            (micro_resolute_model model_asp_args_val (* system_asp_args_val *) )
                             micro_resolute_statement 
                             [] in
 
