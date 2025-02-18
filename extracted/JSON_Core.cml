@@ -937,15 +937,19 @@ val coq_Jsonifiable_RawEv : coq_RawEv coq_Jsonifiable =
     (map (fn bs => JSON_String
       (let val Build_Stringifiable to_string _ = coq_Stringifiable_BS in
        to_string bs end)) ev))) :: [])) (fn js =>
-    case coq_JSON_get_Array rawev_name_constant js of
+    case coq_JSON_get_Object rawev_name_constant js of
       Coq_errC e => Coq_errC e
-    | Coq_resultC js' =>
-      result_map (fn js'0 =>
-        case js'0 of
-          JSON_String s =>
-          let val Build_Stringifiable _ from_string = coq_Stringifiable_BS in
-          from_string s end
-        | _ => Coq_errC err_str_json_invalid_constructor_name) js')
+    | Coq_resultC j =>
+      (case j of
+         JSON_Array js' =>
+         result_map (fn js'0 =>
+           case js'0 of
+             JSON_String s =>
+             let val Build_Stringifiable _ from_string = coq_Stringifiable_BS
+             in
+             from_string s end
+           | _ => Coq_errC err_str_json_invalid_constructor_name) js'
+       | _ => Coq_errC err_str_json_invalid_constructor_name))
 
 (** val coq_Jsonifiable_Evidence :
     coq_RawEv coq_Jsonifiable -> coq_EvidenceT coq_Jsonifiable ->

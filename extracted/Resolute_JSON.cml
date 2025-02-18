@@ -1,27 +1,17 @@
-(** val coq_STR_RESOLUTE_SUCCESS : string **)
-
-val coq_STR_RESOLUTE_SUCCESS : string =
-  "RESOLUTE_POLICY_CHECK"
-
 (** val coq_STR_RESOLUTE_FORMULA : string **)
 
 val coq_STR_RESOLUTE_FORMULA : string =
   "RESOLUTE_FORMULA"
 
-(** val coq_STR_RESOLUTE : string **)
+(** val coq_STR_RESOLUTE_JUDGEMENT : string **)
 
-val coq_STR_RESOLUTE : string =
-  "RESOLUTE"
+val coq_STR_RESOLUTE_JUDGEMENT : string =
+  "RESOLUTE_JUDGEMENT"
 
-(** val r_false_name_constant : string **)
+(** val coq_STR_RESOLUTE_TERM : string **)
 
-val r_false_name_constant : string =
-  "R_False"
-
-(** val r_true_name_constant : string **)
-
-val r_true_name_constant : string =
-  "R_True"
+val coq_STR_RESOLUTE_TERM : string =
+  "RESOLUTE_TERM"
 
 (** val r_goal_name_constant : string **)
 
@@ -38,282 +28,650 @@ val r_and_name_constant : string =
 val r_or_name_constant : string =
   "R_Or"
 
-(** val r_imp_name_constant : string **)
+(** val r_goal_t_name_constant : string **)
 
-val r_imp_name_constant : string =
-  "R_Imp"
+val r_goal_t_name_constant : string =
+  "R_Goal_T"
 
-(** val coq_Resolute_to_JSON : coq_Resolute -> coq_JSON **)
+(** val r_and_t_name_constant : string **)
+
+val r_and_t_name_constant : string =
+  "R_And_T"
+
+(** val r_or_t_name_constant : string **)
+
+val r_or_t_name_constant : string =
+  "R_Or_T"
+
+(** val r_goal_j_name_constant : string **)
+
+val r_goal_j_name_constant : string =
+  "R_Goal_J"
+
+(** val r_and_j_name_constant : string **)
+
+val r_and_j_name_constant : string =
+  "R_And_J"
+
+(** val r_or_j_name_constant : string **)
+
+val r_or_j_name_constant : string =
+  "R_Or_J"
+
+(** val coq_Resolute_to_JSON : coq_Resolute_Formula -> coq_JSON **)
 
 fun coq_Resolute_to_JSON t = case t of
-  R_False => constructor_to_JSON coq_STR_RESOLUTE r_false_name_constant []
-| R_True => constructor_to_JSON coq_STR_RESOLUTE r_true_name_constant []
-| R_Goal tid =>
-  constructor_to_JSON coq_STR_RESOLUTE r_goal_name_constant ((JSON_String
+  R_Goal tid args =>
+  constructor_to_JSON coq_STR_RESOLUTE_FORMULA r_goal_name_constant
+    ((JSON_String
     (let val Build_Stringifiable to_string _ = coq_Stringifiable_ID_Type in
-     to_string tid end)) :: [])
+     to_string tid end)) :: ((let val Build_Jsonifiable to_JSON _ =
+                                coq_Jsonifiable_ASP_ARGS
+                              in
+                              to_JSON args end) :: []))
 | R_And t1 t2 =>
-  constructor_to_JSON coq_STR_RESOLUTE r_and_name_constant
+  constructor_to_JSON coq_STR_RESOLUTE_FORMULA r_and_name_constant
     ((coq_Resolute_to_JSON t1) :: ((coq_Resolute_to_JSON t2) :: []))
 | R_Or t1 t2 =>
-  constructor_to_JSON coq_STR_RESOLUTE r_or_name_constant
-    ((coq_Resolute_to_JSON t1) :: ((coq_Resolute_to_JSON t2) :: []))
-| R_Imp t1 t2 =>
-  constructor_to_JSON coq_STR_RESOLUTE r_imp_name_constant
+  constructor_to_JSON coq_STR_RESOLUTE_FORMULA r_or_name_constant
     ((coq_Resolute_to_JSON t1) :: ((coq_Resolute_to_JSON t2) :: []))
 
 (** val coq_Resolute_from_JSON :
-    coq_JSON -> (coq_Resolute, string) coq_ResultT **)
+    coq_JSON -> (coq_Resolute_Formula, string) coq_ResultT **)
 
 fun coq_Resolute_from_JSON js =
   let val type_str =
-    String.^ coq_STR_RESOLUTE (String.^ type_sep type_string_constant)
+    String.^ coq_STR_RESOLUTE_FORMULA (String.^ type_sep type_string_constant)
   in
   let val body_str =
-    String.^ coq_STR_RESOLUTE (String.^ type_sep body_string_constant)
+    String.^ coq_STR_RESOLUTE_FORMULA (String.^ type_sep body_string_constant)
   in
   (case coq_JSON_get_Object type_str js of
      Coq_errC e => Coq_errC e
    | Coq_resultC j =>
      (case j of
         JSON_String cons_name =>
-        (case eqb coq_Eq_Class_ID_Type cons_name r_false_name_constant of
-           True => Coq_resultC R_False
-         | False =>
-           (case eqb coq_Eq_Class_ID_Type cons_name r_true_name_constant of
-              True => Coq_resultC R_True
-            | False =>
-              (case eqb coq_Eq_Class_ID_Type cons_name r_goal_name_constant of
-                 True =>
-                 (case coq_JSON_get_Object body_str js of
-                    Coq_errC _ =>
+        (case eqb coq_Eq_Class_ID_Type cons_name r_goal_name_constant of
+           True =>
+           (case coq_JSON_get_Object body_str js of
+              Coq_errC _ =>
+              Coq_errC err_str_json_parsing_failure_wrong_number_args
+            | Coq_resultC j0 =>
+              (case j0 of
+                 JSON_Array l =>
+                 (case l of
+                    [] =>
                     Coq_errC err_str_json_parsing_failure_wrong_number_args
-                  | Coq_resultC j0 =>
-                    (case j0 of
+                  | j1 :: l0 =>
+                    (case j1 of
                        JSON_String n_js =>
-                       res_bind
-                         (let val Build_Stringifiable _ from_string =
-                            coq_Stringifiable_ID_Type
-                          in
-                          from_string n_js end) (fn n => Coq_resultC (R_Goal
-                         n))
-                     | _ =>
-                       Coq_errC err_str_json_parsing_failure_wrong_number_args))
-               | False =>
-                 (case eqb coq_Eq_Class_ID_Type cons_name r_and_name_constant of
-                    True =>
-                    (case js of
-                       JSON_Object m =>
-                       (case m of
+                       (case l0 of
                           [] =>
                           Coq_errC
                             err_str_json_parsing_failure_wrong_number_args
-                        | _ :: l =>
-                          (case l of
+                        | args_js :: l1 =>
+                          (case l1 of
                              [] =>
+                             res_bind
+                               (let val Build_Stringifiable _ from_string =
+                                  coq_Stringifiable_ID_Type
+                                in
+                                from_string n_js end) (fn n =>
+                               res_bind
+                                 (let val Build_Jsonifiable _ from_JSON =
+                                    coq_Jsonifiable_ASP_ARGS
+                                  in
+                                  from_JSON args_js end) (fn args =>
+                                 Coq_resultC (R_Goal n args)))
+                           | _ :: _ =>
                              Coq_errC
-                               err_str_json_parsing_failure_wrong_number_args
-                           | p0 :: l0 =>
-                             let val (_, j0) = p0 in
-                             (case j0 of
-                                JSON_Array l1 =>
-                                (case l1 of
-                                   [] =>
-                                   Coq_errC
-                                     err_str_json_parsing_failure_wrong_number_args
-                                 | term1 :: l2 =>
-                                   (case l2 of
-                                      [] =>
-                                      Coq_errC
-                                        err_str_json_parsing_failure_wrong_number_args
-                                    | term2 :: l3 =>
-                                      (case l3 of
-                                         [] =>
-                                         (case l0 of
-                                            [] =>
-                                            res_bind
-                                              (coq_Resolute_from_JSON term1)
-                                              (fn term1_val =>
-                                              res_bind
-                                                (coq_Resolute_from_JSON term2)
-                                                (fn term2_val => Coq_resultC
-                                                (R_And term1_val term2_val)))
-                                          | _ :: _ =>
-                                            Coq_errC
-                                              err_str_json_parsing_failure_wrong_number_args)
-                                       | _ :: _ =>
-                                         Coq_errC
-                                           err_str_json_parsing_failure_wrong_number_args)))
-                              | _ =>
-                                Coq_errC
-                                  err_str_json_parsing_failure_wrong_number_args) end))
+                               err_str_json_parsing_failure_wrong_number_args))
                      | _ =>
-                       Coq_errC err_str_json_parsing_failure_wrong_number_args)
-                  | False =>
-                    (case eqb coq_Eq_Class_ID_Type cons_name
-                            r_or_name_constant of
-                       True =>
-                       (case js of
-                          JSON_Object m =>
-                          (case m of
+                       Coq_errC err_str_json_parsing_failure_wrong_number_args))
+               | _ => Coq_errC err_str_json_parsing_failure_wrong_number_args))
+         | False =>
+           (case eqb coq_Eq_Class_ID_Type cons_name r_and_name_constant of
+              True =>
+              (case js of
+                 JSON_Object m =>
+                 (case m of
+                    [] =>
+                    Coq_errC err_str_json_parsing_failure_wrong_number_args
+                  | _ :: l =>
+                    (case l of
+                       [] =>
+                       Coq_errC err_str_json_parsing_failure_wrong_number_args
+                     | p0 :: l0 =>
+                       let val (_, j0) = p0 in
+                       (case j0 of
+                          JSON_Array l1 =>
+                          (case l1 of
                              [] =>
                              Coq_errC
                                err_str_json_parsing_failure_wrong_number_args
-                           | _ :: l =>
-                             (case l of
+                           | term1 :: l2 =>
+                             (case l2 of
                                 [] =>
                                 Coq_errC
                                   err_str_json_parsing_failure_wrong_number_args
-                              | p0 :: l0 =>
-                                let val (_, j0) = p0 in
-                                (case j0 of
-                                   JSON_Array l1 =>
-                                   (case l1 of
+                              | term2 :: l3 =>
+                                (case l3 of
+                                   [] =>
+                                   (case l0 of
                                       [] =>
+                                      res_bind (coq_Resolute_from_JSON term1)
+                                        (fn term1_val =>
+                                        res_bind
+                                          (coq_Resolute_from_JSON term2)
+                                          (fn term2_val => Coq_resultC (R_And
+                                          term1_val term2_val)))
+                                    | _ :: _ =>
                                       Coq_errC
-                                        err_str_json_parsing_failure_wrong_number_args
-                                    | term1 :: l2 =>
-                                      (case l2 of
-                                         [] =>
-                                         Coq_errC
-                                           err_str_json_parsing_failure_wrong_number_args
-                                       | term2 :: l3 =>
-                                         (case l3 of
-                                            [] =>
-                                            (case l0 of
-                                               [] =>
-                                               res_bind
-                                                 (coq_Resolute_from_JSON
-                                                   term1) (fn term1_val =>
-                                                 res_bind
-                                                   (coq_Resolute_from_JSON
-                                                     term2) (fn term2_val =>
-                                                   Coq_resultC (R_Or
-                                                   term1_val term2_val)))
-                                             | _ :: _ =>
-                                               Coq_errC
-                                                 err_str_json_parsing_failure_wrong_number_args)
-                                          | _ :: _ =>
-                                            Coq_errC
-                                              err_str_json_parsing_failure_wrong_number_args)))
-                                 | _ =>
+                                        err_str_json_parsing_failure_wrong_number_args)
+                                 | _ :: _ =>
                                    Coq_errC
-                                     err_str_json_parsing_failure_wrong_number_args) end))
+                                     err_str_json_parsing_failure_wrong_number_args)))
                         | _ =>
                           Coq_errC
-                            err_str_json_parsing_failure_wrong_number_args)
-                     | False =>
-                       (case eqb coq_Eq_Class_ID_Type cons_name
-                               r_imp_name_constant of
-                          True =>
-                          (case js of
-                             JSON_Object m =>
-                             (case m of
+                            err_str_json_parsing_failure_wrong_number_args) end))
+               | _ => Coq_errC err_str_json_parsing_failure_wrong_number_args)
+            | False =>
+              (case eqb coq_Eq_Class_ID_Type cons_name r_or_name_constant of
+                 True =>
+                 (case js of
+                    JSON_Object m =>
+                    (case m of
+                       [] =>
+                       Coq_errC err_str_json_parsing_failure_wrong_number_args
+                     | _ :: l =>
+                       (case l of
+                          [] =>
+                          Coq_errC
+                            err_str_json_parsing_failure_wrong_number_args
+                        | p0 :: l0 =>
+                          let val (_, j0) = p0 in
+                          (case j0 of
+                             JSON_Array l1 =>
+                             (case l1 of
                                 [] =>
                                 Coq_errC
                                   err_str_json_parsing_failure_wrong_number_args
-                              | _ :: l =>
-                                (case l of
+                              | term1 :: l2 =>
+                                (case l2 of
                                    [] =>
                                    Coq_errC
                                      err_str_json_parsing_failure_wrong_number_args
-                                 | p0 :: l0 =>
-                                   let val (_, j0) = p0 in
-                                   (case j0 of
-                                      JSON_Array l1 =>
-                                      (case l1 of
+                                 | term2 :: l3 =>
+                                   (case l3 of
+                                      [] =>
+                                      (case l0 of
                                          [] =>
+                                         res_bind
+                                           (coq_Resolute_from_JSON term1)
+                                           (fn term1_val =>
+                                           res_bind
+                                             (coq_Resolute_from_JSON term2)
+                                             (fn term2_val => Coq_resultC
+                                             (R_Or term1_val term2_val)))
+                                       | _ :: _ =>
                                          Coq_errC
-                                           err_str_json_parsing_failure_wrong_number_args
-                                       | term1 :: l2 =>
-                                         (case l2 of
-                                            [] =>
-                                            Coq_errC
-                                              err_str_json_parsing_failure_wrong_number_args
-                                          | term2 :: l3 =>
-                                            (case l3 of
-                                               [] =>
-                                               (case l0 of
-                                                  [] =>
-                                                  res_bind
-                                                    (coq_Resolute_from_JSON
-                                                      term1) (fn term1_val =>
-                                                    res_bind
-                                                      (coq_Resolute_from_JSON
-                                                        term2)
-                                                      (fn term2_val =>
-                                                      Coq_resultC (R_Imp
-                                                      term1_val term2_val)))
-                                                | _ :: _ =>
-                                                  Coq_errC
-                                                    err_str_json_parsing_failure_wrong_number_args)
-                                             | _ :: _ =>
-                                               Coq_errC
-                                                 err_str_json_parsing_failure_wrong_number_args)))
-                                    | _ =>
+                                           err_str_json_parsing_failure_wrong_number_args)
+                                    | _ :: _ =>
                                       Coq_errC
-                                        err_str_json_parsing_failure_wrong_number_args) end))
+                                        err_str_json_parsing_failure_wrong_number_args)))
                            | _ =>
                              Coq_errC
-                               err_str_json_parsing_failure_wrong_number_args)
-                        | False =>
-                          Coq_errC err_str_json_invalid_constructor_name))))))
+                               err_str_json_parsing_failure_wrong_number_args) end))
+                  | _ =>
+                    Coq_errC err_str_json_parsing_failure_wrong_number_args)
+               | False => Coq_errC err_str_json_invalid_constructor_name)))
       | _ => Coq_errC err_str_json_invalid_constructor_name)) end end
 
-(** val coq_Jsonifiable_Resolute : coq_Resolute coq_Jsonifiable **)
+(** val coq_Resolute_Term_to_JSON :
+    coq_Term coq_Jsonifiable -> coq_Resolute_Term -> coq_JSON **)
 
-val coq_Jsonifiable_Resolute : coq_Resolute coq_Jsonifiable =
+fun coq_Resolute_Term_to_JSON h t = case t of
+  R_Goal_T tid args t0 =>
+  constructor_to_JSON coq_STR_RESOLUTE_TERM r_goal_t_name_constant
+    ((JSON_String
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_ID_Type in
+     to_string tid end)) :: ((let val Build_Jsonifiable to_JSON _ =
+                                coq_Jsonifiable_ASP_ARGS
+                              in
+                              to_JSON args end) :: ((let val Build_Jsonifiable to_JSON
+                                                       _ = h
+                                                     in
+                                                     to_JSON t0 end) :: [])))
+| R_And_T t1 t2 =>
+  constructor_to_JSON coq_STR_RESOLUTE_TERM r_and_t_name_constant
+    ((coq_Resolute_Term_to_JSON h t1) :: ((coq_Resolute_Term_to_JSON h t2) :: []))
+| R_Or_T t1 t2 =>
+  constructor_to_JSON coq_STR_RESOLUTE_TERM r_or_t_name_constant
+    ((coq_Resolute_Term_to_JSON h t1) :: ((coq_Resolute_Term_to_JSON h t2) :: []))
+
+(** val coq_Resolute_Term_from_JSON :
+    coq_Term coq_Jsonifiable -> coq_JSON -> (coq_Resolute_Term, string)
+    coq_ResultT **)
+
+fun coq_Resolute_Term_from_JSON h js =
+  let val type_str =
+    String.^ coq_STR_RESOLUTE_TERM (String.^ type_sep type_string_constant)
+  in
+  let val body_str =
+    String.^ coq_STR_RESOLUTE_TERM (String.^ type_sep body_string_constant)
+  in
+  (case coq_JSON_get_Object type_str js of
+     Coq_errC e => Coq_errC e
+   | Coq_resultC j =>
+     (case j of
+        JSON_String cons_name =>
+        (case eqb coq_Eq_Class_ID_Type cons_name r_goal_t_name_constant of
+           True =>
+           (case coq_JSON_get_Object body_str js of
+              Coq_errC _ =>
+              Coq_errC err_str_json_parsing_failure_wrong_number_args
+            | Coq_resultC j0 =>
+              (case j0 of
+                 JSON_Array l =>
+                 (case l of
+                    [] =>
+                    Coq_errC err_str_json_parsing_failure_wrong_number_args
+                  | j1 :: l0 =>
+                    (case j1 of
+                       JSON_String n_js =>
+                       (case l0 of
+                          [] =>
+                          Coq_errC
+                            err_str_json_parsing_failure_wrong_number_args
+                        | args_js :: l1 =>
+                          (case l1 of
+                             [] =>
+                             Coq_errC
+                               err_str_json_parsing_failure_wrong_number_args
+                           | t_js :: l2 =>
+                             (case l2 of
+                                [] =>
+                                res_bind
+                                  (let val Build_Stringifiable _
+                                     from_string = coq_Stringifiable_ID_Type
+                                   in
+                                   from_string n_js end) (fn n =>
+                                  res_bind
+                                    (let val Build_Jsonifiable _ from_JSON =
+                                       coq_Jsonifiable_ASP_ARGS
+                                     in
+                                     from_JSON args_js end) (fn args =>
+                                    res_bind
+                                      (let val Build_Jsonifiable _
+                                         from_JSON = h
+                                       in
+                                       from_JSON t_js end) (fn t =>
+                                      Coq_resultC (R_Goal_T n args t))))
+                              | _ :: _ =>
+                                Coq_errC
+                                  err_str_json_parsing_failure_wrong_number_args)))
+                     | _ =>
+                       Coq_errC err_str_json_parsing_failure_wrong_number_args))
+               | _ => Coq_errC err_str_json_parsing_failure_wrong_number_args))
+         | False =>
+           (case eqb coq_Eq_Class_ID_Type cons_name r_and_t_name_constant of
+              True =>
+              (case js of
+                 JSON_Object m =>
+                 (case m of
+                    [] =>
+                    Coq_errC err_str_json_parsing_failure_wrong_number_args
+                  | _ :: l =>
+                    (case l of
+                       [] =>
+                       Coq_errC err_str_json_parsing_failure_wrong_number_args
+                     | p0 :: l0 =>
+                       let val (_, j0) = p0 in
+                       (case j0 of
+                          JSON_Array l1 =>
+                          (case l1 of
+                             [] =>
+                             Coq_errC
+                               err_str_json_parsing_failure_wrong_number_args
+                           | term1 :: l2 =>
+                             (case l2 of
+                                [] =>
+                                Coq_errC
+                                  err_str_json_parsing_failure_wrong_number_args
+                              | term2 :: l3 =>
+                                (case l3 of
+                                   [] =>
+                                   (case l0 of
+                                      [] =>
+                                      res_bind
+                                        (coq_Resolute_Term_from_JSON h term1)
+                                        (fn term1_val =>
+                                        res_bind
+                                          (coq_Resolute_Term_from_JSON h
+                                            term2) (fn term2_val =>
+                                          Coq_resultC (R_And_T term1_val
+                                          term2_val)))
+                                    | _ :: _ =>
+                                      Coq_errC
+                                        err_str_json_parsing_failure_wrong_number_args)
+                                 | _ :: _ =>
+                                   Coq_errC
+                                     err_str_json_parsing_failure_wrong_number_args)))
+                        | _ =>
+                          Coq_errC
+                            err_str_json_parsing_failure_wrong_number_args) end))
+               | _ => Coq_errC err_str_json_parsing_failure_wrong_number_args)
+            | False =>
+              (case eqb coq_Eq_Class_ID_Type cons_name r_or_t_name_constant of
+                 True =>
+                 (case js of
+                    JSON_Object m =>
+                    (case m of
+                       [] =>
+                       Coq_errC err_str_json_parsing_failure_wrong_number_args
+                     | _ :: l =>
+                       (case l of
+                          [] =>
+                          Coq_errC
+                            err_str_json_parsing_failure_wrong_number_args
+                        | p0 :: l0 =>
+                          let val (_, j0) = p0 in
+                          (case j0 of
+                             JSON_Array l1 =>
+                             (case l1 of
+                                [] =>
+                                Coq_errC
+                                  err_str_json_parsing_failure_wrong_number_args
+                              | term1 :: l2 =>
+                                (case l2 of
+                                   [] =>
+                                   Coq_errC
+                                     err_str_json_parsing_failure_wrong_number_args
+                                 | term2 :: l3 =>
+                                   (case l3 of
+                                      [] =>
+                                      (case l0 of
+                                         [] =>
+                                         res_bind
+                                           (coq_Resolute_Term_from_JSON h
+                                             term1) (fn term1_val =>
+                                           res_bind
+                                             (coq_Resolute_Term_from_JSON h
+                                               term2) (fn term2_val =>
+                                             Coq_resultC (R_Or_T term1_val
+                                             term2_val)))
+                                       | _ :: _ =>
+                                         Coq_errC
+                                           err_str_json_parsing_failure_wrong_number_args)
+                                    | _ :: _ =>
+                                      Coq_errC
+                                        err_str_json_parsing_failure_wrong_number_args)))
+                           | _ =>
+                             Coq_errC
+                               err_str_json_parsing_failure_wrong_number_args) end))
+                  | _ =>
+                    Coq_errC err_str_json_parsing_failure_wrong_number_args)
+               | False => Coq_errC err_str_json_invalid_constructor_name)))
+      | _ => Coq_errC err_str_json_invalid_constructor_name)) end end
+
+(** val coq_Resolute_Judgement_to_JSON :
+    bool coq_Jsonifiable -> coq_Resolute_Judgement -> coq_JSON **)
+
+fun coq_Resolute_Judgement_to_JSON h t = case t of
+  R_Goal_J tid args e =>
+  constructor_to_JSON coq_STR_RESOLUTE_JUDGEMENT r_goal_j_name_constant
+    ((JSON_String
+    (let val Build_Stringifiable to_string _ = coq_Stringifiable_ID_Type in
+     to_string tid end)) :: ((let val Build_Jsonifiable to_JSON _ =
+                                coq_Jsonifiable_ASP_ARGS
+                              in
+                              to_JSON args end) :: ((let val Build_Jsonifiable to_JSON
+                                                       _ = h
+                                                     in
+                                                     to_JSON e end) :: [])))
+| R_And_J t1 t2 =>
+  constructor_to_JSON coq_STR_RESOLUTE_JUDGEMENT r_and_j_name_constant
+    ((coq_Resolute_Judgement_to_JSON h t1) :: ((coq_Resolute_Judgement_to_JSON
+                                                 h t2) :: []))
+| R_Or_J t1 t2 =>
+  constructor_to_JSON coq_STR_RESOLUTE_JUDGEMENT r_or_j_name_constant
+    ((coq_Resolute_Judgement_to_JSON h t1) :: ((coq_Resolute_Judgement_to_JSON
+                                                 h t2) :: []))
+
+(** val coq_Resolute_Judgement_from_JSON :
+    bool coq_Jsonifiable -> coq_JSON -> (coq_Resolute_Judgement, string)
+    coq_ResultT **)
+
+fun coq_Resolute_Judgement_from_JSON h js =
+  let val type_str =
+    String.^ coq_STR_RESOLUTE_JUDGEMENT
+      (String.^ type_sep type_string_constant)
+  in
+  let val body_str =
+    String.^ coq_STR_RESOLUTE_JUDGEMENT
+      (String.^ type_sep body_string_constant)
+  in
+  (case coq_JSON_get_Object type_str js of
+     Coq_errC e => Coq_errC e
+   | Coq_resultC j =>
+     (case j of
+        JSON_String cons_name =>
+        (case eqb coq_Eq_Class_ID_Type cons_name r_goal_j_name_constant of
+           True =>
+           (case coq_JSON_get_Object body_str js of
+              Coq_errC _ =>
+              Coq_errC err_str_json_parsing_failure_wrong_number_args
+            | Coq_resultC j0 =>
+              (case j0 of
+                 JSON_Array l =>
+                 (case l of
+                    [] =>
+                    Coq_errC err_str_json_parsing_failure_wrong_number_args
+                  | j1 :: l0 =>
+                    (case j1 of
+                       JSON_String n_js =>
+                       (case l0 of
+                          [] =>
+                          Coq_errC
+                            err_str_json_parsing_failure_wrong_number_args
+                        | args_js :: l1 =>
+                          (case l1 of
+                             [] =>
+                             Coq_errC
+                               err_str_json_parsing_failure_wrong_number_args
+                           | jt_js :: l2 =>
+                             (case l2 of
+                                [] =>
+                                res_bind
+                                  (let val Build_Stringifiable _
+                                     from_string = coq_Stringifiable_ID_Type
+                                   in
+                                   from_string n_js end) (fn n =>
+                                  res_bind
+                                    (let val Build_Jsonifiable _ from_JSON =
+                                       coq_Jsonifiable_ASP_ARGS
+                                     in
+                                     from_JSON args_js end) (fn args =>
+                                    res_bind
+                                      (let val Build_Jsonifiable _
+                                         from_JSON = h
+                                       in
+                                       from_JSON jt_js end) (fn jt =>
+                                      Coq_resultC (R_Goal_J n args jt))))
+                              | _ :: _ =>
+                                Coq_errC
+                                  err_str_json_parsing_failure_wrong_number_args)))
+                     | _ =>
+                       Coq_errC err_str_json_parsing_failure_wrong_number_args))
+               | _ => Coq_errC err_str_json_parsing_failure_wrong_number_args))
+         | False =>
+           (case eqb coq_Eq_Class_ID_Type cons_name r_and_j_name_constant of
+              True =>
+              (case js of
+                 JSON_Object m =>
+                 (case m of
+                    [] =>
+                    Coq_errC err_str_json_parsing_failure_wrong_number_args
+                  | _ :: l =>
+                    (case l of
+                       [] =>
+                       Coq_errC err_str_json_parsing_failure_wrong_number_args
+                     | p0 :: l0 =>
+                       let val (_, j0) = p0 in
+                       (case j0 of
+                          JSON_Array l1 =>
+                          (case l1 of
+                             [] =>
+                             Coq_errC
+                               err_str_json_parsing_failure_wrong_number_args
+                           | term1 :: l2 =>
+                             (case l2 of
+                                [] =>
+                                Coq_errC
+                                  err_str_json_parsing_failure_wrong_number_args
+                              | term2 :: l3 =>
+                                (case l3 of
+                                   [] =>
+                                   (case l0 of
+                                      [] =>
+                                      res_bind
+                                        (coq_Resolute_Judgement_from_JSON h
+                                          term1) (fn term1_val =>
+                                        res_bind
+                                          (coq_Resolute_Judgement_from_JSON h
+                                            term2) (fn term2_val =>
+                                          Coq_resultC (R_And_J term1_val
+                                          term2_val)))
+                                    | _ :: _ =>
+                                      Coq_errC
+                                        err_str_json_parsing_failure_wrong_number_args)
+                                 | _ :: _ =>
+                                   Coq_errC
+                                     err_str_json_parsing_failure_wrong_number_args)))
+                        | _ =>
+                          Coq_errC
+                            err_str_json_parsing_failure_wrong_number_args) end))
+               | _ => Coq_errC err_str_json_parsing_failure_wrong_number_args)
+            | False =>
+              (case eqb coq_Eq_Class_ID_Type cons_name r_or_j_name_constant of
+                 True =>
+                 (case js of
+                    JSON_Object m =>
+                    (case m of
+                       [] =>
+                       Coq_errC err_str_json_parsing_failure_wrong_number_args
+                     | _ :: l =>
+                       (case l of
+                          [] =>
+                          Coq_errC
+                            err_str_json_parsing_failure_wrong_number_args
+                        | p0 :: l0 =>
+                          let val (_, j0) = p0 in
+                          (case j0 of
+                             JSON_Array l1 =>
+                             (case l1 of
+                                [] =>
+                                Coq_errC
+                                  err_str_json_parsing_failure_wrong_number_args
+                              | term1 :: l2 =>
+                                (case l2 of
+                                   [] =>
+                                   Coq_errC
+                                     err_str_json_parsing_failure_wrong_number_args
+                                 | term2 :: l3 =>
+                                   (case l3 of
+                                      [] =>
+                                      (case l0 of
+                                         [] =>
+                                         res_bind
+                                           (coq_Resolute_Judgement_from_JSON
+                                             h term1) (fn term1_val =>
+                                           res_bind
+                                             (coq_Resolute_Judgement_from_JSON
+                                               h term2) (fn term2_val =>
+                                             Coq_resultC (R_Or_J term1_val
+                                             term2_val)))
+                                       | _ :: _ =>
+                                         Coq_errC
+                                           err_str_json_parsing_failure_wrong_number_args)
+                                    | _ :: _ =>
+                                      Coq_errC
+                                        err_str_json_parsing_failure_wrong_number_args)))
+                           | _ =>
+                             Coq_errC
+                               err_str_json_parsing_failure_wrong_number_args) end))
+                  | _ =>
+                    Coq_errC err_str_json_parsing_failure_wrong_number_args)
+               | False => Coq_errC err_str_json_invalid_constructor_name)))
+      | _ => Coq_errC err_str_json_invalid_constructor_name)) end end
+
+(** val coq_Jsonifiable_Resolute : coq_Resolute_Formula coq_Jsonifiable **)
+
+val coq_Jsonifiable_Resolute : coq_Resolute_Formula coq_Jsonifiable =
   Build_Jsonifiable coq_Resolute_to_JSON coq_Resolute_from_JSON
 
-(** val coq_ResoluteResponse_to_JSON :
-    coq_Term coq_Jsonifiable -> coq_Resolute coq_Jsonifiable ->
-    coq_ResoluteResponse -> coq_JSON **)
+(** val coq_Jsonifiable_Resolute_Term :
+    coq_Term coq_Jsonifiable -> coq_Resolute_Term coq_Jsonifiable **)
 
-fun coq_ResoluteResponse_to_JSON h h0 resp =
-  JSON_Object ((coq_STR_RESOLUTE_SUCCESS, (JSON_Boolean
-    (let val Coq_mkResoluteResp resoluteresp_success _ _ = resp in
-     resoluteresp_success end))) :: ((coq_STR_RESOLUTE_FORMULA,
+fun coq_Jsonifiable_Resolute_Term h =
+  Build_Jsonifiable (coq_Resolute_Term_to_JSON h)
+    (coq_Resolute_Term_from_JSON h)
+
+(** val coq_Jsonifiable_Resolute_Judgement :
+    bool coq_Jsonifiable -> coq_Resolute_Judgement coq_Jsonifiable **)
+
+fun coq_Jsonifiable_Resolute_Judgement h =
+  Build_Jsonifiable (coq_Resolute_Judgement_to_JSON h)
+    (coq_Resolute_Judgement_from_JSON h)
+
+(** val coq_ResoluteResponse_to_JSON :
+    coq_Resolute_Term coq_Jsonifiable -> coq_Resolute_Formula coq_Jsonifiable
+    -> coq_Resolute_Judgement coq_Jsonifiable -> coq_ResoluteResponse ->
+    coq_JSON **)
+
+fun coq_ResoluteResponse_to_JSON h h0 h1 resp =
+  JSON_Object ((coq_STR_RESOLUTE_JUDGEMENT,
+    (let val Build_Jsonifiable to_JSON _ = h1 in
+     to_JSON
+       (let val Coq_mkResoluteResp resoluteresp_judgement _ _ = resp in
+        resoluteresp_judgement end) end)) :: ((coq_STR_RESOLUTE_FORMULA,
     (let val Build_Jsonifiable to_JSON _ = h0 in
      to_JSON
        (let val Coq_mkResoluteResp _ resoluteresp_formula _ = resp in
-        resoluteresp_formula end) end)) :: ((coq_STR_TERM,
+        resoluteresp_formula end) end)) :: ((coq_STR_RESOLUTE_TERM,
     (let val Build_Jsonifiable to_JSON _ = h in
      to_JSON
        (let val Coq_mkResoluteResp _ _ resoluteresp_term = resp in
         resoluteresp_term end) end)) :: [])))
 
 (** val coq_ResoluteResponse_from_JSON :
-    coq_Term coq_Jsonifiable -> coq_Resolute coq_Jsonifiable -> coq_JSON ->
+    coq_Resolute_Term coq_Jsonifiable -> coq_Resolute_Formula coq_Jsonifiable
+    -> coq_Resolute_Judgement coq_Jsonifiable -> coq_JSON ->
     (coq_ResoluteResponse, string) coq_ResultT **)
 
-fun coq_ResoluteResponse_from_JSON h h0 resp =
-  res_bind (coq_JSON_get_bool coq_STR_RESOLUTE_SUCCESS resp)
+fun coq_ResoluteResponse_from_JSON h h0 h1 resp =
+  res_bind (coq_JSON_get_Object coq_STR_RESOLUTE_JUDGEMENT resp)
     (fn temp_success =>
     res_bind (coq_JSON_get_Object coq_STR_RESOLUTE_FORMULA resp)
       (fn temp_formula =>
-      res_bind (coq_JSON_get_Object coq_STR_TERM resp) (fn temp_term =>
+      res_bind (coq_JSON_get_Object coq_STR_RESOLUTE_TERM resp)
+        (fn temp_term =>
         res_bind
-          (let val Build_Jsonifiable _ from_JSON = h0 in
-           from_JSON temp_formula end) (fn formula =>
+          (let val Build_Jsonifiable _ from_JSON = h1 in
+           from_JSON temp_success end) (fn judgement =>
           res_bind
-            (let val Build_Jsonifiable _ from_JSON = h in
-             from_JSON temp_term end) (fn term => Coq_resultC
-            (Coq_mkResoluteResp temp_success formula term))))))
+            (let val Build_Jsonifiable _ from_JSON = h0 in
+             from_JSON temp_formula end) (fn formula =>
+            res_bind
+              (let val Build_Jsonifiable _ from_JSON = h in
+               from_JSON temp_term end) (fn term => Coq_resultC
+              (Coq_mkResoluteResp judgement formula term)))))))
 
 (** val coq_Jsonifiable_ResoluteResponse :
-    coq_Term coq_Jsonifiable -> coq_Resolute coq_Jsonifiable ->
+    coq_Resolute_Judgement coq_Jsonifiable -> coq_Resolute_Term
+    coq_Jsonifiable -> coq_Resolute_Formula coq_Jsonifiable ->
     coq_ResoluteResponse coq_Jsonifiable **)
 
-fun coq_Jsonifiable_ResoluteResponse h h0 =
-  Build_Jsonifiable (coq_ResoluteResponse_to_JSON h h0)
-    (coq_ResoluteResponse_from_JSON h h0)
-
-(** val test_resolute_resp_compute_json : coq_ResoluteResponse -> coq_JSON **)
-
-fun test_resolute_resp_compute_json x =
-  let val Build_Jsonifiable to_JSON _ =
-    coq_Jsonifiable_ResoluteResponse
-      (coq_Jsonifiable_Term (coq_Jsonifiable_ASP coq_Jsonifiable_ASP_ARGS)
-        coq_Jsonifiable_Split) coq_Jsonifiable_Resolute
-  in
-  to_JSON x end
+fun coq_Jsonifiable_ResoluteResponse h h0 h1 =
+  Build_Jsonifiable (coq_ResoluteResponse_to_JSON h0 h1 h)
+    (coq_ResoluteResponse_from_JSON h0 h1 h)

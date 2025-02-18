@@ -71,21 +71,38 @@ fun am_client_app_summary att_sess req_plc e t toPlc =
     res_bind (eval glob_ctx toPlc et t) (fn et' =>
       do_AppraisalSummary et' rawev glob_ctx example_RawEvJudgement) end end
 
+(** val run_resolute_term :
+    coq_Resolute_Term -> coq_Attestation_Session -> coq_Plc -> coq_Plc ->
+    (coq_Resolute_Evidence, string) coq_ResultT **)
+
+fun run_resolute_term rt att_sess req_plc toPlc =
+  case rt of
+    R_Goal_T tid args t =>
+    let val appr_t = Coq_lseq t (Coq_asp APPR) in
+    res_bind (am_sendReq att_sess req_plc mt_evc appr_t toPlc) (fn rawev =>
+      res_bind
+        (eval
+          (let val Coq_mkAtt_Sess _ _ _ ats_context = att_sess in
+           ats_context end) toPlc Coq_mt_evt appr_t) (fn et' => Coq_resultC
+        (R_Goal_E tid args (Coq_evc rawev et')))) end
+  | R_And_T t1 t2 =>
+    res_bind (run_resolute_term t1 att_sess req_plc toPlc) (fn e1 =>
+      res_bind (run_resolute_term t2 att_sess req_plc toPlc) (fn e2 =>
+        Coq_resultC (R_And_E e1 e2)))
+  | R_Or_T t1 t2 =>
+    res_bind (run_resolute_term t1 att_sess req_plc toPlc) (fn e1 =>
+      res_bind (run_resolute_term t2 att_sess req_plc toPlc) (fn e2 =>
+        Coq_resultC (R_Or_E e1 e2)))
+
 (** val am_client_do_res :
     coq_Attestation_Session -> coq_Plc -> coq_Plc -> coq_Model ->
-    coq_Resolute -> (coq_TargetT, coq_Evidence) coq_Map ->
-    (coq_ResoluteResponse, string) coq_ResultT **)
+    coq_Resolute_Formula -> (coq_ResoluteResponse, string) coq_ResultT **)
 
-fun am_client_do_res att_sess req_plc toPlc m r m0 =
-  let val (t, pol) = res_to_copland m r m0 in
-  let val appr_t = Coq_lseq t (Coq_asp APPR) in
-  res_bind (am_sendReq att_sess req_plc mt_evc appr_t toPlc) (fn rawev =>
-    let val glob_ctx =
-      let val Coq_mkAtt_Sess _ _ _ ats_context = att_sess in ats_context end
-    in
-    res_bind (eval glob_ctx toPlc Coq_mt_evt appr_t) (fn et' =>
-      let val b = pol (Coq_evc rawev et') in
-      Coq_resultC (Coq_mkResoluteResp b r t) end) end) end end
+fun am_client_do_res att_sess req_plc toPlc m r =
+  let val (rt, pol) = res_to_copland m r in
+  res_bind (run_resolute_term rt att_sess req_plc toPlc) (fn resolute_ev =>
+    let val resolute_judgement = pol resolute_ev in
+    Coq_resultC (Coq_mkResoluteResp resolute_judgement r rt) end) end
 
 (** val micro_res_asp_type_env : coq_ASP_Type_Env **)
 
@@ -135,9 +152,8 @@ val micro_resolute_example_context : coq_GlobalContext =
 fun micro_resolute_model model_args =
   Build_Model (fn _ => meas_micro model_args) (fn _ => fn e =>
     micro_res_policy e micro_resolute_example_context example_RawEvJudgement)
-    micro_resolute_example_context
 
-(** val micro_resolute_statement : coq_Resolute **)
+(** val micro_resolute_statement : coq_Resolute_Formula **)
 
-val micro_resolute_statement : coq_Resolute =
-  R_Goal micro_resolute_targ
+val micro_resolute_statement : coq_Resolute_Formula =
+  R_Goal micro_resolute_targ (JSON_Object [])

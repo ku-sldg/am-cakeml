@@ -60,3 +60,14 @@ val concrete_Jsonifiable_GlobalContext : coq_GlobalContext coq_Jsonifiable =
 
 val concrete_Jsonifiable_ASP_ARGS : coq_ASP_ARGS coq_Jsonifiable =
   coq_Jsonifiable_ASP_ARGS
+
+(** val concrete_Jsonifiable_ResoluteResponse :
+    coq_ResoluteResponse coq_Jsonifiable **)
+
+val concrete_Jsonifiable_ResoluteResponse : coq_ResoluteResponse
+                                            coq_Jsonifiable =
+  coq_Jsonifiable_ResoluteResponse
+    (coq_Jsonifiable_Resolute_Judgement jsonifiable_bool)
+    (coq_Jsonifiable_Resolute_Term
+      (coq_Jsonifiable_Term (coq_Jsonifiable_ASP coq_Jsonifiable_ASP_ARGS)
+        coq_Jsonifiable_Split)) coq_Jsonifiable_Resolute

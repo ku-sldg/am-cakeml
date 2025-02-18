@@ -89,6 +89,14 @@ fun str_pair_from_JSON h h0 js = case js of
 fun coq_Jsonifiable_str_pair h h0 =
   Build_Jsonifiable (str_pair_to_JSON h h0) (str_pair_from_JSON h h0)
 
+(** val jsonifiable_bool : bool coq_Jsonifiable **)
+
+val jsonifiable_bool : bool coq_Jsonifiable =
+  Build_Jsonifiable (fn b => JSON_Boolean b) (fn js =>
+    case js of
+      JSON_Boolean b => Coq_resultC b
+    | _ => Coq_errC (errStr_json_wrong_type "bool" js))
+
 (** val map_serial_serial_to_JSON :
     'a1 coq_Stringifiable -> 'a2 coq_Stringifiable -> 'a1 coq_EqClass ->
     ('a1, 'a2) coq_Map -> coq_JSON **)

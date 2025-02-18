@@ -101,14 +101,30 @@ fun main () =
                             att_plc 
                             (micro_resolute_model model_asp_args_val (* system_asp_args_val *) )
                             micro_resolute_statement 
-                            [] in
+                            (* (JSON_Object []) *) in
 
       (*
       (att_sess : Attestation_Session) (req_plc:Plc) 
   (toPlc:Plc) (M : Model) (r:Resolute) (m:Map TargetT Evidence)
   *)
       case maybe_resolute_resp of 
-        Coq_resultC resp => print (coq_JSON_to_string (test_resolute_resp_compute_json resp))
+        Coq_resultC resp => 
+          let val (Build_Jsonifiable to_JSON _) = concrete_Jsonifiable_ResoluteResponse
+              val coqJsonResp = to_JSON resp
+              val coqjsonRespString = coq_JSON_to_string coqJsonResp in
+            print coqjsonRespString
+          end 
+        | _ => print "Error receiving ResoluteResponse JSON in client_am"
+
+        (*
+          let val (Build_Jsonifiable _ from_JSON) = concrete_Jsonifiable_ResoluteResponse in
+                case (from_JSON resp) of 
+                  Coq_resultC respVal => 
+                      print (* (coq_JSON_to_string (respVal)) *)
+                  | _ => print "Error decoding ResoluteResponse JSON" 
+
+            end
+        *)
         
          (* ("Resolute Policy check:  " ^ (if(b) then "SUCCESS" else "FAILED"))  *)
       | Coq_errC errStr => print errStr 
