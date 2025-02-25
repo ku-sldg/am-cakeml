@@ -1,3 +1,46 @@
+
+
+fun print_list ls = 
+  case ls of 
+    [] => (print "")
+  | x :: ls' => let val _ = print x in (print_list ls') end
+
+fun stringify_one_targmap_entry (x: (string * Json.json)) = 
+  let val x' = (snd x) in
+    case x' of 
+      Json.String s => String.concat ["\t", (fst x), ": ", s, "\n"] 
+    | _ => "" 
+  end
+
+fun list_stringify_targmap (tmap:Json.json) = 
+  case tmap of 
+    Json.Object (ls: (string * Json.json) list) => (List.map stringify_one_targmap_entry ls) : string list 
+  | _ => []
+
+(* tmap :: Json.json~~(Json.Object (string * Json.json) list) -> string *)
+fun stringify_targmap (tmap:Json.json) = 
+  let val ls = list_stringify_targmap tmap in 
+    String.concat ls 
+  end
+
+fun list_stringify_appsumm (appsumm_coq_json : coq_JSON) = 
+  let val appsumm_cakeml_json = (coq_JSON_to_CakeML_JSON appsumm_coq_json : (Json.json)) in
+      (* val s =  *)
+        case appsumm_cakeml_json of 
+          Json.Object (ls : (string * Json.json) list) => (List.map (fn ((k:string), (v:Json.json)) => String.concat [k, ": ", "\n", (stringify_targmap v)]) ls) : (string list)
+        | _ => [] (* TextIO.print_err "AppraisalSummary not correct JSON type\n" *)
+  end
+
+fun print_appraisal_summary (appsumm : coq_AppraisalSummary) = 
+  let val (Build_Jsonifiable to_JSON _) = concrete_Jsonifiable_AppraisalSummary in 
+    (
+      print "\nAppraisal Summary:\n\n" ;
+      print (String.concat (list_stringify_appsumm (to_JSON appsumm)));
+      print "\n"
+    )
+  end
+
+
 (* 
 For handle_AM_request (now extracted from Coq):
 
@@ -31,7 +74,7 @@ fun main () =
                               (* example_appTerm  *)
                               att_plc in 
       case maybe_appsumm of 
-        Coq_resultC appsumm => print (coq_JSON_to_string (test_app_summary_compute_json appsumm)) 
+        Coq_resultC appsumm => print_appraisal_summary appsumm
       | Coq_errC errStr => print errStr 
     end
   end

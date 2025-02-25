@@ -1,62 +1,65 @@
 (** val certificate_style : coq_Term **)
 
 val certificate_style : coq_Term =
-  Coq_att coq_P1 (Coq_lseq (Coq_asp (ASPC (Coq_asp_paramsC attest_id []
-    coq_P1 sys_targ))) (Coq_att coq_P2 (Coq_lseq (Coq_asp (ASPC
-    (Coq_asp_paramsC appraise_id [] coq_P2 sys_targ))) (Coq_asp (ASPC
-    (Coq_asp_paramsC certificate_id [] coq_P2 sys_targ))))))
+  Coq_att coq_P1 (Coq_lseq (Coq_asp (ASPC (Coq_asp_paramsC attest_id
+    (JSON_Object []) coq_P1 sys_targ))) (Coq_att coq_P2 (Coq_lseq (Coq_asp
+    (ASPC (Coq_asp_paramsC appraise_id (JSON_Object []) coq_P2 sys_targ)))
+    (Coq_asp (ASPC (Coq_asp_paramsC certificate_id (JSON_Object []) coq_P2
+    sys_targ))))))
 
 (** val background_check : coq_Term **)
 
 val background_check : coq_Term =
-  Coq_lseq (Coq_att coq_P1 (Coq_asp (ASPC (Coq_asp_paramsC attest_id []
-    coq_P1 sys_targ)))) (Coq_att coq_P2 (Coq_asp (ASPC (Coq_asp_paramsC
-    appraise_id [] coq_P2 sys_targ))))
+  Coq_lseq (Coq_att coq_P1 (Coq_asp (ASPC (Coq_asp_paramsC attest_id
+    (JSON_Object []) coq_P1 sys_targ)))) (Coq_att coq_P2 (Coq_asp (ASPC
+    (Coq_asp_paramsC appraise_id (JSON_Object []) coq_P2 sys_targ))))
 
 (** val parallel_mutual_1 : coq_Term **)
 
 val parallel_mutual_1 : coq_Term =
-  Coq_att coq_P1 (Coq_lseq (Coq_asp (ASPC (Coq_asp_paramsC attest_id []
-    coq_P1 sys_targ))) (Coq_att coq_P2 (Coq_asp (ASPC (Coq_asp_paramsC
-    appraise_id [] coq_P2 sys_targ)))))
+  Coq_att coq_P1 (Coq_lseq (Coq_asp (ASPC (Coq_asp_paramsC attest_id
+    (JSON_Object []) coq_P1 sys_targ))) (Coq_att coq_P2 (Coq_asp (ASPC
+    (Coq_asp_paramsC appraise_id (JSON_Object []) coq_P2 sys_targ)))))
 
 (** val parallel_mutual_2 : coq_Term **)
 
 val parallel_mutual_2 : coq_Term =
-  Coq_att coq_P0 (Coq_lseq (Coq_asp (ASPC (Coq_asp_paramsC attest_id []
-    coq_P0 sys_targ))) (Coq_att coq_P2 (Coq_asp (ASPC (Coq_asp_paramsC
-    appraise_id [] coq_P2 sys_targ)))))
+  Coq_att coq_P0 (Coq_lseq (Coq_asp (ASPC (Coq_asp_paramsC attest_id
+    (JSON_Object []) coq_P0 sys_targ))) (Coq_att coq_P2 (Coq_asp (ASPC
+    (Coq_asp_paramsC appraise_id (JSON_Object []) coq_P2 sys_targ)))))
 
 (** val layered_background_check : coq_Term **)
 
 val layered_background_check : coq_Term =
   Coq_att coq_P1 (Coq_bpar (ALL, ALL) (Coq_lseq (Coq_att coq_P1 (Coq_asp
-    (ASPC (Coq_asp_paramsC attest_id [] coq_P1 sys_targ)))) (Coq_lseq
-    (Coq_asp (ASPC (Coq_asp_paramsC attest_id [] coq_P3 att_targ))) (Coq_asp
-    (ASPC (Coq_asp_paramsC attest_id [] coq_P4 att_targ))))) (Coq_bpar (ALL,
-    ALL) (Coq_att coq_P3 (Coq_asp (ASPC (Coq_asp_paramsC attest_id [] coq_P3
-    sys_targ)))) (Coq_lseq (Coq_att coq_P4 (Coq_asp (ASPC (Coq_asp_paramsC
-    attest_id [] coq_P4 sys_targ)))) (Coq_att coq_P2 (Coq_lseq (Coq_asp (ASPC
-    (Coq_asp_paramsC appraise_id [] coq_P2 it_targ))) (Coq_asp (ASPC
-    sig_params)))))))
+    (ASPC (Coq_asp_paramsC attest_id (JSON_Object []) coq_P1 sys_targ))))
+    (Coq_lseq (Coq_asp (ASPC (Coq_asp_paramsC attest_id (JSON_Object [])
+    coq_P3 att_targ))) (Coq_asp (ASPC (Coq_asp_paramsC attest_id (JSON_Object
+    []) coq_P4 att_targ))))) (Coq_bpar (ALL, ALL) (Coq_att coq_P3 (Coq_asp
+    (ASPC (Coq_asp_paramsC attest_id (JSON_Object []) coq_P3 sys_targ))))
+    (Coq_lseq (Coq_att coq_P4 (Coq_asp (ASPC (Coq_asp_paramsC attest_id
+    (JSON_Object []) coq_P4 sys_targ)))) (Coq_att coq_P2 (Coq_lseq (Coq_asp
+    (ASPC (Coq_asp_paramsC appraise_id (JSON_Object []) coq_P2 it_targ)))
+    (Coq_asp (ASPC sig_params)))))))
 
 (** val filehash_auth_phrase : coq_Term **)
 
 val filehash_auth_phrase : coq_Term =
-  Coq_att coq_P1 (Coq_lseq (Coq_asp (ASPC (Coq_asp_paramsC hashfile_id []
-    coq_P1 hashfile_targ))) (Coq_asp SIG))
+  Coq_att coq_P1 (Coq_lseq (Coq_asp (ASPC (Coq_asp_paramsC hashfile_id
+    (JSON_Object []) coq_P1 hashfile_targ))) (Coq_asp SIG))
 
 (** val split_phrase : coq_Term **)
 
 val split_phrase : coq_Term =
   Coq_att coq_P1 (Coq_bseq (ALL, ALL) (Coq_asp (ASPC (Coq_asp_paramsC
-    attest1_id [] coq_P1 sys_targ))) (Coq_asp (ASPC (Coq_asp_paramsC
-    attest2_id [] coq_P1 sys_targ))))
+    attest1_id (JSON_Object []) coq_P1 sys_targ))) (Coq_asp (ASPC
+    (Coq_asp_paramsC attest2_id (JSON_Object []) coq_P1 sys_targ))))
 
 (** val large_output_asp_test : coq_Term **)
 
 val large_output_asp_test : coq_Term =
-  Coq_asp (ASPC (Coq_asp_paramsC large_output_id [] coq_P1 sys_targ))
+  Coq_asp (ASPC (Coq_asp_paramsC large_output_id (JSON_Object []) coq_P1
+    sys_targ))
 
 (** val appr_term : coq_Term **)
 
@@ -153,8 +156,8 @@ val example_appTerm_provision : coq_Term =
 (** val simple_sig : coq_Term **)
 
 val simple_sig : coq_Term =
-  Coq_lseq (Coq_lseq (Coq_asp (ASPC (Coq_asp_paramsC attest_id [] coq_P1
-    sys_targ))) r_ssl_sig_asp) appr_term
+  Coq_lseq (Coq_lseq (Coq_asp (ASPC (Coq_asp_paramsC attest_id (JSON_Object
+    []) coq_P1 sys_targ))) r_ssl_sig_asp) appr_term
 
 (** val flexible_mechanisms_map : (string * coq_Term) list **)
 

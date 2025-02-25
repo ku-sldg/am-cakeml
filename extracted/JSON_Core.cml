@@ -1,3 +1,8 @@
+(** val coq_Jsonifiable_ASP_ARGS : coq_ASP_ARGS coq_Jsonifiable **)
+
+val coq_Jsonifiable_ASP_ARGS : coq_ASP_ARGS coq_Jsonifiable =
+  Build_Jsonifiable (fn x => x) (fn x => Coq_resultC x)
+
 (** val coq_ASP_PARAMS_to_JSON :
     coq_ASP_ARGS coq_Jsonifiable -> coq_ASP_PARAMS -> coq_JSON **)
 
