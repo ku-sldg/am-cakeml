@@ -11,12 +11,22 @@ val cds_query_kim_plc : coq_Plc =
 (** val kim_evidence_targ : coq_TARG_ID **)
 
 val kim_evidence_targ : coq_TARG_ID =
-  "kim_evidence_targ"
+  "kernal_module_targ"
+
+(** val selinux_policy_targ : coq_TARG_ID **)
+
+val selinux_policy_targ : coq_TARG_ID =
+  "selinux_policy_targ"
 
 (** val ssl_sig_targ : coq_TARG_ID **)
 
 val ssl_sig_targ : coq_TARG_ID =
   "ssl_sig_targ"
+
+(** val tpm_sig_targ : coq_TARG_ID **)
+
+val tpm_sig_targ : coq_TARG_ID =
+  "tpm_sig_targ"
 
 (** val cds_config_1_targ : coq_TARG_ID **)
 
@@ -27,11 +37,6 @@ val cds_config_1_targ : coq_TARG_ID =
 
 val cds_config_2_targ : coq_TARG_ID =
   "cds_filter_config_2_targ"
-
-(** val cds_config_3_targ : coq_TARG_ID **)
-
-val cds_config_3_targ : coq_TARG_ID =
-  "cds_config_3_targ"
 
 (** val cds_img_1_targ : coq_TARG_ID **)
 
@@ -87,11 +92,6 @@ val provision_id : coq_ASP_ID =
 
 val appr_query_kim_id : coq_ASP_ID =
   "appraise_r_invary_get_measurement_id"
-
-(** val appr_query_kim_stub_id : coq_ASP_ID **)
-
-val appr_query_kim_stub_id : coq_ASP_ID =
-  "appraise_r_invary_get_measurement_stub_id"
 
 (** val tpm_sig_id : coq_ASP_ID **)
 
@@ -249,7 +249,7 @@ val hash_cds_img_2 : coq_Term =
 (** val selinux_hash_pol : coq_Term **)
 
 val selinux_hash_pol : coq_Term =
-  selinux_hash_asp cds_config_dir_plc cds_img_2_targ
+  selinux_hash_asp cds_config_dir_plc selinux_policy_targ
 
 (** val provision_config_1 : coq_Term **)
 
@@ -294,4 +294,4 @@ val r_ssl_sig_asp : coq_Term =
 
 val r_tpm_sig_asp : coq_Term =
   Coq_asp (ASPC (Coq_asp_paramsC tpm_sig_id (JSON_Object [])
-    cds_query_kim_plc ssl_sig_targ))
+    cds_query_kim_plc tpm_sig_targ))

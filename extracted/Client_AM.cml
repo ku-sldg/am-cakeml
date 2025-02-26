@@ -69,4 +69,4 @@ fun am_client_app_summary att_sess req_plc e t toPlc =
     in
     let val Coq_evc _ et = e in
     res_bind (eval glob_ctx toPlc et t) (fn et' =>
-      do_AppraisalSummary et' rawev glob_ctx example_RawEvJudgement) end end
+      do_AppraisalSummary et' rawev glob_ctx cds_RawEvJudgement) end end
