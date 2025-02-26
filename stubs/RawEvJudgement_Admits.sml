@@ -15,6 +15,6 @@ fun ex_targJudgement_fun' rev =
         (* val _ = print ("\n" ^ "Judging this RawEv string:  " ^ v ^ "\n\n") *)
         val golden = BString.unshow passed_string in
             if (List.member golden rev) 
-            then "I JUDGE YOU GOLDEN !!!!!"
-            else "GOLDEN CHECK FAILED :( "
+            then "GOLDEN CHECK:  PASSED!!!"
+            else "GOLDEN CHECK:  FAILED :("
         end

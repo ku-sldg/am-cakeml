@@ -21,12 +21,12 @@ val ssl_sig_targ : coq_TARG_ID =
 (** val cds_config_1_targ : coq_TARG_ID **)
 
 val cds_config_1_targ : coq_TARG_ID =
-  "cds_config_1_targ"
+  "cds_rewrite_config_targ"
 
 (** val cds_config_2_targ : coq_TARG_ID **)
 
 val cds_config_2_targ : coq_TARG_ID =
-  "cds_config_2_targ"
+  "cds_filter_config_2_targ"
 
 (** val cds_config_3_targ : coq_TARG_ID **)
 
@@ -36,12 +36,12 @@ val cds_config_3_targ : coq_TARG_ID =
 (** val cds_img_1_targ : coq_TARG_ID **)
 
 val cds_img_1_targ : coq_TARG_ID =
-  "cds_img_1_targ"
+  "cds_rewrite_img_targ"
 
 (** val cds_img_2_targ : coq_TARG_ID **)
 
 val cds_img_2_targ : coq_TARG_ID =
-  "cds_img_2_targ"
+  "cds_filter_img_targ"
 
 (** val cds_img_3_targ : coq_TARG_ID **)
 
