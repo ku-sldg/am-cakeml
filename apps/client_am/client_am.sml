@@ -62,6 +62,7 @@ fun main () =
       val init_rawev : coq_RawEv = [] (* [passed_bs] *)
       val attester_addr : coq_UUID = "localhost:5000"
       val appraiser_addr : coq_UUID = "localhost:5003" 
+      val passed_string = "UEFTU0VE"
       
       (* val app_result = run_demo_client_AM demo_term top_plc att_plc init_et att_sess init_rawev attester_addr appraiser_addr  *)
       (* TODO: Current this will do basically NOTHING *)
@@ -72,7 +73,8 @@ fun main () =
                               (Coq_evc [] Coq_mt_evt) 
                               demo_term
                               (* example_appTerm  *)
-                              att_plc in 
+                              att_plc
+                              passed_string in 
       case maybe_appsumm of 
         Coq_resultC appsumm => print_appraisal_summary appsumm
       | Coq_errC errStr => print errStr 

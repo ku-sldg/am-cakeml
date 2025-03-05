@@ -118,36 +118,67 @@ fun do_AppraisalSummary' et r g m s =
 fun do_AppraisalSummary et r g m =
   do_AppraisalSummary' et r g m []
 
-type single_add_type = coq_ASP_ID * (coq_TARG_ID * (coq_RawEv -> string))
+type coq_RawEvJudgement_Entry =
+  coq_ASP_ID * (coq_TARG_ID * (coq_RawEv -> string))
 
 (** val addOne_rawEvJudgement :
-    coq_RawEvJudgement -> single_add_type -> coq_RawEvJudgement **)
+    coq_RawEvJudgement -> coq_RawEvJudgement_Entry -> coq_RawEvJudgement **)
 
 fun addOne_rawEvJudgement a b =
   let val aid = fst b in
   let val tid = fst (snd b) in
   let val f = snd (snd b) in add_RawEvJudgement aid tid f a end end end
 
-(** val gen_rawEvJudgement : single_add_type list -> coq_RawEvJudgement **)
+(** val gen_rawEvJudgement :
+    coq_RawEvJudgement_Entry list -> coq_RawEvJudgement **)
 
 fun gen_rawEvJudgement ls =
   fold_left addOne_rawEvJudgement ls []
 
-(** val cds_RawEvJudgement_ls : single_add_type list **)
+(** val rawEvJudgement_from_EvidenceT''' :
+    string -> (coq_ASP_ID * coq_TARG_ID) -> coq_RawEvJudgement_Entry **)
 
-val cds_RawEvJudgement_ls : single_add_type list =
-  (appr_gather_file_contents_id, (cds_config_1_targ,
-    ex_targJudgement_fun')) :: ((appr_gather_file_contents_id,
-    (cds_config_2_targ, ex_targJudgement_fun')) :: ((appr_query_kim_id,
-    (kim_evidence_targ,
-    ex_targJudgement_fun')) :: ((appr_hash_file_contents_id, (cds_img_1_targ,
-    ex_targJudgement_fun')) :: ((appr_hash_file_contents_id, (cds_img_2_targ,
-    ex_targJudgement_fun')) :: ((r_ssl_sig_appr_id, (ssl_sig_targ,
-    ex_targJudgement_fun')) :: ((tpm_sig_appr_id, (tpm_sig_targ,
-    ex_targJudgement_fun')) :: ((appr_selinux_pol_dump_id,
-    (selinux_policy_targ, ex_targJudgement_fun')) :: [])))))))
+fun rawEvJudgement_from_EvidenceT''' s x =
+  let val v = fst x in
+  let val v' = snd x in (v, (v', (ex_targJudgement_fun' s))) end end
 
-(** val cds_RawEvJudgement : coq_RawEvJudgement **)
+(** val asp_params_to_rawev_ids :
+    coq_ASP_PARAMS -> coq_ASP_ID * coq_TARG_ID **)
 
-val cds_RawEvJudgement : coq_RawEvJudgement =
-  gen_rawEvJudgement cds_RawEvJudgement_ls
+fun asp_params_to_rawev_ids ps = case ps of
+  Coq_asp_paramsC i _ _ tid => (i, tid)
+
+(** val rawEvJudgement_from_EvidenceT''_helper :
+    coq_EvidenceT -> (coq_ASP_ID * coq_TARG_ID) list ->
+    (coq_ASP_ID * coq_TARG_ID) list **)
+
+fun rawEvJudgement_from_EvidenceT''_helper et ls =
+  case et of
+    Coq_asp_evt _ ps et' =>
+    rawEvJudgement_from_EvidenceT''_helper et'
+      ((asp_params_to_rawev_ids ps) :: ls)
+  | Coq_left_evt et' => rawEvJudgement_from_EvidenceT''_helper et' ls
+  | Coq_right_evt et' => rawEvJudgement_from_EvidenceT''_helper et' ls
+  | Coq_split_evt et1 et2 =>
+    rawEvJudgement_from_EvidenceT''_helper et2
+      (rawEvJudgement_from_EvidenceT''_helper et1 ls)
+  | _ => ls
+
+(** val rawEvJudgement_from_EvidenceT'' :
+    coq_EvidenceT -> (coq_ASP_ID * coq_TARG_ID) list **)
+
+fun rawEvJudgement_from_EvidenceT'' et =
+  rawEvJudgement_from_EvidenceT''_helper et []
+
+(** val rawEvJudgement_from_EvidenceT' :
+    string -> coq_EvidenceT -> coq_RawEvJudgement_Entry list **)
+
+fun rawEvJudgement_from_EvidenceT' s et =
+  map (rawEvJudgement_from_EvidenceT''' s)
+    (rawEvJudgement_from_EvidenceT'' et)
+
+(** val rawEvJudgement_from_EvidenceT :
+    string -> coq_EvidenceT -> coq_RawEvJudgement **)
+
+fun rawEvJudgement_from_EvidenceT s et =
+  gen_rawEvJudgement (rawEvJudgement_from_EvidenceT' s et)
