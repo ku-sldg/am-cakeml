@@ -1,17 +1,6 @@
 type coq_AppraisalSummary =
   (coq_ASP_ID, (coq_TARG_ID, string) coq_Map) coq_Map
 
-(** val get_all_summary_strings : coq_AppraisalSummary -> string list **)
-
-fun get_all_summary_strings s =
-  concat
-    (map (map_vals coq_Eq_Class_ID_Type) (map_vals coq_Eq_Class_ID_Type s))
-
-(** val check_strings_list_bool : string list -> (string -> bool) -> bool **)
-
-fun check_strings_list_bool ls f =
-  forallb f ls
-
 type coq_RawEvJudgement =
   (coq_ASP_ID, (coq_TARG_ID, coq_RawEv -> string) coq_Map) coq_Map
 

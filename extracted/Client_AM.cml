@@ -71,89 +71,86 @@ fun am_client_app_summary att_sess req_plc e t toPlc =
     res_bind (eval glob_ctx toPlc et t) (fn et' =>
       do_AppraisalSummary et' rawev glob_ctx example_RawEvJudgement) end end
 
-(** val run_resolute_term :
-    coq_Resolute_Term -> coq_Attestation_Session -> coq_Plc -> coq_Plc ->
-    (coq_Resolute_Evidence, string) coq_ResultT **)
+(** val run_resolute_id :
+    coq_Term -> coq_Attestation_Session -> coq_Plc -> coq_Plc ->
+    (coq_Evidence, string) coq_ResultT **)
 
-fun run_resolute_term rt att_sess req_plc toPlc =
-  case rt of
-    R_Goal_T tid args t =>
-    let val appr_t = Coq_lseq t (Coq_asp APPR) in
-    res_bind (am_sendReq att_sess req_plc mt_evc appr_t toPlc) (fn rawev =>
-      res_bind
-        (eval
-          (let val Coq_mkAtt_Sess _ _ _ ats_context = att_sess in
-           ats_context end) toPlc Coq_mt_evt appr_t) (fn et' => Coq_resultC
-        (R_Goal_E tid args (Coq_evc rawev et')))) end
-  | R_And_T t1 t2 =>
-    res_bind (run_resolute_term t1 att_sess req_plc toPlc) (fn e1 =>
-      res_bind (run_resolute_term t2 att_sess req_plc toPlc) (fn e2 =>
-        Coq_resultC (R_And_E e1 e2)))
-  | R_Or_T t1 t2 =>
-    res_bind (run_resolute_term t1 att_sess req_plc toPlc) (fn e1 =>
-      res_bind (run_resolute_term t2 att_sess req_plc toPlc) (fn e2 =>
-        Coq_resultC (R_Or_E e1 e2)))
+fun run_resolute_id t att_sess req_plc toPlc =
+  let val appr_t = Coq_lseq t (Coq_asp APPR) in
+  res_bind (am_sendReq att_sess req_plc mt_evc appr_t toPlc) (fn rawev =>
+    res_bind
+      (eval
+        (let val Coq_mkAtt_Sess _ _ _ ats_context = att_sess in
+         ats_context end) toPlc Coq_mt_evt appr_t) (fn et' => Coq_resultC
+      (Coq_evc rawev et'))) end
+
+type coq_Term_Model =
+  string -> coq_Term
+  (* singleton inductive, whose constructor was Build_Term_Model *)
+
+(** val term_conc : coq_Term_Model -> string -> coq_Term **)
+
+fun term_conc t =
+  t
+
+(** val add_term_args : coq_Term -> coq_JSON -> coq_Term **)
+
+fun add_term_args t args =
+  case t of
+    Coq_asp a =>
+    (case a of
+       ASPC a0 =>
+       let val Coq_asp_paramsC i _ p tid = a0 in
+       Coq_asp (ASPC (Coq_asp_paramsC i args p tid)) end
+     | _ => Coq_asp a)
+  | Coq_att q t' => Coq_att q (add_term_args t' args)
+  | Coq_lseq t1 t2 => Coq_lseq (add_term_args t1 args) (add_term_args t2 args)
+  | Coq_bseq s t1 t2 =>
+    Coq_bseq s (add_term_args t1 args) (add_term_args t2 args)
+  | Coq_bpar s t1 t2 =>
+    Coq_bpar s (add_term_args t1 args) (add_term_args t2 args)
+
+(** val good_bs : coq_BS **)
+
+val good_bs : coq_BS =
+  passed_bs
+
+(** val judge_evidence : coq_Evidence -> bool **)
+
+fun judge_evidence e = case e of
+  Coq_evc rawev _ => forallb (fn bs => eqb coq_EqClass_BS bs good_bs) rawev
 
 (** val am_client_do_res :
-    coq_Attestation_Session -> coq_Plc -> coq_Plc -> coq_Model ->
-    coq_Resolute_Formula -> (coq_ResoluteResponse, string) coq_ResultT **)
-
-fun am_client_do_res att_sess req_plc toPlc m r =
-  let val (rt, pol) = res_to_copland m r in
-  res_bind (run_resolute_term rt att_sess req_plc toPlc) (fn resolute_ev =>
-    let val resolute_judgement = pol resolute_ev in
-    Coq_resultC (Coq_mkResoluteResp resolute_judgement r rt) end) end
-
-(** val micro_res_asp_type_env : coq_ASP_Type_Env **)
-
-val micro_res_asp_type_env : coq_ASP_Type_Env =
-  (hash_file_contents_id, (Coq_ev_arrow EXTEND InAll (OutN (S
-    O)))) :: ((appr_hash_file_contents_id, (Coq_ev_arrow REPLACE InAll (OutN
-    (S O)))) :: ((hash_evidence_id, (Coq_ev_arrow EXTEND InAll (OutN (S
-    O)))) :: []))
-
-(** val micro_res_asp_compat_mapt : coq_ASP_Compat_MapT **)
-
-val micro_res_asp_compat_mapt : coq_ASP_Compat_MapT =
-  (hash_file_contents_id, appr_hash_file_contents_id) :: ((hash_evidence_id,
-    appr_hash_file_contents_id) :: [])
-
-(** val res_policy_passed_string : string -> bool **)
-
-fun res_policy_passed_string s =
-  eqb coq_Eq_Class_ID_Type s "I JUDGE YOU GOLDEN !!!!!"
-
-(** val res_policy_appSummary :
-    coq_Evidence -> coq_GlobalContext -> coq_RawEvJudgement -> (bool, string)
+    coq_Attestation_Session -> coq_Plc -> coq_Plc -> coq_Term_Model ->
+    coq_Resolute_Client_Request -> (coq_Resolute_Client_Result, string)
     coq_ResultT **)
 
-fun res_policy_appSummary e g m =
-  let val Coq_evc rawEv et = e in
-  res_bind (do_AppraisalSummary et rawEv g m) (fn app_summary =>
-    let val ls = get_all_summary_strings app_summary in
-    let val b = check_strings_list_bool ls res_policy_passed_string in
-    Coq_resultC b end end) end
+fun am_client_do_res att_sess req_plc toPlc m req =
+  let val rt =
+    term_conc m
+      (let val Coq_mkResoluteClientReq resclientreq_attest_id _ _ = req in
+       resclientreq_attest_id end)
+  in
+  let val rt_w_args =
+    add_term_args rt
+      (let val Coq_mkResoluteClientReq _ resclientreq_args _ = req in
+       resclientreq_args end)
+  in
+  let val maybe_ev = run_resolute_id rt_w_args att_sess req_plc toPlc in
+  (case maybe_ev of
+     Coq_errC errStr =>
+     Coq_resultC (Coq_mkResoluteClientResult rt_w_args mt_evc False errStr)
+   | Coq_resultC e =>
+     let val judgement = judge_evidence e in
+     Coq_resultC (Coq_mkResoluteClientResult rt_w_args e judgement "") end) end end end
 
-(** val micro_res_policy :
-    coq_Evidence -> coq_GlobalContext -> coq_RawEvJudgement -> bool **)
+(** val micro_resolute_term_model : coq_Term_Model **)
 
-fun micro_res_policy e g m =
-  case res_policy_appSummary e g m of
-    Coq_errC _ => False
-  | Coq_resultC b => b
+fun micro_resolute_term_model _ =
+  meas_micro'
 
-(** val micro_resolute_example_context : coq_GlobalContext **)
+(** val micro_resolute_client_req :
+    string -> coq_JSON -> string -> coq_Resolute_Client_Request **)
 
-val micro_resolute_example_context : coq_GlobalContext =
-  Build_GlobalContext micro_res_asp_type_env micro_res_asp_compat_mapt
-
-(** val micro_resolute_model : coq_ASP_ARGS -> coq_Model **)
-
-fun micro_resolute_model model_args =
-  Build_Model (fn _ => meas_micro model_args) (fn _ => fn e =>
-    micro_res_policy e micro_resolute_example_context example_RawEvJudgement)
-
-(** val micro_resolute_statement : coq_Resolute_Formula **)
-
-val micro_resolute_statement : coq_Resolute_Formula =
-  R_Goal micro_resolute_targ (JSON_Object [])
+fun micro_resolute_client_req att_id args res_path =
+  Coq_mkResoluteClientReq att_id args res_path

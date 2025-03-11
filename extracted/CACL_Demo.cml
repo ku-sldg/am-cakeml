@@ -53,11 +53,6 @@ val cds_img_3_targ : coq_TARG_ID =
 val query_kim_id : coq_ASP_ID =
   "r_invary_get_measurement_id"
 
-(** val hash_file_contents_id : coq_ASP_ID **)
-
-val hash_file_contents_id : coq_ASP_ID =
-  "r_hashfile_id"
-
 (** val hash_dir_contents_id : coq_ASP_ID **)
 
 val hash_dir_contents_id : coq_ASP_ID =

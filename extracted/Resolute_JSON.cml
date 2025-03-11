@@ -58,6 +58,31 @@ val r_and_j_name_constant : string =
 val r_or_j_name_constant : string =
   "R_Or_J"
 
+(** val coq_STR_RESOLUTE_CLIENT_RESPONSE_SUCCESS : string **)
+
+val coq_STR_RESOLUTE_CLIENT_RESPONSE_SUCCESS : string =
+  "ResClientRespSuccess"
+
+(** val coq_STR_RESOLUTE_CLIENT_RESULT_TERM : string **)
+
+val coq_STR_RESOLUTE_CLIENT_RESULT_TERM : string =
+  "ResClientResult_term"
+
+(** val coq_STR_RESOLUTE_CLIENT_RESULT_EVIDENCE : string **)
+
+val coq_STR_RESOLUTE_CLIENT_RESULT_EVIDENCE : string =
+  "ResClientResult_evidence"
+
+(** val coq_STR_RESOLUTE_CLIENT_RESULT_SUCCESS : string **)
+
+val coq_STR_RESOLUTE_CLIENT_RESULT_SUCCESS : string =
+  "ResClientResult_success"
+
+(** val coq_STR_RESOLUTE_CLIENT_RESULT_ERROR : string **)
+
+val coq_STR_RESOLUTE_CLIENT_RESULT_ERROR : string =
+  "ResClientResult_error"
+
 (** val coq_Resolute_to_JSON : coq_Resolute_Formula -> coq_JSON **)
 
 fun coq_Resolute_to_JSON t = case t of
@@ -623,6 +648,82 @@ fun coq_Jsonifiable_Resolute_Term h =
 fun coq_Jsonifiable_Resolute_Judgement h =
   Build_Jsonifiable (coq_Resolute_Judgement_to_JSON h)
     (coq_Resolute_Judgement_from_JSON h)
+
+(** val coq_Resolute_Client_Response_to_JSON :
+    coq_Resolute_Client_Response -> coq_JSON **)
+
+fun coq_Resolute_Client_Response_to_JSON resp =
+  JSON_Object ((coq_STR_RESOLUTE_CLIENT_RESPONSE_SUCCESS, (JSON_Boolean
+    (resclientresp_success resp))) :: [])
+
+(** val coq_Resolute_Client_Response_from_JSON :
+    coq_JSON -> (coq_Resolute_Client_Response, string) coq_ResultT **)
+
+fun coq_Resolute_Client_Response_from_JSON resp =
+  res_bind (coq_JSON_get_bool coq_STR_RESOLUTE_CLIENT_RESPONSE_SUCCESS resp)
+    (fn temp_attid => Coq_resultC temp_attid)
+
+(** val coq_Jsonifiable_Resolute_Client_Response :
+    coq_Resolute_Client_Response coq_Jsonifiable **)
+
+val coq_Jsonifiable_Resolute_Client_Response : coq_Resolute_Client_Response
+                                               coq_Jsonifiable =
+  Build_Jsonifiable coq_Resolute_Client_Response_to_JSON
+    coq_Resolute_Client_Response_from_JSON
+
+(** val coq_Resolute_Client_Result_to_JSON :
+    coq_Term coq_Jsonifiable -> coq_Evidence coq_Jsonifiable -> bool
+    coq_Jsonifiable -> coq_Resolute_Client_Result -> coq_JSON **)
+
+fun coq_Resolute_Client_Result_to_JSON h h0 _ res =
+  JSON_Object ((coq_STR_RESOLUTE_CLIENT_RESULT_TERM,
+    (let val Build_Jsonifiable to_JSON _ = h in
+     to_JSON
+       (let val Coq_mkResoluteClientResult resclientres_term _ _ _ = res in
+        resclientres_term end) end)) :: ((coq_STR_RESOLUTE_CLIENT_RESULT_EVIDENCE,
+    (let val Build_Jsonifiable to_JSON _ = h0 in
+     to_JSON
+       (let val Coq_mkResoluteClientResult _ resclientres_evidence _ _ = res
+        in
+        resclientres_evidence end) end)) :: ((coq_STR_RESOLUTE_CLIENT_RESULT_SUCCESS,
+    (JSON_Boolean
+    (let val Coq_mkResoluteClientResult _ _ resclientres_success _ = res in
+     resclientres_success end))) :: ((coq_STR_RESOLUTE_CLIENT_RESULT_ERROR,
+    (JSON_String
+    (let val Coq_mkResoluteClientResult _ _ _ resclientres_error_str = res in
+     resclientres_error_str end))) :: []))))
+
+(** val coq_Resolute_Client_Result_from_JSON :
+    coq_Term coq_Jsonifiable -> coq_Evidence coq_Jsonifiable -> bool
+    coq_Jsonifiable -> coq_JSON -> (coq_Resolute_Client_Result, string)
+    coq_ResultT **)
+
+fun coq_Resolute_Client_Result_from_JSON h h0 _ res =
+  res_bind (coq_JSON_get_Object coq_STR_RESOLUTE_CLIENT_RESULT_TERM res)
+    (fn temp_term =>
+    res_bind
+      (coq_JSON_get_Object coq_STR_RESOLUTE_CLIENT_RESULT_EVIDENCE res)
+      (fn temp_evid =>
+      res_bind (coq_JSON_get_bool coq_STR_RESOLUTE_CLIENT_RESULT_SUCCESS res)
+        (fn temp_succ =>
+        res_bind
+          (coq_JSON_get_string coq_STR_RESOLUTE_CLIENT_RESULT_ERROR res)
+          (fn temp_err =>
+          res_bind
+            (let val Build_Jsonifiable _ from_JSON = h in
+             from_JSON temp_term end) (fn term =>
+            res_bind
+              (let val Build_Jsonifiable _ from_JSON = h0 in
+               from_JSON temp_evid end) (fn evid => Coq_resultC
+              (Coq_mkResoluteClientResult term evid temp_succ temp_err)))))))
+
+(** val coq_Jsonifiable_Resolute_Client_Result :
+    coq_Term coq_Jsonifiable -> coq_Evidence coq_Jsonifiable -> bool
+    coq_Jsonifiable -> coq_Resolute_Client_Result coq_Jsonifiable **)
+
+fun coq_Jsonifiable_Resolute_Client_Result h h0 h1 =
+  Build_Jsonifiable (coq_Resolute_Client_Result_to_JSON h h0 h1)
+    (coq_Resolute_Client_Result_from_JSON h h0 h1)
 
 (** val coq_ResoluteResponse_to_JSON :
     coq_Resolute_Term coq_Jsonifiable -> coq_Resolute_Formula coq_Jsonifiable

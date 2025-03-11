@@ -14,6 +14,41 @@ fun coq_EqClass_impl_DecEq h x y =
                           True => True
                         | False => False) end
 
+(** val list_eqb_eqb :
+    ('a1 -> 'a1 -> bool) -> 'a1 list -> 'a1 list -> bool **)
+
+fun list_eqb_eqb eqbA l1 l2 =
+  case l1 of
+    [] => (case l2 of
+             [] => True
+           | _ :: _ => False)
+  | h1 :: t1 =>
+    (case l2 of
+       [] => False
+     | h2 :: t2 =>
+       (fn x => fn y => x andalso y) (eqbA h1 h2) (list_eqb_eqb eqbA t1 t2))
+
+(** val general_list_eq_class_eqb :
+    'a1 coq_EqClass -> 'a1 list -> 'a1 list -> bool **)
+
+fun general_list_eq_class_eqb h l1 l2 =
+  case l1 of
+    [] => (case l2 of
+             [] => True
+           | _ :: _ => False)
+  | h1 :: t1 =>
+    (case l2 of
+       [] => False
+     | h2 :: t2 =>
+       (fn x => fn y => x andalso y) (eqb h h1 h2)
+         (general_list_eq_class_eqb h t1 t2))
+
+(** val coq_EqClass_extends_to_list :
+    'a1 coq_EqClass -> 'a1 list coq_EqClass **)
+
+val coq_EqClass_extends_to_list =
+  general_list_eq_class_eqb
+
 (** val str_eq_class : string coq_EqClass **)
 
 val str_eq_class : string coq_EqClass =
@@ -23,3 +58,17 @@ val str_eq_class : string coq_EqClass =
 
 val nat_EqClass : nat coq_EqClass =
   (op=)
+
+(** val eqbPair :
+    'a1 coq_EqClass -> 'a2 coq_EqClass -> ('a1 * 'a2) -> ('a1 * 'a2) -> bool **)
+
+fun eqbPair h h' p1 p2 =
+  let val (a1, b1) = p1 in
+  let val (a2, b2) = p2 in
+  (fn x => fn y => x andalso y) (eqb h a1 a2) (eqb h' b1 b2) end end
+
+(** val pair_EqClass :
+    'a1 coq_EqClass -> 'a2 coq_EqClass -> ('a1 * 'a2) coq_EqClass **)
+
+val pair_EqClass =
+  eqbPair

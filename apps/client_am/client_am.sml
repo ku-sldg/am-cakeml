@@ -99,8 +99,9 @@ fun main () =
                             att_sess 
                             top_plc 
                             att_plc 
-                            (micro_resolute_model model_asp_args_val (* system_asp_args_val *) )
-                            micro_resolute_statement 
+                           (* (micro_resolute_model model_asp_args_val (* system_asp_args_val *) ) *)
+                            micro_resolute_term_model
+                            (micro_resolute_client_req "hi" model_asp_args_val "hey.txt")
                             (* (JSON_Object []) *) in
 
       (*
@@ -109,7 +110,7 @@ fun main () =
   *)
       case maybe_resolute_resp of 
         Coq_resultC resp => 
-          let val (Build_Jsonifiable to_JSON _) = concrete_Jsonifiable_ResoluteResponse
+          let val (Build_Jsonifiable to_JSON _) = concrete_Jsonifiable_Resolute_Client_Result
               val coqJsonResp = to_JSON resp
               val coqjsonRespString = coq_JSON_to_string coqJsonResp in
             print coqjsonRespString

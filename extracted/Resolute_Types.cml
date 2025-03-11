@@ -1,3 +1,18 @@
+datatype coq_Resolute_Client_Request =
+  Coq_mkResoluteClientReq string coq_JSON string
+
+type coq_Resolute_Client_Response =
+  bool
+  (* singleton inductive, whose constructor was mkResoluteClientResp *)
+
+(** val resclientresp_success : coq_Resolute_Client_Response -> bool **)
+
+fun resclientresp_success r =
+  r
+
+datatype coq_Resolute_Client_Result =
+  Coq_mkResoluteClientResult coq_Term coq_Evidence bool string
+
 datatype coq_ResoluteResponse =
   Coq_mkResoluteResp coq_Resolute_Judgement coq_Resolute_Formula
    coq_Resolute_Term

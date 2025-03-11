@@ -71,3 +71,23 @@ val concrete_Jsonifiable_ResoluteResponse : coq_ResoluteResponse
     (coq_Jsonifiable_Resolute_Term
       (coq_Jsonifiable_Term (coq_Jsonifiable_ASP coq_Jsonifiable_ASP_ARGS)
         coq_Jsonifiable_Split)) coq_Jsonifiable_Resolute
+
+(** val concrete_Jsonifiable_Resolute_Client_Response :
+    coq_Resolute_Client_Response coq_Jsonifiable **)
+
+val concrete_Jsonifiable_Resolute_Client_Response : coq_Resolute_Client_Response
+                                                    coq_Jsonifiable =
+  coq_Jsonifiable_Resolute_Client_Response
+
+(** val concrete_Jsonifiable_Resolute_Client_Result :
+    coq_Resolute_Client_Result coq_Jsonifiable **)
+
+val concrete_Jsonifiable_Resolute_Client_Result : coq_Resolute_Client_Result
+                                                  coq_Jsonifiable =
+  coq_Jsonifiable_Resolute_Client_Result
+    (coq_Jsonifiable_Term (coq_Jsonifiable_ASP coq_Jsonifiable_ASP_ARGS)
+      coq_Jsonifiable_Split)
+    (coq_Jsonifiable_Evidence coq_Jsonifiable_RawEv
+      (coq_Jsonifiable_EvidenceT coq_Jsonifiable_ASP_ARGS coq_Jsonifiable_nat
+        (coq_Jsonifiable_ASP_Params coq_Jsonifiable_ASP_ARGS)))
+    jsonifiable_bool
