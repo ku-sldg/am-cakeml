@@ -159,6 +159,17 @@ val simple_sig : coq_Term =
   Coq_lseq (Coq_lseq (Coq_asp (ASPC (Coq_asp_paramsC attest_id (JSON_Object
     []) coq_P1 sys_targ))) r_ssl_sig_asp) appr_term
 
+(** val meas_cds_local : coq_Term **)
+
+val meas_cds_local : coq_Term =
+  Coq_bseq (ALL, ALL) gather_config_1 gather_config_2
+
+(** val cds_local : coq_Term **)
+
+val cds_local : coq_Term =
+  Coq_lseq (Coq_bseq (ALL, ALL) query_kim_asp meas_cds_local) (Coq_lseq
+    r_ssl_sig_asp appr_term)
+
 (** val flexible_mechanisms_map : (string * coq_Term) list **)
 
 val flexible_mechanisms_map : (string * coq_Term) list =
@@ -170,11 +181,11 @@ val flexible_mechanisms_map : (string * coq_Term) list =
     layered_background_check) :: (("filehash",
     filehash_auth_phrase) :: (("large_output",
     large_output_asp_test) :: (("cds_simple",
-    example_appTerm) :: (("cds_ssl", cds_ssl) :: (("cds_tpm",
-    cds_tpm) :: (("cds_provision",
+    example_appTerm) :: (("cds_ssl", cds_ssl) :: (("cds_local",
+    cds_local) :: (("cds_tpm", cds_tpm) :: (("cds_provision",
     example_appTerm_provision) :: (("simple_sig", simple_sig) :: (("micro",
     micro_appTerm) :: (("micro_provision",
-    micro_appTerm_provision) :: []))))))))))))))))
+    micro_appTerm_provision) :: [])))))))))))))))))
 
 (** val add_EvidenceT_flexible_mechanisms :
     coq_GlobalContext -> (string, coq_Term * (coq_EvidenceT, string)

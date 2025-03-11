@@ -13,13 +13,6 @@ fun map f l = case l of
   [] => []
 | a :: t => (f a) :: (map f t)
 
-(** val fold_left : ('a1 -> 'a2 -> 'a1) -> 'a2 list -> 'a1 -> 'a1 **)
-
-fun fold_left f l a0 =
-  case l of
-    [] => a0
-  | b :: t => fold_left f t (f a0 b)
-
 (** val forallb : ('a1 -> bool) -> 'a1 list -> bool **)
 
 fun forallb f l = case l of

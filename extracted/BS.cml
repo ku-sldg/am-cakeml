@@ -4,3 +4,13 @@ type coq_BS (* AXIOM TO BE REALIZED *)
 
 val coq_Stringifiable_BS : coq_BS coq_Stringifiable =
   failwith "AXIOM TO BE REALIZED"
+
+(** val coq_EqClass_BS : coq_BS coq_EqClass **)
+
+val coq_EqClass_BS : coq_BS coq_EqClass =
+  failwith "AXIOM TO BE REALIZED"
+
+(** val passed_bs : coq_BS **)
+
+val passed_bs : coq_BS =
+  failwith "AXIOM TO BE REALIZED"

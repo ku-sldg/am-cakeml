@@ -16,5 +16,10 @@ val coq_Stringifiable_BS : coq_BS coq_Stringifiable =
       Coq_errC ("Invalid hex string: " ^ s)
       )
 
-val passed_bs = BString.fromString "PASSED"
+(** val coq_EqClass_BS : coq_BS coq_EqClass **)
+
+val coq_EqClass_BS : coq_BS coq_EqClass =
+    (fn bs1 => fn bs2 => bs1 = bs2)
+
+val passed_bs = BString.fromString "UEFTU0VE"
 val failed_bs = BString.fromString "FAILED"

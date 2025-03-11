@@ -22,6 +22,12 @@ fun map_set h x v m = case m of
      True => (hk, v) :: t
    | False => (hk, hv) :: (map_set h x v t)) end
 
+(** val map_vals : 'a1 coq_EqClass -> ('a1, 'a2) coq_Map -> 'a2 list **)
+
+fun map_vals h m = case m of
+  [] => []
+| p :: m' => let val (_, v) = p in v :: (map_vals h m') end
+
 (** val map_map :
     'a1 coq_EqClass -> ('a2 -> 'a3) -> ('a1, 'a2) coq_Map -> ('a1, 'a3)
     coq_Map **)

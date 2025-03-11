@@ -1,3 +1,0 @@
-datatype coq_ResoluteResponse =
-  Coq_mkResoluteResp coq_Resolute_Judgement coq_Resolute_Formula
-   coq_Resolute_Term

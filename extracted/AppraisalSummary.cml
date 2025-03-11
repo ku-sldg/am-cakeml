@@ -1,38 +1,4 @@
-type coq_AppraisalSummary =
-  (coq_ASP_ID, (coq_TARG_ID, string) coq_Map) coq_Map
-
-type coq_RawEvJudgement =
-  (coq_ASP_ID, (coq_TARG_ID, coq_RawEv -> string) coq_Map) coq_Map
-
-(** val add_RawEvJudgement :
-    coq_ASP_ID -> coq_TARG_ID -> (coq_RawEv -> string) -> coq_RawEvJudgement
-    -> coq_RawEvJudgement **)
-
-fun add_RawEvJudgement i tid f m =
-  let val m' =
-    case map_get coq_Eq_Class_ID_Type i m of
-      Some tm => tm
-    | None => []
-  in
-  let val m'' = map_set coq_Eq_Class_ID_Type tid f m' in
-  map_set coq_Eq_Class_ID_Type i m'' m end end
-
-(** val get_RawEvJudgement :
-    coq_ASP_ID -> coq_TARG_ID -> coq_RawEvJudgement -> coq_RawEv -> string **)
-
-fun get_RawEvJudgement i tid m =
-  let val default_fun = fn _ =>
-    String.^ "( "
-      (String.^ i
-        (String.^ ", "
-          (String.^ tid (String.^ " ) " "not found in RawEvJudgement map"))))
-  in
-  (case map_get coq_Eq_Class_ID_Type i m of
-     Some m' =>
-     (case map_get coq_Eq_Class_ID_Type tid m' of
-        Some f => f
-      | None => default_fun)
-   | None => default_fun) end
+type coq_AppraisalSummary = (coq_ASP_ID, (coq_TARG_ID, bool) coq_Map) coq_Map
 
 (** val map_get_default :
     'a1 coq_EqClass -> 'a1 -> 'a2 -> ('a1, 'a2) coq_Map -> 'a2 **)
@@ -43,26 +9,36 @@ fun map_get_default h x y m =
   | None => y
 
 (** val set_AppraisalSummary :
-    coq_ASP_ID -> coq_TARG_ID -> string -> coq_AppraisalSummary ->
+    coq_ASP_ID -> coq_TARG_ID -> bool -> coq_AppraisalSummary ->
     coq_AppraisalSummary **)
 
-fun set_AppraisalSummary i tid str s =
+fun set_AppraisalSummary i tid b s =
   let val m = map_get_default coq_Eq_Class_ID_Type i [] s in
-  let val m' = map_set coq_Eq_Class_ID_Type tid str m in
+  let val m' = map_set coq_Eq_Class_ID_Type tid b m in
   map_set coq_Eq_Class_ID_Type i m' s end end
 
-(** val add_asp_summary :
-    coq_ASP_ID -> coq_TARG_ID -> (coq_RawEv -> string) -> coq_RawEv ->
-    coq_AppraisalSummary -> coq_AppraisalSummary **)
+(** val check_simple_appraised_rawev : coq_RawEv -> bool **)
 
-fun add_asp_summary i tid f rEv s =
-  let val str = f rEv in set_AppraisalSummary i tid str s end
+fun check_simple_appraised_rawev ls = case ls of
+  [] => False
+| bs :: l =>
+  (case l of
+     [] => eqb coq_EqClass_BS bs passed_bs
+   | _ :: _ => False)
+
+(** val add_asp_summary :
+    coq_ASP_ID -> coq_TARG_ID -> coq_RawEv -> coq_AppraisalSummary ->
+    coq_AppraisalSummary **)
+
+fun add_asp_summary i tid ls s =
+  let val b = check_simple_appraised_rawev ls in
+  set_AppraisalSummary i tid b s end
 
 (** val do_AppraisalSummary' :
-    coq_EvidenceT -> coq_RawEv -> coq_GlobalContext -> coq_RawEvJudgement ->
-    coq_AppraisalSummary -> (coq_AppraisalSummary, string) coq_ResultT **)
+    coq_EvidenceT -> coq_RawEv -> coq_GlobalContext -> coq_AppraisalSummary
+    -> (coq_AppraisalSummary, string) coq_ResultT **)
 
-fun do_AppraisalSummary' et r g m s =
+fun do_AppraisalSummary' et r g s =
   case et of
     Coq_asp_evt _ ps et' =>
     let val Coq_asp_paramsC i _ _ tid = ps in
@@ -74,32 +50,28 @@ fun do_AppraisalSummary' et r g m s =
           REPLACE =>
           (case out_sig of
              OutN n =>
-             let val f = get_RawEvJudgement i tid m in
              res_bind (peel_n_rawev n r) (fn x =>
                let val (r1, _) = x in
-               let val s' = add_asp_summary i tid f r1 s in Coq_resultC s' end end) end
+               let val s' = add_asp_summary i tid r1 s in Coq_resultC s' end end)
            | OutUnwrap => Coq_errC err_str_cannot_have_outwrap)
         | EXTEND =>
           (case out_sig of
              OutN n =>
-             let val f = get_RawEvJudgement i tid m in
              res_bind (peel_n_rawev n r) (fn x =>
                let val (r1, rest) = x in
-               let val s' = add_asp_summary i tid f r1 s in
-               do_AppraisalSummary' et' rest g m s' end end) end
+               let val s' = add_asp_summary i tid r1 s in
+               do_AppraisalSummary' et' rest g s' end end)
            | OutUnwrap => Coq_errC err_str_cannot_have_outwrap)
         | _ => Coq_resultC s) end
      | None => Coq_resultC s) end
   | Coq_left_evt et' =>
     res_bind
-      (apply_to_evidence_below g (fn et'' =>
-        do_AppraisalSummary' et'' r g m s) (Trail_LEFT :: []) et') (fn r0 =>
-      r0)
+      (apply_to_evidence_below g (fn et'' => do_AppraisalSummary' et'' r g s)
+        (Trail_LEFT :: []) et') (fn r0 => r0)
   | Coq_right_evt et' =>
     res_bind
-      (apply_to_evidence_below g (fn et'' =>
-        do_AppraisalSummary' et'' r g m s) (Trail_RIGHT :: []) et') (fn r0 =>
-      r0)
+      (apply_to_evidence_below g (fn et'' => do_AppraisalSummary' et'' r g s)
+        (Trail_RIGHT :: []) et') (fn r0 => r0)
   | Coq_split_evt et1 et2 =>
     res_bind (et_size g et1) (fn et1_size =>
       res_bind (et_size g et2) (fn et2_size =>
@@ -107,78 +79,20 @@ fun do_AppraisalSummary' et r g m s =
           let val (r1, rest) = x in
           res_bind (peel_n_rawev et2_size rest) (fn x0 =>
             let val (r2, _) = x0 in
-            res_bind (do_AppraisalSummary' et1 r1 g m s) (fn s1 =>
-              do_AppraisalSummary' et2 r2 g m s1) end) end)))
+            res_bind (do_AppraisalSummary' et1 r1 g s) (fn s1 =>
+              do_AppraisalSummary' et2 r2 g s1) end) end)))
   | _ => Coq_resultC s
 
 (** val do_AppraisalSummary :
-    coq_EvidenceT -> coq_RawEv -> coq_GlobalContext -> coq_RawEvJudgement ->
-    (coq_AppraisalSummary, string) coq_ResultT **)
+    coq_EvidenceT -> coq_RawEv -> coq_GlobalContext -> (coq_AppraisalSummary,
+    string) coq_ResultT **)
 
-fun do_AppraisalSummary et r g m =
-  do_AppraisalSummary' et r g m []
+fun do_AppraisalSummary et r g =
+  do_AppraisalSummary' et r g []
 
-type coq_RawEvJudgement_Entry =
-  coq_ASP_ID * (coq_TARG_ID * (coq_RawEv -> string))
+(** val fold_appsumm : coq_AppraisalSummary -> bool **)
 
-(** val addOne_rawEvJudgement :
-    coq_RawEvJudgement -> coq_RawEvJudgement_Entry -> coq_RawEvJudgement **)
-
-fun addOne_rawEvJudgement a b =
-  let val aid = fst b in
-  let val tid = fst (snd b) in
-  let val f = snd (snd b) in add_RawEvJudgement aid tid f a end end end
-
-(** val gen_rawEvJudgement :
-    coq_RawEvJudgement_Entry list -> coq_RawEvJudgement **)
-
-fun gen_rawEvJudgement ls =
-  fold_left addOne_rawEvJudgement ls []
-
-(** val rawEvJudgement_from_EvidenceT''' :
-    string -> (coq_ASP_ID * coq_TARG_ID) -> coq_RawEvJudgement_Entry **)
-
-fun rawEvJudgement_from_EvidenceT''' s x =
-  let val v = fst x in
-  let val v' = snd x in (v, (v', (ex_targJudgement_fun' s))) end end
-
-(** val asp_params_to_rawev_ids :
-    coq_ASP_PARAMS -> coq_ASP_ID * coq_TARG_ID **)
-
-fun asp_params_to_rawev_ids ps = case ps of
-  Coq_asp_paramsC i _ _ tid => (i, tid)
-
-(** val rawEvJudgement_from_EvidenceT''_helper :
-    coq_EvidenceT -> (coq_ASP_ID * coq_TARG_ID) list ->
-    (coq_ASP_ID * coq_TARG_ID) list **)
-
-fun rawEvJudgement_from_EvidenceT''_helper et ls =
-  case et of
-    Coq_asp_evt _ ps et' =>
-    rawEvJudgement_from_EvidenceT''_helper et'
-      ((asp_params_to_rawev_ids ps) :: ls)
-  | Coq_left_evt et' => rawEvJudgement_from_EvidenceT''_helper et' ls
-  | Coq_right_evt et' => rawEvJudgement_from_EvidenceT''_helper et' ls
-  | Coq_split_evt et1 et2 =>
-    rawEvJudgement_from_EvidenceT''_helper et2
-      (rawEvJudgement_from_EvidenceT''_helper et1 ls)
-  | _ => ls
-
-(** val rawEvJudgement_from_EvidenceT'' :
-    coq_EvidenceT -> (coq_ASP_ID * coq_TARG_ID) list **)
-
-fun rawEvJudgement_from_EvidenceT'' et =
-  rawEvJudgement_from_EvidenceT''_helper et []
-
-(** val rawEvJudgement_from_EvidenceT' :
-    string -> coq_EvidenceT -> coq_RawEvJudgement_Entry list **)
-
-fun rawEvJudgement_from_EvidenceT' s et =
-  map (rawEvJudgement_from_EvidenceT''' s)
-    (rawEvJudgement_from_EvidenceT'' et)
-
-(** val rawEvJudgement_from_EvidenceT :
-    string -> coq_EvidenceT -> coq_RawEvJudgement **)
-
-fun rawEvJudgement_from_EvidenceT s et =
-  gen_rawEvJudgement (rawEvJudgement_from_EvidenceT' s et)
+fun fold_appsumm appsumm =
+  let val targmaps = map_vals coq_Eq_Class_ID_Type appsumm in
+  let val targbools = map (map_vals coq_Eq_Class_ID_Type) targmaps in
+  forallb (fn ls => forallb id ls) targbools end end

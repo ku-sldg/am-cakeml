@@ -31,10 +31,16 @@ fun list_stringify_appsumm (appsumm_coq_json : coq_JSON) =
         | _ => [] (* TextIO.print_err "AppraisalSummary not correct JSON type\n" *)
   end
 
-fun print_appraisal_summary (appsumm : coq_AppraisalSummary) = 
-  let val (Build_Jsonifiable to_JSON _) = concrete_Jsonifiable_AppraisalSummary in 
+fun print_appraisal_summary (appsumm_pair : (coq_AppraisalSummary * bool)) = 
+  let val (Build_Jsonifiable to_JSON _) = concrete_Jsonifiable_AppraisalSummary 
+      val appsumm = fst appsumm_pair 
+      val appsumm_bool = snd appsumm_pair
+      val overall_string = 
+        case appsumm_bool of 
+          True => "PASSED"
+        | _ =>    "FAILED" in 
     (
-      print "\nAppraisal Summary:\n\n" ;
+      print (String.concat ["\nAppraisal Summary: ", overall_string, "\n\n"]) ;
       print (String.concat (list_stringify_appsumm (to_JSON appsumm)));
       print "\n"
     )
@@ -59,10 +65,9 @@ fun main () =
       val top_plc   : coq_Plc = "TOP_PLC"
       val att_plc   : coq_Plc = "P0" 
       val init_et        : coq_EvidenceT = Coq_mt_evt (* Coq_nonce_evt O  *)
-      val init_rawev : coq_RawEv = [] (* [passed_bs] *)
+      val init_rawev : coq_RawEv = []
       val attester_addr : coq_UUID = "localhost:5000"
-      val appraiser_addr : coq_UUID = "localhost:5003" 
-      val passed_string = "UEFTU0VE"
+      val appraiser_addr : coq_UUID = "localhost:5003"
       
       (* val app_result = run_demo_client_AM demo_term top_plc att_plc init_et att_sess init_rawev attester_addr appraiser_addr  *)
       (* TODO: Current this will do basically NOTHING *)
@@ -72,11 +77,9 @@ fun main () =
                               top_plc 
                               (Coq_evc [] Coq_mt_evt) 
                               demo_term
-                              (* example_appTerm  *)
-                              att_plc
-                              passed_string in 
+                              att_plc in 
       case maybe_appsumm of 
-        Coq_resultC appsumm => print_appraisal_summary appsumm
+        Coq_resultC (appsumm, appsumm_bool) => print_appraisal_summary (appsumm, appsumm_bool)
       | Coq_errC errStr => print errStr 
     end
   end
