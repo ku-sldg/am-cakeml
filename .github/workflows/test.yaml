@@ -67,5 +67,5 @@ jobs:
       - name: Run Tests
         run: |
           cd ${{ github.workspace }}/tests
-          export ASP_BIN=${{ env.ASP_LIB_PATH }}/bin
+          export ASP_BIN=${{ env.ASP_LIB_PATH }}/target/release
           make ci_test
