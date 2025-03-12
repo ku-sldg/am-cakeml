@@ -1,0 +1,98 @@
+type coq_AppraisalSummary = (coq_ASP_ID, (coq_TARG_ID, bool) coq_Map) coq_Map
+
+(** val map_get_default :
+    'a1 coq_EqClass -> 'a1 -> 'a2 -> ('a1, 'a2) coq_Map -> 'a2 **)
+
+fun map_get_default h x y m =
+  case map_get h x m of
+    Some v => v
+  | None => y
+
+(** val set_AppraisalSummary :
+    coq_ASP_ID -> coq_TARG_ID -> bool -> coq_AppraisalSummary ->
+    coq_AppraisalSummary **)
+
+fun set_AppraisalSummary i tid b s =
+  let val m = map_get_default coq_Eq_Class_ID_Type i [] s in
+  let val m' = map_set coq_Eq_Class_ID_Type tid b m in
+  map_set coq_Eq_Class_ID_Type i m' s end end
+
+(** val check_simple_appraised_rawev : coq_RawEv -> bool **)
+
+fun check_simple_appraised_rawev ls = case ls of
+  [] => False
+| bs :: l =>
+  (case l of
+     [] => eqb coq_EqClass_BS bs passed_bs
+   | _ :: _ => False)
+
+(** val add_asp_summary :
+    coq_ASP_ID -> coq_TARG_ID -> coq_RawEv -> coq_AppraisalSummary ->
+    coq_AppraisalSummary **)
+
+fun add_asp_summary i tid ls s =
+  let val b = check_simple_appraised_rawev ls in
+  set_AppraisalSummary i tid b s end
+
+(** val do_AppraisalSummary' :
+    coq_EvidenceT -> coq_RawEv -> coq_GlobalContext -> coq_AppraisalSummary
+    -> (coq_AppraisalSummary, string) coq_ResultT **)
+
+fun do_AppraisalSummary' et r g s =
+  case et of
+    Coq_asp_evt _ ps et' =>
+    let val Coq_asp_paramsC i _ _ tid = ps in
+    (case map_get coq_Eq_Class_ID_Type i
+            (let val Build_GlobalContext asp_types _ = g in asp_types end) of
+       Some e =>
+       let val Coq_ev_arrow fwd _ out_sig = e in
+       (case fwd of
+          REPLACE =>
+          (case out_sig of
+             OutN n =>
+             res_bind (peel_n_rawev n r) (fn x =>
+               let val (r1, _) = x in
+               let val s' = add_asp_summary i tid r1 s in Coq_resultC s' end end)
+           | OutUnwrap => Coq_errC err_str_cannot_have_outwrap)
+        | EXTEND =>
+          (case out_sig of
+             OutN n =>
+             res_bind (peel_n_rawev n r) (fn x =>
+               let val (r1, rest) = x in
+               let val s' = add_asp_summary i tid r1 s in
+               do_AppraisalSummary' et' rest g s' end end)
+           | OutUnwrap => Coq_errC err_str_cannot_have_outwrap)
+        | _ => Coq_resultC s) end
+     | None => Coq_resultC s) end
+  | Coq_left_evt et' =>
+    res_bind
+      (apply_to_evidence_below g (fn et'' => do_AppraisalSummary' et'' r g s)
+        (Trail_LEFT :: []) et') (fn r0 => r0)
+  | Coq_right_evt et' =>
+    res_bind
+      (apply_to_evidence_below g (fn et'' => do_AppraisalSummary' et'' r g s)
+        (Trail_RIGHT :: []) et') (fn r0 => r0)
+  | Coq_split_evt et1 et2 =>
+    res_bind (et_size g et1) (fn et1_size =>
+      res_bind (et_size g et2) (fn et2_size =>
+        res_bind (peel_n_rawev et1_size r) (fn x =>
+          let val (r1, rest) = x in
+          res_bind (peel_n_rawev et2_size rest) (fn x0 =>
+            let val (r2, _) = x0 in
+            res_bind (do_AppraisalSummary' et1 r1 g s) (fn s1 =>
+              do_AppraisalSummary' et2 r2 g s1) end) end)))
+  | _ => Coq_resultC s
+
+(** val do_AppraisalSummary :
+    coq_EvidenceT -> coq_RawEv -> coq_GlobalContext -> (coq_AppraisalSummary,
+    string) coq_ResultT **)
+
+fun do_AppraisalSummary et r g =
+  do_AppraisalSummary' et r g []
+
+(** val fold_appsumm : coq_AppraisalSummary -> bool **)
+
+fun fold_appsumm appsumm =
+  let val targmaps = map_vals coq_Eq_Class_ID_Type appsumm in
+  let val targbools = map (map_vals coq_Eq_Class_ID_Type) targmaps in
+  forallb (fn ls => forallb id ls) targbools end end

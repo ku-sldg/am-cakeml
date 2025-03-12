@@ -10,19 +10,12 @@ fun handle_AM_request_JSON conf js _ =
        (case let val Build_Jsonifiable _ from_JSON =
                coq_Jsonifiable_ProtocolRunRequest
                  (coq_Jsonifiable_Term
-                   (coq_Jsonifiable_ASP
-                     (jsonifiable_map_serial_serial coq_Stringifiable_ID_Type
-                       coq_Eq_Class_ID_Type coq_Stringifiable_ID_Type))
+                   (coq_Jsonifiable_ASP coq_Jsonifiable_ASP_ARGS)
                    coq_Jsonifiable_Split)
                  (coq_Jsonifiable_Evidence coq_Jsonifiable_RawEv
-                   (coq_Jsonifiable_EvidenceT
-                     (jsonifiable_map_serial_serial coq_Stringifiable_ID_Type
-                       coq_Eq_Class_ID_Type coq_Stringifiable_ID_Type)
+                   (coq_Jsonifiable_EvidenceT coq_Jsonifiable_ASP_ARGS
                      coq_Jsonifiable_nat
-                     (coq_Jsonifiable_ASP_Params
-                       (jsonifiable_map_serial_serial
-                         coq_Stringifiable_ID_Type coq_Eq_Class_ID_Type
-                         coq_Stringifiable_ID_Type))))
+                     (coq_Jsonifiable_ASP_Params coq_Jsonifiable_ASP_ARGS)))
                  (coq_Jsonifiable_Attestation_Session
                    (jsonifiable_map_serial_serial coq_Stringifiable_ID_Type
                      coq_Eq_Class_ID_Type coq_Stringifiable_UUUID)
@@ -51,14 +44,9 @@ fun handle_AM_request_JSON conf js _ =
              let val Build_Jsonifiable to_JSON _ =
                coq_Jsonifiable_ProtocolRunResponse
                  (coq_Jsonifiable_Evidence coq_Jsonifiable_RawEv
-                   (coq_Jsonifiable_EvidenceT
-                     (jsonifiable_map_serial_serial coq_Stringifiable_ID_Type
-                       coq_Eq_Class_ID_Type coq_Stringifiable_ID_Type)
+                   (coq_Jsonifiable_EvidenceT coq_Jsonifiable_ASP_ARGS
                      coq_Jsonifiable_nat
-                     (coq_Jsonifiable_ASP_Params
-                       (jsonifiable_map_serial_serial
-                         coq_Stringifiable_ID_Type coq_Eq_Class_ID_Type
-                         coq_Stringifiable_ID_Type))))
+                     (coq_Jsonifiable_ASP_Params coq_Jsonifiable_ASP_ARGS)))
              in
              to_JSON (Coq_mkPRResp True res_ev) end) end end end end end)
      | False =>

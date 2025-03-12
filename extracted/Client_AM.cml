@@ -1,0 +1,73 @@
+(** val am_sendReq :
+    coq_Attestation_Session -> coq_Plc -> coq_Evidence -> coq_Term -> coq_Plc
+    -> (coq_RawEv, string) coq_ResultT **)
+
+fun am_sendReq att_sess req_plc e t toPlc =
+  let val req = Coq_mkPRReq att_sess req_plc e t in
+  let val m =
+    let val Coq_mkAtt_Sess _ plc_Mapping _ _ = att_sess in plc_Mapping end
+  in
+  (case map_get coq_Eq_Class_ID_Type toPlc m of
+     Some uuid =>
+     let val js =
+       let val Build_Jsonifiable to_JSON _ =
+         coq_Jsonifiable_ProtocolRunRequest
+           (coq_Jsonifiable_Term
+             (coq_Jsonifiable_ASP coq_Jsonifiable_ASP_ARGS)
+             coq_Jsonifiable_Split)
+           (coq_Jsonifiable_Evidence coq_Jsonifiable_RawEv
+             (coq_Jsonifiable_EvidenceT coq_Jsonifiable_ASP_ARGS
+               coq_Jsonifiable_nat
+               (coq_Jsonifiable_ASP_Params coq_Jsonifiable_ASP_ARGS)))
+           (coq_Jsonifiable_Attestation_Session
+             (jsonifiable_map_serial_serial coq_Stringifiable_ID_Type
+               coq_Eq_Class_ID_Type coq_Stringifiable_UUUID)
+             (jsonifiable_map_serial_serial coq_Stringifiable_ID_Type
+               coq_Eq_Class_ID_Type coq_Stringifiable_PublicKey)
+             (coq_Jsonifiable_GlobalContext coq_Stringifiable_ID_Type
+               (jsonifiable_map_serial_serial coq_Stringifiable_ID_Type
+                 coq_Eq_Class_ID_Type coq_Stringifiable_ID_Type)
+               (jsonifiable_map_serial_json coq_Stringifiable_ID_Type
+                 coq_Eq_Class_ID_Type
+                 (coq_Jsonifiable_EvSig
+                   (coq_Jsonifiable_EvOutSig coq_Jsonifiable_nat)
+                   coq_Stringifiable_FWD))))
+       in
+       to_JSON req end
+     in
+     let val resp_res = make_JSON_Network_Request uuid js in
+     (case resp_res of
+        Coq_errC msg => Coq_errC msg
+      | Coq_resultC js_res =>
+        (case let val Build_Jsonifiable _ from_JSON =
+                coq_Jsonifiable_ProtocolRunResponse
+                  (coq_Jsonifiable_Evidence coq_Jsonifiable_RawEv
+                    (coq_Jsonifiable_EvidenceT coq_Jsonifiable_ASP_ARGS
+                      coq_Jsonifiable_nat
+                      (coq_Jsonifiable_ASP_Params coq_Jsonifiable_ASP_ARGS)))
+              in
+              from_JSON js_res end of
+           Coq_errC msg => Coq_errC msg
+         | Coq_resultC res =>
+           let val Coq_mkPRResp success prresp_Evidence = res in
+           let val Coq_evc ev _ = prresp_Evidence in
+           (case success of
+              True => Coq_resultC ev
+            | False => Coq_errC errStr_remote_am_failure) end end)) end end
+   | None => Coq_errC errStr_remote_am_failure) end end
+
+(** val am_client_app_summary :
+    coq_Attestation_Session -> coq_Plc -> coq_Evidence -> coq_Term -> coq_Plc
+    -> (coq_AppraisalSummary * bool, string) coq_ResultT **)
+
+fun am_client_app_summary att_sess req_plc e t toPlc =
+  case am_sendReq att_sess req_plc e t toPlc of
+    Coq_errC msg => Coq_errC msg
+  | Coq_resultC rawev =>
+    let val glob_ctx =
+      let val Coq_mkAtt_Sess _ _ _ ats_context = att_sess in ats_context end
+    in
+    let val Coq_evc _ et = e in
+    res_bind (eval glob_ctx toPlc et t) (fn et' =>
+      res_bind (do_AppraisalSummary et' rawev glob_ctx) (fn appsumm =>
+        Coq_resultC (appsumm, (fold_appsumm appsumm)))) end end

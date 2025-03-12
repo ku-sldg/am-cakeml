@@ -26,6 +26,47 @@ structure BString = struct
     in 
         type bstring = bstring
 
+        (* bstring -> byte_array *)
+        fun toByteArray bs = case bs of Bs s =>
+            let val len = String.size s
+                val arr = Word8Array.array len Word8Extra.null
+             in Word8Array.copyVec s 0 len arr 0;
+                arr
+            end
+
+        (* byte_array -> bstring *)
+        fun fromByteArray arr = Bs (Word8Array.substring arr 0 (Word8Array.length arr))
+
+        fun int_to_qword i = 
+          if (i > 2147483647) orelse (i < ~2147483648)
+          then raise (Exception "int_to_qword: integer out of range")
+          else
+          (let
+            val wbuf = Word8Array.array 4 (Word8.fromInt 0)
+            val _ = Word8Array.update wbuf 0 (Word8.fromInt (i div 16777216))
+            val _ = Word8Array.update wbuf 1 (Word8.fromInt ((i div 65536) mod 256))
+            val _ = Word8Array.update wbuf 2 (Word8.fromInt ((i div 256) mod 256))
+            val _ = Word8Array.update wbuf 3 (Word8.fromInt (i mod 256))
+          in
+            fromByteArray wbuf
+          end)
+
+        fun qword_to_int arr = 
+          let val wbuf = toByteArray arr
+          in
+            if Word8Array.length wbuf <> 4
+            then raise (Exception "qword_to_int: invalid buffer length")
+            else
+            let
+              val b0 = Word8.toIntSigned (Word8Array.sub wbuf 0)
+              val b1 = Word8.toInt (Word8Array.sub wbuf 1)
+              val b2 = Word8.toInt (Word8Array.sub wbuf 2)
+              val b3 = Word8.toInt (Word8Array.sub wbuf 3)
+            in
+              b0 * 16777216 + b1 * 65536 + b2 * 256 + b3
+            end
+          end
+
         val empty = Bs ""
         val nullByte = Bs nullCharStr
 
@@ -91,14 +132,16 @@ structure BString = struct
         fun tokens f = List.map fromString o applyStr (String.tokens (f o charToWord8))
 
         (* bstring -> string *)
-        val show = String.concat o List.map Word8Extra.toHex o explode
+        (* val show = String.concat o List.map Word8Extra.toHex o explode *)
+        val show = toString
 
         (* string -> bstring *)
-        fun unshow s = case String.size s of 
+        (* fun unshow s = case String.size s of 
               0 => empty
             | 1 => raise Word8Extra.InvalidHex
             | _ => case StringExtra.splitAt 2 s of 
-                  (hexByte, s') => concat (singleton (Word8Extra.fromHex hexByte)) (unshow s')
+                  (hexByte, s') => concat (singleton (Word8Extra.fromHex hexByte)) (unshow s') *)
+        val unshow = fromString
 
         (* (word8 -> word8) -> bstring -> bstring *)
         fun map f = mapStr (StringExtra.map (word8ToChar o f o charToWord8))
@@ -114,17 +157,6 @@ structure BString = struct
 
         (* (int -> 'a -> word8 -> 'a) -> 'a -> bstring -> 'a *)
         fun foldli f = applyStr o StringExtra.foldli (fn i => fn a => f i a o charToWord8)
-
-        (* bstring -> byte_array *)
-        fun toByteArray bs = case bs of Bs s =>
-            let val len = String.size s
-                val arr = Word8Array.array len Word8Extra.null
-             in Word8Array.copyVec s 0 len arr 0;
-                arr
-            end
-
-        (* byte_array -> bstring *)
-        fun fromByteArray arr = Bs (Word8Array.substring arr 0 (Word8Array.length arr))
 
         datatype endianness = BigEndian | LittleEndian
 

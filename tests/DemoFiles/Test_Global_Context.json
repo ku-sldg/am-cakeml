@@ -1,6 +1,14 @@
 {
   "ASP_Types": {
-    "sig_id": {
+    "magic_appr": {
+      "FWD": "REPLACE",
+      "EvInSig": "ALL",
+      "EvOutSig": {
+        "EvOutSig_CONSTRUCTOR": "OutN",
+        "EvOutSig_BODY": "1"
+      }
+    },
+    "large_output": {
       "FWD": "EXTEND",
       "EvInSig": "ALL",
       "EvOutSig": {
@@ -8,7 +16,7 @@
         "EvOutSig_BODY": "1"
       }
     },
-    "attest1_id": {
+    "attest": {
       "FWD": "EXTEND",
       "EvInSig": "ALL",
       "EvOutSig": {
@@ -16,7 +24,7 @@
         "EvOutSig_BODY": "1"
       }
     },
-    "attest2_id": {
+    "appraise": {
       "FWD": "EXTEND",
       "EvInSig": "ALL",
       "EvOutSig": {
@@ -24,15 +32,7 @@
         "EvOutSig_BODY": "1"
       }
     },
-    "hashfile_id": {
-      "FWD": "EXTEND",
-      "EvInSig": "NONE",
-      "EvOutSig": {
-        "EvOutSig_CONSTRUCTOR": "OutN",
-        "EvOutSig_BODY": "1"
-      }
-    },
-    "attest_id": {
+    "certificate": {
       "FWD": "EXTEND",
       "EvInSig": "ALL",
       "EvOutSig": {
@@ -40,15 +40,15 @@
         "EvOutSig_BODY": "1"
       }
     },
-    "certificate_id": {
-      "FWD": "EXTEND",
-      "EvInSig": "NONE",
+    "hashevidence": {
+      "FWD": "REPLACE",
+      "EvInSig": "ALL",
       "EvOutSig": {
         "EvOutSig_CONSTRUCTOR": "OutN",
         "EvOutSig_BODY": "1"
       }
     },
-    "appraise_id": {
+    "hashfile": {
       "FWD": "EXTEND",
       "EvInSig": "ALL",
       "EvOutSig": {
@@ -56,7 +56,103 @@
         "EvOutSig_BODY": "1"
       }
     },
-    "large_output_id": {
+    "hashfile_appr": {
+      "FWD": "REPLACE",
+      "EvInSig": "ALL",
+      "EvOutSig": {
+        "EvOutSig_CONSTRUCTOR": "OutN",
+        "EvOutSig_BODY": "1"
+      }
+    },
+    "invary_get_measurement": {
+      "FWD": "EXTEND",
+      "EvInSig": "ALL",
+      "EvOutSig": {
+        "EvOutSig_CONSTRUCTOR": "OutN",
+        "EvOutSig_BODY": "1"
+      }
+    },
+    "invary_get_measurement_appr": {
+      "FWD": "REPLACE",
+      "EvInSig": "ALL",
+      "EvOutSig": {
+        "EvOutSig_CONSTRUCTOR": "OutN",
+        "EvOutSig_BODY": "1"
+      }
+    },
+    "provision": {
+      "FWD": "EXTEND",
+      "EvInSig": "ALL",
+      "EvOutSig": {
+        "EvOutSig_CONSTRUCTOR": "OutN",
+        "EvOutSig_BODY": "1"
+      }
+    },
+    "readfile": {
+      "FWD": "EXTEND",
+      "EvInSig": "ALL",
+      "EvOutSig": {
+        "EvOutSig_CONSTRUCTOR": "OutN",
+        "EvOutSig_BODY": "1"
+      }
+    },
+    "readfile_appr": {
+      "FWD": "REPLACE",
+      "EvInSig": "ALL",
+      "EvOutSig": {
+        "EvOutSig_CONSTRUCTOR": "OutN",
+        "EvOutSig_BODY": "1"
+      }
+    },
+    "selinux_pol_dump": {
+      "FWD": "EXTEND",
+      "EvInSig": "ALL",
+      "EvOutSig": {
+        "EvOutSig_CONSTRUCTOR": "OutN",
+        "EvOutSig_BODY": "1"
+      }
+    },
+    "selinux_pol_dump_appr": {
+      "FWD": "REPLACE",
+      "EvInSig": "ALL",
+      "EvOutSig": {
+        "EvOutSig_CONSTRUCTOR": "OutN",
+        "EvOutSig_BODY": "1"
+      }
+    },
+    "sig": {
+      "FWD": "EXTEND",
+      "EvInSig": "ALL",
+      "EvOutSig": {
+        "EvOutSig_CONSTRUCTOR": "OutN",
+        "EvOutSig_BODY": "1"
+      }
+    },
+    "sig_appr": {
+      "FWD": "REPLACE",
+      "EvInSig": "ALL",
+      "EvOutSig": {
+        "EvOutSig_CONSTRUCTOR": "OutN",
+        "EvOutSig_BODY": "1"
+      }
+    },
+    "sig_tpm": {
+      "FWD": "EXTEND",
+      "EvInSig": "ALL",
+      "EvOutSig": {
+        "EvOutSig_CONSTRUCTOR": "OutN",
+        "EvOutSig_BODY": "1"
+      }
+    },
+    "sig_tpm_appr": {
+      "FWD": "REPLACE",
+      "EvInSig": "ALL",
+      "EvOutSig": {
+        "EvOutSig_CONSTRUCTOR": "OutN",
+        "EvOutSig_BODY": "1"
+      }
+    },
+    "uptime": {
       "FWD": "EXTEND",
       "EvInSig": "ALL",
       "EvOutSig": {
@@ -66,12 +162,17 @@
     }
   },
   "ASP_Comps": {
-    "sig_id": "certificate_id",
-    "hashfile_id": "appraise_id",
-    "attest_id": "appraise_id",
-    "attest1_id": "appraise_id",
-    "attest2_id": "appraise_id",
-    "appraise_id": "appraise_id",
-    "certificate_id": "appraise_id"
+    "attest": "magic_appr",
+    "certificate": "magic_appr",
+    "appraise": "magic_appr",
+    "hashevidence": "NULL",
+    "hashfile": "hashfile_appr",
+    "invary_get_measurement": "invary_get_measurement_appr",
+    "provision": "NULL",
+    "readfile": "readfile_appr",
+    "selinux_pol_dump": "selinux_pol_dump_appr",
+    "sig": "sig_appr",
+    "sig_tpm": "sig_tpm_appr",
+    "uptime": "NULL"
   }
 }

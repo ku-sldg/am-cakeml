@@ -12,15 +12,16 @@ BUILD_BIN="$BUILD_DIR/bin"
 
 # Function to display usage instructions
 usage() {
-  echo "Usage: $0 -t [cert|cert_appr|bg|parmut|filehash] (-h (headless)) [-a <path-to-asps>]"
+  echo "Usage: $0 -t [cert|cert_appr|bg|parmut|filehash] (-h (headless)) [-a <path-to-asps>] -s (for only checking phrase send, otherwise checks for successful appraisal)"
   exit 1
 }
 
 TERM_TYPE=""
 HEADLESS=0
+SEND=0
 
 # Parse command-line arguments
-while getopts "t:ha:" opt; do
+while getopts "t:ha:s" opt; do
   case ${opt} in
     t )
       TERM_TYPE=$OPTARG
@@ -30,6 +31,9 @@ while getopts "t:ha:" opt; do
       ;;
     a )
       ASP_BIN=$OPTARG
+      ;;
+    s )
+      SEND=1
       ;;
     * )
       usage
@@ -41,6 +45,13 @@ done
 if [[ -z "$TERM_TYPE" ]]; then
   usage
   exit 1
+fi
+
+CLIENT_AM_ARGS=""
+if [[ $SEND -eq 1 ]]; then
+  CLIENT_AM_ARGS="--send"
+else
+  CLIENT_AM_ARGS="--appr"
 fi
 
 if [[ "$TERM_TYPE" == "layered_bg" ]]; then
@@ -85,6 +96,8 @@ GENERATED=$DEMO_FILES/Generated
 # Reusable Variables
 TEST_GLOBAL_CONTEXT=$DEMO_FILES/Test_Global_Context.json
 TEST_ATT_SESS=$DEMO_FILES/Test_Session.json
+FULL_ATT_SESS=$GENERATED/Full_Session.json
+SESS_REPLACE_VAR="\"\$\$FILL_IN_CONTEXT\$\$\""
 
 # Specific Variables
 TERM_FILE="$GENERATED/$TERM_TYPE.json"
@@ -96,6 +109,13 @@ EVID_PAIR_LIST="$GENERATED/EvidPairList.json"
 # Clean and rebuild generated dir
 rm -rf $GENERATED
 mkdir -p $GENERATED
+
+# Replace $$Test_Global_Context.json$$ variable in TEST_ATT_SESS with the value within the file TEST_GLOBAL_CONTEXT
+sed -e "/$SESS_REPLACE_VAR/{
+  s/$SESS_REPLACE_VAR//g
+  r $TEST_GLOBAL_CONTEXT
+}" $TEST_ATT_SESS > $FULL_ATT_SESS
+
 
 if [[ "$REPO_ROOT" == */am-cakeml ]]; then
   # Move to build folder
@@ -157,14 +177,18 @@ if [[ "$REPO_ROOT" == */am-cakeml ]]; then
   if [[ $HEADLESS -eq 0 ]]; then
     tmux new-window -t ServerProcess -n "Client"
 
-    tmux send-keys -t ServerProcess:Client "sleep 1 && $CLIENT_AM_EXEC -t $TERM_FILE -s $TEST_ATT_SESS" C-m
+    tmux send-keys -t ServerProcess:Client "sleep 1 && $CLIENT_AM_EXEC -t $TERM_FILE -s $FULL_ATT_SESS $CLIENT_AM_ARGS" C-m
       
     tmux attach-session -d -t ServerProcess
   else
     sleep 1 
-    $TESTS_DIR/send_term_req.sh -h $IP -p $PORT -f $TERM_FILE -s $TEST_ATT_SESS > $GENERATED/output_resp.json
+    $CLIENT_AM_EXEC -t $TERM_FILE -s $FULL_ATT_SESS $CLIENT_AM_ARGS > $GENERATED/output_resp.json
     # We need this to be the last line so that the exit code is whether or not we found success
-    grep "\"SUCCESS\":true" $GENERATED/output_resp.json
+    if [[ $SEND -eq 1 ]]; then
+      grep "SUCCESS: Copland Phrase Executed Successfully!" $GENERATED/output_resp.json
+    else
+      grep "Appraisal Summary: PASSED" $GENERATED/output_resp.json
+    fi
   fi
 else
   echo "You are in $PWD, with the root set as $REPO_ROOT, but youre root should be 'am-cakeml'"

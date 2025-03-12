@@ -1,0 +1,80 @@
+
+
+
+
+// Group together headers that determine where messages should be
+// delivered:
+{"declare-str" : {"recipients" :
+		  ["To",
+		   "CC", 
+		   "Bcc",
+		   "Apparently-to" ]}}
+
+// Some headers dealing with where a msg has come from, which are
+// convenient for testing substitutions.  
+
+{"declare-str" : {"sourceinfo" :
+		  ["Received",
+		   "Message-ID",
+		   "x-forefront-antispam-report",
+		   "x-ms-exchange-crosstenant-authsource",
+		   "X-MS-Exchange-CrossTenant-AuthSource"]}}
+
+// Group together headers that expose messages came from on the
+// inside:
+{"declare-str" : {"origin" :
+		  ["From",
+		   "Reply-to",
+		   "Return-path" ]}}
+
+// Two substitutions to de-sensitize "origin" headers:  
+{"declare-doms-subst" :
+ {"clean-up-internal" :
+  [{"from" : ["sensitive", "internal", "gov"],
+    "to"   : ["mail", "internal", "gov"]},
+   {"from" : ["sensitive-peer", "gov"],
+    "to"   : ["alias-peer", "gov"]}]}}
+
+//Two substitutions to change Baroque to Renaissance artists
+{"declare-str-subst" :
+ {"classicize" :
+  [{"from" : "Caravaggio",
+    "to" : "Correggio"},
+   {"from" : "Bernini",
+    "to" : "Bellini"}]}} 
+
+// Don't send mesgs to these domains!  
+{"declare-doms" :
+ {"unfriendly" :
+  [ ["fsb", "ru"],
+    ["kgb", "by"] ]}} // Belorus didn't change the name
+
+// One action to de-sensitize domains from inside
+
+{"locale" : {"header" : "origin",
+	     "field"  : "domain"},
+ "outcome" : "clean-up-internal"}
+
+// One action to redirect messages addressed to unfriendly
+// addressees to our logging domain
+
+{"locale" : {"header" : "recipients",
+	     "field"  : "domain"},
+ "outcome" : {"from" : "unfriendly",
+	      "to"   : ["logging", "local"]}}
+
+// Convenient test substitutions 
+
+{"locale" : "sourceinfo",
+ "outcome" : {"from" : "outlook.com",
+	      "to"   : "mitre.org"}}
+
+{"locale" : "Bcc",
+ "outcome" : {"from" : "comrade",
+	      "to"   : "scoundrel"}}
+
+{"locale" : "Subject",
+ "outcome" : "classicize"}
+
+
+

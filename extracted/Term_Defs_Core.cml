@@ -8,7 +8,7 @@ type coq_ASP_ID = coq_ID_Type
 
 type coq_ASP_Compat_MapT = (coq_ASP_ID, coq_ASP_ID) coq_Map
 
-type coq_ASP_ARGS = (string, string) coq_Map
+type coq_ASP_ARGS = coq_JSON
 
 type coq_TARG_ID = coq_ID_Type
 
@@ -65,93 +65,6 @@ datatype coq_Term =
 | Coq_lseq coq_Term coq_Term
 | Coq_bseq coq_Split coq_Term coq_Term
 | Coq_bpar coq_Split coq_Term coq_Term
-
-datatype coq_EvTrails =
-  Trail_UNWRAP coq_ASP_ID
-| Trail_LEFT 
-| Trail_RIGHT 
-
-(** val apply_to_evidence_below :
-    coq_GlobalContext -> (coq_EvidenceT -> 'a1) -> coq_EvTrails list ->
-    coq_EvidenceT -> ('a1, string) coq_ResultT **)
-
-fun apply_to_evidence_below g f trails e =
-  case trails of
-    [] => Coq_resultC (f e)
-  | trail :: trails' =>
-    (case e of
-       Coq_asp_evt _ a et' =>
-       let val Coq_asp_paramsC top_id _ _ _ = a in
-       (case map_get coq_Eq_Class_ID_Type top_id
-               (let val Build_GlobalContext asp_types _ = g in asp_types end) of
-          Some e0 =>
-          let val Coq_ev_arrow f0 _ _ = e0 in
-          (case f0 of
-             WRAP =>
-             (case trail of
-                Trail_UNWRAP unwrap_id =>
-                (case map_get coq_Eq_Class_ID_Type top_id
-                        (let val Build_GlobalContext _ asp_comps = g in
-                         asp_comps end) of
-                   Some test_unwrapping_id =>
-                   (case eqb coq_Eq_Class_ID_Type test_unwrapping_id unwrap_id of
-                      True => apply_to_evidence_below g f trails' et'
-                    | False => Coq_errC err_str_wrap_asp_not_duals)
-                 | None => Coq_errC err_str_asp_no_compat_appr_asp)
-              | _ => Coq_errC err_str_trail_mismatch)
-           | UNWRAP =>
-             apply_to_evidence_below g f ((Trail_UNWRAP top_id) :: trails) et'
-           | _ => Coq_errC err_str_asp_at_bottom_not_wrap) end
-        | None => Coq_errC err_str_asp_no_type_sig) end
-     | Coq_left_evt et' =>
-       apply_to_evidence_below g f (Trail_LEFT :: trails) et'
-     | Coq_right_evt et' =>
-       apply_to_evidence_below g f (Trail_RIGHT :: trails) et'
-     | Coq_split_evt e1 e2 =>
-       (case trail of
-          Trail_UNWRAP _ => Coq_errC err_str_trail_mismatch
-        | Trail_LEFT => apply_to_evidence_below g f trails' e1
-        | Trail_RIGHT => apply_to_evidence_below g f trails' e2)
-     | _ => Coq_errC err_str_no_evidence_below)
-
-(** val et_size :
-    coq_GlobalContext -> coq_EvidenceT -> (nat, string) coq_ResultT **)
-
-fun et_size g e = case e of
-  Coq_mt_evt => Coq_resultC O
-| Coq_nonce_evt _ => Coq_resultC (S O)
-| Coq_asp_evt _ par e' =>
-  let val Coq_asp_paramsC asp_id _ _ _ = par in
-  (case map_get coq_Eq_Class_ID_Type asp_id
-          (let val Build_GlobalContext asp_types _ = g in asp_types end) of
-     Some e0 =>
-     let val Coq_ev_arrow fwd _ out_sig = e0 in
-     (case fwd of
-        UNWRAP =>
-        (case out_sig of
-           OutN _ => Coq_errC err_str_unwrap_must_have_outwrap
-         | OutUnwrap =>
-           res_bind
-             (apply_to_evidence_below g (et_size g) ((Trail_UNWRAP
-               asp_id) :: []) e') (fn n' => n'))
-      | EXTEND =>
-        (case out_sig of
-           OutN n => res_bind (et_size g e') (fn n' => Coq_resultC (add n n'))
-         | OutUnwrap => Coq_errC err_str_cannot_have_outwrap)
-      | _ =>
-        (case out_sig of
-           OutN n => Coq_resultC n
-         | OutUnwrap => Coq_errC err_str_cannot_have_outwrap)) end
-   | None => Coq_errC err_str_asp_no_type_sig) end
-| Coq_left_evt e' =>
-  res_bind (apply_to_evidence_below g (et_size g) (Trail_LEFT :: []) e')
-    (fn r => r)
-| Coq_right_evt e' =>
-  res_bind (apply_to_evidence_below g (et_size g) (Trail_RIGHT :: []) e')
-    (fn r => r)
-| Coq_split_evt e1 e2 =>
-  res_bind (et_size g e1) (fn s1 =>
-    res_bind (et_size g e2) (fn s2 => Coq_resultC (add s1 s2)))
 
 type coq_RawEv = coq_BS list
 

@@ -1,0 +1,267 @@
+(** val cds_config_dir_plc : coq_Plc **)
+
+val cds_config_dir_plc : coq_Plc =
+  "cds_config_dir_plc"
+
+(** val cds_query_kim_plc : coq_Plc **)
+
+val cds_query_kim_plc : coq_Plc =
+  "cds_query_kim_plc"
+
+(** val kim_evidence_targ : coq_TARG_ID **)
+
+val kim_evidence_targ : coq_TARG_ID =
+  "kernal_module_targ"
+
+(** val selinux_policy_targ : coq_TARG_ID **)
+
+val selinux_policy_targ : coq_TARG_ID =
+  "selinux_policy_targ"
+
+(** val ssl_sig_targ : coq_TARG_ID **)
+
+val ssl_sig_targ : coq_TARG_ID =
+  "ssl_sig_targ"
+
+(** val tpm_sig_targ : coq_TARG_ID **)
+
+val tpm_sig_targ : coq_TARG_ID =
+  "tpm_sig_targ"
+
+(** val cds_config_1_targ : coq_TARG_ID **)
+
+val cds_config_1_targ : coq_TARG_ID =
+  "cds_rewrite_config_targ"
+
+(** val cds_config_2_targ : coq_TARG_ID **)
+
+val cds_config_2_targ : coq_TARG_ID =
+  "cds_filter_config_2_targ"
+
+(** val cds_img_1_targ : coq_TARG_ID **)
+
+val cds_img_1_targ : coq_TARG_ID =
+  "cds_rewrite_img_targ"
+
+(** val cds_img_2_targ : coq_TARG_ID **)
+
+val cds_img_2_targ : coq_TARG_ID =
+  "cds_filter_img_targ"
+
+(** val cds_img_3_targ : coq_TARG_ID **)
+
+val cds_img_3_targ : coq_TARG_ID =
+  "cds_img_3_targ"
+
+(** val query_kim : coq_ASP_ID **)
+
+val query_kim : coq_ASP_ID =
+  "invary_get_measurement"
+
+(** val hash_file_contents : coq_ASP_ID **)
+
+val hash_file_contents : coq_ASP_ID =
+  "hashfile"
+
+(** val hash_evidence : coq_ASP_ID **)
+
+val hash_evidence : coq_ASP_ID =
+  "hashevidence"
+
+(** val gather_file_contents : coq_ASP_ID **)
+
+val gather_file_contents : coq_ASP_ID =
+  "readfile"
+
+(** val provision : coq_ASP_ID **)
+
+val provision : coq_ASP_ID =
+  "provision"
+
+(** val tpm_sig : coq_ASP_ID **)
+
+val tpm_sig : coq_ASP_ID =
+  "sig_tpm"
+
+(** val selinux_pol_dump : coq_ASP_ID **)
+
+val selinux_pol_dump : coq_ASP_ID =
+  "selinux_pol_dump"
+
+(** val r_ssl_sig : coq_ASP_ID **)
+
+val r_ssl_sig : coq_ASP_ID =
+  "sig"
+
+(** val gather_targ_asp :
+    coq_Plc -> coq_TARG_ID -> string -> string -> coq_Term **)
+
+fun gather_targ_asp targPlc targId path appr_path =
+  Coq_asp (ASPC (Coq_asp_paramsC gather_file_contents (JSON_Object
+    (("filepath", (JSON_String path)) :: (("filepath-golden", (JSON_String
+    appr_path)) :: []))) targPlc targId))
+
+(** val hash_targ_asp :
+    coq_Plc -> coq_TARG_ID -> string -> string -> coq_Term **)
+
+fun hash_targ_asp targPlc targId path appr_path =
+  Coq_asp (ASPC (Coq_asp_paramsC hash_file_contents (JSON_Object
+    (("filepath", (JSON_String path)) :: (("filepath-golden", (JSON_String
+    appr_path)) :: []))) targPlc targId))
+
+(** val provision_targ_asp : coq_Plc -> coq_TARG_ID -> string -> coq_Term **)
+
+fun provision_targ_asp targPlc targId path =
+  Coq_asp (ASPC (Coq_asp_paramsC provision (JSON_Object (("filepath",
+    (JSON_String path)) :: [])) targPlc targId))
+
+(** val hash_evidence_asp : coq_Plc -> coq_TARG_ID -> string -> coq_Term **)
+
+fun hash_evidence_asp targPlc targId appr_path =
+  Coq_asp (ASPC (Coq_asp_paramsC hash_evidence (JSON_Object
+    (("filepath-golden", (JSON_String appr_path)) :: [])) targPlc targId))
+
+(** val selinux_hash_asp : coq_Plc -> coq_TARG_ID -> coq_Term **)
+
+fun selinux_hash_asp targPlc targId =
+  Coq_asp (ASPC (Coq_asp_paramsC selinux_pol_dump (JSON_Object []) targPlc
+    targId))
+
+(** val path_targ1 : string **)
+
+val path_targ1 : string =
+  "/../LayeredAttestation/src/demo_layered_attestation/cds_config/rewrite_one_config.json"
+
+(** val path_targ1_golden : string **)
+
+val path_targ1_golden : string =
+  "/tests/DemoFiles/goldenFiles/rewrite_one_config.json"
+
+(** val path_micro_targ1 : string **)
+
+val path_micro_targ1 : string =
+  "/../INSPECTA-models/micro-examples/microkit/aadl_port_types/data/base_type/aadl/data_1_prod_2_cons.aadl"
+
+(** val path_micro_targ1_golden : string **)
+
+val path_micro_targ1_golden : string =
+  "/tests/DemoFiles/goldenFiles/data_1_prod_2_cons.aadl"
+
+(** val path_micro_targ2 : string **)
+
+val path_micro_targ2 : string =
+  "/../INSPECTA-models/micro-examples/microkit/aadl_port_types/data/base_type/hamr/microkit/microkit.system"
+
+(** val path_micro_targ2_golden : string **)
+
+val path_micro_targ2_golden : string =
+  "/tests/DemoFiles/goldenFiles/microkit.system"
+
+(** val path_micro_composite_golden : string **)
+
+val path_micro_composite_golden : string =
+  "/tests/DemoFiles/goldenFiles/micro_composite.txt"
+
+(** val path_targ2 : string **)
+
+val path_targ2 : string =
+  "/../LayeredAttestation/src/demo_layered_attestation/cds_config/filter_one_config.json"
+
+(** val path_targ2_golden : string **)
+
+val path_targ2_golden : string =
+  "/tests/DemoFiles/goldenFiles/filter_one_config.json"
+
+(** val path_exe_targ1 : string **)
+
+val path_exe_targ1 : string =
+  "/../LayeredAttestation/src/demo_layered_attestation/installed_dir/bin/rewrite_one"
+
+(** val path_exe_targ1_golden : string **)
+
+val path_exe_targ1_golden : string =
+  "/tests/DemoFiles/goldenFiles/rewrite_one"
+
+(** val path_exe_targ2 : string **)
+
+val path_exe_targ2 : string =
+  "/../LayeredAttestation/src/demo_layered_attestation/installed_dir/bin/filter_one"
+
+(** val path_exe_targ2_golden : string **)
+
+val path_exe_targ2_golden : string =
+  "/tests/DemoFiles/goldenFiles/filter_one"
+
+(** val gather_config_1 : coq_Term **)
+
+val gather_config_1 : coq_Term =
+  gather_targ_asp cds_config_dir_plc cds_config_1_targ path_targ1
+    path_targ1_golden
+
+(** val gather_config_2 : coq_Term **)
+
+val gather_config_2 : coq_Term =
+  gather_targ_asp cds_config_dir_plc cds_config_2_targ path_targ2
+    path_targ2_golden
+
+(** val hash_cds_img_1 : coq_Term **)
+
+val hash_cds_img_1 : coq_Term =
+  hash_targ_asp cds_config_dir_plc cds_img_1_targ path_exe_targ1
+    path_exe_targ1_golden
+
+(** val hash_cds_img_2 : coq_Term **)
+
+val hash_cds_img_2 : coq_Term =
+  hash_targ_asp cds_config_dir_plc cds_img_2_targ path_exe_targ2
+    path_exe_targ2_golden
+
+(** val selinux_hash_pol : coq_Term **)
+
+val selinux_hash_pol : coq_Term =
+  selinux_hash_asp cds_config_dir_plc selinux_policy_targ
+
+(** val provision_config_1 : coq_Term **)
+
+val provision_config_1 : coq_Term =
+  provision_targ_asp cds_config_dir_plc cds_config_1_targ path_targ1_golden
+
+(** val provision_config_2 : coq_Term **)
+
+val provision_config_2 : coq_Term =
+  provision_targ_asp cds_config_dir_plc cds_config_2_targ path_targ2_golden
+
+(** val provision_img_1 : coq_Term **)
+
+val provision_img_1 : coq_Term =
+  provision_targ_asp cds_config_dir_plc cds_img_1_targ path_exe_targ1_golden
+
+(** val provision_img_2 : coq_Term **)
+
+val provision_img_2 : coq_Term =
+  provision_targ_asp cds_config_dir_plc cds_img_2_targ path_exe_targ2_golden
+
+(** val query_kim_args : coq_ASP_ARGS **)
+
+val query_kim_args : coq_ASP_ARGS =
+  JSON_Object ((query_kim_dynamic_arg, (JSON_String
+    query_kim_dynamic_arg_val)) :: ((query_kim_appraisal_dir_arg,
+    (JSON_String query_kim_appraisal_dir_arg_val)) :: []))
+
+(** val query_kim_asp : coq_Term **)
+
+val query_kim_asp : coq_Term =
+  Coq_asp (ASPC (Coq_asp_paramsC query_kim query_kim_args cds_query_kim_plc
+    kim_evidence_targ))
+
+(** val r_ssl_sig_asp : coq_Term **)
+
+val r_ssl_sig_asp : coq_Term =
+  Coq_asp (ASPC (Coq_asp_paramsC r_ssl_sig (JSON_Object []) cds_query_kim_plc
+    ssl_sig_targ))
+
+(** val r_tpm_sig_asp : coq_Term **)
+
+val r_tpm_sig_asp : coq_Term =
+  Coq_asp (ASPC (Coq_asp_paramsC tpm_sig (JSON_Object []) cds_query_kim_plc
+    tpm_sig_targ))

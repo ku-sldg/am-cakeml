@@ -109,7 +109,9 @@ struct
                 fun toJson numr =
                     case numr of
                       Ok doubleStr =>
-                        Ok (Float (Double.toWord (Double.fromString doubleStr)))
+                        (case Double.fromString doubleStr of
+                          None => Err "Error reading double."
+                        | Some d => Ok (Float (Double.toWord d)))
                     | Err intStr =>
                         case Int.fromString intStr of
                           None => Err "Error reading integer."

@@ -1,3 +1,5 @@
+type ml___dummy = unit
+
 (** val negb : bool -> bool **)
 
 fun negb b = case b of
@@ -30,3 +32,8 @@ fun app l m =
   case l of
     [] => m
   | a :: l1 => a :: (app l1 m)
+
+(** val id : ml___dummy -> ml___dummy **)
+
+fun id x =
+  x
