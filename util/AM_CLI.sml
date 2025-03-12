@@ -3,7 +3,8 @@
 structure AM_CLI_Utils = struct
   type priv_key_t = string
   type server_am_args_t = coq_AM_Manager_Config
-  type client_am_args_t = (coq_Term * coq_Attestation_Session)
+  (* bool marks whether or not appraisal is done *)
+  type client_am_args_t = (coq_Term * coq_Attestation_Session * bool)
   
   (* Parse a JSON file into a JSON object *)
   (* : string -> (coq_Manifest, string) coq_ResultT *)
@@ -63,15 +64,19 @@ structure AM_CLI_Utils = struct
   
   fun retrieve_Client_AM_CLI_args _ =
     let val name = CommandLine.name ()
-        val usage = ("Usage: " ^ name ^ " -t <term_file>.json -s <att_session.json>\n\ne.g.\t" ^ name ^ " -t cert.json -s my_session.json\n\n")
+        val usage = ("Usage: " ^ name ^ " -t <term_file>.json -s <att_session.json> (--appr | --send)\n\ne.g.\t" ^ name ^ " -t cert.json -s my_session.json --send\n\n")
         val argList = CommandLine.arguments ()
         val termInd        = ListExtra.find_index argList "-t"
         val sessInd        = ListExtra.find_index argList "-s"
+        val apprInd        = ListExtra.find_index argList "--appr"
+        val sendInd        = ListExtra.find_index argList "--send"
         val termIndBool   = argIndPresent termInd
         val sessIndBool   = argIndPresent sessInd
+        val apprIndBool   = argIndPresent apprInd
+        val sendIndBool   = argIndPresent sendInd
     in 
     (
-    if ((termIndBool = False) orelse (sessIndBool = False))
+    if ((termIndBool = False) orelse (sessIndBool = False) orelse ((apprIndBool = False) andalso (sendIndBool = False)))
     then raise (Exception ("Invalid Arguments\n" ^ usage))
     else (
       let val termFileName  = List.nth argList (termInd + 1)
@@ -82,7 +87,7 @@ structure AM_CLI_Utils = struct
           | Coq_resultC term =>
             (case (parse_att_session_from_file sessFileName) of
               Coq_errC e => raise (Exception ("Could not parse Attestation Session from Json: " ^ e ^ "\n"))
-            | Coq_resultC sess => (term, sess)
+            | Coq_resultC sess => (term, sess, apprIndBool)
             )
           )
       end

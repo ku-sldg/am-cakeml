@@ -23,57 +23,32 @@ val coq_P3 : coq_Plc =
 val coq_P4 : coq_Plc =
   "P4"
 
-(** val attest_id : coq_ASP_ID **)
+(** val attest : coq_ASP_ID **)
 
-val attest_id : coq_ASP_ID =
-  "attest_id"
+val attest : coq_ASP_ID =
+  "attest"
 
-(** val attest1_id : coq_ASP_ID **)
+(** val appraise : coq_ASP_ID **)
 
-val attest1_id : coq_ASP_ID =
-  "attest1_id"
+val appraise : coq_ASP_ID =
+  "appraise"
 
-(** val attest2_id : coq_ASP_ID **)
+(** val certificate : coq_ASP_ID **)
 
-val attest2_id : coq_ASP_ID =
-  "attest2_id"
+val certificate : coq_ASP_ID =
+  "certificate"
 
-(** val appraise_id : coq_ASP_ID **)
+(** val hashfile : coq_ASP_ID **)
 
-val appraise_id : coq_ASP_ID =
-  "appraise_id"
+val hashfile : coq_ASP_ID =
+  "hashfile"
 
-(** val certificate_id : coq_ASP_ID **)
+(** val large_output : coq_ASP_ID **)
 
-val certificate_id : coq_ASP_ID =
-  "certificate_id"
-
-(** val hashfile_id : coq_ASP_ID **)
-
-val hashfile_id : coq_ASP_ID =
-  "hashfile_id"
-
-(** val large_output_id : coq_ASP_ID **)
-
-val large_output_id : coq_ASP_ID =
-  "large_output_id"
+val large_output : coq_ASP_ID =
+  "large_output"
 
 (** val sys_targ : coq_TARG_ID **)
 
 val sys_targ : coq_TARG_ID =
   "sys_targ"
-
-(** val att_targ : coq_TARG_ID **)
-
-val att_targ : coq_TARG_ID =
-  "att_targ"
-
-(** val it_targ : coq_TARG_ID **)
-
-val it_targ : coq_TARG_ID =
-  "it_targ"
-
-(** val hashfile_targ : coq_TARG_ID **)
-
-val hashfile_targ : coq_TARG_ID =
-  "hashfile_targ"

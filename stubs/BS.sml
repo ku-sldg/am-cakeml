@@ -21,5 +21,5 @@ val coq_Stringifiable_BS : coq_BS coq_Stringifiable =
 val coq_EqClass_BS : coq_BS coq_EqClass =
     (fn bs1 => fn bs2 => bs1 = bs2)
 
-val passed_bs = BString.fromString "UEFTU0VE"
+val passed_bs = BString.fromString ""
 val failed_bs = BString.fromString "FAILED"

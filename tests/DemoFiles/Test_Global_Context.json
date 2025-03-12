@@ -1,94 +1,6 @@
 {
   "ASP_Types": {
-    "attest1_id": {
-      "FWD": "EXTEND",
-      "EvInSig": "ALL",
-      "EvOutSig": {
-        "EvOutSig_CONSTRUCTOR": "OutN",
-        "EvOutSig_BODY": "1"
-      }
-    },
-    "attest2_id": {
-      "FWD": "EXTEND",
-      "EvInSig": "ALL",
-      "EvOutSig": {
-        "EvOutSig_CONSTRUCTOR": "OutN",
-        "EvOutSig_BODY": "1"
-      }
-    },
-    "attest_id": {
-      "FWD": "EXTEND",
-      "EvInSig": "ALL",
-      "EvOutSig": {
-        "EvOutSig_CONSTRUCTOR": "OutN",
-        "EvOutSig_BODY": "1"
-      }
-    },
-    "certificate_id": {
-      "FWD": "EXTEND",
-      "EvInSig": "ALL",
-      "EvOutSig": {
-        "EvOutSig_CONSTRUCTOR": "OutN",
-        "EvOutSig_BODY": "1"
-      }
-    },
-    "hashfile_id": {
-      "FWD": "EXTEND",
-      "EvInSig": "ALL",
-      "EvOutSig": {
-        "EvOutSig_CONSTRUCTOR": "OutN",
-        "EvOutSig_BODY": "1"
-      }
-    },
-    "r_hashfile_id": {
-      "FWD": "EXTEND",
-      "EvInSig": "ALL",
-      "EvOutSig": {
-        "EvOutSig_CONSTRUCTOR": "OutN",
-        "EvOutSig_BODY": "1"
-      }
-    },
-    "r_hashevidence_id": {
-      "FWD": "EXTEND",
-      "EvInSig": "ALL",
-      "EvOutSig": {
-        "EvOutSig_CONSTRUCTOR": "OutN",
-        "EvOutSig_BODY": "1"
-      }
-    },
-    "sig_id": {
-      "FWD": "EXTEND",
-      "EvInSig": "ALL",
-      "EvOutSig": {
-        "EvOutSig_CONSTRUCTOR": "OutN",
-        "EvOutSig_BODY": "1"
-      }
-    },
-    "ssl_sig_id": {
-      "FWD": "EXTEND",
-      "EvInSig": "ALL",
-      "EvOutSig": {
-        "EvOutSig_CONSTRUCTOR": "OutN",
-        "EvOutSig_BODY": "1"
-      }
-    },
-    "r_sig": {
-      "FWD": "EXTEND",
-      "EvInSig": "ALL",
-      "EvOutSig": {
-        "EvOutSig_CONSTRUCTOR": "OutN",
-        "EvOutSig_BODY": "1"
-      }
-    },
-    "r_sig_tpm": {
-      "FWD": "EXTEND",
-      "EvInSig": "ALL",
-      "EvOutSig": {
-        "EvOutSig_CONSTRUCTOR": "OutN",
-        "EvOutSig_BODY": "1"
-      }
-    },
-    "appraise_r_sig": {
+    "magic_appr": {
       "FWD": "REPLACE",
       "EvInSig": "ALL",
       "EvOutSig": {
@@ -96,7 +8,7 @@
         "EvOutSig_BODY": "1"
       }
     },
-    "r_readfile_id": {
+    "large_output": {
       "FWD": "EXTEND",
       "EvInSig": "ALL",
       "EvOutSig": {
@@ -104,7 +16,7 @@
         "EvOutSig_BODY": "1"
       }
     },
-    "r_selinux_pol_dump": {
+    "attest": {
       "FWD": "EXTEND",
       "EvInSig": "ALL",
       "EvOutSig": {
@@ -112,63 +24,7 @@
         "EvOutSig_BODY": "1"
       }
     },
-    "r_provision_id": {
-      "FWD": "EXTEND",
-      "EvInSig": "ALL",
-      "EvOutSig": {
-        "EvOutSig_CONSTRUCTOR": "OutN",
-        "EvOutSig_BODY": "0"
-      }
-    },
-    "appraise_r_readfile_id": {
-      "FWD": "REPLACE",
-      "EvInSig": "ALL",
-      "EvOutSig": {
-        "EvOutSig_CONSTRUCTOR": "OutN",
-        "EvOutSig_BODY": "1"
-      }
-    },
-    "appraise_r_selinux_pol_dump": {
-      "FWD": "REPLACE",
-      "EvInSig": "ALL",
-      "EvOutSig": {
-        "EvOutSig_CONSTRUCTOR": "OutN",
-        "EvOutSig_BODY": "1"
-      }
-    },
-    "appraise_r_hashfile_id": {
-      "FWD": "REPLACE",
-      "EvInSig": "ALL",
-      "EvOutSig": {
-        "EvOutSig_CONSTRUCTOR": "OutN",
-        "EvOutSig_BODY": "1"
-      }
-    },
-    "ssl_sig_appr_id": {
-      "FWD": "REPLACE",
-      "EvInSig": "ALL",
-      "EvOutSig": {
-        "EvOutSig_CONSTRUCTOR": "OutN",
-        "EvOutSig_BODY": "1"
-      }
-    },
-    "appraise_r_sig_tpm": {
-      "FWD": "REPLACE",
-      "EvInSig": "ALL",
-      "EvOutSig": {
-        "EvOutSig_CONSTRUCTOR": "OutN",
-        "EvOutSig_BODY": "1"
-      }
-    },
-    "appraise_id": {
-      "FWD": "REPLACE",
-      "EvInSig": "ALL",
-      "EvOutSig": {
-        "EvOutSig_CONSTRUCTOR": "OutN",
-        "EvOutSig_BODY": "1"
-      }
-    },
-    "r_invary_get_measurement_id": {
+    "appraise": {
       "FWD": "EXTEND",
       "EvInSig": "ALL",
       "EvOutSig": {
@@ -176,7 +32,7 @@
         "EvOutSig_BODY": "1"
       }
     },
-    "large_output_id": {
+    "certificate": {
       "FWD": "EXTEND",
       "EvInSig": "ALL",
       "EvOutSig": {
@@ -184,8 +40,120 @@
         "EvOutSig_BODY": "1"
       }
     },
-    "appraise_r_invary_get_measurement_id": {
+    "hashevidence": {
       "FWD": "REPLACE",
+      "EvInSig": "ALL",
+      "EvOutSig": {
+        "EvOutSig_CONSTRUCTOR": "OutN",
+        "EvOutSig_BODY": "1"
+      }
+    },
+    "hashfile": {
+      "FWD": "EXTEND",
+      "EvInSig": "ALL",
+      "EvOutSig": {
+        "EvOutSig_CONSTRUCTOR": "OutN",
+        "EvOutSig_BODY": "1"
+      }
+    },
+    "hashfile_appr": {
+      "FWD": "REPLACE",
+      "EvInSig": "ALL",
+      "EvOutSig": {
+        "EvOutSig_CONSTRUCTOR": "OutN",
+        "EvOutSig_BODY": "1"
+      }
+    },
+    "invary_get_measurement": {
+      "FWD": "EXTEND",
+      "EvInSig": "ALL",
+      "EvOutSig": {
+        "EvOutSig_CONSTRUCTOR": "OutN",
+        "EvOutSig_BODY": "1"
+      }
+    },
+    "invary_get_measurement_appr": {
+      "FWD": "REPLACE",
+      "EvInSig": "ALL",
+      "EvOutSig": {
+        "EvOutSig_CONSTRUCTOR": "OutN",
+        "EvOutSig_BODY": "1"
+      }
+    },
+    "provision": {
+      "FWD": "EXTEND",
+      "EvInSig": "ALL",
+      "EvOutSig": {
+        "EvOutSig_CONSTRUCTOR": "OutN",
+        "EvOutSig_BODY": "1"
+      }
+    },
+    "readfile": {
+      "FWD": "EXTEND",
+      "EvInSig": "ALL",
+      "EvOutSig": {
+        "EvOutSig_CONSTRUCTOR": "OutN",
+        "EvOutSig_BODY": "1"
+      }
+    },
+    "readfile_appr": {
+      "FWD": "REPLACE",
+      "EvInSig": "ALL",
+      "EvOutSig": {
+        "EvOutSig_CONSTRUCTOR": "OutN",
+        "EvOutSig_BODY": "1"
+      }
+    },
+    "selinux_pol_dump": {
+      "FWD": "EXTEND",
+      "EvInSig": "ALL",
+      "EvOutSig": {
+        "EvOutSig_CONSTRUCTOR": "OutN",
+        "EvOutSig_BODY": "1"
+      }
+    },
+    "selinux_pol_dump_appr": {
+      "FWD": "REPLACE",
+      "EvInSig": "ALL",
+      "EvOutSig": {
+        "EvOutSig_CONSTRUCTOR": "OutN",
+        "EvOutSig_BODY": "1"
+      }
+    },
+    "sig": {
+      "FWD": "EXTEND",
+      "EvInSig": "ALL",
+      "EvOutSig": {
+        "EvOutSig_CONSTRUCTOR": "OutN",
+        "EvOutSig_BODY": "1"
+      }
+    },
+    "sig_appr": {
+      "FWD": "REPLACE",
+      "EvInSig": "ALL",
+      "EvOutSig": {
+        "EvOutSig_CONSTRUCTOR": "OutN",
+        "EvOutSig_BODY": "1"
+      }
+    },
+    "sig_tpm": {
+      "FWD": "EXTEND",
+      "EvInSig": "ALL",
+      "EvOutSig": {
+        "EvOutSig_CONSTRUCTOR": "OutN",
+        "EvOutSig_BODY": "1"
+      }
+    },
+    "sig_tpm_appr": {
+      "FWD": "REPLACE",
+      "EvInSig": "ALL",
+      "EvOutSig": {
+        "EvOutSig_CONSTRUCTOR": "OutN",
+        "EvOutSig_BODY": "1"
+      }
+    },
+    "uptime": {
+      "FWD": "EXTEND",
       "EvInSig": "ALL",
       "EvOutSig": {
         "EvOutSig_CONSTRUCTOR": "OutN",
@@ -194,24 +162,17 @@
     }
   },
   "ASP_Comps": {
-    "attest1_id": "appraise_id",
-    "attest2_id": "appraise_id",
-    "attest_id": "appraise_id",
-    "certificate_id": "appraise_id",
-    "hashfile_id": "appraise_id",
-    "sig_id": "appraise_id",
-    "r_readfile_id": "appraise_r_readfile_id",
-    "r_provision_id": "appraise_id",
-    "r_hashfile_id": "appraise_r_hashfile_id",
-    "r_hashevidence_id": "appraise_r_hashfile_id",
-    "appraise_id": "appraise_id",
-    "appraise_r_readfile_id": "appraise_id",
-    "appraise_r_hashfile_id": "appraise_id",
-    "ssl_sig_id": "ssl_sig_appr_id",
-    "ssl_sig_appr_id": "appraise_id",
-    "r_sig": "appraise_r_sig",
-    "r_sig_tpm": "appraise_r_sig_tpm",
-    "r_invary_get_measurement_id": "appraise_r_invary_get_measurement_id",
-    "r_selinux_pol_dump": "appraise_r_selinux_pol_dump"
+    "attest": "magic_appr",
+    "certificate": "magic_appr",
+    "appraise": "magic_appr",
+    "hashevidence": "NULL",
+    "hashfile": "hashfile_appr",
+    "invary_get_measurement": "invary_get_measurement_appr",
+    "provision": "NULL",
+    "readfile": "readfile_appr",
+    "selinux_pol_dump": "selinux_pol_dump_appr",
+    "sig": "sig_appr",
+    "sig_tpm": "sig_tpm_appr",
+    "uptime": "NULL"
   }
 }

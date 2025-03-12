@@ -60,7 +60,7 @@ When things go wrong, handle_AM_request returns a raw error message string.
 
 (* () -> () *)
 fun main () =
-  let val (demo_term, att_sess) = AM_CLI_Utils.retrieve_Client_AM_CLI_args ()
+  let val (demo_term, att_sess, do_appr) = AM_CLI_Utils.retrieve_Client_AM_CLI_args ()
       (* TODO: Maybe someday we refactor args *)
       val top_plc   : coq_Plc = "TOP_PLC"
       val att_plc   : coq_Plc = "P0" 
@@ -72,7 +72,9 @@ fun main () =
       (* val app_result = run_demo_client_AM demo_term top_plc att_plc init_et att_sess init_rawev attester_addr appraiser_addr  *)
       (* TODO: Current this will do basically NOTHING *)
   in 
-      let val maybe_appsumm = am_client_app_summary
+    if do_appr 
+    then
+      (let val maybe_appsumm = am_client_app_summary
                               att_sess 
                               top_plc 
                               (Coq_evc [] Coq_mt_evt) 
@@ -80,8 +82,24 @@ fun main () =
                               att_plc in 
       case maybe_appsumm of 
         Coq_resultC (appsumm, appsumm_bool) => print_appraisal_summary (appsumm, appsumm_bool)
-      | Coq_errC errStr => print errStr 
-    end
+      | Coq_errC errStr => print errStr
+      end)
+    else
+      (case (am_sendReq att_sess top_plc (Coq_evc [] Coq_mt_evt) demo_term att_plc) of
+          Coq_errC msg => 
+            let 
+              val _ = print "ERROR: Phrase Execution Failed!\n\n" 
+              val _ = print msg
+            in
+              ()
+            end
+        | Coq_resultC rawev =>
+          (* We finished correctly, print out the result evidence *)
+          let 
+            val _ = print "SUCCESS: Copland Phrase Executed Successfully!\n"
+          in
+            ()
+          end)
   end
   handle Exception e => TextIO.print_err e 
           | Word8Extra.InvalidHex => TextIO.print_err "BSTRING UNSHOW ERROR"
