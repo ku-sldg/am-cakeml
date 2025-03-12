@@ -28,6 +28,7 @@ CMakeCache.txt
 
 tests/DemoFiles/Generated
 tests/DemoFiles/targFiles/*
+tests/.vscode/*
 
 # Backup files
 *backup.*
