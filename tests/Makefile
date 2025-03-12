@@ -1,6 +1,6 @@
 .PHONY: ci_build ci_test
 
-all:
+ci:
 	make ci_build
 	make ci_test
 
