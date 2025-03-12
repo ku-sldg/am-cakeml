@@ -183,7 +183,6 @@ if [[ "$REPO_ROOT" == */am-cakeml ]]; then
   else
     sleep 1 
     $CLIENT_AM_EXEC -t $TERM_FILE -s $FULL_ATT_SESS $CLIENT_AM_ARGS > $GENERATED/output_resp.json
-    # $TESTS_DIR/send_term_req.sh -h $IP -p $PORT -f $TERM_FILE -s $FULL_ATT_SESS > $GENERATED/output_resp.json
     # We need this to be the last line so that the exit code is whether or not we found success
     if [[ $SEND -eq 1 ]]; then
       grep "SUCCESS: Copland Phrase Executed Successfully!" $GENERATED/output_resp.json
