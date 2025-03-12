@@ -16,4 +16,4 @@ val query_kim_appraisal_dir_arg : string =
 (** val query_kim_appraisal_dir_arg_val : string **)
 
 val query_kim_appraisal_dir_arg_val : string =
-  "$AM_ROOT/tests/DemoFiles/goldenFiles/"
+  "$AM_ROOT/tests/DemoFiles/staticAppraisalFiles/"
