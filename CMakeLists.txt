@@ -71,12 +71,9 @@ get_files(copland_am_src
 
     extracted/Term_Defs.cml
     extracted/Cvm_Utils.cml
-    stubs/RawEvJudgement_Admits.sml 
-
     extracted/CACL_Demo_Args.cml
     extracted/CACL_Demo.cml
     extracted/AppraisalSummary.cml
-
     extracted/Term.cml
     extracted/Manifest_Set.cml
     extracted/Manifest.cml
