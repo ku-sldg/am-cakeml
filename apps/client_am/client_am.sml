@@ -110,7 +110,7 @@ fun main () =
   *)
       case maybe_resolute_resp of 
         Coq_resultC resp => 
-          let val (Build_Jsonifiable to_JSON _) = concrete_Jsonifiable_Resolute_Client_Result
+          let val (Build_Jsonifiable to_JSON _) = concrete_Jsonifiable_Resolute_Client_Response
               val coqJsonResp = to_JSON resp
               val coqjsonRespString = coq_JSON_to_string coqJsonResp in
             print coqjsonRespString

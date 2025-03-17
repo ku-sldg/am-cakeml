@@ -110,19 +110,14 @@ fun add_term_args t args =
   | Coq_bpar s t1 t2 =>
     Coq_bpar s (add_term_args t1 args) (add_term_args t2 args)
 
-(** val good_bs : coq_BS **)
-
-val good_bs : coq_BS =
-  passed_bs
-
 (** val judge_evidence : coq_Evidence -> bool **)
 
 fun judge_evidence e = case e of
-  Coq_evc rawev _ => forallb (fn bs => eqb coq_EqClass_BS bs good_bs) rawev
+  Coq_evc rawev _ => forallb (fn bs => eqb coq_EqClass_BS bs passed_bs) rawev
 
 (** val am_client_do_res :
     coq_Attestation_Session -> coq_Plc -> coq_Plc -> coq_Term_Model ->
-    coq_Resolute_Client_Request -> (coq_Resolute_Client_Result, string)
+    coq_Resolute_Client_Request -> (coq_Resolute_Client_Response, string)
     coq_ResultT **)
 
 fun am_client_do_res att_sess req_plc toPlc m req =
@@ -139,10 +134,10 @@ fun am_client_do_res att_sess req_plc toPlc m req =
   let val maybe_ev = run_resolute_id rt_w_args att_sess req_plc toPlc in
   (case maybe_ev of
      Coq_errC errStr =>
-     Coq_resultC (Coq_mkResoluteClientResult rt_w_args mt_evc False errStr)
+     Coq_resultC (Coq_mkResoluteClientResp rt_w_args mt_evc False errStr)
    | Coq_resultC e =>
      let val judgement = judge_evidence e in
-     Coq_resultC (Coq_mkResoluteClientResult rt_w_args e judgement "") end) end end end
+     Coq_resultC (Coq_mkResoluteClientResp rt_w_args e judgement "") end) end end end
 
 (** val micro_resolute_term_model : coq_Term_Model **)
 
