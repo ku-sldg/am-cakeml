@@ -5,16 +5,3 @@ datatype 'a coq_Stringifiable =
 
 val coq_Stringifiable_string : string coq_Stringifiable =
   Build_Stringifiable (fn s => s) (fn s => Coq_resultC s)
-
-(** val coq_Stringifiable_bool : bool coq_Stringifiable **)
-
-val coq_Stringifiable_bool : bool coq_Stringifiable =
-  Build_Stringifiable (fn b => case b of
-                                 True => "true"
-                               | False => "false") (fn s =>
-    case (op=) s "true" of
-      True => Coq_resultC True
-    | False =>
-      (case (op=) s "false" of
-         True => Coq_resultC False
-       | False => Coq_errC "Not a boolean"))
