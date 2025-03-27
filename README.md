@@ -8,7 +8,7 @@ This project makes use of formally verified components, including extracted Cake
 The following documents the process of manually building standalone executables for Linux and MacOS.
 
 ### Prerequisites
-- CakeML v2076: [Download](https://github.com/CakeML/cakeml/releases/tag/v2076) the CakeML compiler (`cake-x64-64.tar.gz` is most likely the version you want, it targets 64-bit architectures). Unpack the tarball, run `make cake`, then put the `cake` executable on your system path. E.g.
+- CakeML (optimally download the latest, but as of last check we know it works with [CakeML v2747](https://github.com/CakeML/cakeml/releases/tag/v2747)) the CakeML compiler (`cake-x64-64.tar.gz` is most likely the version you want, it targets 64-bit architectures). Unpack the tarball, run `make cake`, then put the `cake` executable on your system path. E.g.
 ```sh
 tar -xzf cake-x64-64.tar.gz
 cd cake-x64-64
