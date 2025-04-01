@@ -11,8 +11,8 @@ fun stringify_one_targmap_entry (x: (string * Json.json)) =
       Json.Bool b => 
         let val s = 
           case b of 
-            true => "PASSED" 
-          | false => "FAILED" in 
+            True => "PASSED" 
+          | _ => "FAILED" in 
         String.concat ["\t", (fst x), ": ", s, "\n"] 
         end
     | _ => "" 
