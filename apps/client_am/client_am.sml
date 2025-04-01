@@ -8,7 +8,13 @@ fun print_list ls =
 fun stringify_one_targmap_entry (x: (string * Json.json)) = 
   let val x' = (snd x) in
     case x' of 
-      Json.String s => String.concat ["\t", (fst x), ": ", s, "\n"] 
+      Json.Bool b => 
+        let val s = 
+          case b of 
+            true => "PASSED" 
+          | false => "FAILED" in 
+        String.concat ["\t", (fst x), ": ", s, "\n"] 
+        end
     | _ => "" 
   end
 
