@@ -28,6 +28,11 @@ val coq_STR_PAYLOAD : string =
 val coq_STR_EVIDENCE : string =
   "EVIDENCE"
 
+(** val coq_STR_EVIDENCET : string **)
+
+val coq_STR_EVIDENCET : string =
+  "EVIDENCET"
+
 (** val coq_STR_ACTION : string **)
 
 val coq_STR_ACTION : string =

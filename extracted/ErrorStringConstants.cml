@@ -179,11 +179,6 @@ val err_str_json_parsing_SP : string =
 val err_str_json_parsing_ASPC : string =
   "Error parsing ASPC from JSON"
 
-(** val err_str_invalid_evidence_json : string **)
-
-val err_str_invalid_evidence_json : string =
-  "Invalid Evidence JSON"
-
 (** val err_str_json_unrecognized_constructor : string **)
 
 val err_str_json_unrecognized_constructor : string =

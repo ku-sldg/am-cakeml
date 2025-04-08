@@ -947,38 +947,36 @@ val coq_Jsonifiable_RawEv : coq_RawEv coq_Jsonifiable =
           from_string s end
         | _ => Coq_errC err_str_json_invalid_constructor_name) js')
 
+(** val coq_Evidence_to_JSON :
+    coq_RawEv coq_Jsonifiable -> coq_EvidenceT coq_Jsonifiable ->
+    coq_Evidence -> coq_JSON **)
+
+fun coq_Evidence_to_JSON h h0 e = case e of
+  Coq_evc rawev evt =>
+  JSON_Object ((coq_STR_RAWEV,
+    (let val Build_Jsonifiable to_JSON _ = h in to_JSON rawev end)) :: ((coq_STR_EVIDENCET,
+    (let val Build_Jsonifiable to_JSON _ = h0 in to_JSON evt end)) :: []))
+
+(** val coq_Evidence_from_JSON :
+    coq_RawEv coq_Jsonifiable -> coq_EvidenceT coq_Jsonifiable -> coq_JSON ->
+    (coq_Evidence, string) coq_ResultT **)
+
+fun coq_Evidence_from_JSON h h0 js =
+  res_bind (coq_JSON_get_Object coq_STR_RAWEV js) (fn rawev_js =>
+    res_bind (coq_JSON_get_Object coq_STR_EVIDENCET js) (fn evt_js =>
+      res_bind
+        (let val Build_Jsonifiable _ from_JSON = h in from_JSON rawev_js end)
+        (fn rawev =>
+        res_bind
+          (let val Build_Jsonifiable _ from_JSON = h0 in from_JSON evt_js end)
+          (fn evt => Coq_resultC (Coq_evc rawev evt)))))
+
 (** val coq_Jsonifiable_Evidence :
     coq_RawEv coq_Jsonifiable -> coq_EvidenceT coq_Jsonifiable ->
     coq_Evidence coq_Jsonifiable **)
 
 fun coq_Jsonifiable_Evidence h h0 =
-  Build_Jsonifiable (fn e =>
-    let val Coq_evc r et = e in
-    JSON_Array
-    ((let val Build_Jsonifiable to_JSON _ = h in to_JSON r end) :: ((
-                                                                    let val Build_Jsonifiable to_JSON
-                                                                    _ = h0
-                                                                    in
-                                                                    to_JSON et end) :: [])) end)
-    (fn j =>
-    case j of
-      JSON_Array l =>
-      (case l of
-         [] => Coq_errC err_str_invalid_evidence_json
-       | r_js :: l0 =>
-         (case l0 of
-            [] => Coq_errC err_str_invalid_evidence_json
-          | et_js :: l1 =>
-            (case l1 of
-               [] =>
-               res_bind
-                 (let val Build_Jsonifiable _ from_JSON = h in
-                  from_JSON r_js end) (fn r =>
-                 res_bind
-                   (let val Build_Jsonifiable _ from_JSON = h0 in
-                    from_JSON et_js end) (fn et => Coq_resultC (Coq_evc r et)))
-             | _ :: _ => Coq_errC err_str_invalid_evidence_json)))
-    | _ => Coq_errC err_str_invalid_evidence_json)
+  Build_Jsonifiable (coq_Evidence_to_JSON h h0) (coq_Evidence_from_JSON h h0)
 
 (** val coq_Jsonifiable_GlobalContext :
     coq_ASP_ID coq_Stringifiable -> (coq_ASP_ID, coq_ASP_ID) coq_Map
