@@ -64,6 +64,14 @@
         "EvOutSig_BODY": "1"
       }
     },
+    "hashdir": {
+      "FWD": "EXTEND",
+      "EvInSig": "ALL",
+      "EvOutSig": {
+        "EvOutSig_CONSTRUCTOR": "OutN",
+        "EvOutSig_BODY": "1"
+      }
+    },
     "invary_get_measurement": {
       "FWD": "EXTEND",
       "EvInSig": "ALL",
@@ -157,8 +165,9 @@
     "attest": "magic_appr",
     "certificate": "magic_appr",
     "appraise": "magic_appr",
-    "hashevidence": "NULL",
+    "hashevidence": "hashfile_appr",
     "hashfile": "hashfile_appr",
+    "hashdir": "hashfile_appr",
     "invary_get_measurement": "invary_get_measurement_appr",
     "provision": "NULL",
     "readfile": "readfile_appr",
