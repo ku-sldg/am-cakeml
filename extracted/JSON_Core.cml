@@ -617,25 +617,40 @@ fun coq_Jsonifiable_ASP h =
 val coq_Jsonifiable_Split : coq_Split coq_Jsonifiable =
   Build_Jsonifiable (fn pat =>
     let val (s1, s2) = pat in
-    JSON_Object ((split1_name_constant, (JSON_String
+    JSON_Array ((JSON_String
     (let val Build_Stringifiable to_string _ = coq_Stringifiable_SP in
-     to_string s1 end))) :: ((split2_name_constant, (JSON_String
+     to_string s1 end)) :: ((JSON_String
     (let val Build_Stringifiable to_string _ = coq_Stringifiable_SP in
-     to_string s2 end))) :: [])) end) (fn js =>
-    case coq_JSON_get_string split1_name_constant js of
-      Coq_errC _ => Coq_errC err_str_json_parsing_failure_wrong_number_args
-    | Coq_resultC s1 =>
-      (case coq_JSON_get_string split2_name_constant js of
-         Coq_errC _ => Coq_errC err_str_json_parsing_failure_wrong_number_args
-       | Coq_resultC s2 =>
-         res_bind
-           (let val Build_Stringifiable _ from_string = coq_Stringifiable_SP
-            in
-            from_string s1 end) (fn s3 =>
-           res_bind
-             (let val Build_Stringifiable _ from_string = coq_Stringifiable_SP
-              in
-              from_string s2 end) (fn s4 => Coq_resultC (s3, s4)))))
+     to_string s2 end)) :: [])) end) (fn js =>
+    case js of
+      JSON_Array l =>
+      (case l of
+         [] => Coq_errC err_str_json_parsing_failure_wrong_number_args
+       | j :: l0 =>
+         (case j of
+            JSON_String sp1 =>
+            (case l0 of
+               [] => Coq_errC err_str_json_parsing_failure_wrong_number_args
+             | j0 :: l1 =>
+               (case j0 of
+                  JSON_String sp2 =>
+                  (case l1 of
+                     [] =>
+                     res_bind
+                       (let val Build_Stringifiable _ from_string =
+                          coq_Stringifiable_SP
+                        in
+                        from_string sp1 end) (fn s1 =>
+                       res_bind
+                         (let val Build_Stringifiable _ from_string =
+                            coq_Stringifiable_SP
+                          in
+                          from_string sp2 end) (fn s2 => Coq_resultC (s1, s2)))
+                   | _ :: _ =>
+                     Coq_errC err_str_json_parsing_failure_wrong_number_args)
+                | _ => Coq_errC err_str_json_parsing_failure_wrong_number_args))
+          | _ => Coq_errC err_str_json_parsing_failure_wrong_number_args))
+    | _ => Coq_errC err_str_json_parsing_failure_wrong_number_args)
 
 (** val coq_Term_to_JSON :
     coq_ASP coq_Jsonifiable -> coq_Split coq_Jsonifiable -> coq_Term ->

@@ -143,16 +143,6 @@ val all_name_constant : string =
 val none_name_constant : string =
   "NONE"
 
-(** val split1_name_constant : string **)
-
-val split1_name_constant : string =
-  "split1"
-
-(** val split2_name_constant : string **)
-
-val split2_name_constant : string =
-  "split2"
-
 (** val ev_out_sig_name_constant : string **)
 
 val ev_out_sig_name_constant : string =
