@@ -48,10 +48,20 @@ val cds_img_1_targ : coq_TARG_ID =
 val cds_img_2_targ : coq_TARG_ID =
   "cds_filter_img_targ"
 
-(** val cds_img_3_targ : coq_TARG_ID **)
+(** val aadl_dir_targ : coq_TARG_ID **)
 
-val cds_img_3_targ : coq_TARG_ID =
-  "cds_img_3_targ"
+val aadl_dir_targ : coq_TARG_ID =
+  "aadl_dir_targ"
+
+(** val microkit_dir_targ : coq_TARG_ID **)
+
+val microkit_dir_targ : coq_TARG_ID =
+  "microkit_dir_targ"
+
+(** val micro_hash_comp_targ : coq_TARG_ID **)
+
+val micro_hash_comp_targ : coq_TARG_ID =
+  "micro_hash_composite_targ"
 
 (** val query_kim : coq_ASP_ID **)
 

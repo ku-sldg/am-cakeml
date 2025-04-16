@@ -94,19 +94,19 @@ val path_micro_dir_2_golden : string =
 (** val hash_micro_dir_1 : coq_Term **)
 
 val hash_micro_dir_1 : coq_Term =
-  hash_dir_asp cds_config_dir_plc cds_img_1_targ hashdir_env_var
+  hash_dir_asp cds_config_dir_plc aadl_dir_targ hashdir_env_var
     (path_micro_dir_1 :: []) path_micro_dir_1_golden
 
 (** val hash_micro_dir_2 : coq_Term **)
 
 val hash_micro_dir_2 : coq_Term =
-  hash_dir_asp cds_config_dir_plc cds_img_2_targ hashdir_env_var
+  hash_dir_asp cds_config_dir_plc microkit_dir_targ hashdir_env_var
     (path_micro_dir_2 :: []) path_micro_dir_2_golden
 
 (** val hash_micro_evidence : coq_Term **)
 
 val hash_micro_evidence : coq_Term =
-  hash_evidence_asp cds_config_dir_plc cds_img_3_targ
+  hash_evidence_asp cds_config_dir_plc micro_hash_comp_targ
     path_micro_composite_golden
 
 (** val meas_micro : coq_Term **)
@@ -137,6 +137,12 @@ val cds_tpm : coq_Term =
   Coq_lseq (Coq_bseq (ALL, ALL) query_kim_asp meas_cds) (Coq_lseq
     r_tpm_sig_asp appr_term)
 
+(** val provision_micro_dir_1 : coq_Term **)
+
+val provision_micro_dir_1 : coq_Term =
+  provision_targ_asp cds_config_dir_plc cds_config_1_targ
+    path_micro_dir_1_golden
+
 (** val provision_micro_dir_2 : coq_Term **)
 
 val provision_micro_dir_2 : coq_Term =
@@ -152,9 +158,24 @@ val provision_micro_hash_composite : coq_Term =
 (** val micro_appTerm_provision : coq_Term **)
 
 val micro_appTerm_provision : coq_Term =
-  Coq_bseq (ALL, ALL) (Coq_lseq meas_micro provision_micro_hash_composite)
+  Coq_bseq (ALL, ALL) (Coq_lseq hash_micro_dir_1 provision_micro_dir_1)
     (Coq_bseq (ALL, ALL) (Coq_lseq hash_micro_dir_2 provision_micro_dir_2)
-    (Coq_lseq hash_micro_dir_2 provision_micro_dir_2))
+    (Coq_lseq meas_micro provision_micro_hash_composite))
+
+(** val micro_appTerm_provision_dir_1 : coq_Term **)
+
+val micro_appTerm_provision_dir_1 : coq_Term =
+  Coq_lseq hash_micro_dir_1 provision_micro_dir_1
+
+(** val micro_appTerm_provision_dir_2 : coq_Term **)
+
+val micro_appTerm_provision_dir_2 : coq_Term =
+  Coq_lseq hash_micro_dir_2 provision_micro_dir_2
+
+(** val micro_appTerm_provision_composite : coq_Term **)
+
+val micro_appTerm_provision_composite : coq_Term =
+  Coq_lseq meas_micro provision_micro_hash_composite
 
 (** val example_appTerm_provision : coq_Term **)
 
@@ -195,7 +216,10 @@ val flexible_mechanisms_map : (string * coq_Term) list =
     cds_local) :: (("cds_tpm", cds_tpm) :: (("cds_provision",
     example_appTerm_provision) :: (("simple_sig", simple_sig) :: (("micro",
     micro_appTerm) :: (("micro_provision",
-    micro_appTerm_provision) :: []))))))))))))))))
+    micro_appTerm_provision) :: (("micro_provision_dir_1",
+    micro_appTerm_provision_dir_1) :: (("micro_provision_dir_2",
+    micro_appTerm_provision_dir_2) :: (("micro_provision_composite",
+    micro_appTerm_provision_composite) :: [])))))))))))))))))))
 
 (** val add_EvidenceT_flexible_mechanisms :
     coq_GlobalContext -> (string, coq_Term * (coq_EvidenceT, string)

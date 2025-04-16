@@ -41,7 +41,7 @@
       }
     },
     "hashevidence": {
-      "FWD": "REPLACE",
+      "FWD": "EXTEND",
       "EvInSig": "ALL",
       "EvOutSig": {
         "EvOutSig_CONSTRUCTOR": "OutN",
@@ -93,7 +93,7 @@
       "EvInSig": "ALL",
       "EvOutSig": {
         "EvOutSig_CONSTRUCTOR": "OutN",
-        "EvOutSig_BODY": "1"
+        "EvOutSig_BODY": "0"
       }
     },
     "readfile": {
