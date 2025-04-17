@@ -160,11 +160,13 @@ fun hash_evidence_asp targPlc targId env_var_golden path_golden =
     (("env_var_golden", (JSON_String env_var_golden)) :: (("filepath_golden",
     (JSON_String path_golden)) :: []))) targPlc targId))
 
-(** val selinux_hash_asp : coq_Plc -> coq_TARG_ID -> string -> coq_Term **)
+(** val selinux_hash_asp :
+    coq_Plc -> coq_TARG_ID -> string -> string -> coq_Term **)
 
-fun selinux_hash_asp targPlc targId appr_path =
+fun selinux_hash_asp targPlc targId env_var_golden path_golden =
   Coq_asp (ASPC (Coq_asp_paramsC selinux_pol_dump (JSON_Object
-    (("filepath_golden", (JSON_String appr_path)) :: [])) targPlc targId))
+    (("env_var_golden", (JSON_String env_var_golden)) :: (("filepath_golden",
+    (JSON_String path_golden)) :: []))) targPlc targId))
 
 (** val demo_root_env_var : string **)
 
@@ -253,7 +255,7 @@ val hash_cds_img_2 : coq_Term =
 (** val selinux_hash_pol : coq_Term **)
 
 val selinux_hash_pol : coq_Term =
-  selinux_hash_asp cds_config_dir_plc selinux_policy_targ
+  selinux_hash_asp cds_config_dir_plc selinux_policy_targ am_root_env_var
     selinux_policy_path_golden
 
 (** val provision_config_1 : coq_Term **)
