@@ -109,20 +109,24 @@ val r_ssl_sig : coq_ASP_ID =
   "sig"
 
 (** val gather_targ_asp :
-    coq_Plc -> coq_TARG_ID -> string -> string -> coq_Term **)
+    coq_Plc -> coq_TARG_ID -> string -> string -> string -> string -> coq_Term **)
 
-fun gather_targ_asp targPlc targId path appr_path =
+fun gather_targ_asp targPlc targId env_var env_var_golden path path_golden =
   Coq_asp (ASPC (Coq_asp_paramsC gather_file_contents (JSON_Object
-    (("filepath", (JSON_String path)) :: (("filepath_golden", (JSON_String
-    appr_path)) :: []))) targPlc targId))
+    (("env_var", (JSON_String env_var)) :: (("filepath", (JSON_String
+    path)) :: (("env_var_golden", (JSON_String
+    env_var_golden)) :: (("filepath_golden", (JSON_String
+    path_golden)) :: []))))) targPlc targId))
 
 (** val hash_targ_asp :
-    coq_Plc -> coq_TARG_ID -> string -> string -> coq_Term **)
+    coq_Plc -> coq_TARG_ID -> string -> string -> string -> string -> coq_Term **)
 
-fun hash_targ_asp targPlc targId path appr_path =
-  Coq_asp (ASPC (Coq_asp_paramsC hash_file_contents (JSON_Object
-    (("filepath", (JSON_String path)) :: (("filepath_golden", (JSON_String
-    appr_path)) :: []))) targPlc targId))
+fun hash_targ_asp targPlc targId env_var env_var_golden path path_golden =
+  Coq_asp (ASPC (Coq_asp_paramsC hash_file_contents (JSON_Object (("env_var",
+    (JSON_String env_var)) :: (("filepath", (JSON_String
+    path)) :: (("env_var_golden", (JSON_String
+    env_var_golden)) :: (("filepath_golden", (JSON_String
+    path_golden)) :: []))))) targPlc targId))
 
 (** val string_to_json : string -> coq_JSON **)
 
@@ -130,25 +134,31 @@ fun string_to_json s =
   JSON_String s
 
 (** val hash_dir_asp :
-    coq_Plc -> coq_TARG_ID -> string -> string list -> string -> coq_Term **)
+    coq_Plc -> coq_TARG_ID -> string -> string -> string list -> string ->
+    coq_Term **)
 
-fun hash_dir_asp targPlc targId env_var paths appr_path =
+fun hash_dir_asp targPlc targId env_var env_var_golden paths appr_path =
   Coq_asp (ASPC (Coq_asp_paramsC hash_dir_contents (JSON_Object (("env_var",
-    (JSON_String env_var)) :: (("paths", (JSON_Array
+    (JSON_String env_var)) :: (("env_var_golden", (JSON_String
+    env_var_golden)) :: (("paths", (JSON_Array
     (map string_to_json paths))) :: (("filepath_golden", (JSON_String
-    appr_path)) :: [])))) targPlc targId))
+    appr_path)) :: []))))) targPlc targId))
 
-(** val provision_targ_asp : coq_Plc -> coq_TARG_ID -> string -> coq_Term **)
+(** val provision_targ_asp :
+    coq_Plc -> coq_TARG_ID -> string -> string -> coq_Term **)
 
-fun provision_targ_asp targPlc targId path =
-  Coq_asp (ASPC (Coq_asp_paramsC provision (JSON_Object (("filepath",
-    (JSON_String path)) :: [])) targPlc targId))
+fun provision_targ_asp targPlc targId env_var path =
+  Coq_asp (ASPC (Coq_asp_paramsC provision (JSON_Object (("env_var",
+    (JSON_String env_var)) :: (("filepath", (JSON_String path)) :: [])))
+    targPlc targId))
 
-(** val hash_evidence_asp : coq_Plc -> coq_TARG_ID -> string -> coq_Term **)
+(** val hash_evidence_asp :
+    coq_Plc -> coq_TARG_ID -> string -> string -> coq_Term **)
 
-fun hash_evidence_asp targPlc targId appr_path =
+fun hash_evidence_asp targPlc targId env_var_golden path_golden =
   Coq_asp (ASPC (Coq_asp_paramsC hash_evidence (JSON_Object
-    (("filepath_golden", (JSON_String appr_path)) :: [])) targPlc targId))
+    (("env_var_golden", (JSON_String env_var_golden)) :: (("filepath_golden",
+    (JSON_String path_golden)) :: []))) targPlc targId))
 
 (** val selinux_hash_asp : coq_Plc -> coq_TARG_ID -> string -> coq_Term **)
 
@@ -156,15 +166,25 @@ fun selinux_hash_asp targPlc targId appr_path =
   Coq_asp (ASPC (Coq_asp_paramsC selinux_pol_dump (JSON_Object
     (("filepath_golden", (JSON_String appr_path)) :: [])) targPlc targId))
 
+(** val demo_root_env_var : string **)
+
+val demo_root_env_var : string =
+  "DEMO_ROOT"
+
+(** val am_root_env_var : string **)
+
+val am_root_env_var : string =
+  "AM_ROOT"
+
 (** val path_targ1 : string **)
 
 val path_targ1 : string =
-  "$DEMO_ROOT/cds_config/rewrite_one_config.json"
+  "/cds_config/rewrite_one_config.json"
 
 (** val path_targ1_golden : string **)
 
 val path_targ1_golden : string =
-  "$AM_ROOT/tests/DemoFiles/goldenFiles/rewrite_one_config.json"
+  "/tests/DemoFiles/goldenFiles/rewrite_one_config.json"
 
 (** val path_micro_composite_golden : string **)
 
@@ -174,61 +194,61 @@ val path_micro_composite_golden : string =
 (** val path_targ2 : string **)
 
 val path_targ2 : string =
-  "$DEMO_ROOT/cds_config/filter_one_config.json"
+  "/cds_config/filter_one_config.json"
 
 (** val path_targ2_golden : string **)
 
 val path_targ2_golden : string =
-  "$AM_ROOT/tests/DemoFiles/goldenFiles/filter_one_config.json"
+  "/tests/DemoFiles/goldenFiles/filter_one_config.json"
 
 (** val path_exe_targ1 : string **)
 
 val path_exe_targ1 : string =
-  "$DEMO_ROOT/installed_dir/bin/rewrite_one"
+  "/installed_dir/bin/rewrite_one"
 
 (** val path_exe_targ1_golden : string **)
 
 val path_exe_targ1_golden : string =
-  "$AM_ROOT/tests/DemoFiles/goldenFiles/rewrite_one"
+  "/tests/DemoFiles/goldenFiles/rewrite_one"
 
 (** val path_exe_targ2 : string **)
 
 val path_exe_targ2 : string =
-  "$DEMO_ROOT/installed_dir/bin/filter_one"
+  "/installed_dir/bin/filter_one"
 
 (** val path_exe_targ2_golden : string **)
 
 val path_exe_targ2_golden : string =
-  "$AM_ROOT/tests/DemoFiles/goldenFiles/filter_one"
+  "/tests/DemoFiles/goldenFiles/filter_one"
 
 (** val selinux_policy_path_golden : string **)
 
 val selinux_policy_path_golden : string =
-  "$AM_ROOT/tests/DemoFiles/goldenFiles/demo_pipeline_golden.cil"
+  "/tests/DemoFiles/goldenFiles/demo_pipeline_golden.cil"
 
 (** val gather_config_1 : coq_Term **)
 
 val gather_config_1 : coq_Term =
-  gather_targ_asp cds_config_dir_plc cds_config_1_targ path_targ1
-    path_targ1_golden
+  gather_targ_asp cds_config_dir_plc cds_config_1_targ demo_root_env_var
+    am_root_env_var path_targ1 path_targ1_golden
 
 (** val gather_config_2 : coq_Term **)
 
 val gather_config_2 : coq_Term =
-  gather_targ_asp cds_config_dir_plc cds_config_2_targ path_targ2
-    path_targ2_golden
+  gather_targ_asp cds_config_dir_plc cds_config_2_targ demo_root_env_var
+    am_root_env_var path_targ2 path_targ2_golden
 
 (** val hash_cds_img_1 : coq_Term **)
 
 val hash_cds_img_1 : coq_Term =
-  hash_targ_asp cds_config_dir_plc cds_img_1_targ path_exe_targ1
-    path_exe_targ1_golden
+  hash_targ_asp cds_config_dir_plc cds_img_1_targ demo_root_env_var
+    am_root_env_var path_exe_targ1 path_exe_targ1_golden
 
 (** val hash_cds_img_2 : coq_Term **)
 
 val hash_cds_img_2 : coq_Term =
-  hash_targ_asp cds_config_dir_plc cds_img_2_targ path_exe_targ2
-    path_exe_targ2_golden
+  hash_targ_asp cds_config_dir_plc cds_img_2_targ demo_root_env_var
+    am_root_env_var path_exe_targ2 path_exe_targ2_golden
 
 (** val selinux_hash_pol : coq_Term **)
 
@@ -239,29 +259,34 @@ val selinux_hash_pol : coq_Term =
 (** val provision_config_1 : coq_Term **)
 
 val provision_config_1 : coq_Term =
-  provision_targ_asp cds_config_dir_plc cds_config_1_targ path_targ1_golden
+  provision_targ_asp cds_config_dir_plc cds_config_1_targ am_root_env_var
+    path_targ1_golden
 
 (** val provision_config_2 : coq_Term **)
 
 val provision_config_2 : coq_Term =
-  provision_targ_asp cds_config_dir_plc cds_config_2_targ path_targ2_golden
+  provision_targ_asp cds_config_dir_plc cds_config_2_targ am_root_env_var
+    path_targ2_golden
 
 (** val provision_img_1 : coq_Term **)
 
 val provision_img_1 : coq_Term =
-  provision_targ_asp cds_config_dir_plc cds_img_1_targ path_exe_targ1_golden
+  provision_targ_asp cds_config_dir_plc cds_img_1_targ am_root_env_var
+    path_exe_targ1_golden
 
 (** val provision_img_2 : coq_Term **)
 
 val provision_img_2 : coq_Term =
-  provision_targ_asp cds_config_dir_plc cds_img_2_targ path_exe_targ2_golden
+  provision_targ_asp cds_config_dir_plc cds_img_2_targ am_root_env_var
+    path_exe_targ2_golden
 
 (** val query_kim_args : coq_ASP_ARGS **)
 
 val query_kim_args : coq_ASP_ARGS =
   JSON_Object ((query_kim_dynamic_arg, (JSON_String
-    query_kim_dynamic_arg_val)) :: ((query_kim_appraisal_dir_arg,
-    (JSON_String query_kim_appraisal_dir_arg_val)) :: []))
+    query_kim_dynamic_arg_val)) :: ((query_kim_env_var_arg, (JSON_String
+    am_root_env_var)) :: ((query_kim_appraisal_dir_arg, (JSON_String
+    query_kim_appraisal_dir_arg_val)) :: [])))
 
 (** val query_kim_asp : coq_Term **)
 

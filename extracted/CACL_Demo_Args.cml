@@ -8,6 +8,11 @@ val query_kim_dynamic_arg : string =
 val query_kim_dynamic_arg_val : string =
   "false"
 
+(** val query_kim_env_var_arg : string **)
+
+val query_kim_env_var_arg : string =
+  "env_var"
+
 (** val query_kim_appraisal_dir_arg : string **)
 
 val query_kim_appraisal_dir_arg : string =
