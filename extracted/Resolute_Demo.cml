@@ -1,0 +1,133 @@
+(** val micro_demo_plc : coq_Plc **)
+
+val micro_demo_plc : coq_Plc =
+  "micro_demo_Plc"
+
+(** val micro_demo_targ : coq_TARG_ID **)
+
+val micro_demo_targ : coq_TARG_ID =
+  "micro_demo_targ"
+
+(** val aadl_dir_targ : coq_TARG_ID **)
+
+val aadl_dir_targ : coq_TARG_ID =
+  "aadl_dir_targ"
+
+(** val microkit_dir_targ : coq_TARG_ID **)
+
+val microkit_dir_targ : coq_TARG_ID =
+  "microkit_dir_targ"
+
+(** val micro_hash_comp_targ : coq_TARG_ID **)
+
+val micro_hash_comp_targ : coq_TARG_ID =
+  "micro_hash_composite_targ"
+
+(** val am_root_env_var : string **)
+
+val am_root_env_var : string =
+  "AM_ROOT"
+
+(** val hashdir_env_var : string **)
+
+val hashdir_env_var : string =
+  "INSPECTA_ROOT"
+
+(** val path_micro_dir_1_golden : string **)
+
+val path_micro_dir_1_golden : string =
+  "/tests/DemoFiles/goldenFiles/micro_dir_1_golden.txt"
+
+(** val path_micro_dir_1 : string **)
+
+val path_micro_dir_1 : string =
+  "/micro-examples/microkit/aadl_port_types/data/base_type/aadl/"
+
+(** val path_micro_dir_2 : string **)
+
+val path_micro_dir_2 : string =
+  "/micro-examples/microkit/aadl_port_types/data/base_type/hamr/microkit/"
+
+(** val path_micro_dir_2_golden : string **)
+
+val path_micro_dir_2_golden : string =
+  "/tests/DemoFiles/goldenFiles/micro_dir_2_golden.txt"
+
+(** val path_micro_composite_golden : string **)
+
+val path_micro_composite_golden : string =
+  "/tests/DemoFiles/goldenFiles/micro_composite.txt"
+
+(** val provision_micro_dir_1 : coq_Term **)
+
+val provision_micro_dir_1 : coq_Term =
+  provision_targ_asp micro_demo_plc micro_demo_targ am_root_env_var
+    path_micro_dir_1_golden
+
+(** val provision_micro_dir_2 : coq_Term **)
+
+val provision_micro_dir_2 : coq_Term =
+  provision_targ_asp micro_demo_plc micro_demo_targ am_root_env_var
+    path_micro_dir_2_golden
+
+(** val provision_micro_hash_composite : coq_Term **)
+
+val provision_micro_hash_composite : coq_Term =
+  provision_targ_asp micro_demo_plc micro_demo_targ am_root_env_var
+    path_micro_composite_golden
+
+(** val hash_micro_dir_1 : coq_Term **)
+
+val hash_micro_dir_1 : coq_Term =
+  hash_dir_asp micro_demo_plc aadl_dir_targ hashdir_env_var am_root_env_var
+    (path_micro_dir_1 :: []) path_micro_dir_1_golden
+
+(** val hash_micro_dir_2 : coq_Term **)
+
+val hash_micro_dir_2 : coq_Term =
+  hash_dir_asp micro_demo_plc microkit_dir_targ hashdir_env_var
+    am_root_env_var (path_micro_dir_2 :: []) path_micro_dir_2_golden
+
+(** val hash_micro_evidence : coq_Term **)
+
+val hash_micro_evidence : coq_Term =
+  hash_evidence_asp micro_demo_plc micro_hash_comp_targ am_root_env_var
+    path_micro_composite_golden
+
+(** val meas_micro : coq_Term **)
+
+val meas_micro : coq_Term =
+  Coq_lseq (Coq_bseq (ALL, ALL) hash_micro_dir_1 hash_micro_dir_2)
+    hash_micro_evidence
+
+(** val appr_term : coq_Term **)
+
+val appr_term : coq_Term =
+  Coq_asp APPR
+
+(** val micro_appTerm : coq_Term **)
+
+val micro_appTerm : coq_Term =
+  Coq_lseq meas_micro appr_term
+
+(** val micro_appTerm_provision : coq_Term **)
+
+val micro_appTerm_provision : coq_Term =
+  Coq_bseq (ALL, ALL) (Coq_lseq hash_micro_dir_1 provision_micro_dir_1)
+    (Coq_bseq (ALL, ALL) (Coq_lseq hash_micro_dir_2 provision_micro_dir_2)
+    (Coq_lseq meas_micro provision_micro_hash_composite))
+
+(** val micro_appTerm_provision_dir_1 : coq_Term **)
+
+val micro_appTerm_provision_dir_1 : coq_Term =
+  Coq_lseq hash_micro_dir_1 provision_micro_dir_1
+
+(** val micro_appTerm_provision_dir_2 : coq_Term **)
+
+val micro_appTerm_provision_dir_2 : coq_Term =
+  Coq_lseq hash_micro_dir_2 provision_micro_dir_2
+
+(** val micro_appTerm_provision_composite : coq_Term **)
+
+val micro_appTerm_provision_composite : coq_Term =
+  Coq_lseq meas_micro provision_micro_hash_composite

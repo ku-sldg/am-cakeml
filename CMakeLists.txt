@@ -71,8 +71,11 @@ get_files(copland_am_src
 
     extracted/Term_Defs.cml
     extracted/Cvm_Utils.cml
+    extracted/Flexible_Mechanisms_Vars.cml
     extracted/CACL_Demo_Args.cml
-    extracted/CACL_Demo.cml
+    extracted/Demo_Terms.cml
+    extracted/CDS_Demo.cml
+    extracted/Resolute_Demo.cml
     extracted/AppraisalSummary.cml
     extracted/Term.cml
     extracted/Manifest_Set.cml
@@ -95,7 +98,6 @@ get_files(copland_am_src
     extracted/Manifest_Generator.cml
     extracted/Manifest_Generator_Union.cml
     extracted/AM_Json_Interfaces.cml
-    extracted/Flexible_Mechanisms_Vars.cml
     extracted/Flexible_Mechanisms.cml
     extracted/Client_AM.cml
     extracted/Server_AM.cml
