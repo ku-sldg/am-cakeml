@@ -53,6 +53,11 @@ val cds_img_2_targ : coq_TARG_ID =
 val query_kim : coq_ASP_ID =
   "invary_get_measurement"
 
+(** val query_kim_stub : coq_ASP_ID **)
+
+val query_kim_stub : coq_ASP_ID =
+  "invary_get_measurement_stub"
+
 (** val tpm_sig : coq_ASP_ID **)
 
 val tpm_sig : coq_ASP_ID =
@@ -67,12 +72,6 @@ val selinux_pol_dump : coq_ASP_ID =
 
 val r_ssl_sig : coq_ASP_ID =
   "sig"
-
-(** val selinux_hash_asp :
-    coq_Plc -> coq_TARG_ID -> coq_ASP_ARGS -> coq_Term **)
-
-fun selinux_hash_asp targPlc targId args =
-  Coq_asp (ASPC (Coq_asp_paramsC selinux_pol_dump args targPlc targId))
 
 (** val demo_root_env_var : string **)
 
@@ -196,6 +195,29 @@ val provision_img_2_args : coq_ASP_ARGS =
     am_root_env_var)) :: (("filepath_golden", (JSON_String
     path_exe_targ2_golden)) :: []))
 
+(** val query_kim_args : coq_ASP_ARGS **)
+
+val query_kim_args : coq_ASP_ARGS =
+  JSON_Object ((query_kim_dynamic_arg, (JSON_String
+    query_kim_dynamic_arg_val)) :: ((query_kim_env_var_arg, (JSON_String
+    am_root_env_var)) :: ((query_kim_appraisal_dir_arg, (JSON_String
+    query_kim_appraisal_dir_arg_val)) :: [])))
+
+(** val r_ssl_sig_asp_args : coq_ASP_ARGS **)
+
+val r_ssl_sig_asp_args : coq_ASP_ARGS =
+  JSON_Object []
+
+(** val query_kim_asp_stub_args : coq_ASP_ARGS **)
+
+val query_kim_asp_stub_args : coq_ASP_ARGS =
+  JSON_Object []
+
+(** val r_tpm_sig_args : coq_ASP_ARGS **)
+
+val r_tpm_sig_args : coq_ASP_ARGS =
+  JSON_Object (("tpm_folder", (JSON_String "$AM_TPM_DIR")) :: [])
+
 (** val gather_config_1 : coq_Term **)
 
 val gather_config_1 : coq_Term =
@@ -215,6 +237,18 @@ val hash_cds_img_1 : coq_Term =
 
 val hash_cds_img_2 : coq_Term =
   hash_targ_asp cds_config_dir_plc cds_img_2_targ hash_cds_img_2_args
+
+(** val selinux_hash_asp :
+    coq_Plc -> coq_TARG_ID -> coq_ASP_ARGS -> coq_Term **)
+
+fun selinux_hash_asp targPlc targId args =
+  Coq_asp (ASPC (Coq_asp_paramsC selinux_pol_dump args targPlc targId))
+
+(** val query_kim_asp : coq_ASP_ARGS -> coq_Term **)
+
+fun query_kim_asp args =
+  Coq_asp (ASPC (Coq_asp_paramsC query_kim args cds_query_kim_plc
+    kim_evidence_targ))
 
 (** val selinux_hash_pol : coq_Term **)
 
@@ -244,36 +278,37 @@ val provision_img_1 : coq_Term =
 val provision_img_2 : coq_Term =
   provision_targ_asp cds_config_dir_plc cds_img_2_targ provision_img_2_args
 
-(** val query_kim_args : coq_ASP_ARGS **)
+(** val r_ssl_sig_asp' : coq_ASP_ARGS -> coq_Term **)
 
-val query_kim_args : coq_ASP_ARGS =
-  JSON_Object ((query_kim_dynamic_arg, (JSON_String
-    query_kim_dynamic_arg_val)) :: ((query_kim_env_var_arg, (JSON_String
-    am_root_env_var)) :: ((query_kim_appraisal_dir_arg, (JSON_String
-    query_kim_appraisal_dir_arg_val)) :: [])))
-
-(** val query_kim_asp : coq_Term **)
-
-val query_kim_asp : coq_Term =
-  Coq_asp (ASPC (Coq_asp_paramsC query_kim query_kim_args cds_query_kim_plc
-    kim_evidence_targ))
+fun r_ssl_sig_asp' args =
+  Coq_asp (ASPC (Coq_asp_paramsC r_ssl_sig args cds_query_kim_plc
+    ssl_sig_targ))
 
 (** val r_ssl_sig_asp : coq_Term **)
 
 val r_ssl_sig_asp : coq_Term =
-  Coq_asp (ASPC (Coq_asp_paramsC r_ssl_sig (JSON_Object []) cds_query_kim_plc
-    ssl_sig_targ))
+  r_ssl_sig_asp' r_ssl_sig_asp_args
+
+(** val query_kim_asp_stub' : coq_ASP_ARGS -> coq_Term **)
+
+fun query_kim_asp_stub' args =
+  Coq_asp (ASPC (Coq_asp_paramsC query_kim_stub args cds_query_kim_plc
+    kim_evidence_targ))
+
+(** val query_kim_asp_stub : coq_Term **)
+
+val query_kim_asp_stub : coq_Term =
+  query_kim_asp_stub' query_kim_asp_stub_args
+
+(** val r_tpm_sig_asp' : coq_ASP_ARGS -> coq_Term **)
+
+fun r_tpm_sig_asp' args =
+  Coq_asp (ASPC (Coq_asp_paramsC tpm_sig args cds_query_kim_plc tpm_sig_targ))
 
 (** val r_tpm_sig_asp : coq_Term **)
 
 val r_tpm_sig_asp : coq_Term =
-  Coq_asp (ASPC (Coq_asp_paramsC tpm_sig (JSON_Object (("tpm_folder",
-    (JSON_String "$AM_TPM_DIR")) :: [])) cds_query_kim_plc tpm_sig_targ))
-
-(** val appr_term : coq_Term **)
-
-val appr_term : coq_Term =
-  Coq_asp APPR
+  r_tpm_sig_asp' r_tpm_sig_args
 
 (** val meas_cds : coq_Term **)
 
@@ -282,16 +317,21 @@ val meas_cds : coq_Term =
     (Coq_bseq (ALL, ALL) hash_cds_img_2 (Coq_bseq (ALL, ALL) gather_config_1
     gather_config_2)))
 
+(** val query_kim_asp_real : coq_Term **)
+
+val query_kim_asp_real : coq_Term =
+  query_kim_asp query_kim_args
+
 (** val cds_ssl : coq_Term **)
 
 val cds_ssl : coq_Term =
-  Coq_lseq (Coq_bseq (ALL, ALL) query_kim_asp meas_cds) (Coq_lseq
+  Coq_lseq (Coq_bseq (ALL, ALL) query_kim_asp_real meas_cds) (Coq_lseq
     r_ssl_sig_asp appr_term)
 
 (** val cds_tpm : coq_Term **)
 
 val cds_tpm : coq_Term =
-  Coq_lseq (Coq_bseq (ALL, ALL) query_kim_asp meas_cds) (Coq_lseq
+  Coq_lseq (Coq_bseq (ALL, ALL) query_kim_asp_real meas_cds) (Coq_lseq
     r_tpm_sig_asp appr_term)
 
 (** val simple_sig : coq_Term **)
@@ -313,7 +353,7 @@ val meas_cds_local : coq_Term =
 (** val cds_local : coq_Term **)
 
 val cds_local : coq_Term =
-  Coq_lseq (Coq_bseq (ALL, ALL) query_kim_asp meas_cds_local) (Coq_lseq
+  Coq_lseq (Coq_bseq (ALL, ALL) query_kim_asp_stub meas_cds_local) (Coq_lseq
     r_ssl_sig_asp appr_term)
 
 (** val example_appTerm_provision : coq_Term **)

@@ -4,6 +4,11 @@
 fun gen_asp asp_id args targPlc targId =
   Coq_asp (ASPC (Coq_asp_paramsC asp_id args targPlc targId))
 
+(** val appr_term : coq_Term **)
+
+val appr_term : coq_Term =
+  Coq_asp APPR
+
 (** val gather_file_contents : coq_ASP_ID **)
 
 val gather_file_contents : coq_ASP_ID =
@@ -56,8 +61,3 @@ fun provision_targ_asp targPlc targId args =
 
 fun hash_evidence_asp targPlc targId args =
   gen_asp hash_evidence args targPlc targId
-
-(** val string_to_json : string -> coq_JSON **)
-
-fun string_to_json s =
-  JSON_String s
