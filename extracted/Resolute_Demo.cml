@@ -58,41 +58,83 @@ val path_micro_dir_2_golden : string =
 val path_micro_composite_golden : string =
   "/tests/DemoFiles/goldenFiles/micro_composite.txt"
 
+(** val provision_micro_dir_1_args : coq_ASP_ARGS **)
+
+val provision_micro_dir_1_args : coq_ASP_ARGS =
+  JSON_Object (("env_var_golden", (JSON_String
+    am_root_env_var)) :: (("filepath_golden", (JSON_String
+    path_micro_dir_1_golden)) :: []))
+
+(** val provision_micro_dir_2_args : coq_ASP_ARGS **)
+
+val provision_micro_dir_2_args : coq_ASP_ARGS =
+  JSON_Object (("env_var_golden", (JSON_String
+    am_root_env_var)) :: (("filepath_golden", (JSON_String
+    path_micro_dir_2_golden)) :: []))
+
+(** val provision_micro_hash_composite_args : coq_ASP_ARGS **)
+
+val provision_micro_hash_composite_args : coq_ASP_ARGS =
+  JSON_Object (("env_var_golden", (JSON_String
+    am_root_env_var)) :: (("filepath_golden", (JSON_String
+    path_micro_composite_golden)) :: []))
+
+(** val hash_micro_dir_1_args : coq_ASP_ARGS **)
+
+val hash_micro_dir_1_args : coq_ASP_ARGS =
+  JSON_Object (("env_var", (JSON_String
+    hashdir_env_var)) :: (("env_var_golden", (JSON_String
+    am_root_env_var)) :: (("paths", (JSON_Array
+    (map string_to_json (path_micro_dir_1 :: [])))) :: (("filepath_golden",
+    (JSON_String path_micro_dir_1_golden)) :: []))))
+
+(** val hash_micro_dir_2_args : coq_ASP_ARGS **)
+
+val hash_micro_dir_2_args : coq_ASP_ARGS =
+  JSON_Object (("env_var", (JSON_String
+    hashdir_env_var)) :: (("env_var_golden", (JSON_String
+    am_root_env_var)) :: (("paths", (JSON_Array
+    (map string_to_json (path_micro_dir_2 :: [])))) :: (("filepath_golden",
+    (JSON_String path_micro_dir_2_golden)) :: []))))
+
+(** val hash_micro_evidence_args : coq_ASP_ARGS **)
+
+val hash_micro_evidence_args : coq_ASP_ARGS =
+  JSON_Object (("env_var_golden", (JSON_String
+    am_root_env_var)) :: (("filepath_golden", (JSON_String
+    path_micro_composite_golden)) :: []))
+
 (** val provision_micro_dir_1 : coq_Term **)
 
 val provision_micro_dir_1 : coq_Term =
-  provision_targ_asp micro_demo_plc micro_demo_targ am_root_env_var
-    path_micro_dir_1_golden
+  provision_targ_asp micro_demo_plc micro_demo_targ provision_micro_dir_1_args
 
 (** val provision_micro_dir_2 : coq_Term **)
 
 val provision_micro_dir_2 : coq_Term =
-  provision_targ_asp micro_demo_plc micro_demo_targ am_root_env_var
-    path_micro_dir_2_golden
+  provision_targ_asp micro_demo_plc micro_demo_targ provision_micro_dir_2_args
 
 (** val provision_micro_hash_composite : coq_Term **)
 
 val provision_micro_hash_composite : coq_Term =
-  provision_targ_asp micro_demo_plc micro_demo_targ am_root_env_var
-    path_micro_composite_golden
+  provision_targ_asp micro_demo_plc micro_demo_targ
+    provision_micro_hash_composite_args
 
 (** val hash_micro_dir_1 : coq_Term **)
 
 val hash_micro_dir_1 : coq_Term =
-  hash_dir_asp micro_demo_plc aadl_dir_targ hashdir_env_var am_root_env_var
-    (path_micro_dir_1 :: []) path_micro_dir_1_golden
+  hash_dir_asp micro_demo_plc aadl_dir_targ hash_micro_dir_1_args
 
 (** val hash_micro_dir_2 : coq_Term **)
 
 val hash_micro_dir_2 : coq_Term =
-  hash_dir_asp micro_demo_plc microkit_dir_targ hashdir_env_var
-    am_root_env_var (path_micro_dir_2 :: []) path_micro_dir_2_golden
+  hash_dir_asp micro_demo_plc microkit_dir_targ hash_micro_dir_2_args
 
 (** val hash_micro_evidence : coq_Term **)
 
 val hash_micro_evidence : coq_Term =
-  hash_evidence_asp micro_demo_plc micro_hash_comp_targ am_root_env_var
-    path_micro_composite_golden
+  hash_evidence_asp micro_demo_plc micro_hash_comp_targ
+    hash_micro_evidence_args
 
 (** val meas_micro : coq_Term **)
 
@@ -131,3 +173,12 @@ val micro_appTerm_provision_dir_2 : coq_Term =
 
 val micro_appTerm_provision_composite : coq_Term =
   Coq_lseq meas_micro provision_micro_hash_composite
+
+(** val resolute_terms_map : (string * coq_Term) list **)
+
+val resolute_terms_map : (string * coq_Term) list =
+  ("micro", micro_appTerm) :: (("micro_provision",
+    micro_appTerm_provision) :: (("micro_provision_dir_1",
+    micro_appTerm_provision_dir_1) :: (("micro_provision_dir_2",
+    micro_appTerm_provision_dir_2) :: (("micro_provision_composite",
+    micro_appTerm_provision_composite) :: []))))

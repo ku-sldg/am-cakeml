@@ -28,7 +28,7 @@ fun main () =
             val outFile   = List.nth argList (outFileInd + 1)
             val glob_context = Build_GlobalContext [] []
             val outTerm   = 
-              case map_get coq_Eq_Class_ID_Type termName (full_flexible_mechanisms glob_context) of
+              case map_get coq_Eq_Class_ID_Type termName (full_terms glob_context) of
                 Some term_ev_pair => fst term_ev_pair
               | None => 
                   raise (Exception ("TermToJson Argument Error - Unknown term identifier: \"" ^ termName ^ "\"\n" ^ usage))

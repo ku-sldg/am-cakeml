@@ -63,29 +63,25 @@ val flexible_mechanisms_map : (string * coq_Term) list =
     APPR))) :: (("parmut", parallel_mutual_1) :: (("layered_bg",
     layered_background_check) :: (("filehash",
     filehash_auth_phrase) :: (("large_output",
-    large_output_asp_test) :: (("cds_simple",
-    example_appTerm) :: (("cds_ssl", cds_ssl) :: (("cds_local",
-    cds_local) :: (("cds_tpm", cds_tpm) :: (("cds_provision",
-    example_appTerm_provision) :: (("simple_sig", simple_sig) :: (("micro",
-    micro_appTerm) :: (("micro_provision",
-    micro_appTerm_provision) :: (("micro_provision_dir_1",
-    micro_appTerm_provision_dir_1) :: (("micro_provision_dir_2",
-    micro_appTerm_provision_dir_2) :: (("micro_provision_composite",
-    micro_appTerm_provision_composite) :: [])))))))))))))))))))
+    large_output_asp_test) :: []))))))))
 
-(** val add_EvidenceT_flexible_mechanisms :
-    coq_GlobalContext -> (string, coq_Term * (coq_EvidenceT, string)
-    coq_ResultT) coq_Map **)
+(** val full_terms_map : (string * coq_Term) list **)
 
-fun add_EvidenceT_flexible_mechanisms g =
+val full_terms_map : (string * coq_Term) list =
+  app flexible_mechanisms_map (app cds_terms_map resolute_terms_map)
+
+(** val add_EvidenceT_terms_map :
+    (string * coq_Term) list -> coq_GlobalContext -> (string,
+    coq_Term * (coq_EvidenceT, string) coq_ResultT) coq_Map **)
+
+fun add_EvidenceT_terms_map terms_map g =
   map_map coq_Eq_Class_ID_Type (fn t => (t,
-    (eval g coq_P0 (Coq_nonce_evt O) t))) flexible_mechanisms_map
+    (eval g coq_P0 (Coq_nonce_evt O) t))) terms_map
 
-(** val full_flexible_mechanisms :
+(** val full_terms :
     coq_GlobalContext -> (string, coq_Term * (coq_EvidenceT, string)
     coq_ResultT) coq_Map **)
 
-val full_flexible_mechanisms : (coq_GlobalContext -> (string,
-                               coq_Term * (coq_EvidenceT, string)
-                               coq_ResultT) coq_Map) =
-  add_EvidenceT_flexible_mechanisms
+val full_terms : (coq_GlobalContext -> (string, coq_Term * (coq_EvidenceT,
+                 string) coq_ResultT) coq_Map) =
+  add_EvidenceT_terms_map full_terms_map

@@ -50,7 +50,7 @@ fun main () =
                 Coq_resultC globContFile => globContFile
               | Coq_errC c => raise (Exception ("Error parsing global context file: " ^ c))
             val outEvid   = 
-            case map_get coq_Eq_Class_ID_Type termName (full_flexible_mechanisms global_context_val) of
+            case map_get coq_Eq_Class_ID_Type termName (full_terms global_context_val) of
               Some term_ev_pair => 
               let val ev : (coq_EvidenceT, string) coq_ResultT = (snd term_ev_pair) in
               case ev of
