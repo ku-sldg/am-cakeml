@@ -72,8 +72,8 @@ fun main () =
       val att_plc   : coq_Plc = "P0" 
       val init_et        : coq_EvidenceT = Coq_mt_evt (* Coq_nonce_evt O  *)
       val init_rawev : coq_RawEv = []
-      val attester_addr : coq_UUID = "localhost:5000"
-      val appraiser_addr : coq_UUID = "localhost:5003"
+      val attester_addr : coq_UUID = "127.0.0.1:5000"
+      val appraiser_addr : coq_UUID = "127.0.0.1:5003"
       
       (* val app_result = run_demo_client_AM demo_term top_plc att_plc init_et att_sess init_rawev attester_addr appraiser_addr  *)
       (* TODO: Current this will do basically NOTHING *)

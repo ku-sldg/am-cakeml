@@ -1,13 +1,13 @@
 {
   "Session_Plc": "P0",
   "Plc_Mapping": {
-    "P0": "localhost:5000",
-    "P1": "localhost:5001",
-    "P2": "localhost:5002",
-    "P3": "localhost:5003",
-    "P4": "localhost:5004",
-    "P5": "localhost:5005",
-    "P6": "localhost:5006"
+    "P0": "127.0.0.1:5000",
+    "P1": "127.0.0.1:5001",
+    "P2": "127.0.0.1:5002",
+    "P3": "127.0.0.1:5003",
+    "P4": "127.0.0.1:5004",
+    "P5": "127.0.0.1:5005",
+    "P6": "127.0.0.1:5006"
   },
   "PubKey_Mapping": {},
   "Session_Context": "$$FILL_IN_CONTEXT$$"

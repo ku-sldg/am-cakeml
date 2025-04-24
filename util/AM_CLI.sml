@@ -101,7 +101,7 @@ structure AM_CLI_Utils = struct
   *)
   fun retrieve_Server_AM_CLI_args _ =
     (let val name = CommandLine.name ()
-        val usage = ("Usage: " ^ name ^ "-m <ManifestFile>.json -b <asp_bin_location> -u <ip:port>\n\ne.g.\t" ^ name ^ " -m formMan.json -b /opt/asps -u localhost:5000\n\n")
+        val usage = ("Usage: " ^ name ^ "-m <ManifestFile>.json -b <asp_bin_location> -u <ip:port>\n\ne.g.\t" ^ name ^ " -m formMan.json -b /opt/asps -u 127.0.0.1:5000\n\n")
         val argList = CommandLine.arguments ()
         val manInd        = ListExtra.find_index argList "-m"
         val aspBinInd     = ListExtra.find_index argList "-b"

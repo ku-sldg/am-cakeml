@@ -74,7 +74,7 @@ kill_background_processes() {
 trap kill_background_processes EXIT
 
 # Common Variables
-IP=localhost
+IP=127.0.0.1
 PORT=5000
 TERM_GEN=$BUILD_BIN/term_to_json
 EV_GEN=$BUILD_BIN/evidence_to_json

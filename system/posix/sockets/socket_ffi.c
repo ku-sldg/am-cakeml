@@ -125,11 +125,14 @@ int accept_socket(int listen_sock)
   return client_sock;
 }
 
+
 // Function to connect to a server
 int connect_socket(const char *ip, int port)
 {
   DEBUG_PRINTF("In function connect_socket\n");
   DEBUG_PRINTF("Given arguments: ip=%s, port=%d\n", ip, port);
+
+  struct sockaddr_in client_addr;
 
   int sock = socket(AF_INET, SOCK_STREAM, 0);
   if (sock < 0)
@@ -138,6 +141,49 @@ int connect_socket(const char *ip, int port)
     return -1;
   }
 
+  int is_client_fixed = 0;
+  if(is_client_fixed) {
+
+     // reuse Client port
+    int reuse = 1;
+    int reuse_result = setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (void *)&reuse, sizeof(reuse));
+    if ( reuse_result < 0 ) {
+        //perror("ERROR SO_REUSEADDR:");
+        DEBUG_PRINTF("setsockopt(SO_REUSEADDR) failed: %s\n", strerror(errno));
+        close(sock);
+        return -1;
+    }
+
+    /*
+    // linger stuff
+    struct linger my_linger;
+    my_linger.l_onoff = 1;
+    my_linger.l_linger = 0;
+    int linger_result = setsockopt(sock, SOL_SOCKET, SO_LINGER, (void *)&my_linger, sizeof(my_linger));
+    if ( linger_result < 0 ) {
+        //perror("ERROR SO_REUSEADDR:");
+        DEBUG_PRINTF("setsockopt(SO_REUSEADDR) failed: %s\n", strerror(errno));
+        close(sock);
+        return -1;
+    }
+    */
+
+    int client_port = port + 10;
+
+    // Explicitly assigning port number by binding client with that port 
+    client_addr.sin_family = AF_INET;
+    client_addr.sin_port = htons(client_port);
+    client_addr.sin_addr.s_addr = INADDR_ANY;
+    //client_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+
+    if (bind(sock, (struct sockaddr*) &client_addr, sizeof(client_addr)) == 0)
+        printf("Bound Client Correctly\n");
+    else
+        printf("Unable to bind Client\n");
+
+  }
+
+  
   struct addrinfo hints = {0}, *res;
   hints.ai_family = AF_INET;       // Use IPv4
   hints.ai_socktype = SOCK_STREAM; // Use TCP
@@ -154,8 +200,11 @@ int connect_socket(const char *ip, int port)
     return -1;
   }
 
-  // Attempt to connect to the resolved address
-  if (connect(sock, res->ai_addr, res->ai_addrlen) < 0)
+  // Attempt to connect to the resolved server address
+  int con = connect(sock, res->ai_addr, res->ai_addrlen);
+
+
+  if (con < 0)
   {
     DEBUG_PRINTF("Connection failed: %s\n", strerror(errno));
     freeaddrinfo(res);
@@ -163,9 +212,12 @@ int connect_socket(const char *ip, int port)
     return -1;
   }
 
+  printf("Connection to Server succeeded\n");
+
   freeaddrinfo(res); // Free memory allocated by getaddrinfo
   return sock;       // Return the connected socket
 }
+
 
 int socket_read(int sock, void *out_data, size_t length)
 {
