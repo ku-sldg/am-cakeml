@@ -3,10 +3,15 @@
 val query_kim_dynamic_arg : string =
   "dynamic"
 
-(** val query_kim_dynamic_arg_val : string **)
+(** val query_kim_dynamic_arg_val_static : string **)
 
-val query_kim_dynamic_arg_val : string =
+val query_kim_dynamic_arg_val_static : string =
   "false"
+
+(** val query_kim_dynamic_arg_val_dynamic : string **)
+
+val query_kim_dynamic_arg_val_dynamic : string =
+  "true"
 
 (** val query_kim_env_var_arg : string **)
 
@@ -18,7 +23,12 @@ val query_kim_env_var_arg : string =
 val query_kim_appraisal_dir_arg : string =
   "appraisal_dir"
 
-(** val query_kim_appraisal_dir_arg_val : string **)
+(** val query_kim_appraisal_dir_arg_val_static : string **)
 
-val query_kim_appraisal_dir_arg_val : string =
+val query_kim_appraisal_dir_arg_val_static : string =
   "/tests/DemoFiles/staticAppraisalFiles/"
+
+(** val query_kim_appraisal_dir_arg_val_dynamic : string **)
+
+val query_kim_appraisal_dir_arg_val_dynamic : string =
+  "/var/opt/invary-appraiser/appraisals/"
