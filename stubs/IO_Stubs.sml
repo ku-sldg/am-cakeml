@@ -16,40 +16,6 @@ fun decodeUUID (u : coq_UUID) =
     (ip, port')
   end
 
-(** val make_JSON_Network_Request :
-    coq_UUID -> coq_JSON -> (coq_JSON, string) coq_ResultT **)
-
-(*
-fun make_JSON_Network_Request (commsBin : coq_FS_Location) (commsBin2 : coq_FS_Location) (js : coq_JSON) =
-  (let (*val commsBin = "/Users/adampetz/Documents/Spring_2025/rust-am-clients/target/release/" *)
-      val conc_comms_bin_loc = "rust-am-comms-client"
-      val loc = commsBin ^ "/" ^ (conc_comms_bin_loc)
-      val _ = print ("Sending a request to the comms AM: " ^ loc ^ "\n")
-      val req_str = loc ^ " \"" ^ (SysFFI.shellEscapeString (coq_JSON_to_string js)) ^ "\""
-      val _ = print ("Request string: " ^ req_str ^ "\n")
-      val resp = SysFFI.c_popen_string req_str
-      val _ = print ("Got back a response from the comms AM: \n" ^ resp ^ "\n")
-  in
-    string_to_JSON resp
-  end) : (coq_JSON, string) coq_ResultT
-
-  *)
-
-
-(*
-
-fun make_JSON_Network_Request (u : coq_UUID) (js : coq_JSON) =
-  (let val (ip, port) = decodeUUID u
-      val _ = print ("Decoded UUID to: " ^ ip ^ ":" ^ (Int.toString port) ^ "\n")
-      val fd = Socket.connect ip port
-      val _ = print ("Connected to " ^ ip ^ ":" ^ (Int.toString port) ^ "\n")
-      val sendReq = Socket.write fd (coq_JSON_to_string js)
-      val resp = Socket.read fd
-  in
-    string_to_JSON resp
-  end) : (coq_JSON, string) coq_ResultT 
-
-*)
 
 (** val aspid_to_fs_location : coq_ASP_ID -> coq_FS_Location **)
 fun aspid_to_fs_location (a : coq_ASP_ID) =

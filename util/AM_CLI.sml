@@ -4,7 +4,7 @@ structure AM_CLI_Utils = struct
   type priv_key_t = string
   type server_am_args_t = coq_AM_Manager_Config
   (* bool marks whether or not appraisal is done *)
-  type client_am_args_t = (coq_Term * coq_Attestation_Session * bool)
+  type client_am_args_t = (coq_Term * coq_Attestation_Session * bool * string)
   
   (* Parse a JSON file into a JSON object *)
   (* : string -> (coq_Manifest, string) coq_ResultT *)
@@ -64,30 +64,33 @@ structure AM_CLI_Utils = struct
   
   fun retrieve_Client_AM_CLI_args _ =
     let val name = CommandLine.name ()
-        val usage = ("Usage: " ^ name ^ " -t <term_file>.json -s <att_session.json> (--appr | --send)\n\ne.g.\t" ^ name ^ " -t cert.json -s my_session.json --send\n\n")
+        val usage = ("Usage: " ^ name ^ " -t <term_file>.json -s <att_session.json> --comms <coms_exe> (--appr | --send)\n\ne.g.\t" ^ name ^ " -t cert.json -s my_session.json --send\n\n")
         val argList = CommandLine.arguments ()
         val termInd        = ListExtra.find_index argList "-t"
         val sessInd        = ListExtra.find_index argList "-s"
         val apprInd        = ListExtra.find_index argList "--appr"
         val sendInd        = ListExtra.find_index argList "--send"
+        val commsInd       = ListExtra.find_index argList "--comms"
         val termIndBool   = argIndPresent termInd
         val sessIndBool   = argIndPresent sessInd
         val apprIndBool   = argIndPresent apprInd
         val sendIndBool   = argIndPresent sendInd
+        val commsIndBool  = argIndPresent commsInd
     in 
     (
-    if ((termIndBool = False) orelse (sessIndBool = False) orelse ((apprIndBool = False) andalso (sendIndBool = False)))
+    if ((termIndBool = False) orelse (sessIndBool = False) orelse (commsIndBool = False) orelse ((apprIndBool = False) andalso (sendIndBool = False)))
     then raise (Exception ("Invalid Arguments\n" ^ usage))
     else (
-      let val termFileName  = List.nth argList (termInd + 1)
-          val sessFileName  = List.nth argList (sessInd + 1)
+      let val termFileName   = List.nth argList (termInd + 1)
+          val sessFileName   = List.nth argList (sessInd + 1)
+          val commsFileName  = List.nth argList (commsInd + 1)
       in
           (case (parse_term_from_file termFileName) of
             Coq_errC e => raise (Exception ("Could not parse Term file: " ^ e ^ "\n"))
           | Coq_resultC term =>
             (case (parse_att_session_from_file sessFileName) of
               Coq_errC e => raise (Exception ("Could not parse Attestation Session from Json: " ^ e ^ "\n"))
-            | Coq_resultC sess => (term, sess, apprIndBool)
+            | Coq_resultC sess => ((term, sess, apprIndBool, commsFileName) : client_am_args_t)
             )
           )
       end
@@ -101,27 +104,29 @@ structure AM_CLI_Utils = struct
   *)
   fun retrieve_Server_AM_CLI_args _ =
     (let val name = CommandLine.name ()
-        val usage = ("Usage: " ^ name ^ "-m <ManifestFile>.json -b <asp_bin_location> -u <ip:port>\n\ne.g.\t" ^ name ^ " -m formMan.json -b /opt/asps -u 127.0.0.1:5000\n\n")
+        val usage = ("Usage: " ^ name ^ "-m <ManifestFile>.json -b <asp_bin_location> --comms <comms_bin_location> -u <ip:port>\n\ne.g.\t" ^ name ^ " -m formMan.json -b /opt/asps -u 127.0.0.1:5000\n\n")
         val argList = CommandLine.arguments ()
         val manInd        = ListExtra.find_index argList "-m"
         val aspBinInd     = ListExtra.find_index argList "-b"
         val uuidInd       = ListExtra.find_index argList "-u"
-        val manIndBool    = argIndPresent manInd 
-        val aspBinBool    = argIndPresent aspBinInd
-        val uuidIndBool   = argIndPresent uuidInd
+        val commsBinInd   = ListExtra.find_index argList "--comms"
+        val manIndBool        = argIndPresent manInd 
+        val aspBinIndBool     = argIndPresent aspBinInd
+        val uuidIndBool       = argIndPresent uuidInd
+        val commsBinIndBool   = argIndPresent commsBinInd
     in 
-      if ((manIndBool = False) orelse (aspBinBool = False) orelse (uuidIndBool = False))
+      if ((manIndBool = False) orelse (aspBinIndBool = False) orelse (uuidIndBool = False) orelse (commsBinIndBool = False))
       then raise (Exception ("Invalid Arguments\n" ^ usage))
       else (
         let val manFileName   = List.nth argList (manInd + 1)
             val aspBinLoc     = List.nth argList (aspBinInd + 1)
-            val commsBinLoc   = "/Users/adampetz/Documents/Spring_2025/rust-am-clients/target/release/rust-am-comms-client"
+            val commsBinLoc   = List.nth argList (commsBinInd + 1)
             val uuidLoc       = List.nth argList (uuidInd + 1)
         in
           (case (parse_manifest_from_file manFileName) of
             Coq_errC e => raise (Exception ("Could not parse JSON Manifest file: " ^ e ^ "\n"))
           | Coq_resultC manifest =>
-              (Coq_mkAM_Man_Conf manifest aspBinLoc commsBinLoc uuidLoc)
+              (Coq_mkAM_Man_Conf manifest aspBinLoc commsBinLoc uuidLoc) : server_am_args_t
           )
         end
       )

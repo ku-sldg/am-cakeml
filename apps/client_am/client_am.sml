@@ -66,7 +66,7 @@ When things go wrong, handle_AM_request returns a raw error message string.
 
 (* () -> () *)
 fun main () =
-  let val (demo_term, att_sess, do_appr) = AM_CLI_Utils.retrieve_Client_AM_CLI_args ()
+  let val (demo_term, att_sess, do_appr, commsExePath) = AM_CLI_Utils.retrieve_Client_AM_CLI_args ()
       (* TODO: Maybe someday we refactor args *)
       val top_plc   : coq_Plc = "TOP_PLC"
       val att_plc   : coq_Plc = "P0" 
@@ -74,8 +74,6 @@ fun main () =
       val init_rawev : coq_RawEv = []
       val attester_addr : coq_UUID = "127.0.0.1:5000"
       val appraiser_addr : coq_UUID = "127.0.0.1:5003"
-
-      val commsExePath = "/Users/adampetz/Documents/Spring_2025/rust-am-clients/target/release/rust-am-comms-client"
       
       (* val app_result = run_demo_client_AM demo_term top_plc att_plc init_et att_sess init_rawev attester_addr appraiser_addr  *)
       (* TODO: Current this will do basically NOTHING *)

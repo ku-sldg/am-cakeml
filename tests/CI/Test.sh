@@ -21,7 +21,7 @@ HEADLESS=0
 SEND=0
 
 # Parse command-line arguments
-while getopts "t:ha:s" opt; do
+while getopts "t:ha:c:s" opt; do
   case ${opt} in
     t )
       TERM_TYPE=$OPTARG
@@ -31,6 +31,9 @@ while getopts "t:ha:s" opt; do
       ;;
     a )
       ASP_BIN=$OPTARG
+      ;;
+    c )
+      AM_COMMS_BIN=$OPTARG
       ;;
     s )
       SEND=1
@@ -85,6 +88,13 @@ CLIENT_AM_EXEC=$BUILD_BIN/client_am
 if [ -z ${ASP_BIN+x} ]; then
   echo "Variable 'ASP_BIN' is not set" 
   echo "Run: 'export ASP_BIN=<path-to-asps>' or"
+  usage
+  exit 1
+fi
+
+if [ -z ${AM_COMMS_BIN+x} ]; then
+  echo "Variable 'AM_COMMS_BIN' is not set" 
+  echo "Run: 'export AM_COMMS_BIN=<path-to-am-comms-binary>' or"
   usage
   exit 1
 fi
@@ -164,11 +174,11 @@ if [[ "$REPO_ROOT" == */am-cakeml ]]; then
 
       tmux send-keys -t ServerProcess:AM_$MAN_PLC_STR "echo \"Starting AM on port $CUR_PORT for manifest $MANIFEST\"" C-m
 
-      tmux send-keys -t ServerProcess:AM_$MAN_PLC_STR "$AM_EXEC -m $MANIFEST -b $ASP_BIN -u \"$IP:$CUR_PORT\"" C-m
+      tmux send-keys -t ServerProcess:AM_$MAN_PLC_STR "$AM_EXEC -m $MANIFEST -b $ASP_BIN --comms $AM_COMMS_BIN -u \"$IP:$CUR_PORT\"" C-m
     else
       echo "Starting AM on port $CUR_PORT for manifest $MANIFEST"
       # Start the AM in the background and store its PID
-      $AM_EXEC -m $MANIFEST -b $ASP_BIN -u "$IP:$CUR_PORT" &
+      $AM_EXEC -m $MANIFEST -b $ASP_BIN --comms $AM_COMMS_BIN -u "$IP:$CUR_PORT" &
       PIDS+=($!)
     fi
   done
@@ -177,12 +187,12 @@ if [[ "$REPO_ROOT" == */am-cakeml ]]; then
   if [[ $HEADLESS -eq 0 ]]; then
     tmux new-window -t ServerProcess -n "Client"
 
-    tmux send-keys -t ServerProcess:Client "sleep 1 && $CLIENT_AM_EXEC -t $TERM_FILE -s $FULL_ATT_SESS $CLIENT_AM_ARGS" C-m
+    tmux send-keys -t ServerProcess:Client "sleep 1 && $CLIENT_AM_EXEC -t $TERM_FILE -s $FULL_ATT_SESS --comms $AM_COMMS_BIN $CLIENT_AM_ARGS" C-m
       
     tmux attach-session -d -t ServerProcess
   else
     sleep 1 
-    $CLIENT_AM_EXEC -t $TERM_FILE -s $FULL_ATT_SESS $CLIENT_AM_ARGS > $GENERATED/output_resp.json
+    $CLIENT_AM_EXEC -t $TERM_FILE -s $FULL_ATT_SESS --comms $AM_COMMS_BIN $CLIENT_AM_ARGS > $GENERATED/output_resp.json
     # We need this to be the last line so that the exit code is whether or not we found success
     if [[ $SEND -eq 1 ]]; then
       grep "SUCCESS: Copland Phrase Executed Successfully!" $GENERATED/output_resp.json
