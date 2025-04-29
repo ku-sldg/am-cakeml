@@ -33,7 +33,7 @@ fun handle_AM_request_JSON conf js _ =
              from_JSON js end of
           Coq_errC msg => coq_ErrorResponseJSON msg
         | Coq_resultC r =>
-          let val Coq_mkPRReq att_sess _ ev cop_term = r in
+          let val Coq_mkPRReq att_sess _ _ ev cop_term = r in
           let val sc = session_config_compiler conf att_sess in
           let val init_st = Coq_mk_st [] O in
           let val (p, _) = build_cvm ev cop_term init_st sc in

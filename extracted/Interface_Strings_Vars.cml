@@ -3,6 +3,11 @@
 val coq_STR_REQ_PLC : string =
   "REQ_PLC"
 
+(** val coq_STR_TO_PLC : string **)
+
+val coq_STR_TO_PLC : string =
+  "TO_PLC"
+
 (** val coq_STR_TERM : string **)
 
 val coq_STR_TERM : string =

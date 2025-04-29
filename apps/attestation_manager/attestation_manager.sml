@@ -41,7 +41,7 @@ fun handleIncoming (listener_and_ammconf) =
 (* coq_AM_Config -> unit *)
 fun startServer ammconf =
     let val queueLength = 5 (* TODO: Hardcoded queuelength *)
-        val (Coq_mkAM_Man_Conf man aspBin uuidStr) = ammconf
+        val (Coq_mkAM_Man_Conf man aspBin commsBin uuidStr) = ammconf
         val (ip, port) = decodeUUID uuidStr
         val _ = TextIOExtra.printLn ("Starting up Server")
         val _ = TextIOExtra.printLn ("On port: " ^ (Int.toString port) ^ "\nQueue Length: " ^ (Int.toString queueLength))

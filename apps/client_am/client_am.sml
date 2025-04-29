@@ -74,6 +74,8 @@ fun main () =
       val init_rawev : coq_RawEv = []
       val attester_addr : coq_UUID = "127.0.0.1:5000"
       val appraiser_addr : coq_UUID = "127.0.0.1:5003"
+
+      val commsExePath = "/Users/adampetz/Documents/Spring_2025/rust-am-clients/target/release/rust-am-comms-client"
       
       (* val app_result = run_demo_client_AM demo_term top_plc att_plc init_et att_sess init_rawev attester_addr appraiser_addr  *)
       (* TODO: Current this will do basically NOTHING *)
@@ -85,13 +87,14 @@ fun main () =
                               top_plc 
                               (Coq_evc [] Coq_mt_evt) 
                               demo_term
-                              att_plc in 
+                              att_plc
+                              commsExePath in 
       case maybe_appsumm of 
         Coq_resultC (appsumm, appsumm_bool) => print_appraisal_summary (appsumm, appsumm_bool)
       | Coq_errC errStr => print errStr
       end)
     else
-      (case (am_sendReq att_sess top_plc (Coq_evc [] Coq_mt_evt) demo_term att_plc) of
+      (case (am_sendReq att_sess top_plc (Coq_evc [] Coq_mt_evt) demo_term att_plc commsExePath) of
           Coq_errC msg => 
             let 
               val _ = print "ERROR: Phrase Execution Failed!\n\n" 

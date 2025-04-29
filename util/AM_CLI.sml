@@ -115,12 +115,13 @@ structure AM_CLI_Utils = struct
       else (
         let val manFileName   = List.nth argList (manInd + 1)
             val aspBinLoc     = List.nth argList (aspBinInd + 1)
+            val commsBinLoc   = "/Users/adampetz/Documents/Spring_2025/rust-am-clients/target/release/rust-am-comms-client"
             val uuidLoc       = List.nth argList (uuidInd + 1)
         in
           (case (parse_manifest_from_file manFileName) of
             Coq_errC e => raise (Exception ("Could not parse JSON Manifest file: " ^ e ^ "\n"))
           | Coq_resultC manifest =>
-              (Coq_mkAM_Man_Conf manifest aspBinLoc uuidLoc)
+              (Coq_mkAM_Man_Conf manifest aspBinLoc commsBinLoc uuidLoc)
           )
         end
       )

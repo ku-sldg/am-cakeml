@@ -1,14 +1,14 @@
 (** val am_sendReq :
     coq_Attestation_Session -> coq_Plc -> coq_Evidence -> coq_Term -> coq_Plc
-    -> (coq_RawEv, string) coq_ResultT **)
+    -> coq_FS_Location -> (coq_RawEv, string) coq_ResultT **)
 
-fun am_sendReq att_sess req_plc e t toPlc =
-  let val req = Coq_mkPRReq att_sess req_plc e t in
+fun am_sendReq att_sess req_plc e t toPlc comms_fsloc =
+  let val req = Coq_mkPRReq att_sess req_plc toPlc e t in
   let val m =
     let val Coq_mkAtt_Sess _ plc_Mapping _ _ = att_sess in plc_Mapping end
   in
   (case map_get coq_Eq_Class_ID_Type toPlc m of
-     Some uuid =>
+     Some _ =>
      let val js =
        let val Build_Jsonifiable to_JSON _ =
          coq_Jsonifiable_ProtocolRunRequest
@@ -35,7 +35,7 @@ fun am_sendReq att_sess req_plc e t toPlc =
        in
        to_JSON req end
      in
-     let val resp_res = make_JSON_Network_Request uuid js in
+     let val resp_res = make_JSON_FS_Location_Request comms_fsloc js in
      (case resp_res of
         Coq_errC msg => Coq_errC msg
       | Coq_resultC js_res =>
@@ -58,10 +58,10 @@ fun am_sendReq att_sess req_plc e t toPlc =
 
 (** val am_client_app_summary :
     coq_Attestation_Session -> coq_Plc -> coq_Evidence -> coq_Term -> coq_Plc
-    -> (coq_AppraisalSummary * bool, string) coq_ResultT **)
+    -> coq_FS_Location -> (coq_AppraisalSummary * bool, string) coq_ResultT **)
 
-fun am_client_app_summary att_sess req_plc e t toPlc =
-  case am_sendReq att_sess req_plc e t toPlc of
+fun am_client_app_summary att_sess req_plc e t toPlc comms_fsloc =
+  case am_sendReq att_sess req_plc e t toPlc comms_fsloc of
     Coq_errC msg => Coq_errC msg
   | Coq_resultC rawev =>
     let val glob_ctx =

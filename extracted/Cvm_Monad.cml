@@ -30,7 +30,7 @@ fun put_evid i' =
 val get_pl : coq_Plc coq_CVM =
   err_bind get_config (fn sc =>
     err_ret
-      (let val Build_Session_Config session_plc _ _ _ _ _ = sc in
+      (let val Build_Session_Config session_plc _ _ _ _ _ _ = sc in
        session_plc end))
 
 (** val inc_id : coq_Event_ID coq_CVM **)
@@ -81,7 +81,7 @@ fun hoist_result r = case r of
 fun get_asp_type a =
   err_bind get_config (fn sc =>
     let val g =
-      let val Build_Session_Config _ session_context _ _ _ _ = sc in
+      let val Build_Session_Config _ session_context _ _ _ _ _ = sc in
       session_context end
     in
     (case map_get coq_Eq_Class_ID_Type a
@@ -95,7 +95,7 @@ fun get_asp_type a =
 fun get_asp_dual a =
   err_bind get_config (fn sc =>
     let val g =
-      let val Build_Session_Config _ session_context _ _ _ _ = sc in
+      let val Build_Session_Config _ session_context _ _ _ _ _ = sc in
       session_context end
     in
     (case map_get coq_Eq_Class_ID_Type a
@@ -132,7 +132,7 @@ fun bundle_asp p rwev cur_ev ps = case ps of
           UNWRAP =>
           err_bind get_config (fn sc =>
             let val g =
-              let val Build_Session_Config _ session_context _ _ _ _ = sc in
+              let val Build_Session_Config _ session_context _ _ _ _ _ = sc in
               session_context end
             in
             let val Coq_evc _ et = cur_ev in
@@ -155,7 +155,7 @@ fun bundle_asp p rwev cur_ev ps = case ps of
 
 fun do_asp params e _ =
   err_bind get_config (fn sc =>
-    case let val Build_Session_Config _ _ aspCb _ _ _ = sc in
+    case let val Build_Session_Config _ _ aspCb _ _ _ _ = sc in
          aspCb params e end of
       Coq_errC e0 => err_failm (Coq_dispatch_error e0)
     | Coq_resultC r => err_ret r)
@@ -175,7 +175,7 @@ fun invoke_ASP e params =
 fun invoke_APPR' r et out_evt =
   err_bind get_config (fn sc =>
     let val g =
-      let val Build_Session_Config _ session_context _ _ _ _ = sc in
+      let val Build_Session_Config _ session_context _ _ _ _ _ = sc in
       session_context end
     in
     (case et of
@@ -202,7 +202,7 @@ fun invoke_APPR' r et out_evt =
                          True =>
                          invoke_APPR' r'' et' (Coq_asp_evt
                            (let val Build_Session_Config session_plc _ _ _ _
-                              _ = sc
+                              _ _ = sc
                             in
                             session_plc end) dual_par out_evt)
                        | False =>
@@ -305,7 +305,8 @@ fun inc_remote_event_ids e t =
     err_bind get_config (fn sc =>
       err_bind get_pl (fn p =>
         case events_size
-               (let val Build_Session_Config _ session_context _ _ _ _ = sc in
+               (let val Build_Session_Config _ session_context _ _ _ _ _ = sc
+                in
                 session_context end) p (get_et e) t of
           Coq_errC e0 => err_failm (Coq_dispatch_error (Runtime e0))
         | Coq_resultC n => put_evid (add i n))))
@@ -317,7 +318,8 @@ fun inc_par_event_ids e t =
     err_bind get_config (fn sc =>
       err_bind get_pl (fn p =>
         case events_size
-               (let val Build_Session_Config _ session_context _ _ _ _ = sc in
+               (let val Build_Session_Config _ session_context _ _ _ _ _ = sc
+                in
                 session_context end) p (get_et e) t of
           Coq_errC e0 => err_failm (Coq_dispatch_error (Runtime e0))
         | Coq_resultC n => put_evid (add i n))))
@@ -338,7 +340,8 @@ fun tag_RPY p q e =
 
 val get_cvm_policy : coq_PolicyT coq_CVM =
   err_bind get_config (fn sc =>
-    err_ret (let val Build_Session_Config _ _ _ _ _ policy = sc in policy end))
+    err_ret
+      (let val Build_Session_Config _ _ _ _ _ _ policy = sc in policy end))
 
 (** val policy_list_not_disclosed :
     coq_Term -> coq_Plc -> coq_EvidenceT -> (coq_Plc * coq_ASP_ID) list ->
@@ -367,8 +370,8 @@ fun do_remote sc pTo e t =
   in
   let val new_att_sess = Coq_mkAtt_Sess pTo plc_map pk_map g in
   (case map_get coq_Eq_Class_ID_Type pTo plc_map of
-     Some uuid =>
-     let val remote_req = Coq_mkPRReq new_att_sess my_plc e t in
+     Some _ =>
+     let val remote_req = Coq_mkPRReq new_att_sess my_plc pTo e t in
      let val js_req =
        let val Build_Jsonifiable to_JSON _ =
          coq_Jsonifiable_ProtocolRunRequest
@@ -395,7 +398,11 @@ fun do_remote sc pTo e t =
        in
        to_JSON remote_req end
      in
-     let val resp_res = make_JSON_Network_Request uuid js_req in
+     let val comms_fsloc =
+       let val Build_Session_Config _ _ _ comms_FS_loc _ _ _ = sc in
+       comms_FS_loc end
+     in
+     let val resp_res = make_JSON_FS_Location_Request comms_fsloc js_req in
      (case resp_res of
         Coq_errC msg => Coq_errC (Coq_dispatch_error (Runtime msg))
       | Coq_resultC js_resp =>
@@ -413,7 +420,7 @@ fun do_remote sc pTo e t =
            (case success of
               True => Coq_resultC ev
             | False =>
-              Coq_errC (Coq_dispatch_error (Runtime errStr_remote_am_failure))) end)) end end end
+              Coq_errC (Coq_dispatch_error (Runtime errStr_remote_am_failure))) end)) end end end end
    | None => Coq_errC (Coq_dispatch_error Unavailable)) end end
 
 (** val doRemote_session' :
@@ -436,8 +443,8 @@ fun remote_session p q e t =
         err_bind get_evid (fn i =>
           err_bind
             (case events_fix
-                    (let val Build_Session_Config _ session_context _ _ _ _ =
-                       sc
+                    (let val Build_Session_Config _ session_context _ _ _ _
+                       _ = sc
                      in
                      session_context end) q (get_et e) t i of
                Coq_errC e0 => err_failm (Coq_dispatch_error (Runtime e0))
@@ -480,8 +487,8 @@ fun wait_par_thread loc e t =
         err_bind get_config (fn sc =>
           err_bind
             (case events_fix
-                    (let val Build_Session_Config _ session_context _ _ _ _ =
-                       sc
+                    (let val Build_Session_Config _ session_context _ _ _ _
+                       _ = sc
                      in
                      session_context end) p (get_et e) t i of
                Coq_errC e0 => err_failm (Coq_dispatch_error (Runtime e0))
