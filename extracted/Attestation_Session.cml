@@ -9,13 +9,16 @@ datatype coq_DispatcherErrors =
 type 'errType coq_ASPCallback =
   coq_ASP_PARAMS -> coq_RawEv -> (coq_RawEv, 'errType) coq_ResultT
 
+type 'errType coq_RemoteCallback =
+  coq_Plc -> coq_Evidence -> coq_Term -> (coq_Evidence, 'errType) coq_ResultT
+
 type coq_PolicyT = (coq_Plc * coq_ASP_ID) list
 
 datatype coq_Session_Config =
   Build_Session_Config coq_Plc coq_GlobalContext
-   (coq_DispatcherErrors coq_ASPCallback) coq_FS_Location
-   ((coq_Plc, coq_UUID) coq_Map) ((coq_Plc, coq_PublicKey) coq_Map)
-   coq_PolicyT
+   (coq_DispatcherErrors coq_ASPCallback)
+   (coq_DispatcherErrors coq_RemoteCallback) ((coq_Plc, coq_UUID) coq_Map)
+   ((coq_Plc, coq_PublicKey) coq_Map) coq_PolicyT
 
 (** val coq_Jsonifiable_Attestation_Session :
     (coq_Plc, coq_UUID) coq_Map coq_Jsonifiable -> (coq_Plc, coq_PublicKey)

@@ -55,6 +55,69 @@ fun generate_ASP_dispatcher' am _ aspBin par rawEv =
 fun generate_ASP_dispatcher _ =
   generate_ASP_dispatcher'
 
+(** val generate_remote_dispatcher' :
+    coq_Attestation_Session -> coq_FS_Location -> coq_Plc -> coq_Evidence ->
+    coq_Term -> (coq_Evidence, coq_DispatcherErrors) coq_ResultT **)
+
+fun generate_remote_dispatcher' ats commsBin pTo e t =
+  let val Coq_mkAtt_Sess my_plc plc_map pk_map g = ats in
+  let val new_att_sess = Coq_mkAtt_Sess pTo plc_map pk_map g in
+  (case map_get coq_Eq_Class_ID_Type pTo plc_map of
+     Some _ =>
+     let val remote_req = Coq_mkPRReq new_att_sess my_plc pTo e t in
+     let val js_req =
+       let val Build_Jsonifiable to_JSON _ =
+         coq_Jsonifiable_ProtocolRunRequest
+           (coq_Jsonifiable_Term
+             (coq_Jsonifiable_ASP coq_Jsonifiable_ASP_ARGS)
+             coq_Jsonifiable_Split)
+           (coq_Jsonifiable_Evidence coq_Jsonifiable_RawEv
+             (coq_Jsonifiable_EvidenceT coq_Jsonifiable_ASP_ARGS
+               coq_Jsonifiable_nat
+               (coq_Jsonifiable_ASP_Params coq_Jsonifiable_ASP_ARGS)))
+           (coq_Jsonifiable_Attestation_Session
+             (jsonifiable_map_serial_serial coq_Stringifiable_ID_Type
+               coq_Eq_Class_ID_Type coq_Stringifiable_UUUID)
+             (jsonifiable_map_serial_serial coq_Stringifiable_ID_Type
+               coq_Eq_Class_ID_Type coq_Stringifiable_PublicKey)
+             (coq_Jsonifiable_GlobalContext coq_Stringifiable_ID_Type
+               (jsonifiable_map_serial_serial coq_Stringifiable_ID_Type
+                 coq_Eq_Class_ID_Type coq_Stringifiable_ID_Type)
+               (jsonifiable_map_serial_json coq_Stringifiable_ID_Type
+                 coq_Eq_Class_ID_Type
+                 (coq_Jsonifiable_EvSig
+                   (coq_Jsonifiable_EvOutSig coq_Jsonifiable_nat)
+                   coq_Stringifiable_FWD))))
+       in
+       to_JSON remote_req end
+     in
+     let val resp_res = make_JSON_FS_Location_Request commsBin js_req in
+     (case resp_res of
+        Coq_errC msg => Coq_errC (Runtime msg)
+      | Coq_resultC js_resp =>
+        (case let val Build_Jsonifiable _ from_JSON =
+                coq_Jsonifiable_ProtocolRunResponse
+                  (coq_Jsonifiable_Evidence coq_Jsonifiable_RawEv
+                    (coq_Jsonifiable_EvidenceT coq_Jsonifiable_ASP_ARGS
+                      coq_Jsonifiable_nat
+                      (coq_Jsonifiable_ASP_Params coq_Jsonifiable_ASP_ARGS)))
+              in
+              from_JSON js_resp end of
+           Coq_errC msg => Coq_errC (Runtime msg)
+         | Coq_resultC resp =>
+           let val Coq_mkPRResp success ev = resp in
+           (case success of
+              True => Coq_resultC ev
+            | False => Coq_errC (Runtime errStr_remote_am_failure)) end)) end end end
+   | None => Coq_errC Unavailable) end end
+
+(** val generate_remote_dispatcher :
+    coq_ID_Type coq_EqClass -> coq_Attestation_Session -> coq_FS_Location ->
+    coq_DispatcherErrors coq_RemoteCallback **)
+
+fun generate_remote_dispatcher _ =
+  generate_remote_dispatcher'
+
 (** val session_config_compiler :
     coq_AM_Manager_Config -> coq_Attestation_Session -> coq_Session_Config **)
 
@@ -63,20 +126,8 @@ fun session_config_compiler conf ats =
   Build_Session_Config
   (let val Coq_mkAtt_Sess session_Plc _ _ _ = ats in session_Plc end)
   (let val Coq_mkAtt_Sess _ _ _ ats_context = ats in ats_context end)
-  (generate_ASP_dispatcher coq_Eq_Class_ID_Type man ats aspBin) commsBin
+  (generate_ASP_dispatcher coq_Eq_Class_ID_Type man ats aspBin)
+  (generate_remote_dispatcher coq_Eq_Class_ID_Type ats commsBin)
   (let val Coq_mkAtt_Sess _ plc_Mapping _ _ = ats in plc_Mapping end)
   (let val Coq_mkAtt_Sess _ _ pubKey_Mapping _ = ats in pubKey_Mapping end)
   (let val Build_Manifest _ _ man_policy = man in man_policy end) end
-
-(** val session_config_decompiler :
-    coq_Session_Config -> coq_Attestation_Session **)
-
-fun session_config_decompiler sc =
-  Coq_mkAtt_Sess
-    (let val Build_Session_Config session_plc _ _ _ _ _ _ = sc in
-     session_plc end)
-    (let val Build_Session_Config _ _ _ _ plc_map _ _ = sc in plc_map end)
-    (let val Build_Session_Config _ _ _ _ _ pubkey_map _ = sc in
-     pubkey_map end)
-    (let val Build_Session_Config _ session_context _ _ _ _ _ = sc in
-     session_context end)
