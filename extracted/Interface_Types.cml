@@ -9,3 +9,9 @@ datatype coq_ASPRunRequest =
 
 datatype coq_ASPRunResponse =
   Coq_mkASPRResp bool coq_RawEv
+
+datatype coq_AppraisalSummaryRequest =
+  Coq_mkAppSummReq coq_Attestation_Session coq_Evidence
+
+datatype coq_AppraisalSummaryResponse =
+  Coq_mkAppSummResp bool coq_AppraisalSummary

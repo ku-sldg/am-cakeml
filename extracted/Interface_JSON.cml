@@ -68,6 +68,53 @@ fun coq_Jsonifiable_ProtocolRunResponse h =
           (let val Build_Jsonifiable _ from_JSON = h in from_JSON temp_ev end)
           (fn ev => Coq_resultC (Coq_mkPRResp temp_success ev)))))
 
+(** val coq_Jsonifiable_AppraisalSummaryRequest :
+    coq_Evidence coq_Jsonifiable -> coq_Attestation_Session coq_Jsonifiable
+    -> coq_AppraisalSummaryRequest coq_Jsonifiable **)
+
+fun coq_Jsonifiable_AppraisalSummaryRequest h h0 =
+  Build_Jsonifiable (fn req => JSON_Object ((coq_STR_TYPE, (JSON_String
+    coq_STR_REQUEST)) :: ((coq_STR_ACTION, (JSON_String
+    coq_STR_APPSUMM)) :: ((coq_STR_ATTEST_SESS,
+    (let val Build_Jsonifiable to_JSON _ = h0 in
+     to_JSON
+       (let val Coq_mkAppSummReq appsummreq_att_sess _ = req in
+        appsummreq_att_sess end) end)) :: ((coq_STR_EVIDENCE,
+    (let val Build_Jsonifiable to_JSON _ = h in
+     to_JSON
+       (let val Coq_mkAppSummReq _ appsummreq_Evidence = req in
+        appsummreq_Evidence end) end)) :: []))))) (fn j =>
+    res_bind (coq_JSON_get_Object coq_STR_ATTEST_SESS j) (fn temp_att_sess =>
+      res_bind (coq_JSON_get_Object coq_STR_EVIDENCE j) (fn temp_ev =>
+        res_bind
+          (let val Build_Jsonifiable _ from_JSON = h0 in
+           from_JSON temp_att_sess end) (fn att_sess =>
+          res_bind
+            (let val Build_Jsonifiable _ from_JSON = h in
+             from_JSON temp_ev end) (fn ev => Coq_resultC (Coq_mkAppSummReq
+            att_sess ev))))))
+
+(** val coq_Jsonifiable_AppraisalSummaryResponse :
+    coq_AppraisalSummary coq_Jsonifiable -> coq_AppraisalSummaryResponse
+    coq_Jsonifiable **)
+
+fun coq_Jsonifiable_AppraisalSummaryResponse h =
+  Build_Jsonifiable (fn resp => JSON_Object ((coq_STR_TYPE, (JSON_String
+    coq_STR_RESPONSE)) :: ((coq_STR_ACTION, (JSON_String
+    coq_STR_APPSUMM)) :: ((coq_STR_SUCCESS, (JSON_Boolean
+    (let val Coq_mkAppSummResp appsummresp_success _ = resp in
+     appsummresp_success end))) :: ((coq_STR_PAYLOAD,
+    (let val Build_Jsonifiable to_JSON _ = h in
+     to_JSON
+       (let val Coq_mkAppSummResp _ appsummresp_summary = resp in
+        appsummresp_summary end) end)) :: []))))) (fn resp =>
+    res_bind (coq_JSON_get_bool coq_STR_SUCCESS resp) (fn temp_success =>
+      res_bind (coq_JSON_get_Object coq_STR_PAYLOAD resp) (fn temp_appsumm =>
+        res_bind
+          (let val Build_Jsonifiable _ from_JSON = h in
+           from_JSON temp_appsumm end) (fn appsumm => Coq_resultC
+          (Coq_mkAppSummResp temp_success appsumm)))))
+
 (** val coq_Jsonifiable_ASPRunRequest :
     coq_RawEv coq_Jsonifiable -> coq_ASP_ARGS coq_Jsonifiable ->
     coq_ASPRunRequest coq_Jsonifiable **)
