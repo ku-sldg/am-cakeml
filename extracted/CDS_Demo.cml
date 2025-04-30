@@ -36,7 +36,7 @@ val cds_config_1_targ : coq_TARG_ID =
 (** val cds_config_2_targ : coq_TARG_ID **)
 
 val cds_config_2_targ : coq_TARG_ID =
-  "cds_filter_config_2_targ"
+  "cds_filter_config_targ"
 
 (** val cds_img_1_targ : coq_TARG_ID **)
 
