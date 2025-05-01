@@ -341,6 +341,12 @@ val cds_ssl : coq_Term =
   Coq_lseq (Coq_bseq (ALL, ALL) query_kim_asp_static meas_cds) (Coq_lseq
     r_ssl_sig_asp appr_term)
 
+(** val cds_ssl_badkey : coq_Term **)
+
+val cds_ssl_badkey : coq_Term =
+  Coq_lseq (Coq_bseq (ALL, ALL) query_kim_asp_static meas_cds) (Coq_lseq
+    r_ssl_sig_asp (Coq_lseq r_tpm_sig_asp appr_term))
+
 (** val cds_tpm : coq_Term **)
 
 val cds_tpm : coq_Term =
@@ -389,4 +395,5 @@ val cds_terms_map : (string * coq_Term) list =
   ("cds_simple", example_appTerm) :: (("cds_ssl", cds_ssl) :: (("cds_local",
     cds_local) :: (("cds_tpm", cds_tpm) :: (("cds_tpm_static",
     cds_tpm_static) :: (("cds_provision",
-    example_appTerm_provision) :: (("simple_sig", simple_sig) :: []))))))
+    example_appTerm_provision) :: (("cds_ssl_badkey",
+    cds_ssl_badkey) :: (("simple_sig", simple_sig) :: [])))))))
