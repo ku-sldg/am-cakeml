@@ -214,7 +214,7 @@ val query_kim_args_static : coq_ASP_ARGS =
 (** val r_ssl_sig_asp_args : coq_ASP_ARGS **)
 
 val r_ssl_sig_asp_args : coq_ASP_ARGS =
-  JSON_Object []
+  JSON_Object (("tpm_folder", (JSON_String "$AM_TPM_DIR")) :: [])
 
 (** val query_kim_asp_stub_args : coq_ASP_ARGS **)
 
