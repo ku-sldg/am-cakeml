@@ -3,6 +3,11 @@
 val micro_demo_plc : coq_Plc =
   "micro_demo_Plc"
 
+(** val coq_coq_demo_plc : coq_Plc **)
+
+val coq_coq_demo_plc : coq_Plc =
+  "coq_demo_Plc"
+
 (** val micro_demo_targ : coq_TARG_ID **)
 
 val micro_demo_targ : coq_TARG_ID =
@@ -23,6 +28,21 @@ val microkit_dir_targ : coq_TARG_ID =
 val micro_hash_comp_targ : coq_TARG_ID =
   "micro_hash_composite_targ"
 
+(** val run_coq_theorem_targ : coq_TARG_ID **)
+
+val run_coq_theorem_targ : coq_TARG_ID =
+  "run_coq_theorem_targ"
+
+(** val run_coq_theorem_test_targ : coq_TARG_ID **)
+
+val run_coq_theorem_test_targ : coq_TARG_ID =
+  "run_coq_theorem_test_targ"
+
+(** val coq_coq_env_dir_targ : coq_TARG_ID **)
+
+val coq_coq_env_dir_targ : coq_TARG_ID =
+  "coq_env_dir_targ"
+
 (** val am_root_env_var : string **)
 
 val am_root_env_var : string =
@@ -33,15 +53,20 @@ val am_root_env_var : string =
 val hashdir_env_var : string =
   "INSPECTA_ROOT"
 
-(** val path_micro_dir_1_golden : string **)
+(** val theorem_env_var : string **)
 
-val path_micro_dir_1_golden : string =
-  "/tests/DemoFiles/goldenFiles/micro_dir_1_golden.txt"
+val theorem_env_var : string =
+  "THEOREM_ENV_ROOT"
 
 (** val path_micro_dir_1 : string **)
 
 val path_micro_dir_1 : string =
   "/micro-examples/microkit/aadl_port_types/data/base_type/aadl/"
+
+(** val path_micro_dir_1_golden : string **)
+
+val path_micro_dir_1_golden : string =
+  "/tests/DemoFiles/goldenFiles/micro_dir_1_golden.txt"
 
 (** val path_micro_dir_2 : string **)
 
@@ -57,6 +82,67 @@ val path_micro_dir_2_golden : string =
 
 val path_micro_composite_golden : string =
   "/tests/DemoFiles/goldenFiles/micro_composite.txt"
+
+(** val theorems_path : string **)
+
+val theorems_path : string =
+  "/Users/adampetz/Documents/Fall_2024/my_theorems/"
+
+(** val theorems_env_path : string **)
+
+val theorems_env_path : string =
+  "/my_theorems_env/"
+
+(** val theorems_env_dir_golden : string **)
+
+val theorems_env_dir_golden : string =
+  "/tests/DemoFiles/goldenFiles/theorems_env_dir_golden.txt"
+
+(** val coqc_exe_path : string **)
+
+val coqc_exe_path : string =
+  "/Users/adampetz/Documents/Fall_2024/my_theorems_env/coqc"
+
+(** val coqc_R : string **)
+
+val coqc_R : string =
+  "-R"
+
+(** val coqc_Module : string **)
+
+val coqc_Module : string =
+  "ImportantModule"
+
+(** val path_asp_coq_golden : string **)
+
+val path_asp_coq_golden : string =
+  "/tests/DemoFiles/goldenFiles/theorem_output_golden.txt"
+
+(** val path_asp_coq_test_golden : string **)
+
+val path_asp_coq_test_golden : string =
+  "/tests/DemoFiles/goldenFiles/theorem_test_output_golden.txt"
+
+(** val provision_asp_coq_args : coq_ASP_ARGS **)
+
+val provision_asp_coq_args : coq_ASP_ARGS =
+  JSON_Object (("env_var_golden", (JSON_String
+    am_root_env_var)) :: (("filepath_golden", (JSON_String
+    path_asp_coq_golden)) :: []))
+
+(** val provision_asp_coq_test_args : coq_ASP_ARGS **)
+
+val provision_asp_coq_test_args : coq_ASP_ARGS =
+  JSON_Object (("env_var_golden", (JSON_String
+    am_root_env_var)) :: (("filepath_golden", (JSON_String
+    path_asp_coq_test_golden)) :: []))
+
+(** val provision_coq_env_dir_args : coq_ASP_ARGS **)
+
+val provision_coq_env_dir_args : coq_ASP_ARGS =
+  JSON_Object (("env_var_golden", (JSON_String
+    am_root_env_var)) :: (("filepath_golden", (JSON_String
+    theorems_env_dir_golden)) :: []))
 
 (** val provision_micro_dir_1_args : coq_ASP_ARGS **)
 
@@ -78,6 +164,15 @@ val provision_micro_hash_composite_args : coq_ASP_ARGS =
   JSON_Object (("env_var_golden", (JSON_String
     am_root_env_var)) :: (("filepath_golden", (JSON_String
     path_micro_composite_golden)) :: []))
+
+(** val hash_coq_env_dir_args : coq_ASP_ARGS **)
+
+val hash_coq_env_dir_args : coq_ASP_ARGS =
+  JSON_Object (("env_var", (JSON_String
+    theorem_env_var)) :: (("env_var_golden", (JSON_String
+    am_root_env_var)) :: (("paths", (JSON_Array
+    (map (fn x => JSON_String x) (theorems_env_path :: [])))) :: (("filepath_golden",
+    (JSON_String theorems_env_dir_golden)) :: []))))
 
 (** val hash_micro_dir_1_args : coq_ASP_ARGS **)
 
@@ -104,6 +199,44 @@ val hash_micro_evidence_args : coq_ASP_ARGS =
     am_root_env_var)) :: (("filepath_golden", (JSON_String
     path_micro_composite_golden)) :: []))
 
+(** val run_command_asp_coq_args : coq_ASP_ARGS **)
+
+val run_command_asp_coq_args : coq_ASP_ARGS =
+  JSON_Object (("exe_path", (JSON_String coqc_exe_path)) :: (("exe_args",
+    (JSON_Array
+    (map (fn x => JSON_String x)
+      (coqc_R :: (theorems_path :: (coqc_Module :: ("/Users/adampetz/Documents/Fall_2024/my_theorems/ImportantTheorem.v" :: []))))))) :: (("env_var_golden",
+    (JSON_String am_root_env_var)) :: (("filepath_golden", (JSON_String
+    path_asp_coq_golden)) :: []))))
+
+(** val run_command_asp_coq_test_args : coq_ASP_ARGS **)
+
+val run_command_asp_coq_test_args : coq_ASP_ARGS =
+  JSON_Object (("exe_path", (JSON_String coqc_exe_path)) :: (("exe_args",
+    (JSON_Array
+    (map (fn x => JSON_String x)
+      (coqc_R :: (theorems_path :: (coqc_Module :: ("/Users/adampetz/Documents/Fall_2024/my_theorems_env/ImportantTheoremTest.v" :: []))))))) :: (("env_var_golden",
+    (JSON_String am_root_env_var)) :: (("filepath_golden", (JSON_String
+    path_asp_coq_test_golden)) :: []))))
+
+(** val provision_asp_coq : coq_Term **)
+
+val provision_asp_coq : coq_Term =
+  provision_targ_asp coq_coq_demo_plc run_coq_theorem_targ
+    provision_asp_coq_args
+
+(** val provision_asp_coq_test : coq_Term **)
+
+val provision_asp_coq_test : coq_Term =
+  provision_targ_asp coq_coq_demo_plc run_coq_theorem_test_targ
+    provision_asp_coq_test_args
+
+(** val provision_coq_env_dir : coq_Term **)
+
+val provision_coq_env_dir : coq_Term =
+  provision_targ_asp coq_coq_demo_plc run_coq_theorem_test_targ
+    provision_coq_env_dir_args
+
 (** val provision_micro_dir_1 : coq_Term **)
 
 val provision_micro_dir_1 : coq_Term =
@@ -119,6 +252,11 @@ val provision_micro_dir_2 : coq_Term =
 val provision_micro_hash_composite : coq_Term =
   provision_targ_asp micro_demo_plc micro_demo_targ
     provision_micro_hash_composite_args
+
+(** val hash_coq_env_dir : coq_Term **)
+
+val hash_coq_env_dir : coq_Term =
+  hash_dir_asp coq_coq_demo_plc coq_coq_env_dir_targ hash_coq_env_dir_args
 
 (** val hash_micro_dir_1 : coq_Term **)
 
@@ -136,21 +274,51 @@ val hash_micro_evidence : coq_Term =
   hash_evidence_asp micro_demo_plc micro_hash_comp_targ
     hash_micro_evidence_args
 
-(** val meas_micro : coq_Term **)
+(** val run_command_asp_coq : coq_Term **)
 
-val meas_micro : coq_Term =
-  Coq_lseq (Coq_bseq (ALL, ALL) hash_micro_dir_1 hash_micro_dir_2)
-    hash_micro_evidence
+val run_command_asp_coq : coq_Term =
+  run_command_asp coq_coq_demo_plc run_coq_theorem_targ
+    run_command_asp_coq_args
+
+(** val run_command_asp_coq_test : coq_Term **)
+
+val run_command_asp_coq_test : coq_Term =
+  run_command_asp coq_coq_demo_plc run_coq_theorem_test_targ
+    run_command_asp_coq_test_args
 
 (** val appr_term : coq_Term **)
 
 val appr_term : coq_Term =
   Coq_asp APPR
 
+(** val meas_theorem : coq_Term **)
+
+val meas_theorem : coq_Term =
+  Coq_bseq (ALL, ALL) hash_coq_env_dir (Coq_bseq (ALL, ALL)
+    run_command_asp_coq run_command_asp_coq_test)
+
+(** val meas_theorem_appr : coq_Term **)
+
+val meas_theorem_appr : coq_Term =
+  Coq_lseq meas_theorem appr_term
+
+(** val meas_micro : coq_Term **)
+
+val meas_micro : coq_Term =
+  Coq_lseq (Coq_bseq (ALL, ALL) hash_micro_dir_1 hash_micro_dir_2)
+    hash_micro_evidence
+
 (** val micro_appTerm : coq_Term **)
 
 val micro_appTerm : coq_Term =
   Coq_lseq meas_micro appr_term
+
+(** val coq_coq_appTerm_provision : coq_Term **)
+
+val coq_coq_appTerm_provision : coq_Term =
+  Coq_bseq (ALL, ALL) (Coq_lseq hash_coq_env_dir provision_coq_env_dir)
+    (Coq_bseq (ALL, ALL) (Coq_lseq run_command_asp_coq provision_asp_coq)
+    (Coq_lseq run_command_asp_coq_test provision_asp_coq_test))
 
 (** val micro_appTerm_provision : coq_Term **)
 
@@ -158,6 +326,11 @@ val micro_appTerm_provision : coq_Term =
   Coq_bseq (ALL, ALL) (Coq_lseq hash_micro_dir_1 provision_micro_dir_1)
     (Coq_bseq (ALL, ALL) (Coq_lseq hash_micro_dir_2 provision_micro_dir_2)
     (Coq_lseq meas_micro provision_micro_hash_composite))
+
+(** val coq_coq_env_provision_dir : coq_Term **)
+
+val coq_coq_env_provision_dir : coq_Term =
+  Coq_lseq hash_coq_env_dir provision_coq_env_dir
 
 (** val micro_appTerm_provision_dir_1 : coq_Term **)
 
@@ -181,4 +354,10 @@ val resolute_terms_map : (string * coq_Term) list =
     micro_appTerm_provision) :: (("micro_provision_dir_1",
     micro_appTerm_provision_dir_1) :: (("micro_provision_dir_2",
     micro_appTerm_provision_dir_2) :: (("micro_provision_composite",
-    micro_appTerm_provision_composite) :: []))))
+    micro_appTerm_provision_composite) :: (("run_coq_thm",
+    run_command_asp_coq) :: (("run_coq_test",
+    run_command_asp_coq_test) :: (("run_coq_all",
+    meas_theorem) :: (("run_coq_all_appr",
+    meas_theorem_appr) :: (("coq_env_dir_provision",
+    coq_coq_env_provision_dir) :: (("coq_provision_all",
+    coq_coq_appTerm_provision) :: []))))))))))

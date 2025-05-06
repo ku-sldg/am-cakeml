@@ -104,6 +104,14 @@
         "EvOutSig_BODY": "1"
       }
     },
+    "run_command": {
+      "FWD": "EXTEND",
+      "EvInSig": "ALL",
+      "EvOutSig": {
+        "EvOutSig_CONSTRUCTOR": "OutN",
+        "EvOutSig_BODY": "1"
+      }
+    },
     "readfile_appr": {
       "FWD": "REPLACE",
       "EvInSig": "ALL",
@@ -174,6 +182,7 @@
     "selinux_pol_dump": "hashfile_appr",
     "sig": "sig_appr",
     "sig_tpm": "sig_tpm_appr",
-    "uptime": "NULL"
+    "uptime": "NULL", 
+    "run_command": "hashfile_appr"
   }
 }

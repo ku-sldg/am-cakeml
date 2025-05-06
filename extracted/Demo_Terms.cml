@@ -14,6 +14,11 @@ val appr_term : coq_Term =
 val gather_file_contents : coq_ASP_ID =
   "readfile"
 
+(** val run_command : coq_ASP_ID **)
+
+val run_command : coq_ASP_ID =
+  "run_command"
+
 (** val hash_file_contents : coq_ASP_ID **)
 
 val hash_file_contents : coq_ASP_ID =
@@ -39,6 +44,12 @@ val provision : coq_ASP_ID =
 
 fun gather_targ_asp targPlc targId args =
   gen_asp gather_file_contents args targPlc targId
+
+(** val run_command_asp :
+    coq_Plc -> coq_TARG_ID -> coq_ASP_ARGS -> coq_Term **)
+
+fun run_command_asp targPlc targId args =
+  gen_asp run_command args targPlc targId
 
 (** val hash_targ_asp : coq_Plc -> coq_TARG_ID -> coq_ASP_ARGS -> coq_Term **)
 
