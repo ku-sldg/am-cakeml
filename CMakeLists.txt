@@ -76,6 +76,7 @@ get_files(copland_am_src
     extracted/Demo_Terms.cml
     extracted/CDS_Demo.cml
     extracted/Resolute_Demo.cml
+    extracted/Resolute_Demo_NoArgs.cml
     extracted/AppraisalSummary.cml
     extracted/Term.cml
     extracted/Manifest_Set.cml

@@ -1,0 +1,247 @@
+(** val micro_demo_plc : coq_Plc **)
+
+val micro_demo_plc : coq_Plc =
+  "micro_demo_Plc"
+
+(** val coq_coq_demo_plc : coq_Plc **)
+
+val coq_coq_demo_plc : coq_Plc =
+  "coq_demo_Plc"
+
+(** val micro_demo_targ : coq_TARG_ID **)
+
+val micro_demo_targ : coq_TARG_ID =
+  "micro_demo_targ"
+
+(** val aadl_dir_targ : coq_TARG_ID **)
+
+val aadl_dir_targ : coq_TARG_ID =
+  "aadl_dir_targ"
+
+(** val microkit_dir_targ : coq_TARG_ID **)
+
+val microkit_dir_targ : coq_TARG_ID =
+  "microkit_dir_targ"
+
+(** val micro_hash_comp_targ : coq_TARG_ID **)
+
+val micro_hash_comp_targ : coq_TARG_ID =
+  "micro_hash_composite_targ"
+
+(** val run_coq_theorem_targ : coq_TARG_ID **)
+
+val run_coq_theorem_targ : coq_TARG_ID =
+  "run_coq_theorem_targ"
+
+(** val run_coq_theorem_test_targ : coq_TARG_ID **)
+
+val run_coq_theorem_test_targ : coq_TARG_ID =
+  "run_coq_theorem_test_targ"
+
+(** val coq_coq_env_dir_targ : coq_TARG_ID **)
+
+val coq_coq_env_dir_targ : coq_TARG_ID =
+  "coq_env_dir_targ"
+
+(** val provision_asp_coq_args : coq_ASP_ARGS **)
+
+val provision_asp_coq_args : coq_ASP_ARGS =
+  JSON_Object []
+
+(** val provision_asp_coq_test_args : coq_ASP_ARGS **)
+
+val provision_asp_coq_test_args : coq_ASP_ARGS =
+  JSON_Object []
+
+(** val provision_coq_env_dir_args : coq_ASP_ARGS **)
+
+val provision_coq_env_dir_args : coq_ASP_ARGS =
+  JSON_Object []
+
+(** val provision_micro_dir_1_args : coq_ASP_ARGS **)
+
+val provision_micro_dir_1_args : coq_ASP_ARGS =
+  JSON_Object []
+
+(** val provision_micro_dir_2_args : coq_ASP_ARGS **)
+
+val provision_micro_dir_2_args : coq_ASP_ARGS =
+  JSON_Object []
+
+(** val provision_micro_hash_composite_args : coq_ASP_ARGS **)
+
+val provision_micro_hash_composite_args : coq_ASP_ARGS =
+  JSON_Object []
+
+(** val hash_coq_env_dir_args : coq_ASP_ARGS **)
+
+val hash_coq_env_dir_args : coq_ASP_ARGS =
+  JSON_Object []
+
+(** val hash_micro_dir_1_args : coq_ASP_ARGS **)
+
+val hash_micro_dir_1_args : coq_ASP_ARGS =
+  JSON_Object []
+
+(** val hash_micro_dir_2_args : coq_ASP_ARGS **)
+
+val hash_micro_dir_2_args : coq_ASP_ARGS =
+  JSON_Object []
+
+(** val hash_micro_evidence_args : coq_ASP_ARGS **)
+
+val hash_micro_evidence_args : coq_ASP_ARGS =
+  JSON_Object []
+
+(** val run_command_asp_coq_args : coq_ASP_ARGS **)
+
+val run_command_asp_coq_args : coq_ASP_ARGS =
+  JSON_Object []
+
+(** val run_command_asp_coq_test_args : coq_ASP_ARGS **)
+
+val run_command_asp_coq_test_args : coq_ASP_ARGS =
+  JSON_Object []
+
+(** val provision_asp_coq : coq_Term **)
+
+val provision_asp_coq : coq_Term =
+  provision_targ_asp coq_coq_demo_plc run_coq_theorem_targ
+    provision_asp_coq_args
+
+(** val provision_asp_coq_test : coq_Term **)
+
+val provision_asp_coq_test : coq_Term =
+  provision_targ_asp coq_coq_demo_plc run_coq_theorem_test_targ
+    provision_asp_coq_test_args
+
+(** val provision_coq_env_dir : coq_Term **)
+
+val provision_coq_env_dir : coq_Term =
+  provision_targ_asp coq_coq_demo_plc run_coq_theorem_test_targ
+    provision_coq_env_dir_args
+
+(** val provision_micro_dir_1 : coq_Term **)
+
+val provision_micro_dir_1 : coq_Term =
+  provision_targ_asp micro_demo_plc micro_demo_targ provision_micro_dir_1_args
+
+(** val provision_micro_dir_2 : coq_Term **)
+
+val provision_micro_dir_2 : coq_Term =
+  provision_targ_asp micro_demo_plc micro_demo_targ provision_micro_dir_2_args
+
+(** val provision_micro_hash_composite : coq_Term **)
+
+val provision_micro_hash_composite : coq_Term =
+  provision_targ_asp micro_demo_plc micro_demo_targ
+    provision_micro_hash_composite_args
+
+(** val hash_coq_env_dir : coq_Term **)
+
+val hash_coq_env_dir : coq_Term =
+  hash_dir_asp coq_coq_demo_plc coq_coq_env_dir_targ hash_coq_env_dir_args
+
+(** val hash_micro_dir_1 : coq_Term **)
+
+val hash_micro_dir_1 : coq_Term =
+  hash_dir_asp micro_demo_plc aadl_dir_targ hash_micro_dir_1_args
+
+(** val hash_micro_dir_2 : coq_Term **)
+
+val hash_micro_dir_2 : coq_Term =
+  hash_dir_asp micro_demo_plc microkit_dir_targ hash_micro_dir_2_args
+
+(** val hash_micro_evidence : coq_Term **)
+
+val hash_micro_evidence : coq_Term =
+  hash_evidence_asp micro_demo_plc micro_hash_comp_targ
+    hash_micro_evidence_args
+
+(** val run_command_asp_coq : coq_Term **)
+
+val run_command_asp_coq : coq_Term =
+  run_command_asp coq_coq_demo_plc run_coq_theorem_targ
+    run_command_asp_coq_args
+
+(** val run_command_asp_coq_test : coq_Term **)
+
+val run_command_asp_coq_test : coq_Term =
+  run_command_asp coq_coq_demo_plc run_coq_theorem_test_targ
+    run_command_asp_coq_test_args
+
+(** val appr_term : coq_Term **)
+
+val appr_term : coq_Term =
+  Coq_asp APPR
+
+(** val meas_theorem : coq_Term **)
+
+val meas_theorem : coq_Term =
+  Coq_bseq (ALL, ALL) hash_coq_env_dir (Coq_bseq (ALL, ALL)
+    run_command_asp_coq run_command_asp_coq_test)
+
+(** val meas_theorem_appr : coq_Term **)
+
+val meas_theorem_appr : coq_Term =
+  Coq_lseq meas_theorem appr_term
+
+(** val meas_micro : coq_Term **)
+
+val meas_micro : coq_Term =
+  Coq_lseq (Coq_bseq (ALL, ALL) hash_micro_dir_1 hash_micro_dir_2)
+    hash_micro_evidence
+
+(** val micro_appTerm : coq_Term **)
+
+val micro_appTerm : coq_Term =
+  Coq_lseq meas_micro appr_term
+
+(** val coq_coq_appTerm_provision : coq_Term **)
+
+val coq_coq_appTerm_provision : coq_Term =
+  Coq_bseq (ALL, ALL) (Coq_lseq hash_coq_env_dir provision_coq_env_dir)
+    (Coq_bseq (ALL, ALL) (Coq_lseq run_command_asp_coq provision_asp_coq)
+    (Coq_lseq run_command_asp_coq_test provision_asp_coq_test))
+
+(** val micro_appTerm_provision : coq_Term **)
+
+val micro_appTerm_provision : coq_Term =
+  Coq_bseq (ALL, ALL) (Coq_lseq hash_micro_dir_1 provision_micro_dir_1)
+    (Coq_bseq (ALL, ALL) (Coq_lseq hash_micro_dir_2 provision_micro_dir_2)
+    (Coq_lseq meas_micro provision_micro_hash_composite))
+
+(** val coq_coq_env_provision_dir : coq_Term **)
+
+val coq_coq_env_provision_dir : coq_Term =
+  Coq_lseq hash_coq_env_dir provision_coq_env_dir
+
+(** val micro_appTerm_provision_dir_1 : coq_Term **)
+
+val micro_appTerm_provision_dir_1 : coq_Term =
+  Coq_lseq hash_micro_dir_1 provision_micro_dir_1
+
+(** val micro_appTerm_provision_dir_2 : coq_Term **)
+
+val micro_appTerm_provision_dir_2 : coq_Term =
+  Coq_lseq hash_micro_dir_2 provision_micro_dir_2
+
+(** val micro_appTerm_provision_composite : coq_Term **)
+
+val micro_appTerm_provision_composite : coq_Term =
+  Coq_lseq meas_micro provision_micro_hash_composite
+
+(** val resolute_terms_noargs_map : (string * coq_Term) list **)
+
+val resolute_terms_noargs_map : (string * coq_Term) list =
+  ("micro_noargs", micro_appTerm) :: (("micro_provision_noargs",
+    micro_appTerm_provision) :: (("micro_provision_dir_1_noargs",
+    micro_appTerm_provision_dir_1) :: (("micro_provision_dir_2_noargs",
+    micro_appTerm_provision_dir_2) :: (("micro_provision_composite_noargs",
+    micro_appTerm_provision_composite) :: (("run_coq_thm_noargs",
+    run_command_asp_coq) :: (("run_coq_test_noargs",
+    run_command_asp_coq_test) :: (("run_coq_all_noargs",
+    meas_theorem) :: (("run_coq_all_appr_noargs",
+    meas_theorem_appr) :: (("coq_env_dir_provision_noargs",
+    coq_coq_env_provision_dir) :: (("coq_provision_all_noargs",
+    coq_coq_appTerm_provision) :: []))))))))))

@@ -68,7 +68,8 @@ val flexible_mechanisms_map : (string * coq_Term) list =
 (** val full_terms_map : (string * coq_Term) list **)
 
 val full_terms_map : (string * coq_Term) list =
-  app flexible_mechanisms_map (app cds_terms_map resolute_terms_map)
+  app flexible_mechanisms_map
+    (app cds_terms_map (app resolute_terms_map resolute_terms_noargs_map))
 
 (** val add_EvidenceT_terms_map :
     (string * coq_Term) list -> coq_GlobalContext -> (string,
