@@ -15,3 +15,9 @@ datatype coq_AppraisalSummaryRequest =
 
 datatype coq_AppraisalSummaryResponse =
   Coq_mkAppSummResp bool coq_AppraisalSummary
+
+datatype coq_EvidenceSliceRequest =
+  Coq_mkEvSliceReq coq_Evidence coq_GlobalContext coq_ASP_PARAMS
+
+datatype coq_EvidenceSliceResponse =
+  Coq_mkEvSliceResp bool coq_RawEv

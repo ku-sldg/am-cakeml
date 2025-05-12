@@ -52,13 +52,17 @@ get_files(copland_am_src
 
     extracted/EqClass.cml
     extracted/ID_Type.cml
-    extracted/Maps.cml
-    extracted/JSON_Type.cml
-
     stubs/BS.sml
+    extracted/Maps.cml
+    stubs/String_Stubs.sml
+    extracted/JSON_Type.cml
     stubs/JSON_Admits.sml
-
     extracted/ErrorStringConstants.cml
+    
+
+
+
+
     extracted/Interface_Strings_Vars.cml
     extracted/JSON.cml
     extracted/JSON_Core_Strings.cml

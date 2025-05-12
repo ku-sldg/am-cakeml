@@ -66,7 +66,7 @@ val path_micro_dir_1 : string =
 (** val path_micro_dir_1_golden : string **)
 
 val path_micro_dir_1_golden : string =
-  "/tests/DemoFiles/goldenFiles/micro_dir_1_golden.txt"
+  "/tests/DemoFiles/goldenFiles/micro_evidence_all.txt"
 
 (** val path_micro_dir_2 : string **)
 
@@ -82,6 +82,11 @@ val path_micro_dir_2_golden : string =
 
 val path_micro_composite_golden : string =
   "/tests/DemoFiles/goldenFiles/micro_composite.txt"
+
+(** val path_micro_evidence_golden : string **)
+
+val path_micro_evidence_golden : string =
+  "/tests/DemoFiles/goldenFiles/micro_evidence_all.txt"
 
 (** val theorems_path : string **)
 
@@ -164,6 +169,13 @@ val provision_micro_hash_composite_args : coq_ASP_ARGS =
   JSON_Object (("env_var_golden", (JSON_String
     am_root_env_var)) :: (("filepath_golden", (JSON_String
     path_micro_composite_golden)) :: []))
+
+(** val provision_micro_all_args : coq_ASP_ARGS **)
+
+val provision_micro_all_args : coq_ASP_ARGS =
+  JSON_Object (("env_var_golden", (JSON_String
+    am_root_env_var)) :: (("filepath_golden", (JSON_String
+    path_micro_evidence_golden)) :: []))
 
 (** val hash_coq_env_dir_args : coq_ASP_ARGS **)
 
@@ -291,6 +303,12 @@ val run_command_asp_coq_test : coq_Term =
   run_command_asp coq_coq_demo_plc run_coq_theorem_test_targ
     run_command_asp_coq_test_args
 
+(** val provision_goldenevidence_term : coq_Term **)
+
+val provision_goldenevidence_term : coq_Term =
+  provision_goldenevidence_targ_asp micro_demo_plc micro_demo_targ
+    provision_micro_all_args
+
 (** val appr_term : coq_Term **)
 
 val appr_term : coq_Term =
@@ -352,6 +370,11 @@ val micro_appTerm_provision_dir_2 : coq_Term =
 val micro_appTerm_provision_composite : coq_Term =
   Coq_lseq meas_micro provision_micro_hash_composite
 
+(** val micro_appTerm_provision_evidence : coq_Term **)
+
+val micro_appTerm_provision_evidence : coq_Term =
+  Coq_lseq meas_micro provision_goldenevidence_term
+
 (** val resolute_terms_map : (string * coq_Term) list **)
 
 val resolute_terms_map : (string * coq_Term) list =
@@ -359,10 +382,11 @@ val resolute_terms_map : (string * coq_Term) list =
     micro_appTerm_provision) :: (("micro_provision_dir_1",
     micro_appTerm_provision_dir_1) :: (("micro_provision_dir_2",
     micro_appTerm_provision_dir_2) :: (("micro_provision_composite",
-    micro_appTerm_provision_composite) :: (("run_coq_thm",
+    micro_appTerm_provision_composite) :: (("micro_provision_evidence",
+    micro_appTerm_provision_evidence) :: (("run_coq_thm",
     run_command_asp_coq) :: (("run_coq_test",
     run_command_asp_coq_test) :: (("run_coq_all",
     meas_theorem) :: (("run_coq_all_appr",
     meas_theorem_appr) :: (("run_coq_all_appr_provision",
     coq_coq_appTerm_provision) :: (("coq_env_dir_provision",
-    coq_coq_env_provision_dir) :: []))))))))))
+    coq_coq_env_provision_dir) :: [])))))))))))

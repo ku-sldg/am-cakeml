@@ -90,6 +90,60 @@ fun do_AppraisalSummary' et r g s =
 fun do_AppraisalSummary et r g =
   do_AppraisalSummary' et r g []
 
+(** val get_Evidence_Rawev :
+    coq_EvidenceT -> coq_RawEv -> coq_GlobalContext -> coq_ASP_PARAMS ->
+    (coq_RawEv, string) coq_ResultT **)
+
+fun get_Evidence_Rawev et r g params =
+  case et of
+    Coq_asp_evt _ ps _ =>
+    let val Coq_asp_paramsC i _ _ tid = ps in
+    let val Coq_asp_paramsC i' _ _ tid' = params in
+    (case (fn x => fn y => x andalso y) (eqb coq_Eq_Class_ID_Type i i')
+            (eqb coq_Eq_Class_ID_Type tid tid') of
+       True =>
+       (case map_get coq_Eq_Class_ID_Type i
+               (let val Build_GlobalContext asp_types _ = g in asp_types end) of
+          Some e =>
+          let val Coq_ev_arrow fwd _ out_sig = e in
+          (case fwd of
+             REPLACE =>
+             (case out_sig of
+                OutN n =>
+                res_bind (peel_n_rawev n r) (fn x =>
+                  let val (r1, _) = x in Coq_resultC r1 end)
+              | OutUnwrap => Coq_errC err_str_cannot_have_outwrap)
+           | EXTEND =>
+             (case out_sig of
+                OutN n =>
+                res_bind (peel_n_rawev n r) (fn x =>
+                  let val (r1, _) = x in Coq_resultC r1 end)
+              | OutUnwrap => Coq_errC err_str_cannot_have_outwrap)
+           | _ => Coq_errC err_str_cannot_have_outwrap) end
+        | None => Coq_errC err_str_cannot_have_outwrap)
+     | False => Coq_errC err_str_cannot_have_outwrap) end end
+  | Coq_left_evt et' =>
+    res_bind
+      (apply_to_evidence_below g (fn et'' =>
+        get_Evidence_Rawev et'' r g params) (Trail_LEFT :: []) et') (fn r0 =>
+      r0)
+  | Coq_right_evt et' =>
+    res_bind
+      (apply_to_evidence_below g (fn et'' =>
+        get_Evidence_Rawev et'' r g params) (Trail_RIGHT :: []) et')
+      (fn r0 => r0)
+  | Coq_split_evt et1 et2 =>
+    res_bind (et_size g et1) (fn et1_size =>
+      res_bind (et_size g et2) (fn et2_size =>
+        res_bind (peel_n_rawev et1_size r) (fn x =>
+          let val (r1, rest) = x in
+          res_bind (peel_n_rawev et2_size rest) (fn x0 =>
+            let val (r2, _) = x0 in
+            (case get_Evidence_Rawev et1 r1 g params of
+               Coq_errC _ => get_Evidence_Rawev et2 r2 g params
+             | Coq_resultC v => Coq_resultC v) end) end)))
+  | _ => Coq_errC err_str_cannot_have_outwrap
+
 (** val fold_appsumm : coq_AppraisalSummary -> bool **)
 
 fun fold_appsumm appsumm =

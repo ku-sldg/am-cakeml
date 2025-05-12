@@ -58,6 +58,11 @@ val coq_STR_RUN : string =
 val coq_STR_APPSUMM : string =
   "APPSUMM"
 
+(** val coq_STR_EVSLICE : string **)
+
+val coq_STR_EVSLICE : string =
+  "EVSLICE"
+
 (** val coq_STR_NEGOTIATE : string **)
 
 val coq_STR_NEGOTIATE : string =
@@ -78,10 +83,20 @@ val coq_STR_RESPONSE : string =
 val coq_STR_ATTEST_SESS : string =
   "ATTESTATION_SESSION"
 
+(** val coq_STR_GLOB_CONTEXT : string **)
+
+val coq_STR_GLOB_CONTEXT : string =
+  "GLOBAL_CONTEXT"
+
 (** val coq_STR_ASP : string **)
 
 val coq_STR_ASP : string =
   "ASP"
+
+(** val coq_STR_ASP_PARAMS : string **)
+
+val coq_STR_ASP_PARAMS : string =
+  "ASP_PARAMS"
 
 (** val coq_STR_ASP_RUN : string **)
 

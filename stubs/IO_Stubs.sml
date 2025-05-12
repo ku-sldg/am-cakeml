@@ -29,6 +29,12 @@ fun string_to_fs_location (s : string) =
 fun fs_location_to_string (loc : coq_FS_Location) =
   loc
 
+(*
+(** val append_aspid_to_errstr : string -> coq_ASP_ID -> string **)
+
+fun append_aspid_to_errstr (errStr:string) (i:coq_ASP_ID) = String.concat [errStr, i]
+*)
+
 (** val make_JSON_FS_Location_Request :
     coq_FS_Location -> coq_FS_Location -> coq_JSON -> (coq_JSON, string)
     coq_ResultT **)

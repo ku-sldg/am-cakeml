@@ -42,7 +42,8 @@ fun appr_manifest_update g e m =
                 let val m' = aspid_manifest_update appr_asp_id m in
                 appr_manifest_update g e' m' end
               | OutUnwrap => Coq_errC err_str_extend_must_have_outn)) end
-        | None => Coq_errC err_str_asp_no_type_sig)
+        | None =>
+          Coq_errC (append_aspid_to_errstr err_str_asp_no_type_sig asp_id))
      | None => Coq_errC err_str_asp_no_compat_appr_asp) end
   | Coq_left_evt e' =>
     res_bind

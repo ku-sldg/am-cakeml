@@ -39,6 +39,11 @@ val hash_evidence : coq_ASP_ID =
 val provision : coq_ASP_ID =
   "provision"
 
+(** val provision_goldenevidence : coq_ASP_ID **)
+
+val provision_goldenevidence : coq_ASP_ID =
+  "provision_goldenevidence"
+
 (** val gather_targ_asp :
     coq_Plc -> coq_TARG_ID -> coq_ASP_ARGS -> coq_Term **)
 
@@ -66,6 +71,12 @@ fun hash_dir_asp targPlc targId args =
 
 fun provision_targ_asp targPlc targId args =
   gen_asp provision args targPlc targId
+
+(** val provision_goldenevidence_targ_asp :
+    coq_Plc -> coq_TARG_ID -> coq_ASP_ARGS -> coq_Term **)
+
+fun provision_goldenevidence_targ_asp targPlc targId args =
+  gen_asp provision_goldenevidence args targPlc targId
 
 (** val hash_evidence_asp :
     coq_Plc -> coq_TARG_ID -> coq_ASP_ARGS -> coq_Term **)

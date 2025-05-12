@@ -88,7 +88,8 @@ fun get_asp_type a =
             (let val Build_GlobalContext asp_types _ = g in asp_types end) of
        Some ev => err_ret ev
      | None =>
-       err_failm (Coq_dispatch_error (Runtime err_str_asp_no_type_sig))) end)
+       err_failm (Coq_dispatch_error (Runtime
+         (append_aspid_to_errstr err_str_asp_no_type_sig a)))) end)
 
 (** val get_asp_dual : coq_ASP_ID -> coq_ASP_ID coq_CVM **)
 
@@ -169,6 +170,14 @@ fun invoke_ASP e params =
       err_bind (do_asp params (get_bits e) x) (fn rawev =>
         err_bind (bundle_asp p rawev e params) err_ret)))
 
+(** val add_string_kv_to_asp_args :
+    string -> string -> coq_ASP_ARGS -> coq_ASP_ARGS **)
+
+fun add_string_kv_to_asp_args k v args = case args of
+  JSON_Object m =>
+  JSON_Object (map_set coq_Eq_Class_ID_Type k (JSON_String v) m)
+| _ => args
+
 (** val invoke_APPR' :
     coq_RawEv -> coq_EvidenceT -> coq_EvidenceT -> coq_Evidence coq_CVM **)
 
@@ -184,7 +193,15 @@ fun invoke_APPR' r et out_evt =
      | Coq_asp_evt _ par et' =>
        let val Coq_asp_paramsC asp_id args targ_plc targ = par in
        err_bind (get_asp_dual asp_id) (fn appr_asp_id =>
-         let val dual_par = Coq_asp_paramsC appr_asp_id args targ_plc targ in
+         let val dual_args' =
+           add_string_kv_to_asp_args "attestation_aspid" asp_id args
+         in
+         let val dual_args =
+           add_string_kv_to_asp_args "attestation_targid" targ dual_args'
+         in
+         let val dual_par = Coq_asp_paramsC appr_asp_id dual_args targ_plc
+           targ
+         in
          err_bind (get_asp_type asp_id) (fn x =>
            let val Coq_ev_arrow fwd _ out_sig = x in
            (case fwd of
@@ -231,7 +248,7 @@ fun invoke_APPR' r et out_evt =
                          join_seq ev1 ev2)) end))
                | OutUnwrap =>
                  err_failm (Coq_dispatch_error (Runtime
-                   err_str_extend_must_have_outn)))) end) end) end
+                   err_str_extend_must_have_outn)))) end) end end end) end
      | Coq_left_evt et' =>
        err_bind
          (hoist_result

@@ -69,7 +69,8 @@ fun generate_remote_dispatcher' ats commsBin pTo e t =
        let val Build_Jsonifiable to_JSON _ =
          coq_Jsonifiable_ProtocolRunRequest
            (coq_Jsonifiable_Term
-             (coq_Jsonifiable_ASP coq_Jsonifiable_ASP_ARGS)
+             (coq_Jsonifiable_ASP
+               (coq_Jsonifiable_ASP_Params coq_Jsonifiable_ASP_ARGS))
              coq_Jsonifiable_Split)
            (coq_Jsonifiable_Evidence coq_Jsonifiable_RawEv
              (coq_Jsonifiable_EvidenceT coq_Jsonifiable_ASP_ARGS

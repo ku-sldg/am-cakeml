@@ -599,18 +599,20 @@ fun coq_ASP_from_JSON_map h h0 =
          | _ => Coq_errC err_str_json_parsing_failure_wrong_number_args)))) :: [])))))
 
 (** val coq_ASP_from_JSON :
-    coq_ASP_ARGS coq_Jsonifiable -> coq_JSON -> (coq_ASP, string) coq_ResultT **)
+    coq_ASP_PARAMS coq_Jsonifiable -> coq_ASP_ARGS coq_Jsonifiable ->
+    coq_JSON -> (coq_ASP, string) coq_ResultT **)
 
-fun coq_ASP_from_JSON h js =
+fun coq_ASP_from_JSON _ h0 js =
   from_JSON_gen coq_STR_ASP
-    (coq_ASP_from_JSON_map coq_Stringifiable_ID_Type h) js
+    (coq_ASP_from_JSON_map coq_Stringifiable_ID_Type h0) js
 
 (** val coq_Jsonifiable_ASP :
-    coq_ASP_ARGS coq_Jsonifiable -> coq_ASP coq_Jsonifiable **)
+    coq_ASP_PARAMS coq_Jsonifiable -> coq_ASP coq_Jsonifiable **)
 
 fun coq_Jsonifiable_ASP h =
-  Build_Jsonifiable (coq_ASP_to_JSON coq_Stringifiable_ID_Type h)
-    (coq_ASP_from_JSON h)
+  Build_Jsonifiable
+    (coq_ASP_to_JSON coq_Stringifiable_ID_Type coq_Jsonifiable_ASP_ARGS)
+    (coq_ASP_from_JSON h coq_Jsonifiable_ASP_ARGS)
 
 (** val coq_Jsonifiable_Split : coq_Split coq_Jsonifiable **)
 

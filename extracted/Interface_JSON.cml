@@ -115,6 +115,62 @@ fun coq_Jsonifiable_AppraisalSummaryResponse h =
            from_JSON temp_appsumm end) (fn appsumm => Coq_resultC
           (Coq_mkAppSummResp temp_success appsumm)))))
 
+(** val coq_Jsonifiable_EvSliceRequest :
+    coq_Evidence coq_Jsonifiable -> coq_GlobalContext coq_Jsonifiable ->
+    coq_ASP_PARAMS coq_Jsonifiable -> coq_EvidenceSliceRequest coq_Jsonifiable **)
+
+fun coq_Jsonifiable_EvSliceRequest h h0 h1 =
+  Build_Jsonifiable (fn req => JSON_Object ((coq_STR_TYPE, (JSON_String
+    coq_STR_REQUEST)) :: ((coq_STR_ACTION, (JSON_String
+    coq_STR_EVSLICE)) :: ((coq_STR_GLOB_CONTEXT,
+    (let val Build_Jsonifiable to_JSON _ = h0 in
+     to_JSON
+       (let val Coq_mkEvSliceReq _ evslicereq_ctxt _ = req in
+        evslicereq_ctxt end) end)) :: ((coq_STR_EVIDENCE,
+    (let val Build_Jsonifiable to_JSON _ = h in
+     to_JSON
+       (let val Coq_mkEvSliceReq evslicereq_evidence _ _ = req in
+        evslicereq_evidence end) end)) :: ((coq_STR_ASP_PARAMS,
+    (let val Build_Jsonifiable to_JSON _ = h1 in
+     to_JSON
+       (let val Coq_mkEvSliceReq _ _ evslicereq_params = req in
+        evslicereq_params end) end)) :: [])))))) (fn j =>
+    res_bind (coq_JSON_get_Object coq_STR_EVIDENCE j) (fn temp_ev =>
+      res_bind (coq_JSON_get_Object coq_STR_GLOB_CONTEXT j)
+        (fn temp_glob_ctxt =>
+        res_bind (coq_JSON_get_Object coq_STR_ASP_PARAMS j)
+          (fn temp_params =>
+          res_bind
+            (let val Build_Jsonifiable _ from_JSON = h0 in
+             from_JSON temp_glob_ctxt end) (fn ctxt =>
+            res_bind
+              (let val Build_Jsonifiable _ from_JSON = h in
+               from_JSON temp_ev end) (fn ev =>
+              res_bind
+                (let val Build_Jsonifiable _ from_JSON = h1 in
+                 from_JSON temp_params end) (fn params => Coq_resultC
+                (Coq_mkEvSliceReq ev ctxt params))))))))
+
+(** val coq_Jsonifiable_EvSliceResponse :
+    coq_RawEv coq_Jsonifiable -> coq_EvidenceSliceResponse coq_Jsonifiable **)
+
+fun coq_Jsonifiable_EvSliceResponse h =
+  Build_Jsonifiable (fn resp => JSON_Object ((coq_STR_TYPE, (JSON_String
+    coq_STR_RESPONSE)) :: ((coq_STR_ACTION, (JSON_String
+    coq_STR_EVSLICE)) :: ((coq_STR_SUCCESS, (JSON_Boolean
+    (let val Coq_mkEvSliceResp evsliceresp_success _ = resp in
+     evsliceresp_success end))) :: ((coq_STR_PAYLOAD,
+    (let val Build_Jsonifiable to_JSON _ = h in
+     to_JSON
+       (let val Coq_mkEvSliceResp _ evslicerespresp_rawev = resp in
+        evslicerespresp_rawev end) end)) :: []))))) (fn resp =>
+    res_bind (coq_JSON_get_bool coq_STR_SUCCESS resp) (fn temp_success =>
+      res_bind (coq_JSON_get_Object coq_STR_PAYLOAD resp) (fn temp_appsumm =>
+        res_bind
+          (let val Build_Jsonifiable _ from_JSON = h in
+           from_JSON temp_appsumm end) (fn rawev => Coq_resultC
+          (Coq_mkEvSliceResp temp_success rawev)))))
+
 (** val coq_Jsonifiable_ASPRunRequest :
     coq_RawEv coq_Jsonifiable -> coq_ASP_ARGS coq_Jsonifiable ->
     coq_ASPRunRequest coq_Jsonifiable **)

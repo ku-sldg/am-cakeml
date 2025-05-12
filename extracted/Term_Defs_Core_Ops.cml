@@ -34,7 +34,8 @@ fun apply_to_evidence_below g f trails e =
            | UNWRAP =>
              apply_to_evidence_below g f ((Trail_UNWRAP top_id) :: trails) et'
            | _ => Coq_errC err_str_asp_at_bottom_not_wrap) end
-        | None => Coq_errC err_str_asp_no_type_sig) end
+        | None =>
+          Coq_errC (append_aspid_to_errstr err_str_asp_no_type_sig top_id)) end
      | Coq_left_evt et' =>
        apply_to_evidence_below g f (Trail_LEFT :: trails) et'
      | Coq_right_evt et' =>
@@ -74,7 +75,7 @@ fun et_size g e = case e of
         (case out_sig of
            OutN n => Coq_resultC n
          | OutUnwrap => Coq_errC err_str_cannot_have_outwrap)) end
-   | None => Coq_errC err_str_asp_no_type_sig) end
+   | None => Coq_errC (append_aspid_to_errstr err_str_asp_no_type_sig asp_id)) end
 | Coq_left_evt e' =>
   res_bind (apply_to_evidence_below g (et_size g) (Trail_LEFT :: []) e')
     (fn r => r)

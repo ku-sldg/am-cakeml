@@ -1,0 +1,517 @@
+{
+    "TYPE": "REQUEST",
+    "ACTION": "EVSLICE",
+    "GLOBAL_CONTEXT": {
+        "ASP_Types": {
+            "run_command": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": "1"
+                }
+            },
+            "hashfile": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": "1"
+                }
+            },
+            "hashdir": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": "1"
+                }
+            },
+            "uptime": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": "1"
+                }
+            },
+            "invary_get_measurement": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": "1"
+                }
+            },
+            "readfile": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": "1"
+                }
+            },
+            "readfile_appr": {
+                "FWD": "REPLACE",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": "1"
+                }
+            },
+            "hashevidence": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": "1"
+                }
+            },
+            "goldenevidence_appr": {
+                "FWD": "REPLACE",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": "1"
+                }
+            },
+            "invary_get_measurement_appr": {
+                "FWD": "REPLACE",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": "1"
+                }
+            },
+            "selinux_pol_dump": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": "1"
+                }
+            },
+            "hashfile_appr": {
+                "FWD": "REPLACE",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": "1"
+                }
+            },
+            "sig": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": "1"
+                }
+            },
+            "sig_appr": {
+                "FWD": "REPLACE",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": "1"
+                }
+            },
+            "attest": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": "1"
+                }
+            },
+            "provision_goldenevidence": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": "0"
+                }
+            },
+            "provision": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": "0"
+                }
+            },
+            "sig_tpm_appr": {
+                "FWD": "REPLACE",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": "1"
+                }
+            },
+            "sig_tpm": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": "1"
+                }
+            },
+            "large_output": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": "1"
+                }
+            },
+            "magic_appr": {
+                "FWD": "REPLACE",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": "1"
+                }
+            },
+            "appraise": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": "1"
+                }
+            },
+            "certificate": {
+                "FWD": "EXTEND",
+                "EvInSig": "ALL",
+                "EvOutSig": {
+                    "EvOutSig_CONSTRUCTOR": "OutN",
+                    "EvOutSig_BODY": "1"
+                }
+            }
+        },
+        "ASP_Comps": {
+            "sig": "sig_appr",
+            "hashevidence": "hashfile_appr",
+            "sig_tpm": "sig_tpm_appr",
+            "hashfile": "hashfile_appr",
+            "provision_goldenevidence": "NULL",
+            "uptime": "NULL",
+            "appraise": "magic_appr",
+            "hashdir": "goldenevidence_appr",
+            "invary_get_measurement": "invary_get_measurement_appr",
+            "run_command": "hashfile_appr",
+            "provision": "NULL",
+            "attest": "magic_appr",
+            "readfile": "readfile_appr",
+            "selinux_pol_dump": "hashfile_appr",
+            "certificate": "magic_appr"
+        }
+    },
+    "EVIDENCE": {
+        "RAWEV": {
+            "RawEv": [
+                "OHGmWqlHOA0ISBVm6x9YnLvewK3beXbzrldGDBxK6go="
+            ]
+        },
+        "EVIDENCET": {
+            "EvidenceT_CONSTRUCTOR": "split_evt",
+            "EvidenceT_BODY": [
+                {
+                    "EvidenceT_CONSTRUCTOR": "asp_evt",
+                    "EvidenceT_BODY": [
+                        "P0",
+                        {
+                            "ASP_ID": "hashfile_appr",
+                            "ASP_ARGS": {
+                                "env_var_golden": "AM_ROOT",
+                                "filepath_golden": "/tests/DemoFiles/goldenFiles/micro_composite.txt"
+                            },
+                            "ASP_PLC": "micro_demo_Plc",
+                            "ASP_TARG_ID": "micro_hash_composite_targ"
+                        },
+                        {
+                            "EvidenceT_CONSTRUCTOR": "asp_evt",
+                            "EvidenceT_BODY": [
+                                "P0",
+                                {
+                                    "ASP_ID": "hashevidence",
+                                    "ASP_ARGS": {
+                                        "env_var_golden": "AM_ROOT",
+                                        "filepath_golden": "/tests/DemoFiles/goldenFiles/micro_composite.txt"
+                                    },
+                                    "ASP_PLC": "micro_demo_Plc",
+                                    "ASP_TARG_ID": "micro_hash_composite_targ"
+                                },
+                                {
+                                    "EvidenceT_CONSTRUCTOR": "split_evt",
+                                    "EvidenceT_BODY": [
+                                        {
+                                            "EvidenceT_CONSTRUCTOR": "asp_evt",
+                                            "EvidenceT_BODY": [
+                                                "P0",
+                                                {
+                                                    "ASP_ID": "hashdir",
+                                                    "ASP_ARGS": {
+                                                        "env_var": "INSPECTA_ROOT",
+                                                        "env_var_golden": "AM_ROOT",
+                                                        "filepath_golden": "/tests/DemoFiles/goldenFiles/micro_dir_1_golden.txt",
+                                                        "omit_file_suffixes": [],
+                                                        "paths": [
+                                                            "/micro-examples/microkit/aadl_port_types/data/base_type/aadl/"
+                                                        ],
+                                                        "recursive": false
+                                                    },
+                                                    "ASP_PLC": "micro_demo_Plc",
+                                                    "ASP_TARG_ID": "aadl_dir_targ"
+                                                },
+                                                {
+                                                    "EvidenceT_CONSTRUCTOR": "nonce_evt",
+                                                    "EvidenceT_BODY": "0"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "EvidenceT_CONSTRUCTOR": "asp_evt",
+                                            "EvidenceT_BODY": [
+                                                "P0",
+                                                {
+                                                    "ASP_ID": "hashdir",
+                                                    "ASP_ARGS": {
+                                                        "env_var": "INSPECTA_ROOT",
+                                                        "env_var_golden": "AM_ROOT",
+                                                        "filepath_golden": "/tests/DemoFiles/goldenFiles/micro_dir_2_golden.txt",
+                                                        "omit_file_suffixes": [],
+                                                        "paths": [
+                                                            "/micro-examples/microkit/aadl_port_types/data/base_type/hamr/microkit/"
+                                                        ],
+                                                        "recursive": false
+                                                    },
+                                                    "ASP_PLC": "micro_demo_Plc",
+                                                    "ASP_TARG_ID": "microkit_dir_targ"
+                                                },
+                                                {
+                                                    "EvidenceT_CONSTRUCTOR": "nonce_evt",
+                                                    "EvidenceT_BODY": "0"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "EvidenceT_CONSTRUCTOR": "split_evt",
+                    "EvidenceT_BODY": [
+                        {
+                            "EvidenceT_CONSTRUCTOR": "split_evt",
+                            "EvidenceT_BODY": [
+                                {
+                                    "EvidenceT_CONSTRUCTOR": "asp_evt",
+                                    "EvidenceT_BODY": [
+                                        "P0",
+                                        {
+                                            "ASP_ID": "hashfile_appr",
+                                            "ASP_ARGS": {
+                                                "env_var": "INSPECTA_ROOT",
+                                                "env_var_golden": "AM_ROOT",
+                                                "filepath_golden": "/tests/DemoFiles/goldenFiles/micro_dir_1_golden.txt",
+                                                "omit_file_suffixes": [],
+                                                "paths": [
+                                                    "/micro-examples/microkit/aadl_port_types/data/base_type/aadl/"
+                                                ],
+                                                "recursive": false
+                                            },
+                                            "ASP_PLC": "micro_demo_Plc",
+                                            "ASP_TARG_ID": "aadl_dir_targ"
+                                        },
+                                        {
+                                            "EvidenceT_CONSTRUCTOR": "left_evt",
+                                            "EvidenceT_BODY": {
+                                                "EvidenceT_CONSTRUCTOR": "split_evt",
+                                                "EvidenceT_BODY": [
+                                                    {
+                                                        "EvidenceT_CONSTRUCTOR": "asp_evt",
+                                                        "EvidenceT_BODY": [
+                                                            "P0",
+                                                            {
+                                                                "ASP_ID": "hashdir",
+                                                                "ASP_ARGS": {
+                                                                    "env_var": "INSPECTA_ROOT",
+                                                                    "env_var_golden": "AM_ROOT",
+                                                                    "filepath_golden": "/tests/DemoFiles/goldenFiles/micro_dir_1_golden.txt",
+                                                                    "omit_file_suffixes": [],
+                                                                    "paths": [
+                                                                        "/micro-examples/microkit/aadl_port_types/data/base_type/aadl/"
+                                                                    ],
+                                                                    "recursive": false
+                                                                },
+                                                                "ASP_PLC": "micro_demo_Plc",
+                                                                "ASP_TARG_ID": "aadl_dir_targ"
+                                                            },
+                                                            {
+                                                                "EvidenceT_CONSTRUCTOR": "nonce_evt",
+                                                                "EvidenceT_BODY": "0"
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        "EvidenceT_CONSTRUCTOR": "asp_evt",
+                                                        "EvidenceT_BODY": [
+                                                            "P0",
+                                                            {
+                                                                "ASP_ID": "hashdir",
+                                                                "ASP_ARGS": {
+                                                                    "env_var": "INSPECTA_ROOT",
+                                                                    "env_var_golden": "AM_ROOT",
+                                                                    "filepath_golden": "/tests/DemoFiles/goldenFiles/micro_dir_2_golden.txt",
+                                                                    "omit_file_suffixes": [],
+                                                                    "paths": [
+                                                                        "/micro-examples/microkit/aadl_port_types/data/base_type/hamr/microkit/"
+                                                                    ],
+                                                                    "recursive": false
+                                                                },
+                                                                "ASP_PLC": "micro_demo_Plc",
+                                                                "ASP_TARG_ID": "microkit_dir_targ"
+                                                            },
+                                                            {
+                                                                "EvidenceT_CONSTRUCTOR": "nonce_evt",
+                                                                "EvidenceT_BODY": "0"
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "EvidenceT_CONSTRUCTOR": "asp_evt",
+                                    "EvidenceT_BODY": [
+                                        "P0",
+                                        {
+                                            "ASP_ID": "check_nonce_id",
+                                            "ASP_ARGS": {},
+                                            "ASP_PLC": "check_nonce_targPlc",
+                                            "ASP_TARG_ID": "check_nonce_targid"
+                                        },
+                                        {
+                                            "EvidenceT_CONSTRUCTOR": "nonce_evt",
+                                            "EvidenceT_BODY": "0"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "EvidenceT_CONSTRUCTOR": "split_evt",
+                            "EvidenceT_BODY": [
+                                {
+                                    "EvidenceT_CONSTRUCTOR": "asp_evt",
+                                    "EvidenceT_BODY": [
+                                        "P0",
+                                        {
+                                            "ASP_ID": "hashfile_appr",
+                                            "ASP_ARGS": {
+                                                "env_var": "INSPECTA_ROOT",
+                                                "env_var_golden": "AM_ROOT",
+                                                "filepath_golden": "/tests/DemoFiles/goldenFiles/micro_dir_2_golden.txt",
+                                                "omit_file_suffixes": [],
+                                                "paths": [
+                                                    "/micro-examples/microkit/aadl_port_types/data/base_type/hamr/microkit/"
+                                                ],
+                                                "recursive": false
+                                            },
+                                            "ASP_PLC": "micro_demo_Plc",
+                                            "ASP_TARG_ID": "microkit_dir_targ"
+                                        },
+                                        {
+                                            "EvidenceT_CONSTRUCTOR": "right_evt",
+                                            "EvidenceT_BODY": {
+                                                "EvidenceT_CONSTRUCTOR": "split_evt",
+                                                "EvidenceT_BODY": [
+                                                    {
+                                                        "EvidenceT_CONSTRUCTOR": "asp_evt",
+                                                        "EvidenceT_BODY": [
+                                                            "P0",
+                                                            {
+                                                                "ASP_ID": "hashdir",
+                                                                "ASP_ARGS": {
+                                                                    "env_var": "INSPECTA_ROOT",
+                                                                    "env_var_golden": "AM_ROOT",
+                                                                    "filepath_golden": "/tests/DemoFiles/goldenFiles/micro_dir_1_golden.txt",
+                                                                    "omit_file_suffixes": [],
+                                                                    "paths": [
+                                                                        "/micro-examples/microkit/aadl_port_types/data/base_type/aadl/"
+                                                                    ],
+                                                                    "recursive": false
+                                                                },
+                                                                "ASP_PLC": "micro_demo_Plc",
+                                                                "ASP_TARG_ID": "aadl_dir_targ"
+                                                            },
+                                                            {
+                                                                "EvidenceT_CONSTRUCTOR": "nonce_evt",
+                                                                "EvidenceT_BODY": "0"
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        "EvidenceT_CONSTRUCTOR": "asp_evt",
+                                                        "EvidenceT_BODY": [
+                                                            "P0",
+                                                            {
+                                                                "ASP_ID": "hashdir",
+                                                                "ASP_ARGS": {
+                                                                    "env_var": "INSPECTA_ROOT",
+                                                                    "env_var_golden": "AM_ROOT",
+                                                                    "filepath_golden": "/tests/DemoFiles/goldenFiles/micro_dir_2_golden.txt",
+                                                                    "omit_file_suffixes": [],
+                                                                    "paths": [
+                                                                        "/micro-examples/microkit/aadl_port_types/data/base_type/hamr/microkit/"
+                                                                    ],
+                                                                    "recursive": false
+                                                                },
+                                                                "ASP_PLC": "micro_demo_Plc",
+                                                                "ASP_TARG_ID": "microkit_dir_targ"
+                                                            },
+                                                            {
+                                                                "EvidenceT_CONSTRUCTOR": "nonce_evt",
+                                                                "EvidenceT_BODY": "0"
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "EvidenceT_CONSTRUCTOR": "asp_evt",
+                                    "EvidenceT_BODY": [
+                                        "P0",
+                                        {
+                                            "ASP_ID": "check_nonce_id",
+                                            "ASP_ARGS": {},
+                                            "ASP_PLC": "check_nonce_targPlc",
+                                            "ASP_TARG_ID": "check_nonce_targid"
+                                        },
+                                        {
+                                            "EvidenceT_CONSTRUCTOR": "nonce_evt",
+                                            "EvidenceT_BODY": "0"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    "ASP_PARAMS": {
+        "ASP_ID": "hashdir",
+        "ASP_ARGS": {},
+        "ASP_PLC": "",
+        "ASP_TARG_ID": "aadl_dir_targ"
+    }
+}

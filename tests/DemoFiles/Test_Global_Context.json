@@ -64,6 +64,14 @@
         "EvOutSig_BODY": "1"
       }
     },
+    "goldenevidence_appr": {
+      "FWD": "REPLACE",
+      "EvInSig": "ALL",
+      "EvOutSig": {
+        "EvOutSig_CONSTRUCTOR": "OutN",
+        "EvOutSig_BODY": "1"
+      }
+    },
     "hashdir": {
       "FWD": "EXTEND",
       "EvInSig": "ALL",
@@ -89,6 +97,14 @@
       }
     },
     "provision": {
+      "FWD": "EXTEND",
+      "EvInSig": "ALL",
+      "EvOutSig": {
+        "EvOutSig_CONSTRUCTOR": "OutN",
+        "EvOutSig_BODY": "0"
+      }
+    },
+    "provision_goldenevidence": {
       "FWD": "EXTEND",
       "EvInSig": "ALL",
       "EvOutSig": {
@@ -175,9 +191,10 @@
     "appraise": "magic_appr",
     "hashevidence": "hashfile_appr",
     "hashfile": "hashfile_appr",
-    "hashdir": "hashfile_appr",
+    "hashdir": "goldenevidence_appr",
     "invary_get_measurement": "invary_get_measurement_appr",
     "provision": "NULL",
+    "provision_goldenevidence": "NULL",
     "readfile": "readfile_appr",
     "selinux_pol_dump": "hashfile_appr",
     "sig": "sig_appr",

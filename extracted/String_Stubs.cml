@@ -1,0 +1,4 @@
+(** val append_aspid_to_errstr : string -> coq_ID_Type -> string **)
+
+val append_aspid_to_errstr : (string -> coq_ID_Type -> string) =
+  failwith "AXIOM TO BE REALIZED"
