@@ -8,12 +8,16 @@ usage() {
 }
 
 TERM_TYPE=""
+RUN_CLIENT=0
 
 # Parse command-line arguments
-while getopts "t:" opt; do
+while getopts "t:r" opt; do
   case ${opt} in
     t )
       TERM_TYPE=$OPTARG
+      ;;
+    r )
+      RUN_CLIENT=1
       ;;
     * )
       usage
@@ -27,5 +31,12 @@ if [[ -z "$TERM_TYPE" ]]; then
   exit 1
 fi
 
+
+if [[ $RUN_CLIENT -eq 0 ]]; then
+  SERVER_MODE=""
+else
+  SERVER_MODE=" -r"
+fi
+
 TESTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-$TESTS_DIR/CI/Test.sh -t $TERM_TYPE
+$TESTS_DIR/CI/Test.sh -t $TERM_TYPE $SERVER_MODE

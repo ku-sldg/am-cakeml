@@ -19,9 +19,10 @@ usage() {
 TERM_TYPE=""
 HEADLESS=0
 SEND=0
+RUN_CLIENT=0
 
 # Parse command-line arguments
-while getopts "t:ha:c:s" opt; do
+while getopts "t:ha:c:rs" opt; do
   case ${opt} in
     t )
       TERM_TYPE=$OPTARG
@@ -34,6 +35,9 @@ while getopts "t:ha:c:s" opt; do
       ;;
     c )
       AM_COMMS_BIN=$OPTARG
+      ;;
+    r )
+      RUN_CLIENT=1
       ;;
     s )
       SEND=1
@@ -182,23 +186,30 @@ if [[ "$REPO_ROOT" == */am-cakeml ]]; then
       PIDS+=($!)
     fi
   done
-  
-  # Now send the request, on the very last window
-  if [[ $HEADLESS -eq 0 ]]; then
-    tmux new-window -t ServerProcess -n "Client"
 
-    tmux send-keys -t ServerProcess:Client "sleep 1 && $CLIENT_AM_EXEC -t $TERM_FILE -s $FULL_ATT_SESS --comms $AM_COMMS_BIN $CLIENT_AM_ARGS" C-m
-      
-    tmux attach-session -d -t ServerProcess
-  else
-    sleep 1 
-    $CLIENT_AM_EXEC -t $TERM_FILE -s $FULL_ATT_SESS --comms $AM_COMMS_BIN $CLIENT_AM_ARGS > $GENERATED/output_resp.json
-    # We need this to be the last line so that the exit code is whether or not we found success
-    if [[ $SEND -eq 1 ]]; then
-      grep "SUCCESS: Copland Phrase Executed Successfully!" $GENERATED/output_resp.json
+  if [[ $RUN_CLIENT -eq 0 ]]; then
+  
+    # Now send the request, on the very last window
+    if [[ $HEADLESS -eq 0 ]]; then
+      tmux new-window -t ServerProcess -n "Client"
+
+      tmux send-keys -t ServerProcess:Client "sleep 1 && $CLIENT_AM_EXEC -t $TERM_FILE -s $FULL_ATT_SESS --comms $AM_COMMS_BIN $CLIENT_AM_ARGS" C-m
+        
+      tmux attach-session -d -t ServerProcess
     else
-      grep "Appraisal Summary: PASSED" $GENERATED/output_resp.json
+      sleep 1 
+      $CLIENT_AM_EXEC -t $TERM_FILE -s $FULL_ATT_SESS --comms $AM_COMMS_BIN $CLIENT_AM_ARGS > $GENERATED/output_resp.json
+      # We need this to be the last line so that the exit code is whether or not we found success
+      if [[ $SEND -eq 1 ]]; then
+        grep "SUCCESS: Copland Phrase Executed Successfully!" $GENERATED/output_resp.json
+      else
+        grep "Appraisal Summary: PASSED" $GENERATED/output_resp.json
+      fi
     fi
+  else 
+    tmux new-window -t ServerProcess -n "Client"
+    echo "Running in Servers-only mode"
+    tmux attach-session -d -t ServerProcess
   fi
 else
   echo "You are in $PWD, with the root set as $REPO_ROOT, but youre root should be 'am-cakeml'"
