@@ -76,8 +76,8 @@ val full_terms_map : (string * coq_Term) list =
     coq_Term * (coq_EvidenceT, string) coq_ResultT) coq_Map **)
 
 fun add_EvidenceT_terms_map terms_map g =
-  map_map coq_Eq_Class_ID_Type (fn t => (t,
-    (eval g coq_P0 (Coq_nonce_evt O) t))) terms_map
+  map_map coq_Eq_Class_ID_Type (fn t => (t, (eval g coq_P0 Coq_mt_evt t)))
+    terms_map
 
 (** val full_terms :
     coq_GlobalContext -> (string, coq_Term * (coq_EvidenceT, string)
