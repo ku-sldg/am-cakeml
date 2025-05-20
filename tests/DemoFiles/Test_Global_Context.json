@@ -200,6 +200,6 @@
     "sig": "sig_appr",
     "sig_tpm": "sig_tpm_appr",
     "uptime": "NULL", 
-    "run_command": "hashfile_appr"
+    "run_command": "goldenevidence_appr"
   }
 }
