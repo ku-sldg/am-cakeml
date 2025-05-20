@@ -58,30 +58,30 @@ val hashdir_env_var : string =
 val theorem_env_var : string =
   "THEOREM_ENV_ROOT"
 
-(** val path_micro_evidence_golden : string **)
+(** val path_micro_rawev_golden : string **)
 
-val path_micro_evidence_golden : string =
-  "/tests/DemoFiles/goldenFiles/micro_evidence_all.txt"
+val path_micro_rawev_golden : string =
+  "/tests/DemoFiles/goldenFiles/micro_raw_evidence.json"
 
 (** val path_micro_et_golden : string **)
 
 val path_micro_et_golden : string =
-  "/tests/DemoFiles/goldenFiles/micro-Evidence.json"
+  "/tests/DemoFiles/goldenFiles/micro_evidence_type.json"
 
 (** val path_micro_glob_golden : string **)
 
 val path_micro_glob_golden : string =
   "/tests/DemoFiles/Test_Global_Context.json"
 
-(** val path_theorem_evidence_golden : string **)
+(** val path_theorem_rawev_golden : string **)
 
-val path_theorem_evidence_golden : string =
-  "/tests/DemoFiles/goldenFiles/theorem_evidence_all.txt"
+val path_theorem_rawev_golden : string =
+  "/tests/DemoFiles/goldenFiles/theorem_raw_evidence.json"
 
 (** val path_theorem_et_golden : string **)
 
 val path_theorem_et_golden : string =
-  "/tests/DemoFiles/goldenFiles/theorem-Evidence.json"
+  "/tests/DemoFiles/goldenFiles/theorem_evidence_type.json"
 
 (** val path_theorem_glob_golden : string **)
 
@@ -96,7 +96,7 @@ val path_micro_dir_1 : string =
 (** val path_micro_dir_1_golden : string **)
 
 val path_micro_dir_1_golden : string =
-  path_micro_evidence_golden
+  path_micro_rawev_golden
 
 (** val path_micro_dir_2 : string **)
 
@@ -106,12 +106,12 @@ val path_micro_dir_2 : string =
 (** val path_micro_dir_2_golden : string **)
 
 val path_micro_dir_2_golden : string =
-  path_micro_evidence_golden
+  path_micro_rawev_golden
 
 (** val path_micro_composite_golden : string **)
 
 val path_micro_composite_golden : string =
-  path_micro_evidence_golden
+  path_micro_rawev_golden
 
 (** val theorems_path : string **)
 
@@ -167,7 +167,7 @@ val provision_asp_coq_test_args : coq_ASP_ARGS =
 val provision_coq_env_dir_args : coq_ASP_ARGS =
   JSON_Object (("env_var_golden", (JSON_String
     am_root_env_var)) :: (("filepath_golden", (JSON_String
-    path_theorem_evidence_golden)) :: []))
+    path_theorem_rawev_golden)) :: []))
 
 (** val provision_micro_dir_1_args : coq_ASP_ARGS **)
 
@@ -195,14 +195,14 @@ val provision_micro_hash_composite_args : coq_ASP_ARGS =
 val provision_micro_all_args : coq_ASP_ARGS =
   JSON_Object (("env_var_golden", (JSON_String
     am_root_env_var)) :: (("filepath_golden", (JSON_String
-    path_micro_evidence_golden)) :: []))
+    path_micro_rawev_golden)) :: []))
 
 (** val provision_theorem_all_args : coq_ASP_ARGS **)
 
 val provision_theorem_all_args : coq_ASP_ARGS =
   JSON_Object (("env_var_golden", (JSON_String
     am_root_env_var)) :: (("filepath_golden", (JSON_String
-    path_theorem_evidence_golden)) :: []))
+    path_theorem_rawev_golden)) :: []))
 
 (** val hash_coq_env_dir_args : coq_ASP_ARGS **)
 
@@ -210,8 +210,8 @@ val hash_coq_env_dir_args : coq_ASP_ARGS =
   JSON_Object (("env_var", (JSON_String
     theorem_env_var)) :: (("env_var_golden", (JSON_String
     am_root_env_var)) :: (("paths", (JSON_Array
-    (map (fn x => JSON_String x) (theorems_env_path :: [])))) :: (("filepath_golden",
-    (JSON_String path_theorem_evidence_golden)) :: (("filepath_et_golden",
+    (map (fn x => JSON_String x) (theorems_env_path :: [])))) :: (("filepath_rawev_golden",
+    (JSON_String path_theorem_rawev_golden)) :: (("filepath_et_golden",
     (JSON_String path_theorem_et_golden)) :: (("filepath_glob_golden",
     (JSON_String path_theorem_glob_golden)) :: (("recursive", (JSON_Boolean
     True)) :: (("omit_file_suffixes", (JSON_Array
@@ -224,7 +224,7 @@ val hash_micro_dir_1_args : coq_ASP_ARGS =
   JSON_Object (("env_var", (JSON_String
     hashdir_env_var)) :: (("env_var_golden", (JSON_String
     am_root_env_var)) :: (("paths", (JSON_Array
-    (map (fn x => JSON_String x) (path_micro_dir_1 :: [])))) :: (("filepath_golden",
+    (map (fn x => JSON_String x) (path_micro_dir_1 :: [])))) :: (("filepath_rawev_golden",
     (JSON_String path_micro_dir_1_golden)) :: (("filepath_et_golden",
     (JSON_String path_micro_et_golden)) :: (("filepath_glob_golden",
     (JSON_String path_micro_glob_golden)) :: (("recursive", (JSON_Boolean
@@ -236,7 +236,7 @@ val hash_micro_dir_2_args : coq_ASP_ARGS =
   JSON_Object (("env_var", (JSON_String
     hashdir_env_var)) :: (("env_var_golden", (JSON_String
     am_root_env_var)) :: (("paths", (JSON_Array
-    (map (fn x => JSON_String x) (path_micro_dir_2 :: [])))) :: (("filepath_golden",
+    (map (fn x => JSON_String x) (path_micro_dir_2 :: [])))) :: (("filepath_rawev_golden",
     (JSON_String path_micro_dir_2_golden)) :: (("filepath_et_golden",
     (JSON_String path_micro_et_golden)) :: (("filepath_glob_golden",
     (JSON_String path_micro_glob_golden)) :: (("recursive", (JSON_Boolean
@@ -246,7 +246,7 @@ val hash_micro_dir_2_args : coq_ASP_ARGS =
 
 val hash_micro_evidence_args : coq_ASP_ARGS =
   JSON_Object (("env_var_golden", (JSON_String
-    am_root_env_var)) :: (("filepath_golden", (JSON_String
+    am_root_env_var)) :: (("filepath_rawev_golden", (JSON_String
     path_micro_composite_golden)) :: (("filepath_et_golden", (JSON_String
     path_micro_et_golden)) :: (("filepath_glob_golden", (JSON_String
     path_micro_glob_golden)) :: []))))
@@ -258,11 +258,10 @@ val run_command_asp_coq_args : coq_ASP_ARGS =
     (JSON_Array
     (map (fn x => JSON_String x)
       (coqc_R :: (theorems_path :: (coqc_Module :: ("/Users/adampetz/Documents/Fall_2024/my_theorems/ImportantTheorem.v" :: []))))))) :: (("env_var_golden",
-    (JSON_String am_root_env_var)) :: (("filepath_golden", (JSON_String
-    "/tests/DemoFiles/goldenFiles/theorem_evidence_all.txt")) :: (("filepath_et_golden",
-    (JSON_String
-    "/tests/DemoFiles/goldenFiles/theorem-Evidence.json")) :: (("filepath_glob_golden",
-    (JSON_String "/tests/DemoFiles/Test_Global_Context.json")) :: []))))))
+    (JSON_String am_root_env_var)) :: (("filepath_rawev_golden", (JSON_String
+    path_theorem_rawev_golden)) :: (("filepath_et_golden", (JSON_String
+    path_theorem_et_golden)) :: (("filepath_glob_golden", (JSON_String
+    path_theorem_glob_golden)) :: []))))))
 
 (** val run_command_asp_coq_test_args : coq_ASP_ARGS **)
 
@@ -271,11 +270,10 @@ val run_command_asp_coq_test_args : coq_ASP_ARGS =
     (JSON_Array
     (map (fn x => JSON_String x)
       (coqc_R :: (theorems_path :: (coqc_Module :: ("/Users/adampetz/Documents/Fall_2024/my_theorems_env/ImportantTheoremTest.v" :: []))))))) :: (("env_var_golden",
-    (JSON_String am_root_env_var)) :: (("filepath_golden", (JSON_String
-    "/tests/DemoFiles/goldenFiles/theorem_evidence_all.txt")) :: (("filepath_et_golden",
-    (JSON_String
-    "/tests/DemoFiles/goldenFiles/theorem-Evidence.json")) :: (("filepath_glob_golden",
-    (JSON_String "/tests/DemoFiles/Test_Global_Context.json")) :: []))))))
+    (JSON_String am_root_env_var)) :: (("filepath_rawev_golden", (JSON_String
+    path_theorem_rawev_golden)) :: (("filepath_et_golden", (JSON_String
+    path_theorem_et_golden)) :: (("filepath_glob_golden", (JSON_String
+    path_theorem_glob_golden)) :: []))))))
 
 (** val provision_asp_coq : coq_Term **)
 
