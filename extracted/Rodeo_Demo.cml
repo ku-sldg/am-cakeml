@@ -427,9 +427,9 @@ val micro_appTerm_provision_evidence : coq_Term =
 val theorem_provision_evidence : coq_Term =
   Coq_lseq meas_theorem provision_goldenevidence_theorem_term
 
-(** val resolute_terms_map : (string * coq_Term) list **)
+(** val rodeo_terms_map : (string * coq_Term) list **)
 
-val resolute_terms_map : (string * coq_Term) list =
+val rodeo_terms_map : (string * coq_Term) list =
   ("micro", micro_appTerm) :: (("meas_micro",
     meas_micro) :: (("micro_provision",
     micro_appTerm_provision) :: (("micro_provision_dir_1",

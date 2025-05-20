@@ -231,9 +231,9 @@ val micro_appTerm_provision_dir_2 : coq_Term =
 val micro_appTerm_provision_composite : coq_Term =
   Coq_lseq meas_micro provision_micro_hash_composite
 
-(** val resolute_terms_noargs_map : (string * coq_Term) list **)
+(** val rodeo_terms_noargs_map : (string * coq_Term) list **)
 
-val resolute_terms_noargs_map : (string * coq_Term) list =
+val rodeo_terms_noargs_map : (string * coq_Term) list =
   ("micro_noargs", micro_appTerm) :: (("micro_provision_noargs",
     micro_appTerm_provision) :: (("micro_provision_dir_1_noargs",
     micro_appTerm_provision_dir_1) :: (("micro_provision_dir_2_noargs",
