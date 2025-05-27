@@ -12,7 +12,7 @@ BUILD_BIN="$BUILD_DIR/bin"
 
 # Function to display usage instructions
 usage() {
-  echo "Usage: $0 -t [cert|cert_appr|bg|parmut|filehash] (-h (headless)) [-a <path-to-asps>] -s (for only checking phrase send, otherwise checks for successful appraisal)"
+  echo "Usage: $0 -t [cert|cert_appr|bg|parmut|filehash] [-h (headless)] [-a <path-to-asp_bin>] [-c <path-to-am_comms_bin>] [-s (for only checking phrase send, otherwise checks for successful appraisal)]"
   exit 1
 }
 
@@ -54,6 +54,43 @@ if [[ -z "$TERM_TYPE" ]]; then
   exit 1
 fi
 
+
+if ! [ -z ${AM_REPOS_ROOT+x} ]; then 
+
+  ASP_BIN_REL=/asp-libs/target/release/
+  ASP_BIN_FULL=$AM_REPOS_ROOT$ASP_BIN_REL
+  echo "trying to set ASP_BIN=$ASP_BIN_FULL"
+  if ! [ -d "$ASP_BIN_FULL" ]; then
+    echo "Warning:  AM_REPOS_ROOT set, but ASP_BIN directory ($ASP_BIN_REL) not installed there... "
+  else 
+    ASP_BIN=$ASP_BIN_FULL
+  fi
+
+  AM_COMMS_BIN_REL=/rust-am-clients/target/release/rust-am-comms-client
+  AM_COMMS_BIN_FULL=$AM_REPOS_ROOT$AM_COMMS_BIN_REL
+  echo "trying to set AM_COMMS_BIN=$AM_COMMS_BIN_FULL"
+  if ! [ -f "$AM_COMMS_BIN_FULL" ]; then
+    echo "Warning:  AM_REPOS_ROOT set, but AM_COMMS_BIN executable file ($AM_COMMS_BIN_REL) not installed there... "
+  else 
+    AM_COMMS_BIN=$AM_COMMS_BIN_FULL
+  fi
+
+fi
+
+if [ -z ${ASP_BIN+x} ]; then
+  echo "Variable 'ASP_BIN' is not set" 
+  echo "Run: 'export ASP_BIN=<path-to-asp_binaries>' or pass via local arg:"
+  usage
+  exit 1
+fi
+
+if [ -z ${AM_COMMS_BIN+x} ]; then
+  echo "Variable 'AM_COMMS_BIN' is not set" 
+  echo "Run: 'export AM_COMMS_BIN=<path-to-am_comms_binary>' or pass via local arg:"
+  usage
+  exit 1
+fi
+
 CLIENT_AM_ARGS=""
 if [[ $SEND -eq 1 ]]; then
   CLIENT_AM_ARGS="--send"
@@ -88,20 +125,6 @@ EV_GEN=$BUILD_BIN/evidence_to_json
 MAN_GEN=$BUILD_BIN/manifest_generator
 AM_EXEC=$BUILD_BIN/attestation_manager
 CLIENT_AM_EXEC=$BUILD_BIN/client_am
-
-if [ -z ${ASP_BIN+x} ]; then
-  echo "Variable 'ASP_BIN' is not set" 
-  echo "Run: 'export ASP_BIN=<path-to-asps>' or"
-  usage
-  exit 1
-fi
-
-if [ -z ${AM_COMMS_BIN+x} ]; then
-  echo "Variable 'AM_COMMS_BIN' is not set" 
-  echo "Run: 'export AM_COMMS_BIN=<path-to-am-comms-binary>' or"
-  usage
-  exit 1
-fi
 
 # General Path Vars
 DEMO_FILES=$TESTS_DIR/DemoFiles
