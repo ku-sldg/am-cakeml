@@ -16,6 +16,13 @@ ci_test:
 	./CI/Test.sh -t parmut -h -s
 	./CI/Test.sh -t large_output -h -s
 
+
+maestro_attest:
+	./CI/Test.sh -t attest -s
+
+maestro_attest_appr:
+	./CI/Test.sh -t attest
+
 demo_micro:
 	./Demo.sh -t micro
 
@@ -31,5 +38,5 @@ demo_theorem:
 demo_theorem_noclient:
 	./Demo.sh -t run_coq_all_appr -r
 
-demo_theorem_provision:
-	./Demo.sh -t theorem_provision_evidence
+demo_theorem_provision_noclient:
+	./Demo.sh -t theorem_provision_evidence -r

@@ -103,6 +103,7 @@ get_files(copland_am_src
     extracted/Manifest_Generator.cml
     extracted/Manifest_Generator_Union.cml
     extracted/AM_Json_Interfaces.cml
+    extracted/Maestro_Summit_Demo.cml
     extracted/Flexible_Mechanisms.cml
     extracted/Client_AM.cml
     extracted/Server_AM.cml

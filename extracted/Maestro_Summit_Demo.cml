@@ -1,0 +1,9 @@
+(** val attest_term : coq_Term **)
+
+val attest_term : coq_Term =
+  Coq_asp (ASPC (Coq_asp_paramsC attest (JSON_Object []) coq_P0 sys_targ))
+
+(** val maestro_demo_terms_map : (string * coq_Term) list **)
+
+val maestro_demo_terms_map : (string * coq_Term) list =
+  ("attest", attest_term) :: []
