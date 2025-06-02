@@ -3,7 +3,30 @@
 val attest_term : coq_Term =
   Coq_asp (ASPC (Coq_asp_paramsC attest (JSON_Object []) coq_P0 sys_targ))
 
+(** val attest_term_P1 : coq_Term **)
+
+val attest_term_P1 : coq_Term =
+  Coq_asp (ASPC (Coq_asp_paramsC attest (JSON_Object []) coq_P1 sys_targ))
+
+(** val attest_term_P2 : coq_Term **)
+
+val attest_term_P2 : coq_Term =
+  Coq_asp (ASPC (Coq_asp_paramsC attest (JSON_Object []) coq_P2 sys_targ))
+
+(** val attest_term_remote : coq_Term **)
+
+val attest_term_remote : coq_Term =
+  Coq_att coq_P1 attest_term_P1
+
+(** val attest_term_remote_multinode : coq_Term **)
+
+val attest_term_remote_multinode : coq_Term =
+  Coq_bseq (ALL, ALL) (Coq_att coq_P1 attest_term_P1) (Coq_att coq_P2
+    attest_term_P2)
+
 (** val maestro_demo_terms_map : (string * coq_Term) list **)
 
 val maestro_demo_terms_map : (string * coq_Term) list =
-  ("attest", attest_term) :: []
+  ("attest", attest_term) :: (("attest_remote",
+    attest_term_remote) :: (("attest_remote_multinode",
+    attest_term_remote_multinode) :: []))
