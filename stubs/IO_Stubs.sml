@@ -40,11 +40,11 @@ fun append_aspid_to_errstr (errStr:string) (i:coq_ASP_ID) = String.concat [errSt
     coq_ResultT **)
 fun make_JSON_FS_Location_Request (path : string) (* (conc_asp_loc : coq_FS_Location) *) (js : coq_JSON) = 
   (let val loc = path(* aspBin ^ "/" ^ (conc_asp_loc) *)
-      val _ = print ("Sending a request to the FS: " ^ loc ^ "\n")
+      val _ = TextIO.print_err ("Sending a request to the FS: " ^ loc ^ "\n")
       val req_str = loc ^ " \"" ^ (SysFFI.shellEscapeString (coq_JSON_to_string js)) ^ "\""
-      val _ = print ("Request string: " ^ req_str ^ "\n")
+      val _ = TextIO.print_err ("Request string: " ^ req_str ^ "\n")
       val resp = SysFFI.c_popen_string req_str
-      val _ = print ("Got back a response from the FS: \n" ^ resp ^ "\n")
+      val _ = TextIO.print_err ("Got back a response from the FS: \n" ^ resp ^ "\n")
   in
     string_to_JSON resp
   end) : (coq_JSON, string) coq_ResultT

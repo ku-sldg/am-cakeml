@@ -146,9 +146,10 @@ fun handle_AM_request_JSON conf js _ =
                       to_JSON (Coq_mkEvSliceResp success_bool v) end end) end end end)
               | False => coq_ErrorResponseJSON err_str_01))))
 
-(** val handle_FS_request_JSON : coq_JSON -> coq_JSON **)
+(** val handle_FS_request_JSON :
+    coq_AM_Manager_Config -> coq_JSON -> coq_JSON **)
 
-fun handle_FS_request_JSON js =
+fun handle_FS_request_JSON conf js =
   case coq_JSON_get_string coq_STR_ACTION js of
     Coq_errC msg => coq_ErrorResponseJSON msg
   | Coq_resultC req_type =>
@@ -185,4 +186,55 @@ fun handle_FS_request_JSON js =
                coq_Jsonifiable_EvSliceResponse coq_Jsonifiable_RawEv
              in
              to_JSON (Coq_mkEvSliceResp success_bool v) end end) end end end)
-     | False => coq_ErrorResponseJSON err_str_01)
+     | False =>
+       (case (op=) req_type coq_STR_RUN of
+          True =>
+          (case let val Build_Jsonifiable _ from_JSON =
+                  coq_Jsonifiable_ProtocolRunRequest
+                    (coq_Jsonifiable_Term
+                      (coq_Jsonifiable_ASP
+                        (coq_Jsonifiable_ASP_Params coq_Jsonifiable_ASP_ARGS))
+                      coq_Jsonifiable_Split)
+                    (coq_Jsonifiable_Evidence coq_Jsonifiable_RawEv
+                      (coq_Jsonifiable_EvidenceT coq_Jsonifiable_ASP_ARGS
+                        coq_Jsonifiable_nat
+                        (coq_Jsonifiable_ASP_Params coq_Jsonifiable_ASP_ARGS)))
+                    (coq_Jsonifiable_Attestation_Session
+                      (jsonifiable_map_serial_serial
+                        coq_Stringifiable_ID_Type coq_Eq_Class_ID_Type
+                        coq_Stringifiable_UUUID)
+                      (jsonifiable_map_serial_serial
+                        coq_Stringifiable_ID_Type coq_Eq_Class_ID_Type
+                        coq_Stringifiable_PublicKey)
+                      (coq_Jsonifiable_GlobalContext
+                        coq_Stringifiable_ID_Type
+                        (jsonifiable_map_serial_serial
+                          coq_Stringifiable_ID_Type coq_Eq_Class_ID_Type
+                          coq_Stringifiable_ID_Type)
+                        (jsonifiable_map_serial_json
+                          coq_Stringifiable_ID_Type coq_Eq_Class_ID_Type
+                          (coq_Jsonifiable_EvSig
+                            (coq_Jsonifiable_EvOutSig coq_Jsonifiable_nat)
+                            coq_Stringifiable_FWD))))
+                in
+                from_JSON js end of
+             Coq_errC msg => coq_ErrorResponseJSON msg
+           | Coq_resultC r =>
+             let val Coq_mkPRReq att_sess _ _ ev cop_term = r in
+             let val sc = session_config_compiler conf att_sess in
+             let val init_st = Coq_mk_st [] O in
+             let val (p, _) = build_cvm ev cop_term init_st sc in
+             let val (cvm_resp, _) = p in
+             (case cvm_resp of
+                Coq_errC e =>
+                coq_ErrorResponseJSON (coq_CVM_Error_to_string e)
+              | Coq_resultC res_ev =>
+                let val Build_Jsonifiable to_JSON _ =
+                  coq_Jsonifiable_ProtocolRunResponse
+                    (coq_Jsonifiable_Evidence coq_Jsonifiable_RawEv
+                      (coq_Jsonifiable_EvidenceT coq_Jsonifiable_ASP_ARGS
+                        coq_Jsonifiable_nat
+                        (coq_Jsonifiable_ASP_Params coq_Jsonifiable_ASP_ARGS)))
+                in
+                to_JSON (Coq_mkPRResp True res_ev) end) end end end end end)
+        | False => coq_ErrorResponseJSON err_str_01))

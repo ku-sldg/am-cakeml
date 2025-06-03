@@ -104,7 +104,7 @@ structure AM_CLI_Utils = struct
   *)
   fun retrieve_Server_AM_CLI_args _ =
     (let val name = CommandLine.name ()
-        val usage = ("Usage: " ^ name ^ "-m <ManifestFile>.json -b <asp_bin_location> --comms <comms_bin_location> -u <ip:port>\n\ne.g.\t" ^ name ^ " -m formMan.json -b /opt/asps -u 127.0.0.1:5000\n\n")
+        val usage = ("Usage: " ^ name ^ " -m <ManifestFile>.json -b <asp_bin_location> --comms <comms_bin_location> -u <ip:port>\n\ne.g.\t" ^ name ^ " -m formMan.json -b /opt/asps -u 127.0.0.1:5000\n\n")
         val argList = CommandLine.arguments ()
         val manInd        = ListExtra.find_index argList "-m"
         val aspBinInd     = ListExtra.find_index argList "-b"
@@ -131,4 +131,46 @@ structure AM_CLI_Utils = struct
         end
       )
     end) : server_am_args_t
+
+
+  fun retrieve_Server_AM_CLI_args_easy _ =
+  (*
+    (let val name = CommandLine.name ()
+        val usage = ("Usage: " ^ name ^ "-m <ManifestFile>.json -b <asp_bin_location> --comms <comms_bin_location> -u <ip:port>\n\ne.g.\t" ^ name ^ " -m formMan.json -b /opt/asps -u 127.0.0.1:5000\n\n")
+        val argList = CommandLine.arguments ()
+        val manInd        = ListExtra.find_index argList "-m"
+        val aspBinInd     = ListExtra.find_index argList "-b"
+        val uuidInd       = ListExtra.find_index argList "-u"
+        val commsBinInd   = ListExtra.find_index argList "--comms"
+        val manIndBool        = argIndPresent manInd 
+        val aspBinIndBool     = argIndPresent aspBinInd
+        val uuidIndBool       = argIndPresent uuidInd
+        val commsBinIndBool   = argIndPresent commsBinInd
+    in 
+    (*
+      if ((manIndBool = False) orelse (aspBinIndBool = False) orelse (uuidIndBool = False) orelse (commsBinIndBool = False))
+      then raise (Exception ("Invalid Arguments\n" ^ usage))
+      else (
+      *)
+
+
+      (*
+        let val manFileName   = List.nth argList (manInd + 1)
+            val aspBinLoc     = List.nth argList (aspBinInd + 1)
+            val commsBinLoc   = List.nth argList (commsBinInd + 1)
+            val uuidLoc       = List.nth argList (uuidInd + 1)
+        in
+          (case (parse_manifest_from_file manFileName) of
+            Coq_errC e => raise (Exception ("Could not parse JSON Manifest file: " ^ e ^ "\n"))
+          | Coq_resultC manifest =>
+              (Coq_mkAM_Man_Conf manifest aspBinLoc commsBinLoc uuidLoc) : server_am_args_t
+          )
+        end
+
+        *)
+
+  *)
+
+      (Coq_mkAM_Man_Conf empty_Manifest "" "" "") : server_am_args_t
+    (* end) *) (* ) *) (* : server_am_args_t *)
 end

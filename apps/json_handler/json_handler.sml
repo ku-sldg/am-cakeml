@@ -25,8 +25,9 @@ fun respondToMsg ammconf client nonce =
 
 (* () -> () *)
 fun main () =
-  let val inString = TextIO.inputAll TextIO.stdIn
-      val newString = (handle_FS_request inString) in
+  let val ammconf = AM_CLI_Utils.retrieve_Server_AM_CLI_args_easy ()
+      val inString = TextIO.inputAll TextIO.stdIn
+      val newString = (handle_FS_request ammconf inString) in
     TextIOExtra.printLn newString
   end
   handle Exception e => TextIO.print_err e 

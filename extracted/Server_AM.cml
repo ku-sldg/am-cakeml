@@ -1,9 +1,9 @@
-(** val handle_FS_request : string -> string **)
+(** val handle_FS_request : coq_AM_Manager_Config -> string -> string **)
 
-fun handle_FS_request s =
+fun handle_FS_request conf s =
   case string_to_JSON s of
     Coq_errC msg => coq_JSON_to_string (coq_ErrorResponseJSON msg)
-  | Coq_resultC js => coq_JSON_to_string (handle_FS_request_JSON js)
+  | Coq_resultC js => coq_JSON_to_string (handle_FS_request_JSON conf js)
 
 (** val handle_AM_request :
     coq_AM_Manager_Config -> string -> coq_BS -> string **)
