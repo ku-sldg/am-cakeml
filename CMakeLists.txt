@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.10.2)
 set(CMAKE_USER_MAKE_RULES_OVERRIDE "DefaultConfig.cmake")
 
+# Find ZeroMQ
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(ZMQ REQUIRED libzmq)
+
 
 set(CMAKE_OSX_ARCHITECTURES "x86_64" CACHE STRING "Used for MacOS to configure the architecture")
 project(CakemlAM C ASM)
@@ -104,7 +108,7 @@ get_files(copland_am_src
 )
 
 get_files (posix_src_cake 
-    system/posix/sockets/SocketFFI.sml
+    system/posix/sockets/ZMQFFI.sml
     system/posix/time/TimeFFI.sml 
     system/posix/sys/SysFFI.sml
 )
@@ -112,7 +116,7 @@ get_files (posix_src_cake
 get_files(posix_src_c
     system/shared_ffi_fns.c
     ${BASIS_FILE}
-    system/posix/sockets/socket_ffi.c
+    system/posix/sockets/zmq_ffi.c
     system/posix/time/time_ffi.c
     system/posix/sys/sys_ffi.c
 )
@@ -165,7 +169,9 @@ function(build_posix_am name)
     if(${STATIC_LINKING})
         set(link_flags "-static-libgcc -static")
     endif()
-    target_link_libraries(${name} "${name}.cake" ${link_flags})
+    target_link_libraries(${name} "${name}.cake" ${ZMQ_LIBRARIES} ${link_flags})
+    target_include_directories(${name} PRIVATE ${ZMQ_INCLUDE_DIRS})
+    target_compile_options(${name} PRIVATE ${ZMQ_CFLAGS_OTHER})
 endfunction()
 
 file(GLOB appdirs apps/*)
