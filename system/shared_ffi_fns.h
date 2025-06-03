@@ -23,4 +23,6 @@ void int_to_byte8(int i, unsigned char *b);
 
 int byte8_to_int(unsigned char *b);
 
+long long byte8_to_longlong(unsigned char *b);
+
 #endif

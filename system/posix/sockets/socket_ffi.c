@@ -35,20 +35,41 @@ int get_message_size(int sock, size_t *size)
   DEBUG_PRINTF("In function get_message_size\n");
   DEBUG_PRINTF("Given arguments: sock=%d\n", sock);
   uint32_t net_size;
-  ssize_t bytes_read = read(sock, &net_size, sizeof(net_size));
-  if (bytes_read == 0)
+  
+  // Handle partial reads for the 4-byte size header
+  size_t total_read = 0;
+  char *buffer = (char *)&net_size;
+  
+  while (total_read < sizeof(net_size))
   {
-    DEBUG_PRINTF("Connection closed by peer.\n");
-    return -1; // Connection closed
-  }
-  else if (bytes_read != sizeof(net_size))
-  {
-    DEBUG_PRINTF("Failed to read message size: %s\n", strerror(errno));
-    return -1; // Read error
+    ssize_t bytes_read = read(sock, buffer + total_read, sizeof(net_size) - total_read);
+    if (bytes_read == 0)
+    {
+      DEBUG_PRINTF("Connection closed by peer.\n");
+      return -1; // Connection closed
+    }
+    else if (bytes_read < 0)
+    {
+      if (errno == EINTR)
+        continue; // Interrupted by signal, retry
+      DEBUG_PRINTF("Failed to read message size: %s\n", strerror(errno));
+      return -1;
+    }
+    total_read += bytes_read;
   }
 
-  *size = ntohl(net_size); // Convert from network byte order
-  return 0;                // Success
+  uint32_t host_size = ntohl(net_size); // Convert from network byte order
+  
+  // Validate message size to prevent excessive memory allocation
+  #define MAX_MESSAGE_SIZE (1024 * 1024 * 10) // 10MB limit
+  if (host_size > MAX_MESSAGE_SIZE)
+  {
+    DEBUG_PRINTF("Message size too large: %u bytes (max: %d)\n", host_size, MAX_MESSAGE_SIZE);
+    return -1;
+  }
+  
+  *size = host_size;
+  return 0; // Success
 }
 
 // Function to establish a listening socket on a given IP and port
@@ -171,12 +192,27 @@ int socket_read(int sock, void *out_data, size_t length)
 {
   DEBUG_PRINTF("In function socket_read\n");
   DEBUG_PRINTF("Given arguments: sock=%d, length=%zu\n", sock, length);
-  // Read the actual message
-  ssize_t bytes_read = read(sock, out_data, length);
-  if (bytes_read != (ssize_t)length)
+  
+  size_t total_read = 0;
+  char *buffer = (char *)out_data;
+  
+  // Handle partial reads by looping until we get all data
+  while (total_read < length)
   {
-    DEBUG_PRINTF("Failed to read complete message: %s\n", strerror(errno));
-    return -1;
+    ssize_t bytes_read = read(sock, buffer + total_read, length - total_read);
+    if (bytes_read == 0)
+    {
+      DEBUG_PRINTF("Connection closed by peer during read\n");
+      return -1; // Connection closed
+    }
+    else if (bytes_read < 0)
+    {
+      if (errno == EINTR)
+        continue; // Interrupted by signal, retry
+      DEBUG_PRINTF("Failed to read message: %s\n", strerror(errno));
+      return -1;
+    }
+    total_read += bytes_read;
   }
 
   return 0; // Success
@@ -257,13 +293,28 @@ a: flag [0], sockfd [1:5] */
 void fficonnect(uint8_t *c, const long clen, uint8_t *a, const long alen)
 {
   DEBUG_PRINTF("In function fficonnect\n");
-  assert(clen >= 2); // Assumes there are at least the null byte delimiter and terminator
+  assert(clen >= 6); // At least port (4 bytes) + 2 bytes for host
   assert(alen == 5);
 
   // Parse arguments
   int port = qword_to_int(c);
-  // Take slice from c[4 : clen]
-  char *host = (char *)c + 4;
+  
+  // Take slice from c[4 : clen] and ensure null termination
+  int host_len = clen - 4;
+  char *host_data = (char *)c + 4;
+  
+  // Create a null-terminated copy of the host string
+  char host[256]; // Reasonable limit for hostname
+  if (host_len >= sizeof(host))
+  {
+    DEBUG_PRINTF("Host name too long: %d bytes\n", host_len);
+    a[0] = FFI_FAILURE;
+    return;
+  }
+  
+  memcpy(host, host_data, host_len);
+  host[host_len] = '\0'; // Ensure null termination
+  
   DEBUG_PRINTF("Connecting to %s:%d\n", host, port);
 
   // Do connection
@@ -315,12 +366,22 @@ void ffisocket_close(uint8_t *c, const long clen, uint8_t *a, const long alen)
   int sockfd = qword_to_int(c);
   DEBUG_PRINTF("Closing socket %d\n", sockfd);
   assert(alen == 1);
+  
+  // Shutdown the socket first
   if (shutdown(sockfd, SHUT_RDWR) < 0)
   {
     DEBUG_PRINTF("Failed to shutdown socket: %s\n", strerror(errno));
+    // Continue to close even if shutdown fails
+  }
+  
+  // Close the socket file descriptor
+  if (close(sockfd) < 0)
+  {
+    DEBUG_PRINTF("Failed to close socket: %s\n", strerror(errno));
     a[0] = FFI_FAILURE;
     return;
   }
+  
   a[0] = FFI_SUCCESS;
 }
 
@@ -345,16 +406,16 @@ void ffisocket_write(uint8_t *c, const long clen, uint8_t *a, const long alen)
   assert(alen == 5);
 
   // Write to socket
-  ssize_t bytes_written = socket_write(sockfd, buffer, n);
-  if (bytes_written < 0)
+  int result = socket_write(sockfd, buffer, n);
+  if (result < 0)
   {
     a[0] = FFI_FAILURE;
     return;
   }
 
-  // return bytes_written
+  // socket_write returns 0 on success, so return the actual bytes written (n + 4 for length prefix)
   a[0] = FFI_SUCCESS;
-  int_to_qword(bytes_written, a + 1);
+  int_to_qword(n + 4, a + 1); // Return total bytes written (message + 4-byte length prefix)
 }
 
 /**
