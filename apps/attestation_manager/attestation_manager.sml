@@ -9,13 +9,13 @@ When things go wrong, handle_AM_request returns a raw error message string.
   In the future, we may want to wrap said error messages in JSON as well to make 
   it easier on the client. *)
 fun respondToMsg ammconf socket nonce = 
-  let val inString  = ZMQ.recv socket 
+  let val inString  = SocketFFI.recv socket 
       val _ = print ("\n\nReceived request string: \n" ^ inString ^ "\n")
       val time = timestamp ()
       val _ = TextIOExtra.printLn ("Time: " ^ Int.toString time)
       val outString = handle_AM_request ammconf inString nonce
       val _ = print ("\n\nSending response string: \n" ^ outString) 
-      val num_sent = ZMQ.send socket outString
+      val num_sent = SocketFFI.send socket outString
       val _ = print ("Response sent")
   in 
     ()
@@ -32,22 +32,22 @@ fun handleIncoming (socket_and_ammconf) =
     in 
       ()
     end
-    handle ZMQ.ZMQError s     => TextIOExtra.printLn_err ("ZMQ failure: " ^ s)
+    handle SocketFFI.Exception s     => TextIOExtra.printLn_err ("Socket failure: " ^ s)
 
 
 (* coq_AM_Config -> unit *)
 fun startServer ammconf =
     let val (Coq_mkAM_Man_Conf man aspBin uuidStr) = ammconf
         val (ip, port) = decodeUUID uuidStr
-        val _ = TextIOExtra.printLn ("Starting up ZeroMQ Server")
+        val _ = TextIOExtra.printLn ("Starting up Server")
         val _ = TextIOExtra.printLn ("On port: " ^ (Int.toString port))
-        val _ = ZMQ.init ()
-        val socket = ZMQ.listen port
-        val _ = TextIOExtra.printLn ("Server listening on ZeroMQ REP socket")
+        val _ = SocketFFI.init ()
+        val socket = SocketFFI.listen port
+        val _ = TextIOExtra.printLn ("Server listening on socket")
     in 
      loop handleIncoming (socket, ammconf)
     end
-    handle ZMQ.ZMQError s => TextIO.print_err ("ZMQ failure on server startup: " ^ s ^ "\n")
+    handle SocketFFI.Exception s => TextIO.print_err ("Socket failure on server startup: " ^ s ^ "\n")
          | Exception s => TextIO.print_err ("EXCEPTION: " ^ s ^ "\n")
          | Json.Exn s1 s2 => TextIO.print_err ("Json Exception: " ^ s1 ^ "\n" ^ s2 ^ "\n")
          | Result.Exn => TextIO.print_err ("Result Exn:\n")

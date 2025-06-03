@@ -1,8 +1,7 @@
 (* ZeroMQ FFI interface for CakeML *)
-(* Much simpler and more robust than raw sockets *)
 
-structure ZMQ = struct
-  exception ZMQError string
+structure SocketFFI = struct
+  exception Exception string
 
   local
     fun ffi_zmq_init x y = #(zmq_init) x y
@@ -25,7 +24,7 @@ structure ZMQ = struct
       if not (!zmq_initialized) then
         (case FFI.callOpt ffi_zmq_init 0 BString.empty of
            Some _ => zmq_initialized := True
-         | None => raise (ZMQError "Failed to initialize ZeroMQ"))
+         | None => raise (Exception "Failed to initialize ZeroMQ"))
       else ()
   in
     type socket = socket
@@ -40,7 +39,7 @@ structure ZMQ = struct
       in 
         case FFI.callOpt ffi_zmq_listen 4 payload of
           Some bsv => Socket (BString.qword_to_int bsv)
-        | None => raise (ZMQError "Failed to create listening socket")
+        | None => raise (Exception "Failed to create listening socket")
       end
 
     (* Connect to a server *)
@@ -50,7 +49,7 @@ structure ZMQ = struct
       in 
         case FFI.callOpt ffi_zmq_connect 4 payload of
           Some bsv => Socket (BString.qword_to_int bsv)
-        | None => raise (ZMQError ("Failed to connect to " ^ host ^ ":" ^ Int.toString port))
+        | None => raise (Exception ("Failed to connect to " ^ host ^ ":" ^ Int.toString port))
       end
 
     (* Send a message - much simpler than raw sockets! *)
@@ -60,7 +59,7 @@ structure ZMQ = struct
       in
         case FFI.callOpt ffi_zmq_send 0 payload of
           Some _ => ()
-        | None => raise (ZMQError "Failed to send message")
+        | None => raise (Exception "Failed to send message")
       end
 
     (* Receive a message - ZeroMQ handles message boundaries automatically *)
@@ -75,7 +74,7 @@ structure ZMQ = struct
                 val msg_data = BString.substring bsv 4 msg_len
             in BString.toString msg_data
             end
-        | None => raise (ZMQError "Failed to receive message")
+        | None => raise (Exception "Failed to receive message")
       end
 
     (* Close socket *)
@@ -85,14 +84,14 @@ structure ZMQ = struct
       in
         case FFI.callOpt ffi_zmq_close 0 payload of
           Some _ => ()
-        | None => raise (ZMQError "Failed to close socket")
+        | None => raise (Exception "Failed to close socket")
       end
 
     (* Cleanup ZeroMQ - call at program exit *)
     fun cleanup () = 
       case FFI.callOpt ffi_zmq_cleanup 0 BString.empty of
         Some _ => ()
-      | None => raise (ZMQError "Failed to cleanup ZeroMQ")
+      | None => raise (Exception "Failed to cleanup ZeroMQ")
 
   end
 

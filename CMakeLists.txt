@@ -108,7 +108,7 @@ get_files(copland_am_src
 )
 
 get_files (posix_src_cake 
-    system/posix/sockets/ZMQFFI.sml
+    system/posix/sockets/SocketFFI.sml
     system/posix/time/TimeFFI.sml 
     system/posix/sys/SysFFI.sml
 )
@@ -116,7 +116,7 @@ get_files (posix_src_cake
 get_files(posix_src_c
     system/shared_ffi_fns.c
     ${BASIS_FILE}
-    system/posix/sockets/zmq_ffi.c
+    system/posix/sockets/socket_ffi.c
     system/posix/time/time_ffi.c
     system/posix/sys/sys_ffi.c
 )

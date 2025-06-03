@@ -1,5 +1,4 @@
 // ZeroMQ-based FFI for CakeML attestation manager
-// Much more robust than manual socket handling
 
 #include <zmq.h>
 #include <assert.h>
