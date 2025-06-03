@@ -61,8 +61,8 @@ structure FFI = struct
               val buffer_len = BString.qword_to_int (BString.substring out output_LEN_START output_LEN_LEN)
               val buffer_id_slice = BString.substring out buffer_id_START buffer_id_LEN
               val buffer_id = BString.qword_to_int buffer_id_slice
-              val _ = print ("Buffer ID: " ^ Int.toString buffer_id)
-              val _ = print ("Buffer Length: " ^ Int.toString buffer_len)
+              val _ = print ("Buffer ID: " ^ Int.toString buffer_id ^ "\n")
+              val _ = print ("Buffer Length: " ^ Int.toString buffer_len ^ "\n")
             in
               (* Now call the buffer FFI function to get the actual data *)
               call ffi_get_buffer_by_id buffer_len buffer_id_slice

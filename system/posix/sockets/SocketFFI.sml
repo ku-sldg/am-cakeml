@@ -66,15 +66,11 @@ structure SocketFFI = struct
     fun recv socket = 
       let val socket_id = getSocketId socket
           val payload = BString.int_to_qword socket_id
-          val max_size = 65536 (* 64KB max message *)
       in
-        case FFI.callOpt ffi_zmq_recv max_size payload of
-          Some bsv => 
-            let val msg_len = BString.qword_to_int (BString.substring bsv 0 4)
-                val msg_data = BString.substring bsv 4 msg_len
-            in BString.toString msg_data
-            end
-        | None => raise (Exception "Failed to receive message")
+        let val result = FFI.buffered_call ffi_zmq_recv payload
+        in BString.toString result
+        end
+        handle _ => raise (Exception "Failed to receive message")
       end
 
     (* Close socket *)

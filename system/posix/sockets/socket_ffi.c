@@ -4,7 +4,9 @@
 #include <assert.h>
 #include <string.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include "../../shared_ffi_fns.h"
+#include "../../buffer_manager.h"
 
 #define FFI_SUCCESS 0
 #define FFI_FAILURE 1
@@ -151,7 +153,7 @@ void ffizmq_connect(uint8_t *c, const long clen, uint8_t *a, const long alen)
   DEBUG_PRINTF("[ZMQ_CONNECT] Client connection completed successfully\n");
 }
 
-// Send a message (no need for length prefixes!)
+// Send a message using zmq_msg_send
 void ffizmq_send(uint8_t *c, const long clen, uint8_t *a, const long alen)
 {
   DEBUG_PRINTF("[ZMQ_SEND] Starting message send\n");
@@ -175,26 +177,46 @@ void ffizmq_send(uint8_t *c, const long clen, uint8_t *a, const long alen)
   DEBUG_PRINTF("[ZMQ_SEND] Message data (first 50 chars): %.50s%s\n",
                msg_data, msg_len > 50 ? "..." : "");
 
-  int sent_bytes = zmq_send(socket, msg_data, msg_len, 0);
-  if (sent_bytes == msg_len)
+  // Initialize ZMQ message
+  zmq_msg_t message;
+  if (zmq_msg_init_size(&message, msg_len) != 0)
   {
-    DEBUG_PRINTF("[ZMQ_SEND] Successfully sent %d bytes\n", sent_bytes);
+    DEBUG_PRINTF("[ZMQ_SEND] ERROR: Failed to initialize message, zmq_errno: %d\n", zmq_errno());
+    a[0] = FFI_FAILURE;
+    return;
+  }
+
+  // Copy data into the message
+  memcpy(zmq_msg_data(&message), msg_data, msg_len);
+
+  // Send the message
+  int result = zmq_msg_send(&message, socket, 0);
+  if (result == msg_len)
+  {
+    DEBUG_PRINTF("[ZMQ_SEND] Successfully sent %d bytes\n", result);
     a[0] = FFI_SUCCESS;
   }
   else
   {
     DEBUG_PRINTF("[ZMQ_SEND] ERROR: Send failed, sent %d bytes (expected %d), zmq_errno: %d\n",
-                 sent_bytes, msg_len, zmq_errno());
+                 result, msg_len, zmq_errno());
     a[0] = FFI_FAILURE;
   }
+
+  // Clean up the message
+  zmq_msg_close(&message);
 }
 
-// Receive a message (ZeroMQ handles message boundaries automatically)
+// Receive a message using zmq_msg_recv
 void ffizmq_recv(uint8_t *c, const long clen, uint8_t *a, const long alen)
 {
   DEBUG_PRINTF("[ZMQ_RECV] Starting message receive\n");
   assert(clen >= 4);
-  assert(alen >= 5);
+  assert(alen >= 9); // 1 byte status + 4 bytes length + 4 bytes buffer_id
+
+  const uint8_t RESPONSE_CODE_START = 0;
+  const uint8_t OUTPUT_LENGTH_START = 1;
+  const uint8_t OUTPUT_BUFFER_ID_START = 5;
 
   int socket_id = qword_to_int(c);
   DEBUG_PRINTF("[ZMQ_RECV] Socket ID: %d\n", socket_id);
@@ -203,33 +225,73 @@ void ffizmq_recv(uint8_t *c, const long clen, uint8_t *a, const long alen)
   if (!socket)
   {
     DEBUG_PRINTF("[ZMQ_RECV] ERROR: Invalid socket ID %d\n", socket_id);
-    a[0] = FFI_FAILURE;
+    a[RESPONSE_CODE_START] = FFI_FAILURE;
     return;
   }
 
-  // ZeroMQ handles message boundaries - no need for get_message_size!
-  int max_msg_size = alen - 5;
-  DEBUG_PRINTF("[ZMQ_RECV] Max message size: %d\n", max_msg_size);
-
-  int nbytes = zmq_recv(socket, a + 5, max_msg_size, 0);
-
-  if (nbytes >= 0)
+  // Initialize ZMQ message
+  zmq_msg_t message;
+  if (zmq_msg_init(&message) != 0)
   {
-    DEBUG_PRINTF("[ZMQ_RECV] Successfully received %d bytes\n", nbytes);
-    if (nbytes > 0)
-    {
-      DEBUG_PRINTF("[ZMQ_RECV] Message data (first 50 chars): %.50s%s\n",
-                   (char *)(a + 5), nbytes > 50 ? "..." : "");
-    }
-    a[0] = FFI_SUCCESS;
-    int_to_qword(nbytes, a + 1);
+    DEBUG_PRINTF("[ZMQ_RECV] ERROR: Failed to initialize message, zmq_errno: %d\n", zmq_errno());
+    a[RESPONSE_CODE_START] = FFI_FAILURE;
+    return;
   }
-  else
+
+  // Receive the message
+  int nbytes = zmq_msg_recv(&message, socket, 0);
+  if (nbytes < 0)
   {
     DEBUG_PRINTF("[ZMQ_RECV] ERROR: Receive failed with %d bytes, zmq_errno: %d\n",
                  nbytes, zmq_errno());
-    a[0] = FFI_FAILURE;
+    zmq_msg_close(&message);
+    a[RESPONSE_CODE_START] = FFI_FAILURE;
+    return;
   }
+
+  // Get message size and data
+  size_t msg_size = zmq_msg_size(&message);
+  void *msg_data = zmq_msg_data(&message);
+
+  DEBUG_PRINTF("[ZMQ_RECV] Successfully received %zu bytes\n", msg_size);
+  if (msg_size > 0)
+  {
+    DEBUG_PRINTF("[ZMQ_RECV] Message data (first 100 chars): %.100s%s\n",
+                 (char *)msg_data, msg_size > 100 ? "..." : "");
+  }
+
+  // Allocate a buffer for the message data
+  char *msg_buffer = malloc(msg_size);
+  if (!msg_buffer)
+  {
+    DEBUG_PRINTF("[ZMQ_RECV] ERROR: Failed to allocate message buffer\n");
+    zmq_msg_close(&message);
+    a[RESPONSE_CODE_START] = FFI_FAILURE;
+    return;
+  }
+
+  // Copy the message data
+  memcpy(msg_buffer, msg_data, msg_size);
+
+  // Clean up the ZMQ message
+  zmq_msg_close(&message);
+
+  // Store the message in the buffer manager
+  int buffer_id = set_new_buffer(msg_size, msg_buffer);
+  if (buffer_id < 0)
+  {
+    DEBUG_PRINTF("[ZMQ_RECV] ERROR: Failed to store message in buffer manager\n");
+    free(msg_buffer);
+    a[RESPONSE_CODE_START] = FFI_FAILURE;
+    return;
+  }
+
+  DEBUG_PRINTF("[ZMQ_RECV] Message stored in buffer ID: %d\n", buffer_id);
+
+  // Set response data
+  a[RESPONSE_CODE_START] = FFI_SUCCESS;
+  int_to_qword(msg_size, a + OUTPUT_LENGTH_START);
+  int_to_qword(buffer_id, a + OUTPUT_BUFFER_ID_START);
 }
 
 // Close socket
