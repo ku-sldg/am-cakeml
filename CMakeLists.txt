@@ -35,9 +35,14 @@ endfunction()
 
 set(BASIS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/system/basis_ffi.c" CACHE PATH "Filepath of basis_ffi.c to use (associated with the compiler version).")
 
-get_files(util_src util/Extra.sml
-    util/ByteString.sml util/Misc.sml util/Parser.sml util/Json.sml
-    util/BinaryParser.sml util/Http.sml)
+get_files(util_src 
+    util/Extra.sml
+    util/ByteString.sml 
+    util/Misc.sml 
+    util/Parser.sml 
+    util/Json.sml
+    util/BinaryParser.sml 
+    util/Http.sml)
 
 get_files(extraction_preamble_src
     # Require Extraction Files for Types
@@ -108,6 +113,7 @@ get_files(copland_am_src
 )
 
 get_files (posix_src_cake 
+    system/FFI.sml
     system/posix/sockets/SocketFFI.sml
     system/posix/time/TimeFFI.sml 
     system/posix/sys/SysFFI.sml
@@ -115,6 +121,7 @@ get_files (posix_src_cake
 
 get_files(posix_src_c
     system/shared_ffi_fns.c
+    system/buffer_manager.c
     ${BASIS_FILE}
     system/posix/sockets/socket_ffi.c
     system/posix/time/time_ffi.c

@@ -3,6 +3,7 @@
 #include <zmq.h>
 #include <assert.h>
 #include <string.h>
+#include <stdbool.h>
 #include "../../shared_ffi_fns.h"
 
 #define FFI_SUCCESS 0

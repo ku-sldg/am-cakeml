@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 // A macro for printing debugging info
-#define DEBUG_MODE 0
+#define DEBUG_MODE 1
 #if DEBUG_MODE
 #define DEBUG_PRINTF(...) fprintf(stderr, __VA_ARGS__)
 #else

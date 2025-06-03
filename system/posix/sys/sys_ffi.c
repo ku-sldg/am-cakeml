@@ -5,6 +5,7 @@
 #include <limits.h>
 #include <string.h>
 #include "../../shared_ffi_fns.h"
+#include "../../buffer_manager.h"
 
 #define SUCCESS 0x00
 #define BUFFER_OVERFLOW 0xe0
@@ -125,7 +126,7 @@ uint8_t read_until_eof(FILE *file, size_t INITIAL_BUFFER_SIZE, char **buffer, si
  * Output format in buffer 'a':
  * [  Success_Code  : 1 Byte ;
  *    OutputLength  : 4 Bytes (little-endian);
- *    Output        : OutputLength Bytes ;
+ *    OutputBuffId  : 4 Bytes (little-endian);
  * ]
  *
  * Return codes:
@@ -137,18 +138,22 @@ uint8_t read_until_eof(FILE *file, size_t INITIAL_BUFFER_SIZE, char **buffer, si
  * 0xff = Command execution failed (non-zero exit)
  * 0xed-0xef = Buffer allocation/read errors
  */
-void ffipopen_string(const char *commandIn, const long clen, uint8_t *a, const long alen)
+void ffipopen_string(const char *commandIn, const long clen, char *a, const long alen)
 {
   const uint8_t RESPONSE_CODE_START = 0;
   const uint8_t RESPONSE_CODE_LENGTH = 1;
-  const uint8_t OUTPUT_LENGTH_START = 1;
+  const uint8_t OUTPUT_LENGTH_START = RESPONSE_CODE_START + RESPONSE_CODE_LENGTH;
   const uint8_t OUTPUT_LENGTH_LENGTH = 4;
-  const uint8_t HEADER_LENGTH = RESPONSE_CODE_LENGTH + OUTPUT_LENGTH_LENGTH;
+  const uint8_t OUTPUT_BUFFER_ID_START = OUTPUT_LENGTH_START + OUTPUT_LENGTH_LENGTH;
+  const uint8_t OUTPUT_BUFFER_ID_LENGTH = 4; // Not used in this implementation, but reserved for future use
+  const uint8_t HEADER_LENGTH = OUTPUT_BUFFER_ID_START + OUTPUT_BUFFER_ID_LENGTH;
 
   // Input validation
-  if (commandIn == NULL || a == NULL || alen < HEADER_LENGTH || clen <= 0)
+  if (commandIn == NULL || a == NULL || alen != HEADER_LENGTH || clen <= 0)
   {
     DEBUG_PRINTF("ffipopen_string: Invalid input parameters\n");
+    DEBUG_PRINTF("ffipopen_string: commandIn: %p, clen: %ld, a: %p, alen: %ld\n",
+                 commandIn, clen, a, alen);
     if (a != NULL && alen >= 1)
     {
       a[RESPONSE_CODE_START] = FILE_READ_ERROR;
@@ -225,6 +230,7 @@ void ffipopen_string(const char *commandIn, const long clen, uint8_t *a, const l
     a[RESPONSE_CODE_START] = FAILED_TO_ALLOCATE_BUFFER;
     return;
   }
+
   // Cast the output length to a 32-bit integer, with error if too large
   if (output_length > UINT32_MAX)
   {
@@ -234,39 +240,43 @@ void ffipopen_string(const char *commandIn, const long clen, uint8_t *a, const l
     return;
   }
 
-  uint32_t output_size = (uint32_t)output_length + HEADER_LENGTH;
+  // uint32_t output_size = (uint32_t)output_length + HEADER_LENGTH;
 
-  // Check if we have enough space in the output array
-  if (output_size > alen)
-  {
-    DEBUG_PRINTF("ffipopen_string: Insufficient space for output (need %u, have %ld)\n", output_size, alen);
-    DEBUG_PRINTF("ffipopen_string: Output content (truncated): %.100s%s\n",
-                 buffer, output_length > 100 ? "..." : "");
-    free(buffer);
-    a[RESPONSE_CODE_START] = INSUFFICIENT_OUTPUT;
-    return;
-  }
+  // // Check if we have enough space in the output array
+  // if (output_size > alen)
+  // {
+  //   DEBUG_PRINTF("ffipopen_string: Insufficient space for output (need %u, have %ld)\n", output_size, alen);
+  //   DEBUG_PRINTF("ffipopen_string: Output content (truncated): %.100s%s\n",
+  //                buffer, output_length > 100 ? "..." : "");
+  //   free(buffer);
+  //   a[RESPONSE_CODE_START] = INSUFFICIENT_OUTPUT;
+  //   return;
+  // }
+
+  // Store the buffer in our buffer manager
+  int buffer_id = set_new_buffer(output_length, buffer);
+  DEBUG_PRINTF("ffipopen_string: Successfully copying %zu bytes to buffer %d\n", output_length, buffer_id);
 
   // Store output length in the header (little-endian format)
   // OUTPUT_LENGTH_START to (OUTPUT_LENGTH_START + OUTPUT_LENGTH_LENGTH)
   assert(sizeof(uint32_t) == OUTPUT_LENGTH_LENGTH);
-  for (int i = 0; i < OUTPUT_LENGTH_LENGTH; i++)
-  {
-    // Store the length of the payload, not including headers
-    a[OUTPUT_LENGTH_START + i] = (output_length >> (i * 8)) & 0xff;
-  }
+  assert(sizeof(uint32_t) == OUTPUT_BUFFER_ID_LENGTH);
+  int_to_qword(output_length, (unsigned char *)&a[OUTPUT_LENGTH_START]);
+  int_to_qword(buffer_id, (unsigned char *)&a[OUTPUT_BUFFER_ID_START]);
+  // for (int i = 0; i < OUTPUT_LENGTH_LENGTH; i++)
+  // {
+  //   // Store the length of the payload, not including headers
+  //   a[OUTPUT_LENGTH_START + i] = (output_length >> (i * 8)) & 0xff;
+  // }
+  // for (int i = 0; i < OUTPUT_BUFFER_ID_LENGTH; i++)
+  // {
+  //   // Store the buffer ID in little-endian format
+  //   a[OUTPUT_BUFFER_ID_START + i] = (buffer_id >> (i * 8)) & 0xff;
+  // }
 
   // Copy the buffer content to the output array
   a[RESPONSE_CODE_START] = SUCCESS;
-  DEBUG_PRINTF("ffipopen_string: Successfully copying %zu bytes to output\n", output_length);
-
-  for (size_t i = 0; i < output_length; i++)
-  {
-    a[HEADER_LENGTH + i] = (uint8_t)buffer[i];
-  }
-
   // Clean up and return
-  free(buffer);
   DEBUG_PRINTF("ffipopen_string: Function completed successfully\n");
   return;
 }
