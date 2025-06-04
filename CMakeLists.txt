@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.10.2)
 set(CMAKE_USER_MAKE_RULES_OVERRIDE "DefaultConfig.cmake")
 
+# Find ZeroMQ
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(ZMQ REQUIRED libzmq)
+
 
 set(CMAKE_OSX_ARCHITECTURES "x86_64" CACHE STRING "Used for MacOS to configure the architecture")
 project(CakemlAM C ASM)
@@ -31,9 +35,14 @@ endfunction()
 
 set(BASIS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/system/basis_ffi.c" CACHE PATH "Filepath of basis_ffi.c to use (associated with the compiler version).")
 
-get_files(util_src util/Extra.sml
-    util/ByteString.sml util/Misc.sml util/Parser.sml util/Json.sml
-    util/BinaryParser.sml util/Http.sml)
+get_files(util_src 
+    util/Extra.sml
+    util/ByteString.sml 
+    util/Misc.sml 
+    util/Parser.sml 
+    util/Json.sml
+    util/BinaryParser.sml 
+    util/Http.sml)
 
 get_files(extraction_preamble_src
     # Require Extraction Files for Types
@@ -104,6 +113,7 @@ get_files(copland_am_src
 )
 
 get_files (posix_src_cake 
+    system/FFI.sml
     system/posix/sockets/SocketFFI.sml
     system/posix/time/TimeFFI.sml 
     system/posix/sys/SysFFI.sml
@@ -111,6 +121,7 @@ get_files (posix_src_cake
 
 get_files(posix_src_c
     system/shared_ffi_fns.c
+    system/buffer_manager.c
     ${BASIS_FILE}
     system/posix/sockets/socket_ffi.c
     system/posix/time/time_ffi.c
@@ -165,7 +176,9 @@ function(build_posix_am name)
     if(${STATIC_LINKING})
         set(link_flags "-static-libgcc -static")
     endif()
-    target_link_libraries(${name} "${name}.cake" ${link_flags})
+    target_link_libraries(${name} "${name}.cake" ${ZMQ_LIBRARIES} ${link_flags})
+    target_include_directories(${name} PRIVATE ${ZMQ_INCLUDE_DIRS})
+    target_compile_options(${name} PRIVATE ${ZMQ_CFLAGS_OTHER})
 endfunction()
 
 file(GLOB appdirs apps/*)

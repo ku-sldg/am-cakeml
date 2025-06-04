@@ -12,6 +12,12 @@ jobs:
       CAKE_VERSION: v2747
 
     steps:
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libzmq3-dev
+
       ############### Setup and Caching for CakeML
       - name: Restore Cake Cache
         id: cake-cache-restore

@@ -1,385 +1,375 @@
-// FFI interface to UNIX-style network sockets.
+// ZeroMQ-based FFI for CakeML attestation manager
 
-// This socket interface is largely based on the example provided in the
-// getaddrinfo man page http://man7.org/linux/man-pages/man3/getaddrinfo.3.html
-
-// This macro is needed for getaddrinfo, as documented in the manpage.
-// gcc defines this macro by default, but CompCert does not.
-// We must therefore define it explicitly.
-#define _POSIX_C_SOURCE 201112L
-#include <stdio.h>
-#include <stdlib.h>
+#include <zmq.h>
+#include <assert.h>
 #include <string.h>
-#include <unistd.h>
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#include <errno.h>
-#include <assert.h>     // assert
-#include <stdint.h>     // uint8_t, uint16_6, etc.
-#include <sys/types.h>  // socket, bind, listen, getaddrinfo
-#include <sys/socket.h> // socket, bind, listen, getaddrinfo
-#include <netdb.h>      // getaddrinfo
-#include <string.h>     // memset, strerror
-#include <unistd.h>     // close
+#include <stdbool.h>
+#include <stdlib.h>
 #include "../../shared_ffi_fns.h"
-
-/**
- * Reads the message size prefix (4 bytes) from a socket.
- *
- * @param sock The socket file descriptor to read from.
- * @param size Pointer to store the message size (in host byte order).
- * @return 0 on success, -1 on failure.
- */
-int get_message_size(int sock, size_t *size)
-{
-  DEBUG_PRINTF("In function get_message_size\n");
-  DEBUG_PRINTF("Given arguments: sock=%d\n", sock);
-  uint32_t net_size;
-  ssize_t bytes_read = read(sock, &net_size, sizeof(net_size));
-  if (bytes_read == 0)
-  {
-    DEBUG_PRINTF("Connection closed by peer.\n");
-    return -1; // Connection closed
-  }
-  else if (bytes_read != sizeof(net_size))
-  {
-    DEBUG_PRINTF("Failed to read message size: %s\n", strerror(errno));
-    return -1; // Read error
-  }
-
-  *size = ntohl(net_size); // Convert from network byte order
-  return 0;                // Success
-}
-
-// Function to establish a listening socket on a given IP and port
-int listen_socket(const char *ip, int port, int queueLength)
-{
-  DEBUG_PRINTF("In function listen_socket\n");
-  DEBUG_PRINTF("Given arguments: ip=%s, port=%d, queueLength=%d\n", ip, port, queueLength);
-  int sock = socket(AF_INET, SOCK_STREAM, 0);
-  if (sock < 0)
-  {
-    DEBUG_PRINTF("Socket creation failed: %s\n", strerror(errno));
-    return -1;
-  }
-
-  int opt = 1;
-  if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
-  {
-    DEBUG_PRINTF("setsockopt(SO_REUSEADDR) failed: %s\n", strerror(errno));
-    close(sock);
-    return -1;
-  }
-
-  struct sockaddr_in server_addr;
-  server_addr.sin_family = AF_INET;
-  server_addr.sin_port = htons(port);
-
-  // Use INADDR_ANY if no IP is provided
-  if (ip == NULL)
-  {
-    DEBUG_PRINTF("Binding to all interfaces\n");
-    server_addr.sin_addr.s_addr = INADDR_ANY;
-  }
-  else if (inet_pton(AF_INET, ip, &server_addr.sin_addr) <= 0)
-  {
-    DEBUG_PRINTF("Invalid IP address: %s\n", ip);
-    close(sock);
-    return -1;
-  }
-
-  if (bind(sock, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0)
-  {
-    DEBUG_PRINTF("Bind failed: %s\n", strerror(errno));
-    close(sock);
-    return -1;
-  }
-
-  if (listen(sock, queueLength) < 0)
-  {
-    DEBUG_PRINTF("Listen failed: %s\n", strerror(errno));
-    close(sock);
-    return -1;
-  }
-
-  return sock;
-}
-
-// Function to accept a client connection
-int accept_socket(int listen_sock)
-{
-  DEBUG_PRINTF("In function accept_socket\n");
-  DEBUG_PRINTF("Given arguments: listen_sock=%d\n", listen_sock);
-  struct sockaddr_in client_addr;
-  socklen_t client_len = sizeof(client_addr);
-
-  int client_sock = accept(listen_sock, (struct sockaddr *)&client_addr, &client_len);
-  if (client_sock < 0)
-  {
-    DEBUG_PRINTF("Accept failed: %s\n", strerror(errno));
-    return -1;
-  }
-
-  printf("Connection accepted from %s:%d\n",
-         inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
-  return client_sock;
-}
-
-// Function to connect to a server
-int connect_socket(const char *ip, int port)
-{
-  DEBUG_PRINTF("In function connect_socket\n");
-  DEBUG_PRINTF("Given arguments: ip=%s, port=%d\n", ip, port);
-
-  int sock = socket(AF_INET, SOCK_STREAM, 0);
-  if (sock < 0)
-  {
-    DEBUG_PRINTF("Socket creation failed: %s\n", strerror(errno));
-    return -1;
-  }
-
-  struct addrinfo hints = {0}, *res;
-  hints.ai_family = AF_INET;       // Use IPv4
-  hints.ai_socktype = SOCK_STREAM; // Use TCP
-
-  // Convert port to a string for getaddrinfo
-  char port_str[6];
-  snprintf(port_str, sizeof(port_str), "%d", port);
-
-  // Resolve the hostname or IP address
-  if (getaddrinfo(ip, port_str, &hints, &res) != 0)
-  {
-    DEBUG_PRINTF("Failed to resolve IP address or hostname: %s\n", ip);
-    close(sock);
-    return -1;
-  }
-
-  // Attempt to connect to the resolved address
-  if (connect(sock, res->ai_addr, res->ai_addrlen) < 0)
-  {
-    DEBUG_PRINTF("Connection failed: %s\n", strerror(errno));
-    freeaddrinfo(res);
-    close(sock);
-    return -1;
-  }
-
-  freeaddrinfo(res); // Free memory allocated by getaddrinfo
-  return sock;       // Return the connected socket
-}
-
-int socket_read(int sock, void *out_data, size_t length)
-{
-  DEBUG_PRINTF("In function socket_read\n");
-  DEBUG_PRINTF("Given arguments: sock=%d, length=%zu\n", sock, length);
-  // Read the actual message
-  ssize_t bytes_read = read(sock, out_data, length);
-  if (bytes_read != (ssize_t)length)
-  {
-    DEBUG_PRINTF("Failed to read complete message: %s\n", strerror(errno));
-    return -1;
-  }
-
-  return 0; // Success
-}
-
-int socket_write(int sock, const void *data, size_t length)
-{
-  DEBUG_PRINTF("In function socket_write\n");
-  DEBUG_PRINTF("Given arguments: sock=%d, length=%zu\n", sock, length);
-  // Send the length of the message (4 bytes)
-  uint32_t net_length = htonl(length); // Convert to network byte order
-  if (write(sock, &net_length, sizeof(net_length)) != sizeof(net_length))
-  {
-    DEBUG_PRINTF("Failed to send message length: %s\n", strerror(errno));
-    return -1;
-  }
-
-  // Send the actual message
-  if (write(sock, data, length) != (ssize_t)length)
-  {
-    DEBUG_PRINTF("Failed to send message data: %s\n", strerror(errno));
-    return -1;
-  }
-
-  return 0; // Success
-}
+#include "../../buffer_manager.h"
 
 #define FFI_SUCCESS 0
 #define FFI_FAILURE 1
 
-// Arguments: queueLength [0:3], port [4:7]
-// Returns: failure flag in a[0], sockfd as 32-bit int in a[1..4]
-void ffilisten(uint8_t *c, const long clen, uint8_t *a, const long alen)
+static void *zmq_context = NULL;
+static void *zmq_sockets[256]; // Simple socket registry
+static int next_socket_id = 1;
+
+// Initialize ZeroMQ context (call once at startup)
+void ffizmq_init(uint8_t *c, const long clen, uint8_t *a, const long alen)
 {
-  DEBUG_PRINTF("In function ffilisten\n");
-  assert(clen == 8);
-  int queueLength = qword_to_int(c);
-  int port = qword_to_int(c + 4);
-  assert(alen == 5);
+  DEBUG_PRINTF("[ZMQ_INIT] Starting ZeroMQ initialization\n");
+  assert(alen >= 1);
 
-  // NOTE: We utilize NULL for IP here to bind to all available interfaces
-  int server_sockfd = listen_socket(NULL, port, queueLength);
-  if (server_sockfd < 0)
+  if (zmq_context == NULL)
   {
-    a[0] = FFI_FAILURE;
-    return;
+    DEBUG_PRINTF("[ZMQ_INIT] Creating new ZeroMQ context\n");
+    zmq_context = zmq_ctx_new();
+    if (zmq_context)
+    {
+      DEBUG_PRINTF("[ZMQ_INIT] ZeroMQ context created successfully\n");
+      a[0] = FFI_SUCCESS;
+    }
+    else
+    {
+      DEBUG_PRINTF("[ZMQ_INIT] ERROR: Failed to create ZeroMQ context\n");
+      a[0] = FFI_FAILURE;
+    }
   }
-
-  // return sockfd
-  a[0] = FFI_SUCCESS;
-  int_to_qword(server_sockfd, a + 1);
+  else
+  {
+    DEBUG_PRINTF("[ZMQ_INIT] ZeroMQ context already exists, reusing\n");
+    a[0] = FFI_SUCCESS; // Already initialized
+  }
 }
 
-// Argument: sockfd as 64-bit int in c
-// Returns: failure flag in a[0], conn_sockfd as 32-bit int in a[1..5]
-// Blocks until there is an incoming connection
-void ffiaccept(uint8_t *c, const long clen, uint8_t *a, const long alen)
+// Create a server socket (ZMQ_REP pattern for attestation requests)
+void ffizmq_listen(uint8_t *c, const long clen, uint8_t *a, const long alen)
 {
-  DEBUG_PRINTF("In function ffiaccept\n");
+  DEBUG_PRINTF("[ZMQ_LISTEN] Starting server socket creation\n");
   assert(clen == 4);
-  int sockfd = qword_to_int(c);
-  assert(alen == 5);
-  int connection_fd = accept_socket(sockfd);
-  if (connection_fd < 0)
-  {
-    a[0] = FFI_FAILURE;
-    return;
-  }
-  // return connection_fd
-  a[0] = FFI_SUCCESS;
-  int_to_qword(connection_fd, a + 1);
-}
+  assert(alen >= 5);
 
-/**
-c: port [0:4], host is remainder of message
-clen > 5
-a: flag [0], sockfd [1:5] */
-void fficonnect(uint8_t *c, const long clen, uint8_t *a, const long alen)
-{
-  DEBUG_PRINTF("In function fficonnect\n");
-  assert(clen >= 2); // Assumes there are at least the null byte delimiter and terminator
-  assert(alen == 5);
-
-  // Parse arguments
   int port = qword_to_int(c);
-  // Take slice from c[4 : clen]
-  char *host = (char *)c + 4;
-  DEBUG_PRINTF("Connecting to %s:%d\n", host, port);
+  DEBUG_PRINTF("[ZMQ_LISTEN] Port: %d\n", port);
 
-  // Do connection
-  int sockfd = connect_socket(host, port);
-  if (sockfd < 0)
+  if (!zmq_context)
   {
+    DEBUG_PRINTF("[ZMQ_LISTEN] ERROR: ZeroMQ context not initialized\n");
     a[0] = FFI_FAILURE;
     return;
   }
-  // return sockfd
-  a[0] = FFI_SUCCESS;
-  int_to_qword(sockfd, a + 1);
-}
 
-/**
-c: sockfd [0:4],
-clen: 4
-a: success flag [0], msg_length [1:5],
-alen: 5
-*/
-void ffisocket_get_message_length(uint8_t *c, const long clen, uint8_t *a, const long alen)
-{
-  DEBUG_PRINTF("In function ffisocket_get_message_length\n");
-  assert(clen == 4);
-  int sockfd = qword_to_int(c);
-  DEBUG_PRINTF("Getting message length from socket %d\n", sockfd);
-  assert(alen == 5);
-  size_t msg_length;
-  if (get_message_size(sockfd, &msg_length) < 0)
+  void *socket = zmq_socket(zmq_context, ZMQ_REP);
+  if (!socket)
   {
+    DEBUG_PRINTF("[ZMQ_LISTEN] ERROR: Failed to create ZMQ_REP socket\n");
     a[0] = FFI_FAILURE;
     return;
   }
-  DEBUG_PRINTF("Message length: %zu\n", msg_length);
-  a[0] = FFI_SUCCESS;
-  int_to_qword(msg_length, a + 1);
-}
+  DEBUG_PRINTF("[ZMQ_LISTEN] ZMQ_REP socket created successfully\n");
 
-/**
- * c: sockfd [0:3]
- * clen: 4
- * a: success flag [0]
- * alen: 1
- */
-void ffisocket_close(uint8_t *c, const long clen, uint8_t *a, const long alen)
-{
-  DEBUG_PRINTF("In function ffisocket_close\n");
-  assert(clen == 4);
-  int sockfd = qword_to_int(c);
-  DEBUG_PRINTF("Closing socket %d\n", sockfd);
-  assert(alen == 1);
-  if (shutdown(sockfd, SHUT_RDWR) < 0)
+  char endpoint[64];
+  snprintf(endpoint, sizeof(endpoint), "tcp://*:%d", port);
+  DEBUG_PRINTF("[ZMQ_LISTEN] Binding to endpoint: %s\n", endpoint);
+
+  if (zmq_bind(socket, endpoint) != 0)
   {
-    DEBUG_PRINTF("Failed to shutdown socket: %s\n", strerror(errno));
+    DEBUG_PRINTF("[ZMQ_LISTEN] ERROR: Failed to bind to %s, zmq_errno: %d\n", endpoint, zmq_errno());
+    zmq_close(socket);
     a[0] = FFI_FAILURE;
     return;
   }
+  DEBUG_PRINTF("[ZMQ_LISTEN] Successfully bound to %s\n", endpoint);
+
+  // Store socket and return ID
+  int socket_id = next_socket_id++;
+  zmq_sockets[socket_id] = socket;
+  DEBUG_PRINTF("[ZMQ_LISTEN] Socket stored with ID: %d\n", socket_id);
+
   a[0] = FFI_SUCCESS;
+  int_to_qword(socket_id, a + 1);
+  DEBUG_PRINTF("[ZMQ_LISTEN] Server socket creation completed successfully\n");
 }
 
-/**
-c: c[0:4] is sockfd, c[4:] is the message to write
-clen: length of message
-a: success flag [0], # bytes written [1:5]
-alen: 5
-*/
-void ffisocket_write(uint8_t *c, const long clen, uint8_t *a, const long alen)
+// Connect to a server (ZMQ_REQ pattern for sending attestation requests)
+void ffizmq_connect(uint8_t *c, const long clen, uint8_t *a, const long alen)
 {
-  DEBUG_PRINTF("In function ffisocket_write\n");
+  DEBUG_PRINTF("[ZMQ_CONNECT] Starting client connection\n");
+  assert(clen >= 6); // port (4) + host (at least 2)
+  assert(alen >= 5);
+
+  int port = qword_to_int(c);
+  char host[256];
+  int host_len = clen - 4;
+  DEBUG_PRINTF("[ZMQ_CONNECT] Port: %d, Host length: %d\n", port, host_len);
+
+  if (host_len >= sizeof(host))
+  {
+    DEBUG_PRINTF("[ZMQ_CONNECT] ERROR: Host name too long (%d >= %zu)\n", host_len, sizeof(host));
+    a[0] = FFI_FAILURE;
+    return;
+  }
+
+  memcpy(host, c + 4, host_len);
+  host[host_len] = '\0';
+  DEBUG_PRINTF("[ZMQ_CONNECT] Host: %s\n", host);
+
+  if (!zmq_context)
+  {
+    DEBUG_PRINTF("[ZMQ_CONNECT] ERROR: ZeroMQ context not initialized\n");
+    a[0] = FFI_FAILURE;
+    return;
+  }
+
+  void *socket = zmq_socket(zmq_context, ZMQ_REQ);
+  if (!socket)
+  {
+    DEBUG_PRINTF("[ZMQ_CONNECT] ERROR: Failed to create ZMQ_REQ socket\n");
+    a[0] = FFI_FAILURE;
+    return;
+  }
+  DEBUG_PRINTF("[ZMQ_CONNECT] ZMQ_REQ socket created successfully\n");
+
+  char endpoint[512];
+  snprintf(endpoint, sizeof(endpoint), "tcp://%s:%d", host, port);
+  DEBUG_PRINTF("[ZMQ_CONNECT] Connecting to endpoint: %s\n", endpoint);
+
+  if (zmq_connect(socket, endpoint) != 0)
+  {
+    DEBUG_PRINTF("[ZMQ_CONNECT] ERROR: Failed to connect to %s, zmq_errno: %d\n", endpoint, zmq_errno());
+    zmq_close(socket);
+    a[0] = FFI_FAILURE;
+    return;
+  }
+  DEBUG_PRINTF("[ZMQ_CONNECT] Successfully connected to %s\n", endpoint);
+
+  int socket_id = next_socket_id++;
+  zmq_sockets[socket_id] = socket;
+  DEBUG_PRINTF("[ZMQ_CONNECT] Socket stored with ID: %d\n", socket_id);
+
+  a[0] = FFI_SUCCESS;
+  int_to_qword(socket_id, a + 1);
+  DEBUG_PRINTF("[ZMQ_CONNECT] Client connection completed successfully\n");
+}
+
+// Send a message using zmq_msg_send
+void ffizmq_send(uint8_t *c, const long clen, uint8_t *a, const long alen)
+{
+  DEBUG_PRINTF("[ZMQ_SEND] Starting message send\n");
   assert(clen >= 5);
-  // Parse arguments
-  int sockfd = qword_to_int(c);
-  DEBUG_PRINTF("Writing to socket %d\n", sockfd);
-  // Take slice from c[4 : clen]
-  // but we must be careful since c might have extra NULL characters in it
-  int n = clen - 4;
-  char *buffer = (char *)c + 4;
-  DEBUG_PRINTF("Message length: %d\n", n);
-  assert(alen == 5);
+  assert(alen >= 1);
 
-  // Write to socket
-  ssize_t bytes_written = socket_write(sockfd, buffer, n);
-  if (bytes_written < 0)
+  int socket_id = qword_to_int(c);
+  DEBUG_PRINTF("[ZMQ_SEND] Socket ID: %d\n", socket_id);
+
+  void *socket = zmq_sockets[socket_id];
+  if (!socket)
   {
+    DEBUG_PRINTF("[ZMQ_SEND] ERROR: Invalid socket ID %d\n", socket_id);
     a[0] = FFI_FAILURE;
     return;
   }
 
-  // return bytes_written
-  a[0] = FFI_SUCCESS;
-  int_to_qword(bytes_written, a + 1);
-}
+  int msg_len = clen - 4;
+  char *msg_data = (char *)c + 4;
+  DEBUG_PRINTF("[ZMQ_SEND] Message length: %d\n", msg_len);
+  DEBUG_PRINTF("[ZMQ_SEND] Message data (first 50 chars): %.50s%s\n",
+               msg_data, msg_len > 50 ? "..." : "");
 
-/**
-c : sockfd [0:3], msg_size [4:7]
-clen: 8
-a : success flag [0], [1: msg_size + 1] message
-alen : msg_size + 1
-*/
-void ffisocket_read(uint8_t *c, const long clen, uint8_t *a, const long alen)
-{
-  DEBUG_PRINTF("In function ffisocket_read\n");
-  assert(clen == 8); // Ensure control buffer is the correct size
-
-  int sockfd = qword_to_int(c);
-  int msg_size = qword_to_int(c + 4);
-
-  // Ensure output buffer is large enough
-  assert(alen == msg_size + 1);
-
-  // Read the message into `a + 1`
-  if (socket_read(sockfd, a + 1, msg_size) < 0)
+  // Initialize ZMQ message
+  zmq_msg_t message;
+  if (zmq_msg_init_size(&message, msg_len) != 0)
   {
-    a[0] = FFI_FAILURE; // Indicate failure
+    DEBUG_PRINTF("[ZMQ_SEND] ERROR: Failed to initialize message, zmq_errno: %d\n", zmq_errno());
+    a[0] = FFI_FAILURE;
     return;
   }
 
-  a[0] = FFI_SUCCESS; // Indicate success
+  // Copy data into the message
+  memcpy(zmq_msg_data(&message), msg_data, msg_len);
+
+  // Send the message
+  int result = zmq_msg_send(&message, socket, 0);
+  if (result == msg_len)
+  {
+    DEBUG_PRINTF("[ZMQ_SEND] Successfully sent %d bytes\n", result);
+    a[0] = FFI_SUCCESS;
+  }
+  else
+  {
+    DEBUG_PRINTF("[ZMQ_SEND] ERROR: Send failed, sent %d bytes (expected %d), zmq_errno: %d\n",
+                 result, msg_len, zmq_errno());
+    a[0] = FFI_FAILURE;
+  }
+
+  // Clean up the message
+  zmq_msg_close(&message);
+}
+
+// Receive a message using zmq_msg_recv
+void ffizmq_recv(uint8_t *c, const long clen, uint8_t *a, const long alen)
+{
+  DEBUG_PRINTF("[ZMQ_RECV] Starting message receive\n");
+  assert(clen >= 4);
+  assert(alen >= 9); // 1 byte status + 4 bytes length + 4 bytes buffer_id
+
+  const uint8_t RESPONSE_CODE_START = 0;
+  const uint8_t OUTPUT_LENGTH_START = 1;
+  const uint8_t OUTPUT_BUFFER_ID_START = 5;
+
+  int socket_id = qword_to_int(c);
+  DEBUG_PRINTF("[ZMQ_RECV] Socket ID: %d\n", socket_id);
+
+  void *socket = zmq_sockets[socket_id];
+  if (!socket)
+  {
+    DEBUG_PRINTF("[ZMQ_RECV] ERROR: Invalid socket ID %d\n", socket_id);
+    a[RESPONSE_CODE_START] = FFI_FAILURE;
+    return;
+  }
+
+  // Initialize ZMQ message
+  zmq_msg_t message;
+  if (zmq_msg_init(&message) != 0)
+  {
+    DEBUG_PRINTF("[ZMQ_RECV] ERROR: Failed to initialize message, zmq_errno: %d\n", zmq_errno());
+    a[RESPONSE_CODE_START] = FFI_FAILURE;
+    return;
+  }
+
+  // Receive the message
+  int nbytes = zmq_msg_recv(&message, socket, 0);
+  if (nbytes < 0)
+  {
+    DEBUG_PRINTF("[ZMQ_RECV] ERROR: Receive failed with %d bytes, zmq_errno: %d\n",
+                 nbytes, zmq_errno());
+    zmq_msg_close(&message);
+    a[RESPONSE_CODE_START] = FFI_FAILURE;
+    return;
+  }
+
+  // Get message size and data
+  size_t msg_size = zmq_msg_size(&message);
+  void *msg_data = zmq_msg_data(&message);
+
+  DEBUG_PRINTF("[ZMQ_RECV] Successfully received %zu bytes\n", msg_size);
+  if (msg_size > 0)
+  {
+    DEBUG_PRINTF("[ZMQ_RECV] Message data (first 100 chars): %.100s%s\n",
+                 (char *)msg_data, msg_size > 100 ? "..." : "");
+  }
+
+  // Allocate a buffer for the message data
+  char *msg_buffer = malloc(msg_size);
+  if (!msg_buffer)
+  {
+    DEBUG_PRINTF("[ZMQ_RECV] ERROR: Failed to allocate message buffer\n");
+    zmq_msg_close(&message);
+    a[RESPONSE_CODE_START] = FFI_FAILURE;
+    return;
+  }
+
+  // Copy the message data
+  memcpy(msg_buffer, msg_data, msg_size);
+
+  // Clean up the ZMQ message
+  zmq_msg_close(&message);
+
+  // Store the message in the buffer manager
+  int buffer_id = set_new_buffer(msg_size, msg_buffer);
+  if (buffer_id < 0)
+  {
+    DEBUG_PRINTF("[ZMQ_RECV] ERROR: Failed to store message in buffer manager\n");
+    free(msg_buffer);
+    a[RESPONSE_CODE_START] = FFI_FAILURE;
+    return;
+  }
+
+  DEBUG_PRINTF("[ZMQ_RECV] Message stored in buffer ID: %d\n", buffer_id);
+
+  // Set response data
+  a[RESPONSE_CODE_START] = FFI_SUCCESS;
+  int_to_qword(msg_size, a + OUTPUT_LENGTH_START);
+  int_to_qword(buffer_id, a + OUTPUT_BUFFER_ID_START);
+}
+
+// Close socket
+void ffizmq_close(uint8_t *c, const long clen, uint8_t *a, const long alen)
+{
+  DEBUG_PRINTF("[ZMQ_CLOSE] Starting socket close\n");
+  assert(clen >= 4);
+  assert(alen >= 1);
+
+  int socket_id = qword_to_int(c);
+  DEBUG_PRINTF("[ZMQ_CLOSE] Socket ID: %d\n", socket_id);
+
+  void *socket = zmq_sockets[socket_id];
+
+  if (socket)
+  {
+    DEBUG_PRINTF("[ZMQ_CLOSE] Closing socket with ID %d\n", socket_id);
+    int result = zmq_close(socket);
+    if (result != 0)
+    {
+      DEBUG_PRINTF("[ZMQ_CLOSE] WARNING: zmq_close returned %d, zmq_errno: %d\n", result, zmq_errno());
+    }
+    else
+    {
+      DEBUG_PRINTF("[ZMQ_CLOSE] Socket closed successfully\n");
+    }
+    zmq_sockets[socket_id] = NULL;
+    a[0] = FFI_SUCCESS;
+  }
+  else
+  {
+    DEBUG_PRINTF("[ZMQ_CLOSE] ERROR: Socket ID %d not found or already closed\n", socket_id);
+    a[0] = FFI_FAILURE;
+  }
+}
+
+// Cleanup (call at program exit)
+void ffizmq_cleanup(uint8_t *c, const long clen, uint8_t *a, const long alen)
+{
+  DEBUG_PRINTF("[ZMQ_CLEANUP] Starting ZeroMQ cleanup\n");
+
+  if (zmq_context)
+  {
+    DEBUG_PRINTF("[ZMQ_CLEANUP] Closing remaining sockets\n");
+    // Close any remaining sockets
+    int closed_count = 0;
+    for (int i = 0; i < 256; i++)
+    {
+      if (zmq_sockets[i])
+      {
+        DEBUG_PRINTF("[ZMQ_CLEANUP] Closing socket ID %d\n", i);
+        zmq_close(zmq_sockets[i]);
+        zmq_sockets[i] = NULL;
+        closed_count++;
+      }
+    }
+    DEBUG_PRINTF("[ZMQ_CLEANUP] Closed %d sockets\n", closed_count);
+
+    DEBUG_PRINTF("[ZMQ_CLEANUP] Destroying ZeroMQ context\n");
+    int result = zmq_ctx_destroy(zmq_context);
+    if (result != 0)
+    {
+      DEBUG_PRINTF("[ZMQ_CLEANUP] WARNING: zmq_ctx_destroy returned %d, zmq_errno: %d\n", result, zmq_errno());
+    }
+    else
+    {
+      DEBUG_PRINTF("[ZMQ_CLEANUP] ZeroMQ context destroyed successfully\n");
+    }
+    zmq_context = NULL;
+  }
+  else
+  {
+    DEBUG_PRINTF("[ZMQ_CLEANUP] No ZeroMQ context to clean up\n");
+  }
+
+  if (alen >= 1)
+  {
+    a[0] = FFI_SUCCESS;
+  }
+  DEBUG_PRINTF("[ZMQ_CLEANUP] ZeroMQ cleanup completed\n");
 }

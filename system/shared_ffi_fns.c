@@ -40,9 +40,16 @@ void int_to_byte8(int i, unsigned char *b)
   b[7] = (long long)i & 0xFF;
 }
 
-int byte8_to_int(unsigned char *b)
+long long byte8_to_longlong(unsigned char *b)
 {
   return (((long long)b[0] << 56) | ((long long)b[1] << 48) |
           ((long long)b[2] << 40) | ((long long)b[3] << 32) |
-          (b[4] << 24) | (b[5] << 16) | (b[6] << 8) | b[7]);
+          ((long long)b[4] << 24) | ((long long)b[5] << 16) | 
+          ((long long)b[6] << 8) | (long long)b[7]);
+}
+
+int byte8_to_int(unsigned char *b)
+{
+  // Only use lower 32 bits to avoid truncation issues
+  return ((b[4] << 24) | (b[5] << 16) | (b[6] << 8) | b[7]);
 }

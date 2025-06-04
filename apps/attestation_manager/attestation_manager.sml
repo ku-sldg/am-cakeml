@@ -8,47 +8,46 @@ When things go well, handle_AM_request returns a string response that holds an
 When things go wrong, handle_AM_request returns a raw error message string. 
   In the future, we may want to wrap said error messages in JSON as well to make 
   it easier on the client. *)
-fun respondToMsg ammconf client nonce = 
-  let val inString  = Socket.read client 
+fun respondToMsg ammconf socket nonce = 
+  let val inString  = SocketFFI.recv socket 
       val _ = print ("\n\nReceived request string: \n" ^ inString ^ "\n")
       val time = timestamp ()
       val _ = TextIOExtra.printLn ("Time: " ^ Int.toString time)
       val outString = handle_AM_request ammconf inString nonce
       val _ = print ("\n\nSending response string: \n" ^ outString) 
-      val num_written = Socket.write client outString
-      val _ = print ("Closing Socket")
-      val _ = Socket.close client
-      val _ = print ("Closed Socket")
+      val num_sent = SocketFFI.send socket outString
+      val _ = print ("Response sent")
   in 
     ()
   end
   handle Json.Exn s1 s2 =>
           (TextIO.print_err ("JSON error" ^ s1 ^ ": " ^ s2 ^ "\n"); ())
             
-fun handleIncoming (listener_and_ammconf) =
-    let val (listener, ammconf) = listener_and_ammconf
-        val client = Socket.accept listener
-        val _ = TextIOExtra.printLn "Accepted connection\n"
+fun handleIncoming (socket_and_ammconf) =
+    let val (socket, ammconf) = socket_and_ammconf
+        val _ = TextIOExtra.printLn "Waiting for request\n"
         val nonceval = passed_bs (* BString.fromString "anonce" *) (* TODO: should this be hardcoded here? *)
-        val _ = respondToMsg ammconf client nonceval
+        val _ = respondToMsg ammconf socket nonceval
         val _ = print "Responded to message\n"
     in 
       ()
     end
-    handle Socket.Err s     => TextIOExtra.printLn_err ("Socket failure: " ^ s)
+    handle SocketFFI.Exception s     => TextIOExtra.printLn_err ("Socket failure: " ^ s)
 
 
 (* coq_AM_Config -> unit *)
 fun startServer ammconf =
-    let val queueLength = 5 (* TODO: Hardcoded queuelength *)
-        val (Coq_mkAM_Man_Conf man aspBin uuidStr) = ammconf
+    let val (Coq_mkAM_Man_Conf man aspBin uuidStr) = ammconf
         val (ip, port) = decodeUUID uuidStr
         val _ = TextIOExtra.printLn ("Starting up Server")
-        val _ = TextIOExtra.printLn ("On port: " ^ (Int.toString port) ^ "\nQueue Length: " ^ (Int.toString queueLength))
+        val _ = TextIOExtra.printLn ("On port: " ^ (Int.toString port))
+        val _ = SocketFFI.init ()
+        val socket = SocketFFI.listen port
+        val _ = TextIOExtra.printLn ("Server listening on socket")
     in 
-     loop handleIncoming ((Socket.listen port queueLength), ammconf)
+     loop handleIncoming (socket, ammconf)
     end
-    handle Socket.Err s => TextIO.print_err ("Socket failure on listener instantiation: " ^ s ^ "\n")
+    handle SocketFFI.Exception s => TextIO.print_err ("Socket failure on server startup: " ^ s ^ "\n")
          | Exception s => TextIO.print_err ("EXCEPTION: " ^ s ^ "\n")
          | Json.Exn s1 s2 => TextIO.print_err ("Json Exception: " ^ s1 ^ "\n" ^ s2 ^ "\n")
          | Result.Exn => TextIO.print_err ("Result Exn:\n")

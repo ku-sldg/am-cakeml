@@ -1,100 +1,94 @@
-(* Depends on: Util *)
+(* ZeroMQ FFI interface for CakeML *)
 
-(* Safe(ish) wrapper to FFI socket functions *)
-structure Socket = struct
-  (* Generic socket exception *)
-  exception Err string
+structure SocketFFI = struct
+  exception Exception string
 
   local
-    datatype sockfd = Fd BString.bstring
-    fun getFd (Fd s) = s
-    fun getFdString (Fd s) = (BString.toString s)
+    fun ffi_zmq_init x y = #(zmq_init) x y
+    fun ffi_zmq_listen x y = #(zmq_listen) x y  
+    fun ffi_zmq_connect x y = #(zmq_connect) x y
+    fun ffi_zmq_send x y = #(zmq_send) x y
+    fun ffi_zmq_recv x y = #(zmq_recv) x y
+    fun ffi_zmq_close x y = #(zmq_close) x y
+    fun ffi_zmq_cleanup x y = #(zmq_cleanup) x y
 
-    fun ffi_listen  x y = #(listen)  x y
-    fun ffi_accept  x y = #(accept)  x y
-    fun ffi_socket_close   x y = #(socket_close)   x y
-    fun ffi_connect x y = #(connect) x y
-    fun ffi_get_message_length x y = #(socket_get_message_length) x y
-    fun ffi_socket_write x y = #(socket_write) x y
-    fun ffi_socket_read x y = #(socket_read) x y
+    datatype socket = Socket int
+    
+    fun getSocketId (Socket id) = id
+    
+    (* Track initialization state to avoid multiple init calls *)
+    val zmq_initialized = Ref False
+    
+    (* Internal function to ensure ZMQ is initialized *)
+    fun ensureInit () = 
+      if not (!zmq_initialized) then
+        (case FFI.callOpt ffi_zmq_init 0 BString.empty of
+           Some _ => zmq_initialized := True
+         | None => raise (Exception "Failed to initialize ZeroMQ"))
+      else ()
   in
-    type sockfd = sockfd
+    type socket = socket
 
-    (* int -> int -> sockfd *)
-    (* Takes a port number and maximum queue length, and returns the fd of a new actively listening socket *)
-    fun listen port qLen = 
-      let val payload = BString.concat (BString.int_to_qword qLen) (BString.int_to_qword port)
+    (* Initialize ZeroMQ - call once at startup (now optional - auto-called) *)
+    fun init () = ensureInit ()
+
+    (* Create a server socket listening on port *)
+    fun listen port = 
+      let val _ = ensureInit ()
+          val payload = BString.int_to_qword port
       in 
-        case FFI.callOpt ffi_listen 4 payload of 
-          Some bsv => Fd bsv
-        | None => raise (Err "Error in listen()")
+        case FFI.callOpt ffi_zmq_listen 4 payload of
+          Some bsv => Socket (BString.qword_to_int bsv)
+        | None => raise (Exception "Failed to create listening socket")
       end
 
-    (* sockfd -> sockfd *)
-    (* Takes the fd of an actively listening socket, returns the fd of a connection *)
-    (* Blocks until there is an incoming connection *)
-    fun accept sockfd = 
-      case FFI.callOpt ffi_accept 4 (getFd sockfd) of 
-        Some bsv => Fd bsv
-      | None => raise (Err "Error in accept()")
-
-    (* string -> int -> sockfd *)
-    (* Takes the host in the format of a domain name or IPv4 address,
-        and port, an integer corresponding to a port number. Returns a fd. *)
+    (* Connect to a server *)
     fun connect host port = 
-      let 
-        val payload = BString.concat (BString.int_to_qword port) (BString.concat (BString.fromString host) BString.nullByte)
+      let val _ = ensureInit ()
+          val payload = BString.concat (BString.int_to_qword port) (BString.fromString host)
       in 
-        case FFI.callOpt ffi_connect 4 payload of 
-          Some bsv => Fd bsv
-        | None => raise (Err "Error in connect()")
+        case FFI.callOpt ffi_zmq_connect 4 payload of
+          Some bsv => Socket (BString.qword_to_int bsv)
+        | None => raise (Exception ("Failed to connect to " ^ host ^ ":" ^ Int.toString port))
       end
 
-    (* sockfd -> int *)
-    (* Take in a socket FD and return the size of the message that is pending read in the FD *)
-    fun get_message_length fd = 
-      case FFI.callOpt ffi_get_message_length 4 (getFd fd) of 
-        Some bsv => BString.qword_to_int bsv
-      | None => raise (Err "Error in get_message_length()")
-
-    (* sockfd -> string -> int (# bytes written) *)
-    (* Takes a socket fd and a string to write the socket
-       should always return `n` s.t. `n` = length s
-       Unless an error occured *)
-    fun write fd s = 
-      let 
-        val payload = BString.concat (getFd fd) (BString.fromString s)
+    (* Send a message - much simpler than raw sockets! *)
+    fun send socket msg = 
+      let val socket_id = getSocketId socket
+          val payload = BString.concat (BString.int_to_qword socket_id) (BString.fromString msg)
       in
-        case FFI.callOpt ffi_socket_write 4 payload of 
-          Some bsv => BString.qword_to_int bsv
-        | None => raise (Err "Error in write()")
+        case FFI.callOpt ffi_zmq_send 0 payload of
+          Some _ => ()
+        | None => raise (Exception "Failed to send message")
       end
 
-    (* sockfd -> string *)
-    fun read fd = 
-      let 
-        (* first we want to see the incoming msg size *)
-        val msg_size = get_message_length fd
-        val payload = BString.concat (getFd fd) (BString.int_to_qword msg_size)
+    (* Receive a message - ZeroMQ handles message boundaries automatically *)
+    fun recv socket = 
+      let val socket_id = getSocketId socket
+          val payload = BString.int_to_qword socket_id
       in
-        case FFI.callOpt ffi_socket_read msg_size payload of
-          Some bsv => 
-          (* bsv contains how much was read, which should = msg_size *)
-          if BString.length bsv = msg_size
-          then (BString.toString bsv)
-          else raise (Err "Error in read(), we did not read all the bytes")
-        | None => raise (Err "Error in read()")
+        let val result = FFI.buffered_call ffi_zmq_recv payload
+        in BString.toString result
+        end
+        handle _ => raise (Exception "Failed to receive message")
       end
 
-    (* sockfd -> unit *)
-    fun close fd = 
-      let 
-        val payload = getFd fd
+    (* Close socket *)
+    fun close socket = 
+      let val socket_id = getSocketId socket
+          val payload = BString.int_to_qword socket_id
       in
-        case FFI.callOpt ffi_socket_close 0 payload of 
-          Some bsv => ()
-        | None => raise (Err "Error in close()")
+        case FFI.callOpt ffi_zmq_close 0 payload of
+          Some _ => ()
+        | None => raise (Exception "Failed to close socket")
       end
 
-  end 
+    (* Cleanup ZeroMQ - call at program exit *)
+    fun cleanup () = 
+      case FFI.callOpt ffi_zmq_cleanup 0 BString.empty of
+        Some _ => ()
+      | None => raise (Exception "Failed to cleanup ZeroMQ")
+
+  end
+
 end
